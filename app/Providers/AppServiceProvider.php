@@ -8,13 +8,17 @@ use App\Http\Middleware\EnsureLegalAcceptance;
 use App\Http\Middleware\EnsureSuperadmin;
 use App\Http\Middleware\ForbidWhileImpersonating;
 use App\Http\Middleware\ResolveOrganization;
+use App\Models\Diagnosis;
+use App\Models\OrganizationValueSet;
 use App\Models\User;
+use App\Models\Value;
 use App\Services\Alerting\ErrorAlerter;
 use App\Services\Auth\ImpersonationService;
 use App\Support\CurrentOrganization;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Gate;
@@ -46,6 +50,13 @@ class AppServiceProvider extends ServiceProvider
         $this->reportFailedJobs();
         $this->configureRateLimiting();
         $this->configureGates();
+
+        // Stable names in polymorphic columns (versions, inbox), independent of class names.
+        Relation::enforceMorphMap([
+            'value' => Value::class,
+            'organization_value_set' => OrganizationValueSet::class,
+            'diagnosis' => Diagnosis::class,
+        ]);
 
         // Livewire update requests run these again, so actions are checked like page loads.
         Livewire::addPersistentMiddleware([

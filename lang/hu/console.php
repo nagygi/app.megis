@@ -21,4 +21,17 @@ return [
         'unlocked' => ':email fiókja feloldva, a hibás próbálkozások számlálója nullázva.',
     ],
 
+    'values_import' => [
+        'invalid_file' => 'Nem található xlsx vagy csv fájl: :path',
+        'missing_name_column' => 'Hiányzik a „Név” oszlop az első sorból.',
+        'ignored_column' => 'Ismeretlen oszlop, kimarad: :column',
+        'skipped' => 'Már az Értéktárban van, kimarad: :name',
+        'duplicate' => ':line. sor: a(z) „:name” név kétszer szerepel a táblázatban.',
+        'row_error' => ':line. sor: :message',
+        'failed' => 'Hibás sorok miatt semmi nem került be. Javítsd a táblázatot, és futtasd újra.',
+        'dry_run' => 'Ellenőrzés kész, :count érték kerülne be. Nem töltöttünk be semmit.',
+        'category_created' => 'Új kategória: :name',
+        'imported' => ':count érték bekerült az Értéktárba, mindegyik v1-ként.',
+    ],
+
 ];

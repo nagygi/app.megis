@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['type', 'name', 'slug', 'description', 'contact_admin_id', 'product_id', 'headcount_limit'])]
 class Organization extends Model
@@ -52,6 +53,14 @@ class Organization extends Model
     public function teams(): HasMany
     {
         return $this->hasMany(Team::class);
+    }
+
+    /**
+     * @return HasOne<OrganizationValueSet, $this>
+     */
+    public function valueSet(): HasOne
+    {
+        return $this->hasOne(OrganizationValueSet::class);
     }
 
     /**

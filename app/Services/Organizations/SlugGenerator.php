@@ -4,7 +4,7 @@ namespace App\Services\Organizations;
 
 use App\Models\Organization;
 use App\Support\ReservedSlugs;
-use Illuminate\Support\Str;
+use App\Support\UniqueSlug;
 
 /**
  * Organization slugs: lower case, no accents, hyphens (02 · 2.3), never a system route.
@@ -15,17 +15,7 @@ class SlugGenerator
 
     public function fromName(string $name, ?int $ignoreOrganizationId = null): string
     {
-        $base = Str::slug($name);
-        $base = $base === '' ? 'szervezet' : $base;
-
-        $slug = $base;
-        $suffix = 2;
-
-        while (! $this->isAvailable($slug, $ignoreOrganizationId)) {
-            $slug = $base.'-'.$suffix++;
-        }
-
-        return $slug;
+        return UniqueSlug::make($name, 'szervezet', fn (string $slug): bool => $this->isAvailable($slug, $ignoreOrganizationId));
     }
 
     public function isAvailable(string $slug, ?int $ignoreOrganizationId = null): bool

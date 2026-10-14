@@ -7,7 +7,7 @@
 | PHP | 8.4.1 vagy újabb | Kiterjesztések: `pdo_pgsql`, `pdo_sqlite`, `intl`, `redis`, `mbstring`, `fileinfo`, `zip`, `gd`. A Laravel Herd PHP 8.4-e mindet tartalmazza. A herd-lite 8.4.0 nem elég. |
 | Composer | 2.8 | |
 | Node.js | 22 | |
-| PostgreSQL | 16 vagy újabb | Közös környezetben AWS RDS. Helyben sqlite is elég, amíg nincs RDS-hozzáférés. |
+| PostgreSQL | 14 vagy újabb | A fejlesztői adatbázis AWS RDS-en van (`megis_dev`, eu-central-1), `DB_SSLMODE=require`-rel. A hozzáférést a projektvezető adja. Helyben sqlite is elég. |
 | Redis | 7 | Közös környezetben a cache, a session és a queue ezen fut. Helyben elhagyható. |
 
 ## Első indítás
@@ -50,6 +50,23 @@ php artisan megis:admin:create
 
 Belépés: `/admin/belepes`.
 
+## Az Értéktár kezdő értékei (03 · 3.6)
+
+```bash
+php artisan megis:values:import ertekek.xlsx --dry-run   # csak ellenőriz
+php artisan megis:values:import ertekek.xlsx
+```
+
+- xlsx vagy csv, az első munkalap számít. Az első sor a fejléc, soronként egy érték.
+- Oszlopok (a sorrend mindegy, a kis- és nagybetű és az írásjelek nem számítanak):
+  - `Név` (kötelező);
+  - `Kategória` (ha nincs ilyen, létrejön);
+  - `Mit jelent?`, `Mit nem jelent?`;
+  - `6 · Mikor teljesül nagyon?` és `1 · Mikor nagyon nem teljesül?` (mindkettőben legalább egy elem kell);
+  - `Példák`, `Szinonimák, kulcsszavak`.
+- A listák elemei egy cellán belül külön sorban vannak. Az elején álló `-`, `•` vagy sorszám lemarad. Egy elem 2–255 karakter.
+- Minden érték v1-ként, átnézve kerül be. Ami már az Értéktárban van, kimarad, így a parancs újra futtatható. Ha bármelyik sor hibás, semmi nem kerül be.
+
 ## Jogi dokumentumok
 
 Az ügyféloldali belépés és a meghívó elfogadása a három jogi PDF-et kéri (adatkezelési tájékoztató, ÁSZF, cookie-tájékoztató). Töltsd fel őket az adminban: *Beállítások → Jogi dokumentumok*. Amíg hiányoznak, a setup check figyelmeztet (élesben hibát jelez).
@@ -78,7 +95,10 @@ php artisan test --compact
 ```
 
 - A tesztek egyelőre sqlite memóriában futnak.
-- A PostgreSQL-t (jsonb) igénylő tesztek a `pgsql` csoportba kerülnek. A `phpunit.xml` ezt a csoportot addig kihagyja, amíg nincs `megis_test` adatbázis.
+- A tesztek mindig sqlite memóriában futnak (`phpunit.xml`, `force="true"`), akkor is, ha a `.env` az RDS-re mutat: a `RefreshDatabase` minden futáskor üríti az adatbázist.
+- A PostgreSQL-t (jsonb) igénylő tesztek a `pgsql` csoportba kerülnek. A `phpunit.xml` ezt a csoportot addig kihagyja, amíg nincs külön `megis_test` adatbázis. A `megis_dev`-re tesztet futtatni tilos.
+- A böngészős tesztek (`tests/Browser`) a buildelt asseteket használják, előttük `npm run build` kell.
+- AI-hívás tesztben soha nem megy ki: `AiGateway::fake()`.
 - A tesztek nem hívnak külső szolgáltatást (`Http::preventStrayRequests()`), és nem kell hozzájuk Vite-build.
 
 ## Céges proxy vagy vírusirtó TLS-szűrése (pl. Avast)
@@ -96,4 +116,5 @@ $env:NODE_EXTRA_CA_CERTS = "C:\út\windows-roots.pem" # npm run build (Bunny-fon
 |---|---|
 | `php artisan megis:setup:check` | A környezet ellenőrzése (docs/uzemeltetes.md · 7) |
 | `php artisan megis:admin:create [--role=superadmin\|admin] [--invite]` | Admin létrehozása vagy meghívása (01 · 1.1) |
+| `php artisan megis:values:import {file} [--dry-run]` | Az Értéktár kezdő értékeinek betöltése táblázatból (03 · 3.6) |
 | `php artisan megis:admin:unlock {email}` | Zárolt admin feloldása 10 hibás belépés után. A zárolás csak így oldható fel (01 · 1.2). |

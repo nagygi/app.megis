@@ -106,3 +106,17 @@ function fakeTurnstile(bool $success = true): void
         'https://api.pwnedpasswords.com/*' => Http::response(''),
     ]);
 }
+
+/**
+ * Browser tests: fills the field the Turnstile widget would add, so the flow
+ * does not depend on Cloudflare being reachable; the server check is faked.
+ */
+function passTurnstile(mixed $page): void
+{
+    $page->script(<<<'JS'
+        () => document.querySelector('form').insertAdjacentHTML(
+            'beforeend',
+            '<input type="hidden" name="cf-turnstile-response" value="test-token">'
+        )
+    JS);
+}

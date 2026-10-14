@@ -48,4 +48,71 @@ return [
         'email_changed' => 'E-mail cím módosítása',
     ],
 
+    'value_origin' => [
+        'admin' => 'Értéktár',
+        'diagnosis' => 'Diagnózisnál felvett',
+        'ai' => 'AI által detektált',
+        'organization' => 'Szervezet által felvett',
+    ],
+
+    'version_event_type' => [
+        'archived' => 'Archiválva',
+        'restored' => 'Visszaállítva',
+        'reviewed' => 'Átnézve',
+    ],
+
+    'diagnosis_level' => [
+        'organization' => 'Szervezet',
+        'team' => 'Csapat',
+        'user' => 'Felhasználói',
+    ],
+
+    'diagnosis_status' => [
+        'draft' => 'Draft',
+        'pending_approval' => 'Jóváhagyásra vár',
+        'published' => 'Publikált',
+    ],
+
+    'diagnosis_creator' => [
+        'admin' => 'Admin',
+        'aggregated' => 'Aggregált',
+        'automatic' => 'Automatikus',
+    ],
+
+    'score_state' => [
+        'scored' => 'Pontozva',
+        'no_trace' => 'Nincs nyoma',
+        'insufficient_data' => 'Nincs elég adat',
+        'pending' => 'Számításra vár',
+    ],
+
+    'experience_state' => [
+        'answered' => 'Válaszolt',
+        'dont_know' => 'Nem tudom',
+        'missing' => 'Hiányzik',
+    ],
+
+    'tree_element' => [
+        'root' => 'Értékek (gyökér)',
+        'trunk' => 'Purpose (törzs)',
+        'crown' => 'Értékajánlat (korona)',
+        'shadow' => 'Impact (árnyék)',
+    ],
+
+    'inbox_item_type' => [
+        'classification' => 'Besorolás',
+        'processing_error' => 'Feldolgozási hiba',
+        'feedback' => 'Visszajelzés',
+        'invitation' => 'Meghívó',
+        'completion' => 'Kitöltés',
+        'threshold' => 'Küszöb',
+        'publication' => 'Publikálás',
+        'mirror_booking' => 'Értéktükör-foglalás',
+    ],
+
+    'ai_call_status' => [
+        'succeeded' => 'Sikeres',
+        'failed' => 'Sikertelen',
+    ],
+
 ];

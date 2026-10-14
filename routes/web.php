@@ -3,6 +3,7 @@
 use App\Enums\LegalDocumentType;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminPasswordSetupController;
+use App\Http\Controllers\Admin\AiUsageExportController;
 use App\Http\Controllers\Admin\ImpersonationController as AdminImpersonationController;
 use App\Http\Controllers\Admin\LegalDocumentVersionController;
 use App\Http\Controllers\Client\CustomerLoginController;
@@ -65,10 +66,29 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('szervezetek/{organization}', Admin\Organizations\Form::class)->name('organizations.edit');
         Route::livewire('szervezetek/{organization}/csapatok', Admin\Organizations\Teams::class)->name('organizations.teams');
         Route::livewire('szervezetek/{organization}/felhasznalok', Admin\Organizations\Members::class)->name('organizations.members');
+        Route::livewire('szervezetek/{organization}/ertekek', Admin\Organizations\Values::class)->name('organizations.values');
         Route::livewire('szervezetek/{organization}/felhasznalok/meghivas', Admin\Organizations\MemberForm::class)->name('organizations.members.create');
         Route::livewire('szervezetek/{organization}/felhasznalok/{membership}/szerkesztes', Admin\Organizations\MemberForm::class)
             ->name('organizations.members.edit')
             ->scopeBindings();
+
+        Route::livewire('beerkezo', Admin\Inbox\Index::class)->name('inbox.index');
+
+        Route::livewire('diagnozisok', Admin\Diagnoses\Index::class)->name('diagnoses.index');
+        Route::livewire('diagnozisok/uj', Admin\Diagnoses\Form::class)->name('diagnoses.create');
+        Route::livewire('diagnozisok/{diagnosis}', Admin\Diagnoses\Show::class)->name('diagnoses.show');
+        Route::livewire('diagnozisok/{diagnosis}/adatok', Admin\Diagnoses\Form::class)->name('diagnoses.edit');
+        Route::livewire('diagnozis-tipusok', Admin\DiagnosisTypes\Index::class)->name('diagnosis-types.index');
+        Route::livewire('diagnozis-tipusok/uj', Admin\DiagnosisTypes\Form::class)->name('diagnosis-types.create');
+        Route::livewire('diagnozis-tipusok/{type}/szerkesztes', Admin\DiagnosisTypes\Form::class)->name('diagnosis-types.edit');
+
+        Route::livewire('ertektar/ertekek', Admin\Values\Index::class)->name('values.index');
+        Route::livewire('ertektar/ertekek/uj', Admin\Values\Form::class)->name('values.create');
+        Route::livewire('ertektar/ertekek/{value}', Admin\Values\Form::class)->name('values.edit');
+        Route::livewire('ertektar/ertekek/{value}/verziok', Admin\Values\Versions::class)->name('values.versions');
+        Route::livewire('ertektar/kategoriak', Admin\ValueCategories\Index::class)->name('value-categories.index');
+        Route::livewire('ertektar/kategoriak/uj', Admin\ValueCategories\Form::class)->name('value-categories.create');
+        Route::livewire('ertektar/kategoriak/{category}/szerkesztes', Admin\ValueCategories\Form::class)->name('value-categories.edit');
 
         Route::livewire('ugyfelek', Admin\Clients\Index::class)->name('clients.index');
         Route::livewire('ugyfelek/{user}', Admin\Clients\Show::class)->name('clients.show');
@@ -80,6 +100,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::middleware('superadmin')->group(function () {
             Route::livewire('rendszer', Admin\System\Overview::class)->name('system.index');
             Route::livewire('rendszer/health', Admin\System\Health::class)->name('system.health');
+            Route::livewire('rendszer/ai', Admin\System\AiUsage::class)->name('system.ai.usage');
+            Route::get('rendszer/ai/export', AiUsageExportController::class)->name('system.ai.export');
+            Route::livewire('rendszer/ai/konfiguracio', Admin\System\AiConfiguration::class)->name('system.ai.configuration');
+            Route::livewire('rendszer/ai/promptok', Admin\System\AiPrompts::class)->name('system.ai.prompts');
         });
     });
 });

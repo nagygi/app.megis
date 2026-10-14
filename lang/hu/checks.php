@@ -86,6 +86,15 @@ return [
         'missing' => 'Nincs feltöltve: :documents',
     ],
 
+    'ai' => [
+        'label' => 'AI-feladatok',
+        'none_active' => 'Még egyik AI-feladatnak sincs aktív promptja.',
+        'ok' => ':count feladat futtatható: prompt, kulcs és egységár rendben.',
+        'missing_prompt' => 'A(z) :task feladat promptja hiányzik: :prompt.',
+        'missing_key' => 'A(z) :task feladat szolgáltatójának (:provider) nincs API-kulcsa.',
+        'missing_price' => 'Nincs egységár ezekhez a modellekhez: :models. A költségük nem számolódik.',
+    ],
+
     'environment_policy' => [
         'label' => 'Környezeti szabályok',
         'ok' => 'A beállítások illenek a környezethez (:environment).',
