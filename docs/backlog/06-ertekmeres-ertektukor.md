@@ -1,0 +1,196 @@
+# 06 · Értékmérés – Értéktükör és automatikus diagnózis
+
+## Cél
+
+Hangfelvételből vagy szövegből a rendszer AI-jal kiolvassa az értékeket, és **„Jóváhagyásra vár” státuszú diagnózist** hoz létre (04). Három bemenet van:
+
+1. **Nyilvános Értéktükör** (ET1–ET5): belépés nélkül, a végén regisztrálni lehet.
+2. **Értéktükör a saját menüből:** ugyanez bejelentkezett felhasználónak.
+3. **Admin feltöltés:** hangfájl vagy leirat egy vagy több felhasználóhoz.
+
+## Alfeladatok
+
+### 6.1 Nyilvános Értéktükör (ET1–ET5)
+
+Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
+
+**ET1 · nyitó**
+
+- A manifesztó jelenik meg.
+- Gombok: „Belenézek a tükörbe” és „Van fiókom”.
+
+**ET2 · felvétel**
+
+- Három bemenet:
+  - böngészős hangfelvétel számlálóval, legfeljebb 10 percig (8 percnél figyelmeztet);
+  - „Inkább leírom” szöveges bevitel;
+  - fájl feltöltése: txt, md, doc vagy docx. A megengedett formátumok és a maximális méret ki van írva (NFR).
+- Ösztönzés és több instrukció a bevitelnél: „Legalább egy percig mesélj, ha teheted, többet.”
+- **Motiváló elem felvétel közben:** egy idővel telő kör vagy sáv, mellette rövid biztató szöveg, ami az idővel változik. Például:
+  - 0–1 perc: „Mesélj tovább…”
+  - 1 perc után: „Jó kezdet. Mi történt utána?”
+  - 3 perc után: „Ebből már gazdag tükör lesz.”
+- **Támogató kérdések:** ha a felhasználó felvétel közben 5 másodpercig hallgat, megjelenik egy támogató kérdés az admin által felvett listából (6.7). Egyszerre egy kérdés látszik, és amikor újra beszél, a kérdés halványan a helyén marad. A következő csendnél a következő kérdés jön.
+- Ha a felvétel egy percnél rövidebb, finoman jelezzük, de beküldhető.
+- Beküldés Turnstile-lal, IP-alapú rate limittel.
+- A feldolgozás alatt várakozó állapot látszik. Ha a feldolgozás nem sikerül, ez jelenik meg: „Nem tudtuk feldolgozni. Próbáld újra.”
+
+**ET3 · az értékeid**
+
+- Az értékek idézetekkel jelennek meg, szám és értékelés nélkül.
+- A „nem az enyém” jelöléssel a felhasználó kivehet egy értéket. A kivett érték nem kerül a diagnózisba, a nyers detektálásban jelölve megmarad.
+
+**ET5 · teljes kép** (csak az A változat)
+
+- A fa a felhasználó értékeivel, és négy kíváncsiság-kérdés jelölőnégyzettel.
+- Az e-mail mező fölött: **„Lépj be és nézd meg a válaszokat”**.
+- E-mail mező.
+- Alatta jelölőnégyzet: **„Elfogadom az ÁSZF-et és az adatvédelmi szabályzatot”**.
+  - A két dokumentumnév link a 05-ös jegyben feltöltött hatályos verzióra (ÁSZF, Adatkezelési tájékoztató).
+  - Alapból nincs bejelölve. Amíg nincs bejelölve, a gombok szürkék.
+  - Rögzítjük, ki, mikor és melyik dokumentumverziót fogadta el.
+- Elsődleges gomb: **„Létrehozom a fiókot”**.
+- Másodlagos gomb: „Időpontot foglalok”. Ez is létrehozza a fiókot, és mellette új ablakban megnyitja a külső naptárat. A naptár linkje konfigurációból jön.
+- Mentéskor a jelölt kíváncsiság-kérdések a felhasználóhoz kerülnek, és az admin a felhasználó adatlapján (33) látja őket.
+
+**Mi lesz az eredménnyel**
+
+- **Fiók létrehozásakor** (bármelyik gombbal):
+  - E-mail megy a megerősítő linkkel.
+  - A link egy rövid űrlapra visz:
+    - vezetéknév, keresztnév (kötelező);
+    - jelszó + megerősítés (opcionális). Ha nem ad meg jelszót, e-mailben kapott kóddal lép be. A jelszó később a profilban is beállítható. A jelszó szabályai a 14-es jegyben vannak.
+  - Mentés után:
+    - létrejön a fiók;
+    - létrejön egy **Magánszemély típusú szervezet** (02) a felhasználó nevével, amelynek ő a vezetője;
+    - a felhasználó belép.
+  - Ebbe a szervezetbe kerül a felhasználói diagnózis.
+- **Ha az e-mail már létező fiókhoz tartozik:**
+  - Nem jön létre új fiók. A felület ezt írja ki: „Ehhez az e-mailhez már van fiókod. Lépj be, és a tükröd hozzá kerül.”
+  - Kétféleképpen léphet be, helyben, a tükör elvesztése nélkül:
+    - **e-mail + jelszó**;
+    - **e-mailben kapott kód**.
+  - Belépés után a diagnózis ugyanúgy kerül a fiókhoz, mint a saját menüből indított tükörnél (6.2): az aktív szervezethez.
+  - A belépés részletei (Turnstile, rate limit, a kód érvényessége) a 14-es jegyben vannak.
+- **Ha nincs megadott vagy megerősített e-mail:**
+  - Nem lesz diagnózis.
+  - Az eredmény 24 óráig él, utána törlődik.
+  - Csak a névtelen statisztika marad meg: a szabad értéknév és az illeszkedés, idézet nélkül.
+
+### 6.2 Értéktükör a saját menüből
+
+- A bejelentkezett felhasználó *Értéktükör* menüpontja ugyanezt az utat nyitja meg. Az ET5-ön nincs e-mail mező, elfogadó jelölőnégyzet és „Létrehozom a fiókot” gomb. A kíváncsiság-kérdések és a foglalás megmaradnak.
+- A diagnózis a felhasználó **aktív szervezetéhez** kerül (szervezetválasztó). Ha csak egy szervezete van, ahhoz.
+- Ha a felhasználó vezetőként vagy társként benne van egy futó fő diagnózisban, a tükör annak részdiagnózisa lesz (17 · 17.4).
+
+### 6.3 Admin feltöltés
+
+Menü: *Diagnózisok → „+ Feltöltés”*.
+
+**Mezők**
+
+- Szervezet, diagnózis típusa, diagnózis ideje.
+- Fő diagnózis (opcionális): a szervezet „Fut” vagy „Olvasat” szakaszú fő diagnózisai közül. Ha ki van választva, a létrejövő diagnózisok annak részdiagnózisai lesznek (17 · 17.4).
+- Fájl:
+  - hang: mp3, m4a, wav vagy webm, legfeljebb 90 perc és 300 MB;
+  - leirat: txt, md, doc vagy docx, legfeljebb 10 MB.
+- A megengedett formátumok és a maximális méret az űrlapon ki van írva (NFR).
+
+**Beszélők**
+
+- A rendszer felismeri a beszélőket (Beszélő 1, Beszélő 2, …), és mindegyiknél mutat néhány idézetet.
+- Az admin minden beszélőhöz a szervezet egy felhasználóját rendeli, vagy kihagyja a beszélőt.
+- Leiratnál a meglévő beszélő-címkéket használjuk. Ha nincs címke, az egész szöveg egy beszélő.
+
+**Eredmény:** minden hozzárendelt beszélőhöz külön felhasználói diagnózis jön létre, a forrásfájlra mutató linkkel.
+
+### 6.4 A motor (spec 2.10)
+
+Három lépcső:
+
+- **A · Szabad detektálás**
+  - A prompt nem kap értéklistát.
+  - Kimenet soronként: beszélő · szó szerinti idézet · szabad értéknév · rövid indoklás · erősség 1–6.
+- **B · Illesztés**
+  - A szabad értékeket a motor az Értéktár (03) értékeire illeszti, **csak definíció és példák alapján, névegyezés alapján soha**.
+  - Egy szabad érték 0, 1 vagy több Értéktár-értékre illeszkedhet, konfidenciával.
+  - A fő diagnózis anyagainál a szervezet értékeire is illeszt (13, 18). A csapat és az egyéni értékszettek bekötése később jön.
+- **C · Pontozás**
+  - Illesztett értékenként „nincs adat” vagy 1–6, idézet-hivatkozással.
+  - A skála: 1 nincs és mégis van · 2 csak szavak · 3 ad-hoc · 4 néha · 5 többnyire · 6 beépült.
+
+**Nyers detektálás:** minden detektált érték nyersen is megmarad, a következő adatokkal:
+
+- beszélő, idézet, szabad név;
+- melyik Értéktár-értékre illeszkedett (vagy semmire), konfidencia;
+- prompt- és modellverzió.
+
+Ebből látszik később, mely értékek térnek vissza, és mi hiányzik az Értéktárból.
+
+**Nem illeszkedő értékek**
+
+- A nem illeszkedő értékek azonnal az Értéktárba kerülnek, **„AI által detektált”** címkével (03 · 3.7). A név mellé az AI indoklása kerül a „Mit jelent?” listába.
+- Ha a név már létezik:
+  - „AI által detektált” címkés értéknél nem jön létre új érték, a meglévőhöz adódik az új előfordulás.
+  - Rendes Értéktár-értéknél, amire a B lépcső nem illesztette, új érték jön létre „(detektált)” utótaggal. Így látszik, hogy ugyanaz a szó mást jelent.
+
+**AI szabályok (NFR 11)**
+
+- A modell konfigurációból cserélhető.
+- Minden eredmény mellé mentjük a modell és a prompt verzióját.
+- A tokenhasználatot modellenként és időpontonként mérjük.
+
+### 6.5 A létrejövő diagnózis (04)
+
+**A diagnózis adatai**
+
+- Szint: Felhasználói.
+- Készítő: Automatikus.
+- Státusz: **Jóváhagyásra vár**.
+- Név: „Értéktükör · {dátum}”, vagy feltöltésnél a fájl neve.
+- Diagnózis típusa: „Értéktükör”, vagy feltöltésnél amit az admin választott.
+
+**A sorok**
+
+- Soronként: az illesztett érték, a mérőszám (a C lépcső 1–6 értéke), az indoklás (a motorból) és a sorhoz csatolt idézetek (csak olvasható).
+- A „nincs adat” értékek nem kerülnek be.
+- A nem illeszkedő értékek a diagnózis oldalán „Egyéb detektált értékek” listában látszanak, mérőszám nélkül.
+- A diagnózis oldalán az admin látja az átiratot, és lejátszhatja a hangot.
+
+**Megjelenés a felhasználónál**
+
+- A tükörben (ET3–ET5) azonnal látja az eredményt.
+- A platformon a diagnózis csak admin publikálás után jelenik meg.
+
+### 6.6 Hangfelvételek tárolása
+
+- A hangfájl az átirattal együtt megmarad, amíg a felhasználó nem törli.
+- Nem nyilvános tárhelyen van, csak jogosult felhasználó érheti el.
+- A felhasználó a Profiljából (31 · 31.5) törölheti a felvételét. Ilyenkor csak a hang törlődik, az átirat és a diagnózis megmarad.
+- Az admin is törölheti a felvételt.
+- Fiók törlésekor minden felvétel törlődik.
+
+### 6.7 Támogató kérdések (admin)
+
+Menü: *Diagnózisok → Támogató kérdések*. Lista, „+ Új kérdés” gomb, szerkesztés.
+
+- Mezők: kérdés szövege (kötelező, legfeljebb 255 karakter), aktív / inaktív kapcsoló. Az inaktív kérdés nem jelenik meg a felvételnél.
+- A sorrend drag and droppal állítható, a felvételnél ebben a sorrendben jönnek a kérdések.
+- Kezdő példák (a végleges szöveget a mégis adja):
+  - „Ki volt még ott?”
+  - „Mit éreztél abban a pillanatban?”
+  - „Mit tettél végül?”
+  - „Miért volt ez fontos neked?”
+
+## Nincs benne
+
+- Az ET5·b változat (ismételhető tükör) és az A/B teszt: [NM-05](../backlog_nem_MVP/NM-05-ertektukor-ismetles-ab-teszt.md).
+- Az ET4 elmélyülés: [NM-06](../backlog_nem_MVP/NM-06-ertektukor-elmelyules.md).
+- A „Csak elküldöm” (eredmény e-mailben, fiók nélkül): [NM-07](../backlog_nem_MVP/NM-07-ertektukor-csak-elkuldom.md).
+- A regisztráció és a belépés: 14.
+- A csapat és az egyéni értékszettek az illesztésben.
+- Az Értéktár konszolidációja (a hasonló AI által detektált értékek összevonása).
+
+## Nyitott kérdések
+
+1. Melyik szolgáltatás készítse az átiratot beszélő-felismeréssel? A döntést a 12-es jegy PoC-ja (12.7) készíti elő.
