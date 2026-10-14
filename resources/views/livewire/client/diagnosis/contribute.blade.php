@@ -70,7 +70,7 @@
                             <span class="block font-semibold">{{ $material->is_situation ? __('processes.occasions.situation') : ($material->original_name ?? $material->source->label()) }}</span>
                             <span class="block text-sm text-grey-700">
                                 {{ collect([$material->occasion?->process?->name, ($material->occasion?->occurred_at ?? $material->created_at)->format('m.d.')])->filter()->implode(' · ') }}
-                                · <span @class(['font-semibold text-coral-dark' => $state === 'failed'])>{{ __('processes.occasions.states.'.$state) }}</span>
+                                · <span @class(['font-semibold text-coral-ink' => $state === 'failed'])>{{ __('processes.occasions.states.'.$state) }}</span>
                             </span>
                         </span>
                         @if ($canContribute)

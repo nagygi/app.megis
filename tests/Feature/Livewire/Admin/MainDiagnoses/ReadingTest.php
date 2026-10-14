@@ -42,7 +42,7 @@ function diagnosisInReading(): array
 
 function rowOf(MainDiagnosis $main, DiagnosisRowKind $kind, int $index = 0): DiagnosisRow
 {
-    return $main->diagnosis->rows()->where('kind', $kind)->orderBy('position')->get()[$index];
+    return $main->diagnosis->rows()->where('kind', $kind)->orderBy('position')->with('diagnosis')->get()[$index];
 }
 
 it('lists the measuring points in the order of the report with the counter (20 · 20.1)', function () {
@@ -218,7 +218,7 @@ it('opens the Publikálás tab only when everything is approved (20 · 20.5)', f
 
     expect($reading->progress($main)['complete'])->toBeFalse();
 
-    foreach ($main->diagnosis->rows()->get() as $row) {
+    foreach ($main->diagnosis->rows()->with('diagnosis')->get() as $row) {
         in_array($row->kind, [DiagnosisRowKind::Area, DiagnosisRowKind::TreeElement], true)
             ? $reading->scoreRow($row, '3', $admin)
             : $reading->approveRow($row, $admin);

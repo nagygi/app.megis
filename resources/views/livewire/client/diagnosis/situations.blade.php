@@ -22,9 +22,9 @@
                                 @if ($experience?->isSubmitted())
                                     {{ __('processes.occasions.experience_given') }}
                                 @elseif ($editable)
-                                    <a href="{{ route('client.diagnosis.occasion-experience', [$organization, $diagnosis, $material]) }}" class="font-semibold text-coral-dark">{{ __('processes.occasions.experience_missing') }}</a>
+                                    <a href="{{ route('client.diagnosis.occasion-experience', [$organization, $diagnosis, $material]) }}" class="font-semibold text-coral-ink">{{ __('processes.occasions.experience_missing') }}</a>
                                 @else
-                                    <span class="text-coral-dark">{{ __('processes.occasions.experience_missing') }}</span>
+                                    <span class="text-coral-ink">{{ __('processes.occasions.experience_missing') }}</span>
                                 @endif
                             @endif
                         </span>

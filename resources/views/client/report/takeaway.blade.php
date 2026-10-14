@@ -52,7 +52,7 @@
             <ul class="flex flex-col gap-4">
                 @foreach ($takeaway['rows'] as $row)
                     <li class="flex flex-col gap-1">
-                        <p @class(['flex justify-between text-sm', 'font-semibold text-coral-dark' => $row['lower']])>
+                        <p @class(['flex justify-between text-sm', 'font-semibold text-coral-ink' => $row['lower']])>
                             <span>{{ $row['name'] }}</span>
                             <span class="tabular-nums">{{ __('takeaway.row_numbers', ['start' => $whole($row['start']), 'situations' => $whole($row['situations']), 'others' => $whole($row['others'])]) }}</span>
                         </p>

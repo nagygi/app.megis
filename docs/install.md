@@ -92,6 +92,11 @@ php artisan megis:transcription:compare felvetel.mp3 --model=openai:gpt-4o-trans
 - A beszélgetés kivonata és a naptár névjavaslata az `ai` queue-n fut; AI-kulcs nélkül a kivonat elmarad, a naptár a címeket tartja meg.
 - A mezők diktálása (mikrofon) a minta-átíróval helyben is működik: `MEGIS_TRANSCRIBER=fake`.
 
+## Demó diagnózis és Képességtár (M7, 07)
+
+- **Demó szervezet:** `php artisan db:seed --class=DemoDiagnosisSeeder`. Teljes diagnózis egy csapatról: 1 vezető, 4 társ, 2 mért folyamat, 4 helyzet pontokkal és idézetekkel, AI-hívás nélkül. Futó szakaszban áll, a küszöb teljesült: az adminban indítható az olvasat, onnan a publikálás, a riport és a visszajelzés. Az emberek `demo-…@example.com` címeket kapnak; belépni az adminból, „a nevében” lehet. Élesben nem fut, és egy második futtatás nem hozza létre újra.
+- **Képességtár:** *Képességtár → Frissítés a mégis tárából*, a „Képességrendszer · tárak” Sheet xlsx-exportjával. A fájl személyes adatot tartalmazó füleket is tartalmaz (Bizonyíték, Esettár, Találat): ezek nem töltődnek be, de a fájl ne kerüljön a kódtárba.
+
 ## Jogi dokumentumok
 
 Az ügyféloldali belépés és a meghívó elfogadása a három jogi PDF-et kéri (adatkezelési tájékoztató, ÁSZF, cookie-tájékoztató). Töltsd fel őket az adminban: *Beállítások → Jogi dokumentumok*. Amíg hiányoznak, a setup check figyelmeztet (élesben hibát jelez).

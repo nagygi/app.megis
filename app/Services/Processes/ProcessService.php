@@ -107,7 +107,7 @@ class ProcessService
 
         foreach (Process::query()->whereBelongsTo($organization)->where('kind', ProcessKind::Routine)->whereNull('accepted_at')->orderBy('id')->get() as $process) {
             try {
-                $this->setAccepted($process, true, $main);
+                $this->setAccepted($process->setRelation('organization', $organization), true, $main);
                 $count++;
             } catch (DiagnosisException) {
                 break;

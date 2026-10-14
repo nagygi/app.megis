@@ -10,6 +10,7 @@ use App\Models\MainDiagnosis;
 use App\Models\MainDiagnosisParticipant;
 use App\Services\MainDiagnoses\DiagnosisRunService;
 use App\Services\MainDiagnoses\StepProgress;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * The daily scan of the Beérkező (22 · 22.2): invitations not opened in five
@@ -60,7 +61,7 @@ class InboxScanner
     {
         $closed = 0;
 
-        foreach (InboxItem::query()->open()->whereIn('type', [InboxItemType::Invitation, InboxItemType::Completion, InboxItemType::Threshold, InboxItemType::Publication])->with('subject')->get() as $item) {
+        foreach (InboxItem::query()->open()->whereIn('type', [InboxItemType::Invitation, InboxItemType::Completion, InboxItemType::Threshold, InboxItemType::Publication])->with(['subject' => fn (MorphTo $subject) => $subject->morphWith([MainDiagnosisParticipant::class => ['mainDiagnosis']])])->get() as $item) {
             $resolved = match ($item->type) {
                 InboxItemType::Invitation => ! $item->subject instanceof MainDiagnosisParticipant || ! $this->invitationOverdue($item->subject),
                 InboxItemType::Completion => ! $item->subject instanceof MainDiagnosis || ! $this->completionOverdue($item->subject),

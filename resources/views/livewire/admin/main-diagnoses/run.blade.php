@@ -100,7 +100,7 @@
                     @endforeach
                 </p>
                 @if ($missingPeers > 0)
-                    <p class="text-sm font-semibold text-coral-dark">{{ __('admin.run.threshold_missing', ['count' => $missingPeers]) }}</p>
+                    <p class="text-sm font-semibold text-coral-ink">{{ __('admin.run.threshold_missing', ['count' => $missingPeers]) }}</p>
                 @endif
                 <details class="text-sm">
                     <summary class="cursor-pointer font-semibold">{{ __('admin.run.by_name') }}</summary>
@@ -135,7 +135,7 @@
             <h2 id="materials-title" class="text-lg font-semibold">{{ __('admin.run.materials') }}</h2>
             <p class="text-sm">
                 @foreach ($materialCounts as $key => $count)
-                    <span @class(['mr-3', 'font-semibold text-coral-dark' => in_array($key, ['failed', 'unclassified'], true) && $count > 0])>{{ __('admin.run.material_counts.'.$key) }}: <strong>{{ $count }}</strong></span>
+                    <span @class(['mr-3', 'font-semibold text-coral-ink' => in_array($key, ['failed', 'unclassified'], true) && $count > 0])>{{ __('admin.run.material_counts.'.$key) }}: <strong>{{ $count }}</strong></span>
                 @endforeach
             </p>
             <a href="{{ route('admin.inbox.index') }}" class="self-start text-sm font-semibold">{{ __('admin.nav.inbox') }}</a>

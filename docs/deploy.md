@@ -74,6 +74,19 @@ php artisan queue:restart
 - [ ] A kritikus oldalak kézi ellenőrzése.
 - [ ] A napló és a hibaszint ellenőrzése. Ugyanaz a hiba 15 percen belül csak egyszer küld riasztást.
 
+### Élesítés előtt (1.00)
+
+A kód kész, az élesítéshez ezek kellenek a környezetben és a mégistől:
+
+- [ ] **Staging-elfogadás a mégissel** a demó szervezeten (`DemoDiagnosisSeeder`): olvasat → publikálás → riport → visszajelzés → PDF → Útravaló.
+- [ ] **Próba-visszaállítás** a stagingre a „Mentés és próba-visszaállítás” szerint, az eredmény beírva.
+- [ ] **Levélküldő:** SES (eu-central-1) vagy más EU-s küldő, SPF, DKIM és DMARC a megis.hu-n. A visszapattanó levelek webhookja (02) a küldő kiválasztása után készül el; addig a „nem kézbesíthető” jelzést semmi nem állítja be.
+- [ ] **Infrastruktúra:** Redis `noeviction`, S3 verziózással és 30 napos életciklussal, RDS-mentés 30 napra, Gotenberg konténer belső hálózaton, ffprobe, CloudWatch Logs 365 nappal, uptime-figyelés a `/health`-re.
+- [ ] **Titkok és kulcsok:** `APP_DEBUG=false`, https-es `APP_URL`, éles Turnstile-kulcsok, EU-s AI-kulcsok, `MEGIS_TRANSCRIBER=ai` a 12.7 PoC döntése szerint, `MEGIS_HEALTH_TOKEN`.
+- [ ] **Naptár-alkalmazások:** a Google-ellenőrzés lezárva (addig 100 tesztfelhasználó), Microsoft Entra alkalmazás.
+- [ ] **Tartalom:** az első szuperadmin (`megis:admin:create`), a három jogi PDF, a 36 érték (`megis:values:import`), a Képességtár betöltése, a területek szövegei, a támogató kérdések, a Bölcsességtár szövegeinek átnézése, a foglalási link és a támogatási e-mail.
+- [ ] **Nyitott kérdések a mégisnél:** a T1 és a V9 szövegének bővítése a szervezet vezetőivel (15 · 5.), a foglalási szolgáltatás webhookja (15 · 9.).
+
 ## Rollback
 
 1. Az előző release kódjának visszaállítása az azonosított commit-hash-re, majd a „Telepítés” lépései, migráció nélkül.

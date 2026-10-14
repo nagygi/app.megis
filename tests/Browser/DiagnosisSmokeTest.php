@@ -6,24 +6,6 @@ use App\Models\Consent;
 use App\Services\MainDiagnoses\ExperienceService;
 use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\Organizations\OrganizationValueSetService;
-use Illuminate\Support\Facades\Hash;
-
-/**
- * Logs the customer in with the password, as on B1 (14 · 14.2).
- */
-function loginInBrowser($user): mixed
-{
-    fakeTurnstile();
-    $user->forceFill(['password' => Hash::make('a-long-enough-password')])->save();
-
-    $page = visit('/belepes');
-    $page->click('Jelszóval lépek be');
-    $page->fill('email', $user->email)->fill('password', 'a-long-enough-password');
-    passTurnstile($page);
-    $page->press('Belépek');
-
-    return $page;
-}
 
 /**
  * Sets every answer of the experience page through Livewire; the radios are visually hidden.

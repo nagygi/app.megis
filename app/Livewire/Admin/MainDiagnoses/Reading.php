@@ -22,6 +22,7 @@ use App\Services\Diagnoses\ProcessOccasionBreakdown;
 use App\Services\Diagnoses\ReadingService;
 use App\Services\Diagnoses\ThresholdPolicy;
 use App\Services\Inbox\InboxService;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -397,7 +398,12 @@ class Reading extends Component
             'showsExperience' => $threshold->showsTeamExperience($main),
             'missingPeers' => $threshold->missingPeers($main),
             'materials' => $this->materials(),
-            'events' => ReviewEvent::query()->where('diagnosis_id', $this->diagnosis->id)->with('actor')->latest('id')->limit(50)->get(),
+            'events' => ReviewEvent::query()
+                ->where('diagnosis_id', $this->diagnosis->id)
+                ->with(['actor', 'subject' => fn (MorphTo $subject) => $subject->morphWith([DiagnosisRow::class => ['value', 'process', 'area']])])
+                ->latest('id')
+                ->limit(50)
+                ->get(),
             'isOpen' => in_array($main->stage, [MainDiagnosisStage::Reading, MainDiagnosisStage::Published], true),
             'feedback' => $this->feedbackId === null ? null : ReportFeedback::query()->where('main_diagnosis_id', $main->id)->with('user')->find($this->feedbackId),
         ])->layout('layouts::admin', ['organization' => $this->diagnosis->organization])->title($this->diagnosis->name);

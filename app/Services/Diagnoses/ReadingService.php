@@ -81,9 +81,9 @@ class ReadingService
             ->where('score_state', '!=', ScoreState::Pending)
             ->get();
 
-        DB::transaction(function () use ($rows, $admin): void {
+        DB::transaction(function () use ($rows, $admin, $main): void {
             foreach ($rows as $row) {
-                $this->approveRow($row, $admin);
+                $this->approveRow($row->setRelation('diagnosis', $main->diagnosis), $admin);
             }
         });
 

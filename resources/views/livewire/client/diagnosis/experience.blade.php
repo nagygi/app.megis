@@ -24,7 +24,7 @@
                             </button>
                             @if ($openKey === $row['key'])
                                 <dl class="grid gap-1 rounded-lg bg-grey-100 p-3 text-sm sm:grid-cols-[2rem_1fr]">
-                                    <dt class="font-bold text-coral-dark">1</dt>
+                                    <dt class="font-bold text-coral-ink">1</dt>
                                     <dd>{{ $row['low'] }}</dd>
                                     <dt class="font-bold text-green">6</dt>
                                     <dd>{{ $row['high'] }}</dd>

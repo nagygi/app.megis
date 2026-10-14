@@ -595,7 +595,8 @@ class DiagnosisCalculator
         $gapRow = $rows
             ->filter(fn (DiagnosisRow $row) => in_array($row->kind, [DiagnosisRowKind::Value, DiagnosisRowKind::TreeElement], true) && $gapOf($row) !== null)
             ->sortByDesc(fn (DiagnosisRow $row) => abs($gapOf($row)))
-            ->first();
+            ->first()
+            ?->loadMissing(['value', 'process', 'area']);
 
         $peersAnswered = $this->experienceDiagnoses($main)->where('user_id', '!=', $main->leader_id)->count();
 

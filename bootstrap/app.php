@@ -11,6 +11,7 @@ use App\Http\Middleware\EnsureSuperadmin;
 use App\Http\Middleware\ForbidWhileImpersonating;
 use App\Http\Middleware\ProtectStaging;
 use App\Http\Middleware\ResolveOrganization;
+use App\Http\Middleware\SecurityHeaders;
 use App\Services\Alerting\ErrorAlerter;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -35,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(AssignLogId::class);
         $middleware->append(AddRobotsHeader::class);
+        $middleware->append(SecurityHeaders::class);
         $middleware->web(prepend: [ProtectStaging::class]);
 
         $middleware->alias([

@@ -10,7 +10,7 @@
 
         @if ($gap)
             <a href="{{ $url('item', [\App\Services\Report\ReportService::SLUGS[$gap['chapter']], $gap['id']]) }}" class="flex flex-col gap-2 rounded-card bg-charcoal p-5 text-cream no-underline on-dark">
-                <span class="text-xs font-semibold uppercase tracking-wide text-coral">{{ __('report.biggest_gap') }}</span>
+                <span class="text-xs font-semibold uppercase tracking-wide text-coral-light">{{ __('report.biggest_gap') }}</span>
                 <span class="text-xl font-extrabold uppercase">{{ $gap['label'] }}</span>
                 @if ($sentence = \App\Services\Report\ReportText::gap($gap, $report['meta']))
                     <span>{{ $sentence }}</span>

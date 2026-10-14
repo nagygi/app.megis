@@ -111,6 +111,23 @@ it('answers a feedback by e-mail by name (22, question 1)', function () {
         ->and(ReportFeedback::query()->sole()->answered_at)->not->toBeNull();
 });
 
+it('keeps names, quotes and answers as text in the e-mail', function () {
+    [$setup, $main] = publishedReport();
+    $setup['leader']->forceFill(['first_name' => '[Kattints](https://example.com/nev)'])->save();
+    actingAsCustomer($setup['leader']);
+    Livewire::test(Feedback::class, ['main' => $main, 'chapter' => 'brand'])
+        ->call('choose', 'partial')
+        ->set('text', 'Nézd meg [itt](https://example.com/idezet).')
+        ->call('send');
+
+    $mail = new FeedbackReplyMail(ReportFeedback::query()->sole(), 'Válasz [itt](https://example.com/valasz).');
+
+    $mail->assertDontSeeInHtml('https://example.com/nev"', false)
+        ->assertDontSeeInHtml('https://example.com/idezet"', false)
+        ->assertDontSeeInHtml('https://example.com/valasz"', false)
+        ->assertSeeInHtml('Kattints', false);
+});
+
 it('shows the Melléklet with what the mégis wrote over (28 · 28.2)', function () {
     [$setup, $main] = publishedReport();
     actingAsCustomer($setup['leader']);

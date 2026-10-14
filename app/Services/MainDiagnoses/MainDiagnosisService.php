@@ -270,7 +270,7 @@ class MainDiagnosisService
         }
 
         if ($participant->role === ParticipantRole::Leader && $main->stage === MainDiagnosisStage::Invited) {
-            $this->stages->transition($main, MainDiagnosisStage::Filling, $participant->user);
+            $this->stages->transition($main, MainDiagnosisStage::Filling, $participant->loadMissing('user')->user);
         }
     }
 
@@ -299,7 +299,7 @@ class MainDiagnosisService
             $this->stages->transition($main, MainDiagnosisStage::Running, $leader);
 
             foreach ($main->peers()->with('user')->get() as $peer) {
-                $this->invitePeer($peer);
+                $this->invitePeer($peer->setRelation('mainDiagnosis', $main));
             }
         });
 

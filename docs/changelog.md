@@ -2,6 +2,16 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.00 · {hash} · 2026-10-15
+
+M7 · Stabilizálás: az első éles kiadás jelöltje. Az élesítés feltételei a `docs/deploy.md` „Élesítés előtt (1.00)” listáján.
+
+- **Akadálymentesség:** böngészős smoke teszt a riport teljes útjára (R0 → Melléklet, Bölcsességtár) és az admin lapjaira (olvasat, publikálás, Képességtár, Beérkező, diagnózisok, ügyfelek, szervezet fülei, tárak, beállítások), axe-ellenőrzéssel. Javítva: a korall szöveg kontrasztja világos háttéren (új `coral-ink` szín, 5,7:1) és sötét kártyán (`coral-light`), a másodlagos szürke szöveg (`grey-600`: #747474 → #666666), az olvasat md-szerkesztőjének címkéje és súgója.
+- **Teljesítmény:** a hiányzó indexek a lekérdezett és kaszkádolt idegen kulcsokon (PostgreSQL nem indexeli őket magától); az N+1 lekérdezések éles környezeten kívül hibát dobnak, stagingen naplóba kerülnek. Javítva: a diagnózis indítása, a folyamatok elfogadása, a megnyitás, a soronkénti és blokkonkénti jóváhagyás, az olvasat naplója és a Beérkező napi átnézése.
+- **Biztonság:** biztonsági fejlécek minden válaszon (nosniff, SAMEORIGIN keretezés, referrer- és engedély-szabály, élesben https-en HSTS); a markdown e-mailekben a nevek, idézetek és válaszok szövegként maradnak, nem lesz belőlük link. `composer audit` és `npm audit`: nincs ismert sérülékenység.
+- **Demó:** `DemoDiagnosisSeeder` a staging-elfogadáshoz (Teljes, 1 vezető, 4 társ, folyamatok, anyagok).
+- **Dokumentáció:** élesítési ellenőrzőlista, a demó és a Képességtár betöltése az `install.md`-ben.
+
 ## 0.70 · 06c64b1 · 2026-10-14
 
 M6 · Olvasat, publikálás, riport (20, 27, 29, 21, 26.3, 28, 32, 30, 31, 33, 07).

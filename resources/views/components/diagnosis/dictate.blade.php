@@ -35,5 +35,5 @@
     @if ($pending)
         <span role="status">{{ __('diagnosis.dictation.transcribing') }}</span>
     @endif
-    <span x-show="error" x-text="error" x-cloak class="text-coral-dark" role="alert"></span>
+    <span x-show="error" x-text="error" x-cloak class="text-coral-ink" role="alert"></span>
 </div>

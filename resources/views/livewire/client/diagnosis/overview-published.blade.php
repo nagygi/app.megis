@@ -19,12 +19,12 @@
 
     @if ($gap)
         <a href="{{ route('client.report.item', [$organization, $diagnosis, \App\Services\Report\ReportService::SLUGS[$gap['chapter']], $gap['id']]) }}" class="flex flex-col gap-2 rounded-card bg-charcoal p-5 text-cream no-underline on-dark">
-            <span class="text-xs font-semibold uppercase tracking-wide text-coral">{{ __('report.biggest_gap') }}</span>
+            <span class="text-xs font-semibold uppercase tracking-wide text-coral-light">{{ __('report.biggest_gap') }}</span>
             <span>{{ __('report.biggest_gap_sentence', ['label' => $gap['label'], 'sentence' => ReportText::gap($gap, $report['meta']) ?? '']) }}</span>
         </a>
     @elseif ($snapshot && $report['crack'])
         <a href="{{ route('client.report.show', [$organization, $diagnosis]) }}" class="flex flex-col gap-2 rounded-card bg-charcoal p-5 text-cream no-underline on-dark">
-            <span class="text-xs font-semibold uppercase tracking-wide text-coral">{{ __('report.breakpoint_marker') }}</span>
+            <span class="text-xs font-semibold uppercase tracking-wide text-coral-light">{{ __('report.breakpoint_marker') }}</span>
             <span>{{ $report['crack']['text'] }}</span>
         </a>
     @endif

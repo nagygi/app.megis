@@ -29,7 +29,7 @@
                     <tr class="border-b border-grey-200">
                         <th scope="row" class="py-2 font-normal">{{ $team->get($key)['label'] }}</th>
                         <td class="py-2 text-right tabular-nums">{{ $whole($you) }}</td>
-                        <td @class(['py-2 text-right tabular-nums', 'font-semibold text-coral-dark' => $you !== null && $teamScore !== null && abs($you - $teamScore) >= 2])>{{ $whole($teamScore) }}</td>
+                        <td @class(['py-2 text-right tabular-nums', 'font-semibold text-coral-ink' => $you !== null && $teamScore !== null && abs($you - $teamScore) >= 2])>{{ $whole($teamScore) }}</td>
                         <td class="py-2 text-right tabular-nums">{{ $whole($org->get($key)['score'] ?? null) }}</td>
                     </tr>
                 @endforeach

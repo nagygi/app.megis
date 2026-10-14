@@ -119,7 +119,7 @@
                         <span class="block font-semibold">{{ $calendar->providerLabel() }} · {{ __('calendar.profile.connected', ['date' => $calendar->connected_at->format('m.d.')]) }}</span>
                         <span class="block text-sm text-grey-700">{{ __('calendar.profile.metadata_until', ['date' => $calendar->metadata_expires_at->format('m.d.')]) }}</span>
                         @if ($calendar->status === \App\Models\CalendarConnection::BROKEN)
-                            <span class="block text-sm font-semibold text-coral-dark" role="status">{{ __('calendar.profile.broken') }}</span>
+                            <span class="block text-sm font-semibold text-coral-ink" role="status">{{ __('calendar.profile.broken') }}</span>
                         @endif
                     </span>
                     <x-ui.button tone="outline" size="sm" wire:click="disconnectCalendar({{ $calendar->id }})" wire:confirm="{{ __('calendar.profile.confirm_disconnect') }}">{{ __('calendar.profile.disconnect') }}</x-ui.button>

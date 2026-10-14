@@ -35,7 +35,7 @@
 
     @if ($notInCalendar->isNotEmpty())
         <section class="flex flex-col gap-2" aria-labelledby="summary-not-in-calendar">
-            <h2 id="summary-not-in-calendar" class="font-semibold text-coral-dark">{{ __('processes.summary.not_in_calendar') }}</h2>
+            <h2 id="summary-not-in-calendar" class="font-semibold text-coral-ink">{{ __('processes.summary.not_in_calendar') }}</h2>
             <ul class="flex flex-col gap-2">
                 @foreach ($notInCalendar as $process)
                     <li>

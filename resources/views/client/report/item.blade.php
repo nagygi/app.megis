@@ -37,7 +37,7 @@
                     <p>{{ $item['definition']['meaning'] }}</p>
                 @endif
                 <dl class="grid gap-1 rounded-card bg-white p-4 text-sm sm:grid-cols-[6rem_1fr]">
-                    <dt class="font-semibold text-coral-dark">{{ __('report.definition_low') }}</dt>
+                    <dt class="font-semibold text-coral-ink">{{ __('report.definition_low') }}</dt>
                     <dd>{{ $item['definition']['low'] ?: '–' }}</dd>
                     <dt class="font-semibold text-green">{{ __('report.definition_high') }}</dt>
                     <dd>{{ $item['definition']['high'] ?: '–' }}</dd>

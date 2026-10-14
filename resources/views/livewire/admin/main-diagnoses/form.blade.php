@@ -52,7 +52,7 @@
                             · <a href="{{ route('admin.organizations.edit', $organization) }}">{{ __('admin.main_diagnoses.edit_organization') }}</a>
                         </span>
                         @if (! $hasFlow)
-                            <p class="text-sm font-semibold text-coral-dark" role="alert">{{ __('admin.main_diagnoses.no_flow') }}</p>
+                            <p class="text-sm font-semibold text-coral-ink" role="alert">{{ __('admin.main_diagnoses.no_flow') }}</p>
                         @endif
                     </div>
                 @endif

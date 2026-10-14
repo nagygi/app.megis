@@ -81,7 +81,7 @@
                         @if (filled($item['meaning']))
                             <p>{{ $item['meaning'] }}</p>
                         @else
-                            <p class="font-semibold text-coral-dark">{{ __('diagnosis.own_values.meaning_missing') }}</p>
+                            <p class="font-semibold text-coral-ink">{{ __('diagnosis.own_values.meaning_missing') }}</p>
                         @endif
                         <x-form.error :name="'items.'.$index.'.meaning'" :id="'items-'.$index.'-meaning'" />
                         <x-form.error :name="'items.'.$index.'.low_example'" :id="'items-'.$index.'-low'" />

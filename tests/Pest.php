@@ -34,6 +34,7 @@ use App\Services\Report\PublishService;
 use App\Services\Values\PersonalValueSetService;
 use App\Services\Values\ValueService;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -354,7 +355,7 @@ function approvedReading(): array
     $trace = EvidenceTrace::query()->firstOrFail();
     $reading->approveClaim($reading->saveClaim($main, null, ['diagnosis_row_id' => $trace->diagnosis_row_id, 'kind' => 'strength', 'text' => 'Nálatok szólnak a csúszásról.', 'trace_ids' => [$trace->id]], $admin), $admin);
 
-    foreach ($main->diagnosis->rows()->get() as $row) {
+    foreach ($main->diagnosis->rows()->with('diagnosis')->get() as $row) {
         in_array($row->kind, [DiagnosisRowKind::Area, DiagnosisRowKind::TreeElement], true) ? $reading->scoreRow($row, '3', $admin) : $reading->approveRow($row, $admin);
     }
 
@@ -404,4 +405,37 @@ function passTurnstile(mixed $page): void
             '<input type="hidden" name="cf-turnstile-response" value="test-token">'
         )
     JS);
+}
+
+/**
+ * Logs the customer in with the password, as on B1 (14 · 14.2).
+ */
+function loginInBrowser($user): mixed
+{
+    fakeTurnstile();
+    $user->forceFill(['password' => Hash::make('a-long-enough-password')])->save();
+
+    $page = visit('/belepes');
+    $page->click('Jelszóval lépek be');
+    $page->fill('email', $user->email)->fill('password', 'a-long-enough-password');
+    passTurnstile($page);
+    $page->press('Belépek');
+
+    return $page;
+}
+
+/**
+ * Logs an admin in with the password (01 · 1.2).
+ */
+function adminLoginInBrowser(User $admin): mixed
+{
+    fakeTurnstile();
+    $admin->forceFill(['password' => Hash::make('a-long-enough-password')])->save();
+
+    $page = visit('/admin/belepes');
+    $page->fill('email', $admin->email)->fill('password', 'a-long-enough-password');
+    passTurnstile($page);
+    $page->press('Belépek');
+
+    return $page;
 }

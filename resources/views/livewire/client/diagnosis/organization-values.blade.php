@@ -65,7 +65,7 @@
                         </div>
                     @endif
                     @if (blank($item['low_example']) || blank($item['high_example']))
-                        <p class="text-sm font-semibold text-coral-dark">{{ __('diagnosis.organization_values.ends_missing') }}</p>
+                        <p class="text-sm font-semibold text-coral-ink">{{ __('diagnosis.organization_values.ends_missing') }}</p>
                     @endif
                     <x-form.error :name="'items.'.$index.'.low_example'" :id="'items-'.$index.'-low'" />
                     <x-form.error :name="'items.'.$index.'.high_example'" :id="'items-'.$index.'-high'" />

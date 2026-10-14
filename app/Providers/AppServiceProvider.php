@@ -34,8 +34,10 @@ use App\Support\CurrentOrganization;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Markdown;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -70,6 +72,22 @@ class AppServiceProvider extends ServiceProvider
     {
         Carbon::setLocale(config('app.locale'));
         CarbonImmutable::setLocale(config('app.locale'));
+
+        // Outside production a lazy-loaded relation of a model from a list fails loudly:
+        // that is an N+1 query (NFR · 6). In production it only costs a query.
+        Model::preventLazyLoading(! $this->app->isProduction());
+
+        // On staging the mégis walks the app: an N+1 there is logged, not thrown.
+        if ($this->app->environment('staging')) {
+            Model::handleLazyLoadingViolationUsing(fn (Model $model, string $relation) => Log::warning('Lazy loaded relation (N+1).', [
+                'model' => $model::class,
+                'relation' => $relation,
+            ]));
+        }
+
+        // Names, quotes and answers in a markdown e-mail stay text: "[x](link)"
+        // in someone's name does not become a link in a mail to someone else.
+        Markdown::withSecuredEncoding();
 
         $this->reportFailedJobs();
         $this->configureRateLimiting();

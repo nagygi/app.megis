@@ -45,7 +45,7 @@
                 <span>{{ __('calendar.profile.metadata_until', ['date' => $connection->metadata_expires_at->format('Y.m.d.')]) }}</span>
                 <x-ui.badge :tone="$connection->status === 'active' ? 'green' : ($connection->status === 'broken' ? 'coral' : 'muted')">{{ __('calendar.statuses.'.$connection->status) }}</x-ui.badge>
                 @if ($connection->error)
-                    <span class="text-coral-dark">{{ $connection->error }}</span>
+                    <span class="text-coral-ink">{{ $connection->error }}</span>
                 @endif
             </div>
         @empty

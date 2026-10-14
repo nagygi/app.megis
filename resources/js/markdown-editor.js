@@ -32,6 +32,21 @@ export default ({ max }) => ({
             }],
         });
 
+        // CodeMirror types into its own hidden field: it takes the textarea's
+        // label and help, and a click on the label focuses it (WCAG 1.3.1, 4.1.2).
+        const field = this.editor.codemirror.getInputField();
+        const label = input.labels?.[0];
+
+        if (label) {
+            label.id ||= `${input.id}-label`;
+            field.setAttribute('aria-labelledby', label.id);
+            label.addEventListener('click', () => this.editor?.codemirror.focus());
+        }
+
+        if (input.hasAttribute('aria-describedby')) {
+            field.setAttribute('aria-describedby', input.getAttribute('aria-describedby'));
+        }
+
         this.editor.codemirror.on('change', () => {
             input.value = this.editor.value();
             input.dispatchEvent(new Event('input', { bubbles: true }));

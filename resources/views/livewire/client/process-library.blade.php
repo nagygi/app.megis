@@ -17,7 +17,7 @@
                 <a href="{{ route('client.processes.show', [$organization, $process]) }}" class="flex items-center justify-between gap-3 rounded-card bg-white px-4 py-3 text-charcoal no-underline hover:bg-paper">
                     <span>
                         <span class="block font-semibold">{{ $process->name }}</span>
-                        <span @class(['block text-sm', 'text-grey-700' => $process->isInCalendar(), 'text-coral-dark' => ! $process->isInCalendar()])>
+                        <span @class(['block text-sm', 'text-grey-700' => $process->isInCalendar(), 'text-coral-ink' => ! $process->isInCalendar()])>
                             {{ collect([
                                 $process->rhythm?->label() ?? $process->rhythm_label,
                                 $process->responsible?->name,

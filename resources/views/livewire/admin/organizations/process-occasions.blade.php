@@ -37,7 +37,7 @@
                                     <li wire:key="occasion-material-{{ $material->uuid }}">
                                         <a href="{{ route('admin.materials.show', $material) }}" class="font-semibold">{{ $material->is_situation ? __('processes.occasions.situation') : ($material->original_name ?? $material->source->label()) }}</a>
                                         · {{ $material->user?->name ?? $material->creator?->name ?? '–' }}
-                                        · <span @class(['text-coral-dark' => $material->status === \App\Enums\MaterialStatus::Failed])>{{ $material->status->label() }}</span>
+                                        · <span @class(['text-coral-ink' => $material->status === \App\Enums\MaterialStatus::Failed])>{{ $material->status->label() }}</span>
                                         @if ($material->durationLabel())
                                             · {{ $material->durationLabel() }}
                                         @endif
