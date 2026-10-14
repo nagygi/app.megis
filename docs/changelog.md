@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 0.60 · {hash} · 2026-10-14
+## 0.60 · 1dbea23 · 2026-10-14
 
 M5 · Futás (12, 13, 18, 19, 22, 26.1–26.2, 26.4).
 
