@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 0.40 · (még nincs commitolva) · 2026-10-14
+## 0.40 · 5d398e9 · 2026-10-14
 
 M3 · Értékmérés-motor és Értéktükör (06, 12.7 előkészítés, 30 alap, 31.5 részben).
 
