@@ -1,6 +1,11 @@
 <?php
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Membership;
+use App\Models\Organization;
+use App\Models\User;
+use App\Services\Auth\GuardSession;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /*
@@ -15,8 +20,14 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(LazilyRefreshDatabase::class)
     ->in('Feature');
+
+// Browser tests load the built assets, so layout and contrast are checked for real (npm run build first).
+pest()->extend(TestCase::class)
+    ->use(LazilyRefreshDatabase::class)
+    ->beforeEach(fn () => $this->withVite())
+    ->in('Browser');
 
 /*
 |--------------------------------------------------------------------------
@@ -44,7 +55,54 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Logs an admin in on the admin guard the way a real login does: the session
+ * carries the current auth epoch and a fresh activity time.
+ */
+function actingAsAdmin(?User $admin = null): User
 {
-    // ..
+    $admin ??= User::factory()->admin()->create();
+
+    test()->actingAs($admin, GuardSession::ADMIN)->withSession([
+        'auth_epoch.'.GuardSession::ADMIN => $admin->auth_epoch,
+        GuardSession::ADMIN_LAST_ACTIVITY_KEY => now()->getTimestamp(),
+    ]);
+
+    return $admin;
+}
+
+/**
+ * Logs a customer in on the customer guard, with the session's auth epoch.
+ */
+function actingAsCustomer(User $customer): User
+{
+    test()->actingAs($customer, GuardSession::WEB)->withSession([
+        'auth_epoch.'.GuardSession::WEB => $customer->auth_epoch,
+    ]);
+
+    return $customer;
+}
+
+/**
+ * An activated customer with an active membership in an active organization.
+ */
+function customerOf(?Organization $organization = null): User
+{
+    $organization ??= Organization::factory()->create();
+    $customer = User::factory()->create();
+
+    Membership::factory()->for($organization)->for($customer)->create();
+
+    return $customer;
+}
+
+/**
+ * Cloudflare's verification answers with the given result.
+ */
+function fakeTurnstile(bool $success = true): void
+{
+    Http::fake([
+        'https://challenges.cloudflare.com/*' => Http::response(['success' => $success]),
+        'https://api.pwnedpasswords.com/*' => Http::response(''),
+    ]);
 }

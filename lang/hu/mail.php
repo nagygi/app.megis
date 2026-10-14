@@ -1,0 +1,80 @@
+<?php
+
+return [
+
+    'greeting' => 'Szia!',
+    'salutation' => 'mégis',
+
+    'admin_invitation' => [
+        'subject' => 'Meghívó a mégis admin felületére',
+        'body' => ':inviter meghívott a mégis admin felületére. Állítsd be a jelszavad.',
+        'action' => 'Jelszó beállítása',
+        'validity' => 'A link 24 óráig él.',
+    ],
+
+    'admin_password_reset' => [
+        'subject' => 'Új jelszó-beállító link a mégis admin felületére',
+        'body' => ':admin új jelszó-beállító linket kért neked. A régi jelszavad már nem érvényes.',
+        'action' => 'Új jelszó beállítása',
+        'validity' => 'A link 24 óráig él.',
+    ],
+
+    'password_changed' => [
+        'subject' => 'Megváltozott a jelszavad',
+        'body' => 'A jelszavad :time-kor megváltozott.',
+        'admin_note' => 'Ha nem te voltál, szólj egy szuperadminnak.',
+        'customer_note' => 'Ha nem te voltál, írj nekünk: :email',
+    ],
+
+    'admin_locked' => [
+        'subject' => 'Zárolt admin fiók: :name',
+        'body' => ':name (:email) admin fiókja 10 sikertelen belépési kísérlet után zárolódott.',
+        'unlock' => 'Feloldás konzolból: php artisan megis:admin:unlock :email',
+    ],
+
+    'client_invitation' => [
+        'subject' => 'Meghívó a mégis-be',
+        'body' => ':inviter meghívott a mégis-be, a(z) :organization felhasználójaként.',
+        'action' => 'Regisztráció',
+        'validity' => 'A link 14 napig él.',
+    ],
+
+    'organization_added' => [
+        'subject' => 'Hozzáadtunk a(z) :organization szervezethez',
+        'body' => 'Hozzáadtunk a(z) :organization szervezethez a mégis-ben.',
+        'action' => 'Belépés',
+    ],
+
+    'login_code' => [
+        'subject' => 'A belépő kódod: :code',
+        'body' => 'A belépő kódod:',
+        'action' => 'Belépek',
+        'validity' => 'A kód és a link 15 percig él. Ha nem te kérted, hagyd figyelmen kívül.',
+    ],
+
+    'password_confirmation_code' => [
+        'subject' => 'Megerősítő kód: :code',
+        'body' => 'A jelszó beállításához ezt a kódot írd be:',
+        'validity' => 'A kód 15 percig él. Ha nem te kérted, hagyd figyelmen kívül.',
+    ],
+
+    'email_changed' => [
+        'subject' => 'Megváltozott a mégis-fiókod e-mail címe',
+        'old_address' => 'A mégis-fiókod e-mail címe erre változott: :email. Ha nem te voltál, írj nekünk: :support.',
+        'new_address' => 'Ez lett a mégis-fiókod e-mail címe. Mostantól ide küldjük a leveleket.',
+    ],
+
+    'error_alert' => [
+        'subject' => '[:environment] Hiba a mégis-ben: :error',
+        'intro' => 'Hiba történt a mégis :environment környezetében.',
+        'environment' => 'Környezet',
+        'error' => 'Hiba',
+        'message' => 'Üzenet',
+        'url' => 'URL',
+        'job' => 'Job',
+        'time' => 'Időpont',
+        'log_id' => 'Napló-azonosító',
+        'throttle_note' => 'Ugyanez a hiba :minutes percig nem küld újabb levelet. A részletek a naplóban vannak.',
+    ],
+
+];

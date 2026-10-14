@@ -1,0 +1,176 @@
+/*
+ * Brand icons and symbols from the mégis design system (_ds/tokens/icons.css,
+ * _ds/tokens/assets.css), painted through a CSS mask so they take currentColor.
+ * Generated from resources/images/megis; regenerate when the design system changes.
+ */
+
+.megis-mask {
+    display: inline-block;
+    flex: none;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.megis-icon-arrow-circle-right {
+    -webkit-mask-image: url('../../images/megis/icons/arrow-circle-right.svg');
+    mask-image: url('../../images/megis/icons/arrow-circle-right.svg');
+}
+
+.megis-icon-arrow-curve {
+    -webkit-mask-image: url('../../images/megis/icons/arrow-curve.svg');
+    mask-image: url('../../images/megis/icons/arrow-curve.svg');
+}
+
+.megis-icon-arrow-right {
+    -webkit-mask-image: url('../../images/megis/icons/arrow-right.svg');
+    mask-image: url('../../images/megis/icons/arrow-right.svg');
+}
+
+.megis-icon-bullet {
+    -webkit-mask-image: url('../../images/megis/icons/bullet.svg');
+    mask-image: url('../../images/megis/icons/bullet.svg');
+}
+
+.megis-icon-check {
+    -webkit-mask-image: url('../../images/megis/icons/check.svg');
+    mask-image: url('../../images/megis/icons/check.svg');
+}
+
+.megis-icon-chevron-right {
+    -webkit-mask-image: url('../../images/megis/icons/chevron-right.svg');
+    mask-image: url('../../images/megis/icons/chevron-right.svg');
+}
+
+.megis-icon-close {
+    -webkit-mask-image: url('../../images/megis/icons/close.svg');
+    mask-image: url('../../images/megis/icons/close.svg');
+}
+
+.megis-icon-document {
+    -webkit-mask-image: url('../../images/megis/icons/document.svg');
+    mask-image: url('../../images/megis/icons/document.svg');
+}
+
+.megis-icon-home {
+    -webkit-mask-image: url('../../images/megis/icons/home.svg');
+    mask-image: url('../../images/megis/icons/home.svg');
+}
+
+.megis-icon-mail {
+    -webkit-mask-image: url('../../images/megis/icons/mail.svg');
+    mask-image: url('../../images/megis/icons/mail.svg');
+}
+
+.megis-icon-menu {
+    -webkit-mask-image: url('../../images/megis/icons/menu.svg');
+    mask-image: url('../../images/megis/icons/menu.svg');
+}
+
+.megis-icon-plus {
+    -webkit-mask-image: url('../../images/megis/icons/plus.svg');
+    mask-image: url('../../images/megis/icons/plus.svg');
+}
+
+.megis-icon-refresh {
+    -webkit-mask-image: url('../../images/megis/icons/refresh.svg');
+    mask-image: url('../../images/megis/icons/refresh.svg');
+}
+
+.megis-icon-share {
+    -webkit-mask-image: url('../../images/megis/icons/share.svg');
+    mask-image: url('../../images/megis/icons/share.svg');
+}
+
+.megis-symbol-circle {
+    -webkit-mask-image: url('../../images/megis/symbols/circle.svg');
+    mask-image: url('../../images/megis/symbols/circle.svg');
+}
+
+.megis-symbol-fire {
+    -webkit-mask-image: url('../../images/megis/symbols/fire.svg');
+    mask-image: url('../../images/megis/symbols/fire.svg');
+}
+
+.megis-symbol-fruit {
+    -webkit-mask-image: url('../../images/megis/symbols/fruit.svg');
+    mask-image: url('../../images/megis/symbols/fruit.svg');
+}
+
+.megis-symbol-growth-rings {
+    -webkit-mask-image: url('../../images/megis/symbols/growth-rings.svg');
+    mask-image: url('../../images/megis/symbols/growth-rings.svg');
+}
+
+.megis-symbol-mycelium {
+    -webkit-mask-image: url('../../images/megis/symbols/mycelium.svg');
+    mask-image: url('../../images/megis/symbols/mycelium.svg');
+}
+
+.megis-symbol-root {
+    -webkit-mask-image: url('../../images/megis/symbols/root.svg');
+    mask-image: url('../../images/megis/symbols/root.svg');
+}
+
+.megis-symbol-scent {
+    -webkit-mask-image: url('../../images/megis/symbols/scent.svg');
+    mask-image: url('../../images/megis/symbols/scent.svg');
+}
+
+.megis-symbol-shade {
+    -webkit-mask-image: url('../../images/megis/symbols/shade.svg');
+    mask-image: url('../../images/megis/symbols/shade.svg');
+}
+
+.megis-symbol-soil {
+    -webkit-mask-image: url('../../images/megis/symbols/soil.svg');
+    mask-image: url('../../images/megis/symbols/soil.svg');
+}
+
+.megis-symbol-spiral {
+    -webkit-mask-image: url('../../images/megis/symbols/spiral.svg');
+    mask-image: url('../../images/megis/symbols/spiral.svg');
+}
+
+.megis-symbol-tree-of-life {
+    -webkit-mask-image: url('../../images/megis/symbols/tree-of-life.svg');
+    mask-image: url('../../images/megis/symbols/tree-of-life.svg');
+}
+
+.megis-symbol-trunk {
+    -webkit-mask-image: url('../../images/megis/symbols/trunk.svg');
+    mask-image: url('../../images/megis/symbols/trunk.svg');
+}
+
+/* Wordmark lockups keep their own colours, so they are background images, not masks. */
+.megis-logo {
+    display: inline-block;
+    aspect-ratio: 353 / 148;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.megis-logo-black {
+    background-image: url('../../images/megis/logo/black.svg');
+}
+
+.megis-logo-red-dark {
+    background-image: url('../../images/megis/logo/red-dark.svg');
+}
+
+.megis-logo-red-light {
+    background-image: url('../../images/megis/logo/red-light.svg');
+}
+
+.megis-logo-white {
+    background-image: url('../../images/megis/logo/white.svg');
+}
+
+.megis-logo-yellow-light {
+    background-image: url('../../images/megis/logo/yellow-light.svg');
+}

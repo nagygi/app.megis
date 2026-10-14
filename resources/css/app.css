@@ -1,9 +1,103 @@
 @import 'tailwindcss';
+@import './megis/assets.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+/*
+ * mégis design tokens (prototype 3/_ds/tokens). Only the brand palette exists:
+ * Tailwind's default colours are switched off so a raw colour cannot slip in.
+ */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: var(--font-geologica), ui-sans-serif, system-ui, sans-serif;
+
+    --color-*: initial;
+    --color-transparent: transparent;
+    --color-current: currentColor;
+    --color-white: #ffffff;
+    --color-black: #000000;
+
+    /* Three corals, three yellows, one green (_ds/tokens/colors.css). */
+    --color-coral-dark: #ff4255;
+    --color-coral: #ff5a6a;
+    --color-coral-light: #ffa6af;
+    --color-yellow-dark: #ffc640;
+    --color-yellow: #ffcf4b;
+    --color-yellow-light: #ffea94;
+    --color-yellow-pale: #fff9e6;
+    --color-green: #38544f;
+    --color-green-muted: #5a7570;
+    --color-green-soft: #eaf0ee;
+    --color-cream: #fffef8;
+    --color-paper: #fbfbf6;
+    --color-charcoal: #3a3a3a;
+
+    /* Greys used by the design system and the prototype. */
+    --color-grey-700: #5a5a5a;
+    --color-grey-600: #747474;
+    --color-grey-500: #9a9a9a;
+    --color-grey-400: #b8b8b8;
+    --color-grey-350: #c8c8c8;
+    --color-grey-300: #d9d9d9;
+    --color-grey-250: #d0d0d0;
+    --color-grey-200: #e8e8e8;
+    --color-grey-150: #ededed;
+    --color-grey-100: #f2f2f2;
+
+    /* The identity is pills and circles; cards follow the prototype's app radius. */
+    --radius-card: 1.25rem;
+    --radius-pill: 999px;
+
+    /* 15 · 15.6: mobile below 768px (Tailwind md), tablet 768–1199px, desktop from 1200px. */
+    --breakpoint-desktop: 75rem;
+
+    --ease-standard: cubic-bezier(0.2, 0.6, 0.2, 1);
+    --ease-brand-out: cubic-bezier(0, 0.6, 0.3, 1);
+}
+
+@layer base {
+    html {
+        background-color: var(--color-cream);
+        color: var(--color-charcoal);
+    }
+
+    body {
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+        text-decoration-thickness: 2px;
+        text-underline-offset: 3px;
+    }
+
+    ::selection {
+        background-color: var(--color-yellow);
+        color: var(--color-charcoal);
+    }
+
+    /* 2px coral focus ring; yellow on dark grounds (_ds readme). */
+    :focus-visible {
+        outline: 2px solid var(--color-coral);
+        outline-offset: 2px;
+    }
+
+    .on-dark :focus-visible {
+        outline-color: var(--color-yellow);
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@utility press {
+    transition:
+        background-color 200ms var(--ease-standard),
+        color 200ms var(--ease-standard),
+        transform 120ms var(--ease-standard);
+
+    &:active {
+        transform: scale(0.97);
+    }
 }

@@ -11,7 +11,16 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
+        <testsuite name="Browser">
+            <directory>tests/Browser</directory>
+        </testsuite>
     </testsuites>
+    <groups>
+        <exclude>
+            <!-- Needs PostgreSQL (jsonb); runs once the megis_test database is available. -->
+            <group>pgsql</group>
+        </exclude>
+    </groups>
     <source>
         <include>
             <directory>app</directory>
@@ -20,6 +29,12 @@
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="APP_LOCALE" value="hu"/>
+        <env name="APP_TIMEZONE" value="Europe/Budapest"/>
+        <env name="MATERIALS_DISK_DRIVER" value="local"/>
+        <env name="MEGIS_ALERT_RECIPIENTS" value=""/>
+        <env name="MEGIS_MAIL_ALLOWLIST" value=""/>
+        <env name="MEGIS_HEALTH_TOKEN" value=""/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>

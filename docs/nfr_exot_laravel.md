@@ -8,7 +8,7 @@ A projekt specifikus NFR, ami ezt kiegészíti: docs\nfr_project.md
 # Tech stack
 
 - Laravel 13 +
-- PHP 8.3 
+- PHP 8.4 
 - PostgreSQL
 - Redis
 
@@ -16,7 +16,7 @@ A projekt specifikus NFR, ami ezt kiegészíti: docs\nfr_project.md
 
 - install.md: lokális telepítés, szükséges verziók, indítás, build, teszt parancsok.
 - deploy.md: release lépések, konfigurációs pontok, rollback lépések.
-- changelog.md: rövid, verzióhoz kötött változáslista.
+- changelog.md: rövid, verzióhoz kötött változáslista. LEgyen venne verzió, git commit hash és a commit dátuma alapján legyen rendezve 
 - readme kiegészítés: projekt-specifikus döntések, külső integrációk.
 - cron.md az ütemeett háttér folymatoknak 
 

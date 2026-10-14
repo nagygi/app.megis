@@ -1,58 +1,36 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# mégis
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A mégis MVP-je: admin felület, nyilvános Értéktükör és az ügyféloldali diagnózis-út.
 
-## About Laravel
+- Követelmények: `docs/backlog/` (01–33), NFR (`docs/nfr_exot_laravel.md`, `docs/nfr_project.md`), üzemeltetés (`docs/uzemeltetes.md`).
+- Telepítés: `docs/install.md`. Kiadás és rollback: `docs/deploy.md`. Ütemezett feladatok: `docs/cron.md`. Változásnapló: `docs/changelog.md`.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Laravel 13, PHP 8.4, PostgreSQL, Redis, Livewire 4 + Alpine, Tailwind 4, Pest.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Projekt-döntések
 
-## Learning Laravel
+- **Admin felület:** saját Blade és Tailwind, Filament nélkül (NFR · 3).
+- **Livewire:** class-alapú komponensek (`app/Livewire`). A Livewire és az Alpine a `resources/js/app.js`-ből indul, nem automatikus injektálással, így minden lapon elérhető az Alpine.
+- **Design system:** a `prototype 3/_ds` tokenjei a `resources/css/app.css` `@theme` blokkjában vannak. Csak a brand palettája használható, a Tailwind alapszínei ki vannak kapcsolva. Az ikonok, szimbólumok és logók a `resources/images/megis` alatt vannak, CSS-maszkként és háttérképként (`resources/css/megis/assets.css`).
+- **Font:** Geologica, a Bunny Fonts-ról build közben letöltve és saját hostról kiszolgálva. Futás közben nincs külső fontkérés.
+- **Akadálymentesség:** a gombok és szövegek AA-kontrasztúak. A coral gombon fekete a szöveg, mert krémmel csak 3:1 lenne. A hibaüzenet charcoal szövegű, coral jellel.
+- **Nyelv és idő:** magyar és `Europe/Budapest` alapból. Minden felületi szöveg a `lang/hu` alatt van.
+- **Verzió:** egy helyen, a `config/megis.php`-ban.
+- **Üzemeltetés:**
+  - napló öt csatornán (app, auth, ai, mail, queue), érzékenyadat-szűréssel;
+  - hibariasztás e-mailben, 15 perces deduplikálással;
+  - `GET /health` session nélkül, a részletek tokennel kérhetők;
+  - `php artisan megis:setup:check`.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Külső integrációk
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
-```
-
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Szolgáltatás | Mire | Állapot |
+|---|---|---|
+| Cloudflare Turnstile | captcha a publikus formokon és a belépéseknél | ellenőrzés kész (`App\Rules\Turnstile`) |
+| S3-kompatibilis tár (EU) | hangfájlok, átiratok, dokumentumok, jogi PDF-ek | `materials` disk |
+| Tranzakciós levélküldő | rendszerlevelek, megis.hu feladóval | konfigurációból |
+| AI-szolgáltatók (Anthropic, OpenAI, Gemini) | értékfelismerés, kivonatok, vázlatok | 16-os jegy |
+| Átíró szolgáltató | átirat beszélő-felismeréssel | 12.7-es PoC dönt |
+| Google Calendar, Microsoft 365 | naptár összekötése, csak olvasás | 09-es jegy |

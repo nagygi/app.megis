@@ -60,6 +60,33 @@ return [
             'report' => false,
         ],
 
+        /*
+         * Private store for recordings, transcripts, documents and legal PDFs
+         * (docs/uzemeltetes.md · 1). Never public: files are only handed out
+         * through short-lived signed URLs after an authorization check.
+         */
+        'materials' => env('MATERIALS_DISK_DRIVER', 'local') === 's3'
+            ? [
+                'driver' => 's3',
+                'key' => env('AWS_ACCESS_KEY_ID'),
+                'secret' => env('AWS_SECRET_ACCESS_KEY'),
+                'region' => env('AWS_DEFAULT_REGION'),
+                'bucket' => env('MATERIALS_BUCKET', env('AWS_BUCKET')),
+                'endpoint' => env('AWS_ENDPOINT'),
+                'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+                'visibility' => 'private',
+                'throw' => true,
+                'report' => true,
+            ]
+            : [
+                'driver' => 'local',
+                'root' => storage_path('app/private/materials'),
+                'visibility' => 'private',
+                'serve' => false,
+                'throw' => true,
+                'report' => true,
+            ],
+
     ],
 
     /*

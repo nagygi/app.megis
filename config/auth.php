@@ -38,7 +38,15 @@ return [
     */
 
     'guards' => [
+        // Customer side (14).
         'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        // Admin interface (01). A separate guard lets an admin work in a
+        // customer's name on the customer side in parallel (14 · 14.6).
+        'admin' => [
             'driver' => 'session',
             'provider' => 'users',
         ],
