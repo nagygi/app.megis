@@ -11,6 +11,9 @@ enum AuditEventType: string
     case ImpersonationEnded = 'impersonation_ended';
     case ImpersonationAction = 'impersonation_action';
     case EmailChanged = 'email_changed';
+    // A peer's consent on T1 and its withdrawal (25 · 25.2, 31 · 31.6).
+    case ConsentGiven = 'consent_given';
+    case ConsentRevoked = 'consent_revoked';
 
     public function label(): string
     {

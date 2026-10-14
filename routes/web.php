@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AiUsageExportController;
 use App\Http\Controllers\Admin\ImpersonationController as AdminImpersonationController;
 use App\Http\Controllers\Admin\LegalDocumentVersionController;
 use App\Http\Controllers\Admin\MaterialAudioController;
+use App\Http\Controllers\Client\CalendarOAuthController;
 use App\Http\Controllers\Client\CustomerLoginController;
 use App\Http\Controllers\Client\CustomerLogoutController;
 use App\Http\Controllers\Client\HomeController;
@@ -76,6 +77,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('szervezetek/{organization}/csapatok', Admin\Organizations\Teams::class)->name('organizations.teams');
         Route::livewire('szervezetek/{organization}/felhasznalok', Admin\Organizations\Members::class)->name('organizations.members');
         Route::livewire('szervezetek/{organization}/ertekek', Admin\Organizations\Values::class)->name('organizations.values');
+        Route::livewire('szervezetek/{organization}/folyamatok', Admin\Organizations\Processes::class)->name('organizations.processes');
+        Route::livewire('szervezetek/{organization}/diagnozisok', Admin\Organizations\Diagnoses::class)->name('organizations.diagnoses');
         Route::livewire('szervezetek/{organization}/felhasznalok/meghivas', Admin\Organizations\MemberForm::class)->name('organizations.members.create');
         Route::livewire('szervezetek/{organization}/felhasznalok/{membership}/szerkesztes', Admin\Organizations\MemberForm::class)
             ->name('organizations.members.edit')
@@ -85,12 +88,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::livewire('diagnozisok', Admin\Diagnoses\Index::class)->name('diagnoses.index');
         Route::livewire('diagnozisok/uj', Admin\Diagnoses\Form::class)->name('diagnoses.create');
+        Route::livewire('diagnozisok/inditas', Admin\MainDiagnoses\Form::class)->name('main-diagnoses.create');
         Route::livewire('diagnozisok/feltoltes', Admin\Diagnoses\Upload::class)->name('diagnoses.upload');
         Route::livewire('anyagok/{material}', Admin\Materials\Show::class)->name('materials.show');
         Route::get('anyagok/{material}/hang', MaterialAudioController::class)->name('materials.audio');
         Route::livewire('tamogato-kerdesek', Admin\SupportQuestions\Index::class)->name('support-questions.index');
         Route::livewire('diagnozisok/{diagnosis}', Admin\Diagnoses\Show::class)->name('diagnoses.show');
         Route::livewire('diagnozisok/{diagnosis}/adatok', Admin\Diagnoses\Form::class)->name('diagnoses.edit');
+        Route::livewire('diagnozisok/{diagnosis}/beallitas', Admin\MainDiagnoses\Form::class)->name('main-diagnoses.edit');
+        Route::livewire('diagnozisok/{diagnosis}/reszdiagnozisok', Admin\MainDiagnoses\Subdiagnoses::class)->name('main-diagnoses.subdiagnoses');
         Route::livewire('diagnozis-tipusok', Admin\DiagnosisTypes\Index::class)->name('diagnosis-types.index');
         Route::livewire('diagnozis-tipusok/uj', Admin\DiagnosisTypes\Form::class)->name('diagnosis-types.create');
         Route::livewire('diagnozis-tipusok/{type}/szerkesztes', Admin\DiagnosisTypes\Form::class)->name('diagnosis-types.edit');
@@ -159,6 +165,11 @@ Route::middleware('customer')->name('client.')->group(function () {
 
     Route::middleware('legal')->group(function () {
         Route::get('tovabb', LandingController::class)->name('landing');
+        // A fixed callback address for the calendar apps (09 · 9.2).
+        Route::get('naptar/{provider}/visszahivas', [CalendarOAuthController::class, 'callback'])
+            ->middleware('not-impersonating')
+            ->whereIn('provider', ['google', 'microsoft'])
+            ->name('calendar.callback');
 
         Route::prefix('{organization:slug}')
             ->where(['organization' => '[a-z0-9]+(?:-[a-z0-9]+)*'])
@@ -167,9 +178,29 @@ Route::middleware('customer')->name('client.')->group(function () {
                 Route::get('/', HomeController::class)->name('home');
                 Route::livewire('profil', Client\Profile::class)->name('profile');
                 Route::livewire('ertektar', Client\ValueLibrary::class)->name('values');
+                Route::livewire('tarak/folyamatok', Client\ProcessLibrary::class)->name('processes');
+                Route::livewire('tarak/folyamatok/{process}', Client\ProcessSheet::class)->whereNumber('process')->name('processes.show');
                 // Not in the user's name: the recording is the user's own voice (14 · 14.6).
                 Route::livewire('ertektukor', Mirror\Record::class)->middleware('not-impersonating')->name('mirror.record');
                 Route::livewire('ertektukor/{session}', Mirror\Result::class)->name('mirror.result');
+
+                // The filling of a main diagnosis: the leader's V1–V9, the peer's T1–T5 (23, 25).
+                Route::livewire('diagnozis/{diagnosis}', Client\Diagnosis\Overview::class)->name('diagnosis.show');
+                Route::livewire('diagnozis/{diagnosis}/sajat-ertekek', Client\Diagnosis\OwnValues::class)->name('diagnosis.sajat-ertekek');
+                Route::livewire('diagnozis/{diagnosis}/szervezet-ertekei', Client\Diagnosis\OrganizationValues::class)->name('diagnosis.szervezet-ertekei');
+                Route::livewire('diagnozis/{diagnosis}/markad-alapja', Client\Diagnosis\Brand::class)->name('diagnosis.markad-alapja');
+                Route::livewire('diagnozis/{diagnosis}/megeles', Client\Diagnosis\Experience::class)->name('diagnosis.megeles');
+                Route::livewire('diagnozis/{diagnosis}/folyamatok', Client\Diagnosis\Processes::class)->name('diagnosis.folyamatok');
+                Route::livewire('diagnozis/{diagnosis}/folyamatok/naptar', Client\Diagnosis\ProcessCalendar::class)->name('diagnosis.process-calendar');
+                Route::get('diagnozis/{diagnosis}/folyamatok/naptar/{provider}', [CalendarOAuthController::class, 'redirect'])
+                    ->middleware('not-impersonating')
+                    ->whereIn('provider', ['google', 'microsoft'])
+                    ->name('diagnosis.process-calendar.connect');
+                Route::livewire('diagnozis/{diagnosis}/folyamatok/beszelgetes', Client\Diagnosis\ProcessConversation::class)->name('diagnosis.process-conversation');
+                Route::livewire('diagnozis/{diagnosis}/folyamatok/lista', Client\Diagnosis\ProcessList::class)->name('diagnosis.process-list');
+                Route::livewire('diagnozis/{diagnosis}/folyamatok/osszegzes', Client\Diagnosis\ProcessSummary::class)->name('diagnosis.process-summary');
+                Route::livewire('diagnozis/{diagnosis}/folyamatok/{process}', Client\ProcessSheet::class)->whereNumber('process')->name('diagnosis.process');
+                Route::livewire('diagnozis/{diagnosis}/ki-lat-mit', Client\Diagnosis\Visibility::class)->name('diagnosis.ki-lat-mit');
             });
     });
 });

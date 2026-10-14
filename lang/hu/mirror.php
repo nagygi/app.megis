@@ -115,4 +115,9 @@ return [
     'booking_summary_curious' => ':name időpontot foglalna · kíváncsi: :curiosity',
     'someone' => 'Valaki',
 
+    // 17 · 17.6: a mirror from the own menu belongs to a running diagnosis.
+    'which_diagnosis' => 'Melyik diagnózishoz tartozzon?',
+    'which_diagnosis_required' => 'Válaszd ki, melyik diagnózishoz tartozzon.',
+    'back_to_diagnosis' => 'A tükröd elkészült: az új értékeidet a saját értékeid között nézheted át.',
+
 ];

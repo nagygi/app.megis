@@ -80,6 +80,12 @@ return [
         'test_keys' => 'Élesben a Cloudflare tesztkulcsai nem használhatók.',
     ],
 
+    'calendar' => [
+        'label' => 'Naptár-összekötés',
+        'ok' => 'A Google- és a Microsoft-alkalmazás kulcsai be vannak állítva.',
+        'missing' => 'Hiányzik: :variables. Addig csak iCal link, ICS fájl és beszélgetés választható.',
+    ],
+
     'legal_documents' => [
         'label' => 'Jogi dokumentumok',
         'ok' => 'Mindhárom dokumentum fel van töltve.',

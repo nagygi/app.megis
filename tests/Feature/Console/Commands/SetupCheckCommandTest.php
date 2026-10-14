@@ -16,8 +16,15 @@ beforeEach(function () {
         'megis.health.min_free_disk_mb' => 0,
         // The AI tasks with a prompt have a key and a price; audio is handled locally.
         'ai.providers.anthropic.key' => 'test-key',
-        'ai.prices' => ['claude-sonnet-5-5' => ['input' => 3.0, 'output' => 15.0]],
+        'ai.prices' => [
+            'claude-sonnet-5-5' => ['input' => 3.0, 'output' => 15.0],
+            'claude-haiku-5-5' => ['input' => 1.0, 'output' => 5.0],
+        ],
         'megis.transcriber' => 'fake',
+        'services.google.client_id' => 'google-id',
+        'services.google.client_secret' => 'google-secret',
+        'services.microsoft.client_id' => 'microsoft-id',
+        'services.microsoft.client_secret' => 'microsoft-secret',
     ]);
     Process::fake();
 

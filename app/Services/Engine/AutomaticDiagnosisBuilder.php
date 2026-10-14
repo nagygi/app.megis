@@ -43,6 +43,9 @@ class AutomaticDiagnosisBuilder
         ?string $speaker = null,
     ): Diagnosis {
         return DB::transaction(function () use ($material, $user, $organization, $type, $name, $date, $speaker): Diagnosis {
+            // Inside a main diagnosis it is a subdiagnosis with the parent's status (17 · 17.4).
+            $parent = $material->parent_diagnosis_id === null ? null : Diagnosis::query()->find($material->parent_diagnosis_id);
+
             $diagnosis = $this->diagnoses->create([
                 'name' => mb_substr($name, 0, 255),
                 'organization_id' => $organization->id,
@@ -52,7 +55,8 @@ class AutomaticDiagnosisBuilder
                 'diagnosed_on' => $date->toDateString(),
                 'material_id' => $material->id,
                 'speaker' => $speaker,
-            ], DiagnosisCreator::Automatic, DiagnosisStatus::PendingApproval);
+                'parent_id' => $parent?->id,
+            ], DiagnosisCreator::Automatic, $parent?->status ?? DiagnosisStatus::PendingApproval);
 
             $this->syncRows($diagnosis);
 

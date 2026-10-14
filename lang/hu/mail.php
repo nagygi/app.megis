@@ -84,4 +84,19 @@ return [
         'throttle_note' => 'Ugyanez a hiba :minutes percig nem küld újabb levelet. A részletek a naplóban vannak.',
     ],
 
+    'diagnosis_leader' => [
+        'subject' => 'Elindult a(z) :subject diagnózisa',
+        'body_new' => ':admin elindította a(z) :subject diagnózisát a mégis-ben, és téged kért meg, hogy vezesd.',
+        'body_existing' => 'Elindult a(z) :subject diagnózisa a mégis-ben.',
+        'timing' => 'Kb. :minutes perc, :date-ig.',
+        'timing_open' => 'Kb. :minutes perc. A kezdés napja egyeztetés alatt.',
+        'action' => 'Kezdjük',
+    ],
+
+    'diagnosis_peer' => [
+        'subject' => 'Hogyan látod te a(z) :subject működését?',
+        'body' => ':leader kíváncsi, hogyan látod te a(z) :subject működését. Kb. :minutes perc.',
+        'action' => 'Kezdem',
+    ],
+
 ];

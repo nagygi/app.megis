@@ -69,6 +69,11 @@ class DiagnosisService
 
     public function transition(Diagnosis $diagnosis, DiagnosisStatus $to): void
     {
+        // A main diagnosis moves by its stage, a subdiagnosis follows it (17 · 17.4, 17.5).
+        if ($diagnosis->parent_id !== null || $diagnosis->main()->exists()) {
+            throw new DiagnosisException(__('admin.diagnoses.status_follows_stage'));
+        }
+
         $from = $diagnosis->status;
 
         if (! $from->canTransitionTo($to)) {

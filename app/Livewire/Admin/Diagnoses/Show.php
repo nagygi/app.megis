@@ -208,7 +208,10 @@ class Show extends Component
 
     public function render(DiagnosisAggregator $aggregator): View
     {
-        $this->diagnosis->refresh()->load(['organization', 'team', 'user', 'type', 'creator', 'transitions.creator', 'material']);
+        $this->diagnosis->refresh()->load([
+            'organization', 'team', 'user', 'type', 'creator', 'transitions.creator', 'material',
+            'main.leader', 'main.participants', 'parent',
+        ]);
 
         $rows = $this->diagnosis->rows()->with(['value', 'valueVersion'])->get();
         $valueRows = $rows->where('kind.value', 'value')->values();
@@ -227,6 +230,9 @@ class Show extends Component
             'valueRows' => $valueRows,
             'treeRows' => $rows->where('kind.value', 'tree_element')->values(),
             'isEditable' => $this->diagnosis->status->isEditable(),
+            'main' => $this->diagnosis->main,
+            // Status buttons only for diagnoses that move on their own (17 · 17.4, 17.5).
+            'canChangeStatus' => $this->diagnosis->main === null && $this->diagnosis->parent_id === null,
             'availableValues' => $this->diagnosis->status->isEditable()
                 ? Value::query()
                     ->availableTo($this->diagnosis->organization)

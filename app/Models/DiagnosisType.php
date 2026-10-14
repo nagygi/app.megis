@@ -18,6 +18,8 @@ class DiagnosisType extends Model
     /** @use HasFactory<DiagnosisTypeFactory> */
     use Blameable, HasFactory;
 
+    public const MAIN = 'main';
+
     public const EXPERIENCE = 'experience';
 
     public const PROCESS = 'process';

@@ -31,6 +31,19 @@ Schedule::command('model:prune', ['--model' => [UserToken::class]])
     ->name('prune:user-tokens')
     ->onOneServer();
 
+// Connected calendars refresh daily until the diagnosis' time window ends (09 · 9.4, 9.5).
+Schedule::command('megis:calendar:sync')
+    ->dailyAt('04:00')
+    ->name('sync:calendars')
+    ->onOneServer()
+    ->withoutOverlapping();
+
+// Calendar metadata lives 90 days from connecting (09 · 9.5).
+Schedule::command('megis:calendar:prune')
+    ->dailyAt('03:30')
+    ->name('prune:calendar-metadata')
+    ->onOneServer();
+
 // Anonymous Értéktükör runs live 24 hours; only the anonymous statistics stay (06 · 6.1).
 Schedule::command('megis:mirror:prune')
     ->hourly()

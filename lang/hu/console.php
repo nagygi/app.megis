@@ -25,6 +25,14 @@ return [
         'done' => ':count lejárt névtelen tükör törölve.',
     ],
 
+    'calendar_sync' => [
+        'done' => ':count naptár frissítve.',
+    ],
+
+    'calendar_prune' => [
+        'done' => ':count naptár metaadata törölve.',
+    ],
+
     'transcription_compare' => [
         'usage' => 'Adj meg egy hangfájlt és legalább egy --model=szolgáltató:modell opciót.',
         'invalid_model' => 'Hibás modell: :option (szolgáltató:modell kell).',

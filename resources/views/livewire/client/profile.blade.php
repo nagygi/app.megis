@@ -69,6 +69,65 @@
         @endif
     </section>
 
+    {{-- Naptár (09 · 9.5, 9.6; 31 · 31.5) --}}
+    @if ($calendars->isNotEmpty())
+        <section class="flex flex-col gap-3" aria-labelledby="calendar-title">
+            <h2 id="calendar-title" class="text-lg font-semibold">{{ __('calendar.profile.title') }}</h2>
+            @foreach ($calendars as $calendar)
+                <div wire:key="calendar-{{ $calendar->id }}" class="flex flex-wrap items-center justify-between gap-3 rounded-card bg-white px-4 py-3">
+                    <span>
+                        <span class="block font-semibold">{{ $calendar->providerLabel() }} · {{ __('calendar.profile.connected', ['date' => $calendar->connected_at->format('m.d.')]) }}</span>
+                        <span class="block text-sm text-grey-700">{{ __('calendar.profile.metadata_until', ['date' => $calendar->metadata_expires_at->format('m.d.')]) }}</span>
+                        @if ($calendar->status === \App\Models\CalendarConnection::BROKEN)
+                            <span class="block text-sm font-semibold text-coral-dark" role="status">{{ __('calendar.profile.broken') }}</span>
+                        @endif
+                    </span>
+                    <x-ui.button tone="outline" size="sm" wire:click="disconnectCalendar({{ $calendar->id }})" wire:confirm="{{ __('calendar.profile.confirm_disconnect') }}">{{ __('calendar.profile.disconnect') }}</x-ui.button>
+                </div>
+            @endforeach
+        </section>
+    @endif
+
+    {{-- Hozzájárulásaim (31 · 31.5, 31.6) --}}
+    <section class="flex flex-col gap-3" aria-labelledby="consents-title">
+        <h2 id="consents-title" class="text-lg font-semibold">{{ __('client.consents.title') }}</h2>
+
+        @if ($acceptances->isNotEmpty())
+            <ul class="flex flex-col gap-1 text-sm">
+                @foreach ($acceptances as $acceptance)
+                    <li>{{ $acceptance->version?->type?->label() }} · {{ __('client.consents.accepted_at', ['date' => $acceptance->accepted_at?->format('Y.m.d.')]) }}</li>
+                @endforeach
+            </ul>
+        @endif
+
+        @foreach ($consents as $mainConsents)
+            @php($consentMain = $mainConsents->first()->mainDiagnosis)
+            <div wire:key="consents-{{ $consentMain->id }}" class="flex flex-col gap-2 rounded-card bg-white px-4 py-3">
+                <p class="font-semibold">{{ __('client.consents.diagnosis', ['subject' => $consentMain->subjectName()]) }}</p>
+                <ul class="flex flex-col gap-2">
+                    @foreach ($mainConsents->unique('kind') as $consent)
+                        <li class="flex flex-wrap items-center justify-between gap-3">
+                            <span>
+                                <span class="block">{{ $consent->kind->label() }}</span>
+                                <span class="block text-sm text-grey-700">
+                                    {{ $consent->revoked_at ? __('client.consents.revoked_at', ['date' => $consent->revoked_at->format('Y.m.d.')]) : __('client.consents.given_at', ['date' => $consent->given_at->format('Y.m.d.')]) }}
+                                </span>
+                            </span>
+                            @if (! $isImpersonating && $consentService->canRevoke($consent))
+                                <x-ui.button
+                                    tone="outline"
+                                    size="sm"
+                                    wire:click="revokeConsent({{ $consent->id }})"
+                                    wire:confirm="{{ $consent->kind === \App\Enums\ConsentKind::Answers ? __('client.consents.confirm_answers', ['subject' => $consentMain->subjectName()]) : __('client.consents.confirm_quotes') }}"
+                                >{{ __('client.consents.revoke') }}</x-ui.button>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endforeach
+    </section>
+
     {{-- Felvételeim (31 · 31.5, 06 · 6.6) --}}
     <section class="flex flex-col gap-3" aria-labelledby="recordings-title">
         <h2 id="recordings-title" class="text-lg font-semibold">{{ __('client.recordings.title') }}</h2>

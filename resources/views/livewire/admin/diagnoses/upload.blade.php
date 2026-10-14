@@ -2,7 +2,7 @@
     <x-admin.page-header :title="__('admin.upload.title')" />
 
     <form wire:submit="save" class="flex flex-col gap-5 rounded-card border border-grey-250 bg-white p-6">
-        <x-form.select name="organization_id" wire:model="organization_id" :label="__('admin.diagnoses.organization')" required>
+        <x-form.select name="organization_id" wire:model.live="organization_id" :label="__('admin.diagnoses.organization')" required>
             <option value="">{{ __('admin.diagnoses.organization_select') }}</option>
             @foreach ($organizations as $organization)
                 <option value="{{ $organization->id }}">{{ $organization->name }}</option>
@@ -16,6 +16,15 @@
         </x-form.select>
 
         <x-form.input name="diagnosed_on" type="date" wire:model="diagnosed_on" :label="__('admin.diagnoses.date')" required />
+
+        @if ($mainDiagnoses->isNotEmpty())
+            <x-form.select name="parent_diagnosis_id" wire:model="parent_diagnosis_id" :label="__('admin.main_diagnoses.parent')" :help="__('admin.main_diagnoses.parent_help')">
+                <option value="">{{ __('admin.main_diagnoses.parent_none') }}</option>
+                @foreach ($mainDiagnoses as $mainOption)
+                    <option value="{{ $mainOption->id }}">{{ $mainOption->name }}</option>
+                @endforeach
+            </x-form.select>
+        @endif
 
         <div class="flex flex-col gap-1.5">
             <label for="upload-file" class="text-sm font-medium">{{ __('admin.upload.file') }} <span class="font-normal text-grey-600">· {{ __('ui.required') }}</span></label>

@@ -5,9 +5,11 @@ namespace App\Livewire\Admin\Diagnoses;
 use App\Enums\DiagnosisCreator;
 use App\Enums\DiagnosisLevel;
 use App\Enums\DiagnosisStatus;
+use App\Enums\MainDiagnosisStage;
 use App\Livewire\Admin\Concerns\WithDataTable;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisType;
+use App\Models\MainDiagnosis;
 use App\Models\Organization;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -27,7 +29,7 @@ class Index extends Component
 
     public function render(): View
     {
-        $query = Diagnosis::query()->with(['organization', 'team', 'user', 'type', 'creator']);
+        $query = Diagnosis::query()->with(['organization', 'team', 'user', 'type', 'creator', 'main']);
 
         if ($term = $this->searchTerm()) {
             $query->whereLike('name', $term);
@@ -47,6 +49,11 @@ class Index extends Component
             }
         }
 
+        // The stage of a main diagnosis (17 · 17.5): the MVP overview (19).
+        if (($stage = MainDiagnosisStage::tryFrom((string) $this->filter('stage'))) !== null) {
+            $query->whereHas('main', fn ($main) => $main->where('stage', $stage));
+        }
+
         $enumOptions = fn (string $enum) => collect($enum::cases())->mapWithKeys(fn ($case) => [$case->value => $case->label()])->all();
 
         return view('livewire.admin.diagnoses.index', [
@@ -56,6 +63,7 @@ class Index extends Component
             'levels' => $enumOptions(DiagnosisLevel::class),
             'creators' => $enumOptions(DiagnosisCreator::class),
             'statuses' => $enumOptions(DiagnosisStatus::class),
+            'stages' => $enumOptions(MainDiagnosisStage::class),
         ])->layout('layouts::admin')->title(__('admin.diagnoses.title'));
     }
 
@@ -69,6 +77,7 @@ class Index extends Component
             'date' => 'diagnosed_on',
             'creator' => 'creator_kind',
             'status' => 'status',
+            'stage' => MainDiagnosis::query()->select('stage')->whereColumn('main_diagnoses.diagnosis_id', 'diagnoses.id'),
         ];
     }
 

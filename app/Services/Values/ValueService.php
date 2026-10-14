@@ -5,6 +5,7 @@ namespace App\Services\Values;
 use App\Enums\ValueOrigin;
 use App\Enums\VersionEventType;
 use App\Models\Organization;
+use App\Models\User;
 use App\Models\Value;
 use App\Models\Version;
 use App\Support\UniqueSlug;
@@ -80,6 +81,17 @@ class ValueService
     {
         $value->forceFill(['reviewed_at' => now()])->save();
         $value->recordVersionEvent(VersionEventType::Reviewed);
+    }
+
+    /**
+     * A user's new own value: "Felhasználó által felvett", only theirs until
+     * an admin reviews it (24, question 3).
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public function createForUser(string $name, User $user, array $attributes = []): Value
+    {
+        return $this->create(['name' => trim($name), ...$attributes, 'origin_user_id' => $user->id], ValueOrigin::User);
     }
 
     /**

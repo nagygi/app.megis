@@ -3,13 +3,19 @@
 namespace App\Livewire\Client;
 
 use App\Enums\TokenPurpose;
+use App\Exceptions\DiagnosisException;
 use App\Mail\PasswordChangedMail;
 use App\Mail\PasswordConfirmationCodeMail;
+use App\Models\CalendarConnection;
+use App\Models\Consent;
+use App\Models\LegalAcceptance;
 use App\Models\Material;
 use App\Models\Organization;
 use App\Services\Auth\GuardSession;
 use App\Services\Auth\ImpersonationService;
 use App\Services\Auth\TokenService;
+use App\Services\Calendar\CalendarService;
+use App\Services\MainDiagnoses\ConsentService;
 use App\Services\Materials\MaterialStore;
 use App\Support\PasswordRules;
 use Illuminate\Support\Facades\Mail;
@@ -132,6 +138,37 @@ class Profile extends Component
         session()->flash('status', __('client.recordings.deleted'));
     }
 
+    /**
+     * Hozzájárulásaim (31 · 31.6): until publishing; never in the user's name (14 · 14.6).
+     */
+    public function revokeConsent(int $consentId, ConsentService $consents, ImpersonationService $impersonation): void
+    {
+        abort_if($impersonation->isImpersonating(), 403, __('impersonation.forbidden'));
+
+        $consent = Consent::query()->where('user_id', auth()->id())->findOrFail($consentId);
+
+        try {
+            $consents->revoke($consent, auth()->user());
+        } catch (DiagnosisException $exception) {
+            session()->flash('error', $exception->getMessage());
+
+            return;
+        }
+
+        session()->flash('status', __('client.consents.revoked'));
+    }
+
+    /**
+     * "Szétkötés" (09 · 9.5, 31 · 31.5): the metadata goes at once.
+     */
+    public function disconnectCalendar(int $connectionId, CalendarService $calendars): void
+    {
+        $connection = CalendarConnection::query()->where('user_id', auth()->id())->findOrFail($connectionId);
+        $calendars->disconnect($connection);
+
+        session()->flash('status', __('calendar.profile.disconnected'));
+    }
+
     public function render(): View
     {
         $user = auth()->user();
@@ -147,6 +184,24 @@ class Profile extends Component
                 ->where('user_id', $user->id)
                 ->whereNotNull('audio_path')
                 ->whereNull('audio_deleted_at')
+                ->latest('id')
+                ->get(),
+            'acceptances' => LegalAcceptance::query()
+                ->where('user_id', $user->id)
+                ->with('version')
+                ->latest('accepted_at')
+                ->get(),
+            'consents' => Consent::query()
+                ->where('user_id', $user->id)
+                ->with('mainDiagnosis.diagnosis.team', 'mainDiagnosis.diagnosis.organization', 'mainDiagnosis.diagnosis.user')
+                ->latest('id')
+                ->get()
+                ->groupBy('main_diagnosis_id'),
+            'consentService' => app(ConsentService::class),
+            'calendars' => CalendarConnection::query()
+                ->where('user_id', $user->id)
+                ->where('organization_id', $this->organization->id)
+                ->where('status', '!=', CalendarConnection::DISCONNECTED)
                 ->latest('id')
                 ->get(),
         ])->layout('layouts::client', [

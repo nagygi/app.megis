@@ -9,6 +9,8 @@
     'backLabel' => null,
     'subtitle' => null,
     'guest' => false,
+    // "3 / 6" on the filling pages (23 · 23.3).
+    'step' => null,
 ])
 
 @php
@@ -85,6 +87,10 @@
                         @endif
 
                         <span class="flex-1"></span>
+
+                        @if ($step)
+                            <span class="text-sm font-semibold tabular-nums">{{ $step }}</span>
+                        @endif
 
                         @if ($user)
                             <button

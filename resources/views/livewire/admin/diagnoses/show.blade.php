@@ -1,5 +1,6 @@
 @php
-    $isAggregatable = $diagnosis->level->canAggregate();
+    // A main diagnosis is calculated from its subdiagnoses (17 · 17.4, 18), not loaded.
+    $isAggregatable = $diagnosis->level->canAggregate() && $diagnosis->main === null;
     $aggregation = $diagnosis->aggregation;
     $decimalLabel = fn (?float $number) => $number === null ? '–' : number_format($number, 1, ',', '');
 @endphp
@@ -24,10 +25,10 @@
         </div>
 
         <div class="flex flex-wrap gap-2">
-            @if ($isEditable)
+            @if ($isEditable && $canChangeStatus)
                 <x-ui.button tone="outline" size="sm" :href="route('admin.diagnoses.edit', $diagnosis)">{{ __('admin.diagnoses.edit_data') }}</x-ui.button>
             @endif
-            @foreach ($diagnosis->status->nextStatuses() as $next)
+            @foreach ($canChangeStatus ? $diagnosis->status->nextStatuses() : [] as $next)
                 @php
                     [$label, $tone] = match (true) {
                         $next === \App\Enums\DiagnosisStatus::PendingApproval => [__('admin.diagnoses.to_pending'), 'dark'],
@@ -44,6 +45,43 @@
             @endforeach
         </div>
     </div>
+
+    @if ($main)
+        {{-- The main diagnosis: stage, leader, time window (17) --}}
+        <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
+
+        <section class="grid gap-4 rounded-card border border-grey-250 bg-white p-6 sm:grid-cols-2 lg:grid-cols-4" aria-label="{{ __('admin.main_diagnoses.summary') }}">
+            <div>
+                <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.stage') }}</p>
+                <p class="font-semibold">{{ $main->stage->label() }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.product') }}</p>
+                <p class="font-semibold">{{ $main->product_name }} · {{ $main->subject->label() }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-grey-600">{{ $main->subject === \App\Enums\MainDiagnosisSubject::Person ? __('admin.main_diagnoses.person') : __('admin.main_diagnoses.leader') }}</p>
+                <p class="font-semibold">{{ $main->leader->name }}</p>
+                @if ($main->hasPeers())
+                    <p class="text-sm text-grey-700">{{ trans_choice('admin.main_diagnoses.preview_peers', $main->participants->where('role', \App\Enums\ParticipantRole::Peer)->whereNull('excluded_at')->count(), ['count' => $main->participants->where('role', \App\Enums\ParticipantRole::Peer)->whereNull('excluded_at')->count()]) }}</p>
+                @endif
+            </div>
+            <div>
+                <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.window') }}</p>
+                <p class="font-semibold">{{ $main->starts_on?->format('Y.m.d.') ?? __('diagnosis.date_open') }} → {{ $main->publishes_on->format('Y.m.d.') }}</p>
+                <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.reading_short', ['date' => $main->readingStartsOn()->format('Y.m.d.')]) }}</p>
+            </div>
+        </section>
+    @elseif ($diagnosis->parent)
+        <p class="rounded-lg bg-grey-100 px-3 py-2 text-sm">
+            {{ __('admin.main_diagnoses.part_of') }}
+            <a href="{{ route('admin.diagnoses.show', $diagnosis->parent) }}" class="font-semibold">{{ $diagnosis->parent->name }}</a>
+            · {{ __('admin.main_diagnoses.status_follows') }}
+            @if ($diagnosis->excluded_at)
+                · <strong>{{ __('admin.main_diagnoses.excluded') }}</strong>
+            @endif
+        </p>
+    @endif
 
     @unless ($isEditable)
         <p class="rounded-lg bg-grey-100 px-3 py-2 text-sm">{{ __('admin.diagnoses.published_readonly') }}</p>

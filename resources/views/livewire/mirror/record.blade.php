@@ -27,6 +27,20 @@
         <p class="text-grey-700">{{ __('mirror.hint') }}</p>
     </div>
 
+    @if ($diagnosisOptions->count() > 1)
+        {{-- 17 · 17.6: more running diagnoses --}}
+        <fieldset class="flex flex-col gap-2 rounded-card bg-white p-5">
+            <legend class="mb-1 font-semibold">{{ __('mirror.which_diagnosis') }}</legend>
+            @foreach ($diagnosisOptions as $option)
+                <label class="inline-flex items-center gap-2">
+                    <input type="radio" name="mainDiagnosisId" value="{{ $option->diagnosis_id }}" wire:model="mainDiagnosisId" class="size-4 accent-charcoal">
+                    {{ $option->subjectName() }} · {{ $option->product_name }}
+                </label>
+            @endforeach
+            <x-form.error name="mainDiagnosisId" id="mainDiagnosisId" />
+        </fieldset>
+    @endif
+
     <div class="flex flex-wrap gap-2" role="group" aria-label="{{ __('mirror.title') }}">
         @foreach (['record' => __('mirror.mode_record'), 'text' => __('mirror.mode_text'), 'file' => __('mirror.mode_file')] as $key => $label)
             <button

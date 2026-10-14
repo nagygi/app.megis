@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
 #[Fillable([
     'context', 'source', 'organization_id', 'user_id', 'original_name',
     'audio_path', 'audio_mime', 'audio_seconds', 'text', 'segments', 'speaker_assignments', 'diagnosis_type_id', 'diagnosed_on',
-    'status', 'error', 'transcription_ai_call_id', 'processed_at', 'created_by',
+    'status', 'error', 'transcription_ai_call_id', 'processed_at', 'created_by', 'parent_diagnosis_id',
 ])]
 class Material extends Model
 {

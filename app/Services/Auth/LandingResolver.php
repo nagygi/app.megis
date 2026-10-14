@@ -2,14 +2,18 @@
 
 namespace App\Services\Auth;
 
+use App\Enums\MainDiagnosisStage;
+use App\Enums\ParticipantRole;
+use App\Models\MainDiagnosis;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\User;
 
 /**
  * Where a customer arrives after logging in (14 · 14.4). The system picks the
- * page, not the user. Someone who has only made an Értéktükör sees their
- * values in the Értéktár (30); otherwise, until the diagnosis pages exist,
+ * page, not the user: the diagnosis the user leads (V1 while filling in,
+ * later its home), otherwise the one they are a peer in (T1, T5; 26 · 26.4).
+ * Someone who has only made an Értéktükör sees their values (30); otherwise
  * the organization home opens.
  */
 class LandingResolver
@@ -20,6 +24,10 @@ class LandingResolver
 
         if ($organization === null) {
             return route('client.paused');
+        }
+
+        if ($main = $this->diagnosisFor($user, $organization)) {
+            return route('client.diagnosis.show', [$organization, $main->diagnosis]);
         }
 
         if ($organization->isIndividual() && MirrorSession::query()->where('user_id', $user->id)->whereNotNull('claimed_at')->exists()) {
@@ -37,5 +45,24 @@ class LandingResolver
         $organizations = $user->accessibleOrganizations()->orderBy('organizations.name')->get();
 
         return $organizations->firstWhere('id', $user->last_organization_id) ?? $organizations->first();
+    }
+
+    /**
+     * The latest main diagnosis the user leads in the organization; if none, the
+     * latest running one they are a peer in (26 · 26.4). Published ones open
+     * their report once it exists (27).
+     */
+    public function diagnosisFor(User $user, Organization $organization): ?MainDiagnosis
+    {
+        $query = fn (ParticipantRole $role, array $stages) => MainDiagnosis::query()
+            ->withParticipant($user, $role)
+            ->inStages(...$stages)
+            ->whereHas('diagnosis', fn ($diagnosis) => $diagnosis->where('organization_id', $organization->id))
+            ->with('diagnosis')
+            ->latest('id')
+            ->first();
+
+        return $query(ParticipantRole::Leader, [MainDiagnosisStage::Invited, MainDiagnosisStage::Filling, MainDiagnosisStage::Running, MainDiagnosisStage::Reading])
+            ?? $query(ParticipantRole::Peer, [MainDiagnosisStage::Running, MainDiagnosisStage::Reading]);
     }
 }

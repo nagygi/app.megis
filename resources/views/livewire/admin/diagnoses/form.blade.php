@@ -61,6 +61,15 @@
             @endforeach
         </x-form.select>
 
+        @if ($mainDiagnoses->isNotEmpty())
+            <x-form.select name="parent_id" wire:model="parent_id" :label="__('admin.main_diagnoses.parent')" :help="__('admin.main_diagnoses.parent_help')">
+                <option value="">{{ __('admin.main_diagnoses.parent_none') }}</option>
+                @foreach ($mainDiagnoses as $mainOption)
+                    <option value="{{ $mainOption->id }}">{{ $mainOption->name }}</option>
+                @endforeach
+            </x-form.select>
+        @endif
+
         <x-form.toggle name="isPeriod" wire:model.live="isPeriod" :label="__('admin.diagnoses.period')" :help="__('admin.diagnoses.period_help')" />
 
         <div class="grid gap-4 sm:grid-cols-2">

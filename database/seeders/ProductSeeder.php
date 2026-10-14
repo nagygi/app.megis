@@ -6,7 +6,7 @@ use App\Models\Product;
 use Illuminate\Database\Seeder;
 
 /**
- * The three starting products (02 · 2.1). Safe to run repeatedly.
+ * The three starting products (02 · 2.1) with their keys (17 · 17.3). Safe to run repeatedly.
  */
 class ProductSeeder extends Seeder
 {
@@ -18,8 +18,15 @@ class ProductSeeder extends Seeder
 
     public function run(): void
     {
-        foreach ([self::SNAPSHOT_EXTERNAL, self::SNAPSHOT_INTERNAL, self::FULL] as $name) {
-            Product::firstOrCreate(['name' => $name]);
+        foreach ([
+            Product::SNAPSHOT_EXTERNAL => self::SNAPSHOT_EXTERNAL,
+            Product::SNAPSHOT_INTERNAL => self::SNAPSHOT_INTERNAL,
+            Product::FULL => self::FULL,
+        ] as $key => $name) {
+            $product = Product::query()->where('key', $key)->first()
+                ?? Product::query()->firstOrCreate(['name' => $name]);
+
+            $product->forceFill(['key' => $key])->save();
         }
     }
 }

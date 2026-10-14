@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'version' => '0.40',
+    'version' => '0.50',
 
     // Set by the deploy script, shown on Rendszer → Health (docs/uzemeltetes.md · 3).
     'deployed_at' => env('MEGIS_DEPLOYED_AT'),
@@ -67,6 +67,8 @@ return [
         'recording_recommended_seconds' => 60,
         'silence_seconds' => 5,
         'text_max_characters' => 20000,
+        // A spoken field instead of a typed one (08 · 8.1, 10 · 10.1, 24).
+        'dictation_max_seconds' => 180,
     ],
 
     // "ai": the provider of config('ai.tasks.transcription'); "fake": a fixed
@@ -83,6 +85,11 @@ return [
         'chunk_characters' => 12000,
         // Detections sent to step B in one call.
         'matching_batch' => 60,
+    ],
+
+    // An uploaded ICS export (09 · 9.2): the format and the size are shown on the form.
+    'calendar' => [
+        'ics_max_kilobytes' => 5 * 1024,
     ],
 
     'mirror' => [
@@ -149,6 +156,7 @@ return [
         Checks\LegalDocumentsCheck::class,
         Checks\AiConfigurationCheck::class,
         Checks\TranscriptionCheck::class,
+        Checks\CalendarConfigurationCheck::class,
         Checks\EnvironmentPolicyCheck::class,
     ],
 

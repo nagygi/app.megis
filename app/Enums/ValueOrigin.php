@@ -12,6 +12,8 @@ enum ValueOrigin: string
     case Diagnosis = 'diagnosis';
     case Ai = 'ai';
     case Organization = 'organization';
+    // A user's own value from the diagnosis (24, question 3).
+    case User = 'user';
 
     public function label(): string
     {

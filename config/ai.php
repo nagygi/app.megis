@@ -110,7 +110,7 @@ return [
             'temperature' => 0.2,
             'timeout' => 60,
             'prompt' => 'naptar-elnevezes',
-            'prompt_version' => null,
+            'prompt_version' => 1,
         ],
         'conversation_summary' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
@@ -119,7 +119,7 @@ return [
             'temperature' => 0.2,
             'timeout' => 90,
             'prompt' => 'beszelgetes-kivonat',
-            'prompt_version' => null,
+            'prompt_version' => 1,
         ],
         'occasion_analysis' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),

@@ -24,6 +24,11 @@
                     ['route' => 'client.mirror.record', 'active' => 'client.mirror.*', 'label' => __('client.menu.mirror')],
                     ['route' => 'client.values', 'active' => 'client.values', 'label' => __('client.menu.value_library')],
                 ];
+
+                // Tárak → Folyamatok for the leaders (11 · 11.5, 15 · 15.3).
+                if (\App\Services\Processes\ProcessService::canManageLibrary($user, $currentOrganization)) {
+                    $menuItems[] = ['route' => 'client.processes', 'active' => 'client.processes*', 'label' => __('client.menu.processes')];
+                }
             @endphp
             {{-- Riportok, Fejezetek, Bölcsességtár: added by tickets 27, 32. --}}
             <ul class="flex flex-col gap-1">

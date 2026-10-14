@@ -5,6 +5,7 @@ use App\Models\Diagnosis;
 use App\Models\DiagnosisRow;
 use App\Models\DiagnosisType;
 use App\Models\LegalDocumentVersion;
+use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\Membership;
 use App\Models\Organization;
@@ -40,6 +41,12 @@ it('renders every admin page for a superadmin', function (Closure $route) {
     'teams' => fn (array $models) => route('admin.organizations.teams', $models['organization']),
     'members' => fn (array $models) => route('admin.organizations.members', $models['organization']),
     'organization values' => fn (array $models) => route('admin.organizations.values', $models['organization']),
+    'organization processes' => fn (array $models) => route('admin.organizations.processes', $models['organization']),
+    'organization diagnoses' => fn (array $models) => route('admin.organizations.diagnoses', $models['organization']),
+    'start diagnosis' => fn (array $models) => route('admin.main-diagnoses.create', ['szervezet' => $models['organization']->id]),
+    'main diagnosis' => fn () => route('admin.diagnoses.show', MainDiagnosis::factory()->create()->diagnosis),
+    'main diagnosis settings' => fn () => route('admin.main-diagnoses.edit', MainDiagnosis::factory()->create()->diagnosis),
+    'subdiagnoses' => fn () => route('admin.main-diagnoses.subdiagnoses', MainDiagnosis::factory()->create()->diagnosis),
     'invite member' => fn (array $models) => route('admin.organizations.members.create', $models['organization']),
     'edit member' => fn (array $models) => route('admin.organizations.members.edit', [$models['organization'], $models['membership']]),
     'products' => fn () => route('admin.products.index'),

@@ -84,6 +84,14 @@ php artisan megis:transcription:compare felvetel.mp3 --model=openai:gpt-4o-trans
 - Az átiratok a `storage/app/private/transcription-poc/` alá kerülnek. A hívások a Rendszer → AI használat lapon is látszanak.
 - **A felvétel személyes adatot tartalmaz:** ne kerüljön a kódtárba, és a próba után töröld.
 
+## Diagnózis és folyamatok helyben (17–25, 09–11)
+
+- Diagnózist az admin indít: *Diagnózisok → + Új diagnózis → Diagnózis indítása* (A1). A meghívó levelei helyben a Mailpitbe vagy a logba mennek.
+- A termék kulcsa adja a lépéseket (`config/diagnosis.php`). A három kezdő terméket a `ProductSeeder` kulccsal együtt hozza létre; a Snapshot · Külsőhöz még nincs diagnózis-folyamat.
+- A naptár iCal linkkel vagy ICS fájllal kulcsok nélkül is kipróbálható. A Google- és a Microsoft-összekötéshez kellenek a `GOOGLE_*`, illetve a `MICROSOFT_*` kulcsok; nélkülük ez a két lehetőség nem jelenik meg.
+- A beszélgetés kivonata és a naptár névjavaslata az `ai` queue-n fut; AI-kulcs nélkül a kivonat elmarad, a naptár a címeket tartja meg.
+- A mezők diktálása (mikrofon) a minta-átíróval helyben is működik: `MEGIS_TRANSCRIBER=fake`.
+
 ## Jogi dokumentumok
 
 Az ügyféloldali belépés és a meghívó elfogadása a három jogi PDF-et kéri (adatkezelési tájékoztató, ÁSZF, cookie-tájékoztató). Töltsd fel őket az adminban: *Beállítások → Jogi dokumentumok*. Amíg hiányoznak, a setup check figyelmeztet (élesben hibát jelez).
@@ -136,4 +144,6 @@ $env:NODE_EXTRA_CA_CERTS = "C:\út\windows-roots.pem" # npm run build (Bunny-fon
 | `php artisan megis:values:import {file} [--dry-run]` | Az Értéktár kezdő értékeinek betöltése táblázatból (03 · 3.6) |
 | `php artisan megis:mirror:prune` | A 24 óránál régebbi, fiókhoz nem kötött Értéktükrök törlése (06 · 6.1) |
 | `php artisan megis:transcription:compare {file} --model=…` | Átíró szolgáltatók összevetése egy felvételen (12 · 12.7) |
+| `php artisan megis:calendar:sync` | Az összekötött naptárak frissítése, új alkalmak az elfogadott folyamatokhoz, szétkötés az időablak végén (09 · 9.4, 9.5) |
+| `php artisan megis:calendar:prune` | A 90 napnál régebbi naptár-metaadat törlése (09 · 9.5) |
 | `php artisan megis:admin:unlock {email}` | Zárolt admin feloldása 10 hibás belépés után. A zárolás csak így oldható fel (01 · 1.2). |

@@ -42,6 +42,8 @@ return [
     ],
 
     'audit_event_type' => [
+        'consent_given' => 'Hozzájárulás megadva',
+        'consent_revoked' => 'Hozzájárulás visszavonva',
         'impersonation_started' => 'Belépés a nevében: kezdés',
         'impersonation_ended' => 'Belépés a nevében: befejezés',
         'impersonation_action' => 'Módosítás a nevében',
@@ -53,6 +55,7 @@ return [
         'diagnosis' => 'Diagnózisnál felvett',
         'ai' => 'AI által detektált',
         'organization' => 'Szervezet által felvett',
+        'user' => 'Felhasználó által felvett',
     ],
 
     'version_event_type' => [
@@ -119,6 +122,7 @@ return [
         'public_mirror' => 'Nyilvános Értéktükör',
         'mirror' => 'Értéktükör',
         'admin_upload' => 'Admin feltöltés',
+        'dictation' => 'Elmondott mező',
     ],
 
     'material_source' => [
@@ -135,6 +139,75 @@ return [
         'analyzing' => 'elemzés',
         'processed' => 'kész',
         'failed' => 'sikertelen',
+    ],
+
+    'main_diagnosis_stage' => [
+        'draft' => 'Vázlat',
+        'invited' => 'Meghívva',
+        'filling' => 'Kitöltés',
+        'running' => 'Fut',
+        'reading' => 'Olvasat',
+        'published' => 'Publikálva',
+        'closed' => 'Lezárva',
+    ],
+
+    'main_diagnosis_subject' => [
+        'team' => 'Csapat',
+        'individual' => 'Magánszemély',
+        'person' => 'Egy ember, a cég értékeivel',
+    ],
+
+    'participant_role' => [
+        'leader' => 'Vezető',
+        'peer' => 'Társ',
+    ],
+
+    'consent_kind' => [
+        'answers' => 'A válaszaim névvel csak a mégisnél',
+        'quotes' => 'Az idézeteim név nélkül',
+    ],
+
+    'process_kind' => [
+        'routine' => 'rutin',
+        'one_off' => 'egyszeri',
+        'excluded' => 'nem mérjük',
+    ],
+
+    'process_source' => [
+        'calendar' => 'naptár',
+        'conversation' => 'beszélgetés',
+        'manual' => 'kézi',
+    ],
+
+    'process_confidence' => [
+        'high' => 'magas',
+        'medium' => 'közepes',
+        'low' => 'alacsony',
+        'manual' => 'kézzel',
+        'conversation' => 'beszélgetésből',
+    ],
+
+    'process_rhythm' => [
+        'weekly' => 'heti',
+        'biweekly' => 'kétheti',
+        'monthly' => 'havi',
+        'quarterly' => 'negyedéves',
+        'occasional' => 'alkalmi',
+    ],
+
+    'metric_rhythm' => [
+        'weekly' => 'heti',
+        'monthly' => 'havi',
+        'quarterly' => 'negyedéves',
+    ],
+
+    'diagnosis_step' => [
+        'own_values' => 'Saját értékek',
+        'organization_values' => 'A szervezet értékei',
+        'brand' => 'A márkád alapja',
+        'experience' => 'A megélésed',
+        'processes' => 'Folyamatok',
+        'visibility' => 'Ki lát mit',
     ],
 
 ];

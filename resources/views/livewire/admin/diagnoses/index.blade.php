@@ -6,7 +6,14 @@
     <x-admin.page-header :title="__('admin.diagnoses.title')">
         <x-slot:actions>
             <x-ui.button tone="outline" :href="route('admin.diagnoses.upload')">{{ __('admin.upload.create') }}</x-ui.button>
-            <x-ui.button :href="route('admin.diagnoses.create')">{{ __('admin.diagnoses.create') }}</x-ui.button>
+            {{-- Two ways in: start a diagnosis (A1) or record an earlier one (17 · 17.2, 04 · 4.3) --}}
+            <div x-data="{ open: false }" @click.outside="open = false" @keydown.escape="open = false" class="relative">
+                <x-ui.button @click="open = ! open" ::aria-expanded="open" aria-controls="new-diagnosis-menu">{{ __('admin.diagnoses.create') }}</x-ui.button>
+                <ul id="new-diagnosis-menu" x-show="open" x-cloak class="absolute right-0 z-10 mt-2 flex w-72 flex-col gap-1 rounded-card border border-grey-250 bg-white p-2">
+                    <li><a href="{{ route('admin.main-diagnoses.create') }}" class="block rounded-lg px-3 py-2 text-charcoal no-underline hover:bg-grey-100"><span class="block font-semibold">{{ __('admin.main_diagnoses.start') }}</span><span class="block text-sm text-grey-600">{{ __('admin.main_diagnoses.start_help') }}</span></a></li>
+                    <li><a href="{{ route('admin.diagnoses.create') }}" class="block rounded-lg px-3 py-2 text-charcoal no-underline hover:bg-grey-100"><span class="block font-semibold">{{ __('admin.diagnoses.record_earlier') }}</span><span class="block text-sm text-grey-600">{{ __('admin.diagnoses.record_earlier_help') }}</span></a></li>
+                </ul>
+            </div>
         </x-slot:actions>
     </x-admin.page-header>
 
@@ -16,6 +23,7 @@
         <x-admin.filter name="type" :label="__('admin.diagnoses.type')" :options="$types" />
         <x-admin.filter name="creator_kind" :label="__('admin.diagnoses.creator')" :options="$creators" />
         <x-admin.filter name="status" :label="__('admin.diagnoses.status')" :options="$statuses" />
+        <x-admin.filter name="stage" :label="__('admin.main_diagnoses.stage')" :options="$stages" />
     </x-admin.list-toolbar>
 
     <x-admin.table :paginator="$diagnoses">
@@ -27,6 +35,7 @@
             <x-admin.th field="date" :sort-field="$sortField" :sort-direction="$sortDirection">{{ __('admin.diagnoses.date') }}</x-admin.th>
             <x-admin.th field="creator" :sort-field="$sortField" :sort-direction="$sortDirection">{{ __('admin.diagnoses.creator') }}</x-admin.th>
             <x-admin.th field="status" :sort-field="$sortField" :sort-direction="$sortDirection">{{ __('admin.diagnoses.status') }}</x-admin.th>
+            <x-admin.th field="stage" :sort-field="$sortField" :sort-direction="$sortDirection">{{ __('admin.main_diagnoses.stage') }}</x-admin.th>
         </x-slot:head>
 
         @forelse ($diagnoses as $diagnosis)
@@ -43,9 +52,10 @@
                     @endif
                 </td>
                 <td class="px-3 py-2"><x-admin.diagnosis-status :status="$diagnosis->status" /></td>
+                <td class="px-3 py-2">{{ $diagnosis->main?->stage->label() ?? '–' }}</td>
             </tr>
         @empty
-            <tr><td colspan="7" class="px-3 py-6 text-center text-grey-600">{{ __('admin.common.empty') }}</td></tr>
+            <tr><td colspan="8" class="px-3 py-6 text-center text-grey-600">{{ __('admin.common.empty') }}</td></tr>
         @endforelse
     </x-admin.table>
 </div>

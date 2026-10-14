@@ -154,6 +154,16 @@ class Result extends Component
         $this->ensureOwner();
         $this->saveCuriosity();
 
+        $parent = $this->session->material?->parent_diagnosis_id;
+
+        // A mirror told for the own values goes back there with its values (24 · 24.1).
+        if ($parent !== null && $this->organization !== null) {
+            session()->flash('status', __('mirror.back_to_diagnosis'));
+            $this->redirect(route('client.diagnosis.sajat-ertekek', [$this->organization, $parent]), navigate: false);
+
+            return;
+        }
+
         session()->flash('status', __('mirror.saved_to', ['organization' => $this->organization?->name]));
         $this->redirect(route('client.values', $this->organization), navigate: false);
     }

@@ -11,6 +11,7 @@ return [
         'switch_organization' => 'Szervezet váltása',
         'mirror' => 'Értéktükör',
         'value_library' => 'Értéktár',
+        'processes' => 'Folyamatok',
     ],
 
     'value_library' => [
@@ -49,10 +50,26 @@ return [
         'deleted' => 'A hang törölve.',
     ],
 
+    // Hozzájárulásaim (31 · 31.5, 31.6).
+    'consents' => [
+        'title' => 'Hozzájárulásaim',
+        'accepted_at' => 'elfogadva: :date',
+        'diagnosis' => 'A(z) :subject diagnózisa',
+        'given_at' => 'megadva: :date',
+        'revoked_at' => 'visszavonva: :date',
+        'revoke' => 'Visszavonom',
+        'confirm_answers' => 'Ha visszavonod, a válaszaid és a helyzeteid kikerülnek a(z) :subject diagnózisából, és Útravalót sem kapsz.',
+        'confirm_quotes' => 'Ha visszavonod, az idézeteid nem jelennek meg a vezetőnek. A válaszaid a diagnózisban maradnak.',
+        'revoked' => 'A hozzájárulásodat visszavontuk.',
+        'cannot_revoke' => 'Ez a hozzájárulás már nem vonható vissza.',
+    ],
+
     'home' => [
         'title' => 'Kezdőlap',
         'greeting' => 'Szia, :name!',
         'lead' => 'Itt fogod látni a(z) :organization diagnózisát, amint elindul.',
+        'diagnoses' => 'A diagnózisaid',
+        'publishes' => 'publikálás: :date',
     ],
 
     'profile' => [

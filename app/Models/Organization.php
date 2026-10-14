@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['type', 'name', 'slug', 'description', 'contact_admin_id', 'product_id', 'headcount_limit'])]
+#[Fillable(['type', 'name', 'slug', 'description', 'contact_admin_id', 'product_id', 'headcount_limit', 'process_recommendation'])]
 class Organization extends Model
 {
     /** @use HasFactory<OrganizationFactory> */
@@ -61,6 +61,14 @@ class Organization extends Model
     public function valueSet(): HasOne
     {
         return $this->hasOne(OrganizationValueSet::class);
+    }
+
+    /**
+     * @return HasMany<Process, $this>
+     */
+    public function processes(): HasMany
+    {
+        return $this->hasMany(Process::class);
     }
 
     /**

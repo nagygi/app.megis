@@ -10,6 +10,7 @@ use App\Models\DiagnosisType;
 use App\Models\Membership;
 use App\Models\Organization;
 use App\Services\Diagnoses\DiagnosisService;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -43,10 +44,22 @@ class Form extends Component
 
     public string $diagnosed_until = '';
 
+    /**
+     * The main diagnosis this one becomes a subdiagnosis of (17 · 17.4).
+     */
+    public ?int $parent_id = null;
+
     public function mount(?Diagnosis $diagnosis = null): void
     {
         if ($diagnosis?->exists) {
             Gate::authorize('update', $diagnosis);
+
+            // A main diagnosis is set on A1 (17 · 17.2).
+            if ($diagnosis->main !== null) {
+                $this->redirectRoute('admin.main-diagnoses.edit', $diagnosis, navigate: false);
+
+                return;
+            }
 
             $this->diagnosis = $diagnosis;
             $this->name = $diagnosis->name;
@@ -59,6 +72,7 @@ class Form extends Component
             $this->diagnosed_on = $diagnosis->diagnosed_on->toDateString();
             $this->isPeriod = $diagnosis->diagnosed_until !== null;
             $this->diagnosed_until = (string) $diagnosis->diagnosed_until?->toDateString();
+            $this->parent_id = $diagnosis->parent_id;
 
             return;
         }
@@ -72,6 +86,7 @@ class Form extends Component
     {
         $this->team_id = null;
         $this->user_id = null;
+        $this->parent_id = null;
     }
 
     public function save(DiagnosisService $diagnoses): void
@@ -101,7 +116,8 @@ class Form extends Component
                 'nullable',
                 Rule::exists('organization_user', 'user_id')->where('organization_id', $this->organization_id),
             ],
-            'diagnosis_type_id' => ['required', Rule::exists('diagnosis_types', 'id')],
+            'diagnosis_type_id' => ['required', Rule::exists('diagnosis_types', 'id')->where(fn ($query) => $query->whereNull('key')->orWhere('key', '!=', DiagnosisType::MAIN))],
+            'parent_id' => ['nullable', Rule::in($this->mainDiagnosisOptions()->pluck('id'))],
             'diagnosed_on' => ['required', 'date'],
             'diagnosed_until' => [Rule::requiredIf($this->isPeriod), 'nullable', 'date', 'after_or_equal:diagnosed_on'],
         ], [
@@ -115,6 +131,7 @@ class Form extends Component
             'diagnosis_type_id' => __('admin.diagnoses.type'),
             'diagnosed_on' => $this->isPeriod ? __('admin.diagnoses.date_from') : __('admin.diagnoses.date'),
             'diagnosed_until' => __('admin.diagnoses.date_until'),
+            'parent_id' => __('admin.main_diagnoses.parent'),
         ]);
 
         $level = DiagnosisLevel::from($validated['level']);
@@ -128,6 +145,7 @@ class Form extends Component
             'diagnosis_type_id' => $validated['diagnosis_type_id'],
             'diagnosed_on' => $validated['diagnosed_on'],
             'diagnosed_until' => $this->isPeriod ? $validated['diagnosed_until'] : null,
+            'parent_id' => $validated['parent_id'] ?? null,
         ];
 
         if ($this->diagnosis === null) {
@@ -170,8 +188,29 @@ class Form extends Component
                 ->with('user')
                 ->get()
                 ->sortBy(fn (Membership $membership) => $membership->user->name, SORT_NATURAL | SORT_FLAG_CASE),
-            'types' => DiagnosisType::query()->orderBy('name')->get(['id', 'name']),
+            'types' => DiagnosisType::query()->whereNot('key', DiagnosisType::MAIN)->orWhereNull('key')->orderBy('name')->get(['id', 'name']),
+            'mainDiagnoses' => $this->mainDiagnosisOptions(),
         ])->layout('layouts::admin')->title($title);
+    }
+
+    /**
+     * Main diagnoses of the organization still taking input, and the current one (17 · 17.4).
+     *
+     * @return Collection<int, Diagnosis>
+     */
+    private function mainDiagnosisOptions(): Collection
+    {
+        if ($this->organization_id === null) {
+            return collect();
+        }
+
+        return Diagnosis::query()
+            ->where('organization_id', $this->organization_id)
+            ->where(fn ($query) => $query
+                ->whereHas('main', fn ($main) => $main->acceptingInput())
+                ->when($this->diagnosis?->parent_id, fn ($current, $parentId) => $current->orWhere('id', $parentId)))
+            ->orderBy('name')
+            ->get(['id', 'name']);
     }
 
     private function selectedOrganization(): ?Organization

@@ -47,14 +47,15 @@ class OrganizationValueSetService
 
     /**
      * Replaces the values and the brand base; returns the new version, or null
-     * when nothing changed.
+     * when nothing changed. The customer side saves the working copy on every
+     * change and records the version when the step is left (plan 3.5).
      *
      * @param  list<array<string, mixed>>  $items  value_id null means a new value by its name
      * @param  array<string, ?string>  $brand  purpose, value_proposition, impact
      */
-    public function save(OrganizationValueSet $set, array $items, array $brand): ?Version
+    public function save(OrganizationValueSet $set, array $items, array $brand, bool $recordVersion = true): ?Version
     {
-        return DB::transaction(function () use ($set, $items, $brand): ?Version {
+        return DB::transaction(function () use ($set, $items, $brand, $recordVersion): ?Version {
             $keys = [];
 
             foreach (array_values($items) as $position => $item) {
@@ -96,7 +97,7 @@ class OrganizationValueSetService
                 ->all());
             $set->save();
 
-            return $set->recordVersion();
+            return $recordVersion ? $set->recordVersion() : null;
         });
     }
 

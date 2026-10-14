@@ -4,6 +4,7 @@ namespace App\Services\Organizations;
 
 use App\Enums\MembershipStatus;
 use App\Enums\TokenPurpose;
+use App\Events\TeamMemberAdded;
 use App\Exceptions\HeadcountLimitReachedException;
 use App\Mail\ClientInvitationMail;
 use App\Mail\OrganizationAddedMail;
@@ -83,26 +84,41 @@ class MembershipService
     {
         $user = $membership->user;
         $organization = $membership->organization;
+        $token = $this->prepareInvitation($membership, $actor);
 
-        if ($user->isActivated()) {
-            $membership->forceFill([
-                'status' => MembershipStatus::Active,
-                'activated_at' => $membership->activated_at ?? now(),
-            ])->save();
-
+        if ($token === null) {
             Mail::to($user->email)->queue(new OrganizationAddedMail($user, $organization));
 
             return;
         }
 
-        $issued = $this->tokens->issue($user, TokenPurpose::ClientInvitation, $organization, $actor);
+        Mail::to($user->email)->queue(new ClientInvitationMail($user, $organization, $actor, $token));
+    }
+
+    /**
+     * The membership side of an invitation, for mails that carry their own text
+     * (17, 25): an activated account becomes active at once (null), a new one
+     * gets a registration token valid for 14 days.
+     */
+    public function prepareInvitation(Membership $membership, User $actor): ?string
+    {
+        if ($membership->user->isActivated()) {
+            $membership->forceFill([
+                'status' => MembershipStatus::Active,
+                'activated_at' => $membership->activated_at ?? now(),
+            ])->save();
+
+            return null;
+        }
+
+        $issued = $this->tokens->issue($membership->user, TokenPurpose::ClientInvitation, $membership->organization, $actor);
 
         $membership->forceFill([
             'status' => MembershipStatus::Invited,
             'invited_at' => now(),
         ])->save();
 
-        Mail::to($user->email)->queue(new ClientInvitationMail($user, $organization, $actor, $issued->plainToken));
+        return $issued->plainToken;
     }
 
     /**
@@ -177,7 +193,12 @@ class MembershipService
 
         $user = $membership->user;
         $user->teams()->detach($organizationTeamIds->diff($selected->keys())->all());
-        $user->teams()->syncWithoutDetaching($selected->all());
+        $changes = $user->teams()->syncWithoutDetaching($selected->all());
+
+        // A running diagnosis of the team takes the new member as a peer (17 · 17.2).
+        foreach ($changes['attached'] as $teamId) {
+            TeamMemberAdded::dispatch(Team::query()->findOrFail($teamId), $user);
+        }
     }
 
     /**

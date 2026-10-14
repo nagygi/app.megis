@@ -1,6 +1,5 @@
 {{--
-    Tabs of an organization page (02 · 2.3, 08 · 8.5). Tabs whose ticket is not
-    built yet (Folyamatok 11, Diagnózisok 17) are added by those tickets.
+    Tabs of an organization page (02 · 2.3, 08 · 8.5, 11 · 11.6, 17 · 17.8).
 --}}
 @props(['organization'])
 
@@ -15,6 +14,8 @@
 
     $tabs[] = ['route' => 'admin.organizations.members', 'label' => __('admin.organizations.tabs.members')];
     $tabs[] = ['route' => 'admin.organizations.values', 'label' => __('admin.organizations.tabs.values')];
+    $tabs[] = ['route' => 'admin.organizations.processes', 'label' => __('admin.organizations.tabs.processes')];
+    $tabs[] = ['route' => 'admin.organizations.diagnoses', 'label' => __('admin.organizations.tabs.diagnoses')];
 @endphp
 
 <ul class="flex gap-1 overflow-x-auto">

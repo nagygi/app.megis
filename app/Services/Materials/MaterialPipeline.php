@@ -40,6 +40,13 @@ class MaterialPipeline
      */
     public function transcribed(Material $material): void
     {
+        // A dictation goes into a field as text; nothing is measured (08 · 8.1, 10 · 10.1).
+        if ($material->context === MaterialContext::Dictation) {
+            $material->update(['status' => MaterialStatus::Processed, 'processed_at' => now()]);
+
+            return;
+        }
+
         if ($material->context === MaterialContext::AdminUpload) {
             $material->update(['status' => MaterialStatus::AwaitingSpeakers]);
 
@@ -66,6 +73,7 @@ class MaterialPipeline
             MaterialContext::PublicMirror => $this->mirrorSession($material)?->update(['status' => MirrorStatus::Ready]),
             MaterialContext::Mirror => $this->finishSignedInMirror($material),
             MaterialContext::AdminUpload => $this->buildUploadDiagnoses($material),
+            MaterialContext::Dictation => null,
         };
     }
 

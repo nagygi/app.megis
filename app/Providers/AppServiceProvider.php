@@ -8,10 +8,14 @@ use App\Http\Middleware\EnsureLegalAcceptance;
 use App\Http\Middleware\EnsureSuperadmin;
 use App\Http\Middleware\ForbidWhileImpersonating;
 use App\Http\Middleware\ResolveOrganization;
+use App\Models\CalendarConnection;
 use App\Models\Diagnosis;
+use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\OrganizationValueSet;
+use App\Models\PersonalValueSet;
+use App\Models\ProcessConversation;
 use App\Models\User;
 use App\Models\Value;
 use App\Services\Alerting\ErrorAlerter;
@@ -26,12 +30,15 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use SocialiteProviders\Manager\SocialiteWasCalled;
+use SocialiteProviders\Microsoft\Provider as MicrosoftProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -61,6 +68,9 @@ class AppServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
         $this->configureGates();
 
+        // Microsoft 365 / Outlook calendars through Socialite (09 · 9.2).
+        Event::listen(fn (SocialiteWasCalled $event) => $event->extendSocialite('microsoft', MicrosoftProvider::class));
+
         // Stable names in polymorphic columns (versions, inbox), independent of class names.
         Relation::enforceMorphMap([
             'value' => Value::class,
@@ -68,6 +78,10 @@ class AppServiceProvider extends ServiceProvider
             'diagnosis' => Diagnosis::class,
             'material' => Material::class,
             'mirror_session' => MirrorSession::class,
+            'main_diagnosis' => MainDiagnosis::class,
+            'personal_value_set' => PersonalValueSet::class,
+            'process_conversation' => ProcessConversation::class,
+            'calendar_connection' => CalendarConnection::class,
         ]);
 
         // Livewire update requests run these again, so actions are checked like page loads.

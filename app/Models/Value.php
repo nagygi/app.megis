@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable([
     'name', 'slug', 'value_category_id',
     'meanings', 'non_meanings', 'high_examples', 'low_examples', 'examples', 'keywords',
-    'origin', 'origin_organization_id', 'reviewed_at', 'archived_at',
+    'origin', 'origin_organization_id', 'origin_user_id', 'reviewed_at', 'archived_at',
 ])]
 class Value extends Model
 {
@@ -121,6 +121,22 @@ class Value extends Model
      *
      * @param  Builder<Value>  $query
      */
+    /**
+     * What a user may choose for their own values (24 · 24.3): reviewed values,
+     * the ones they added themselves and the ones of their organization.
+     */
+    #[Scope]
+    protected function availableToUser(Builder $query, User $user, ?Organization $organization = null): void
+    {
+        $query->whereNull('archived_at')->where(function (Builder $available) use ($user, $organization): void {
+            $available->whereNotNull('reviewed_at')->orWhere('origin_user_id', $user->id);
+
+            if ($organization !== null) {
+                $available->orWhere('origin_organization_id', $organization->id);
+            }
+        });
+    }
+
     #[Scope]
     protected function awaitingReview(Builder $query): void
     {

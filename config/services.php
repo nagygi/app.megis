@@ -39,6 +39,25 @@ return [
         'timeout_seconds' => 5,
     ],
 
+    /*
+     * Calendar access, read-only (09 · 9.2). The apps are registered on the
+     * mégis company account; until Google's verification is done at most 100
+     * test users can connect. Without keys the option is not offered.
+     */
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', '/naptar/google/visszahivas'),
+    ],
+
+    'microsoft' => [
+        'client_id' => env('MICROSOFT_CLIENT_ID'),
+        'client_secret' => env('MICROSOFT_CLIENT_SECRET'),
+        'redirect' => env('MICROSOFT_REDIRECT_URI', '/naptar/microsoft/visszahivas'),
+        // Multi-tenant: company and personal accounts (09 · 9.2).
+        'tenant' => env('MICROSOFT_TENANT', 'common'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

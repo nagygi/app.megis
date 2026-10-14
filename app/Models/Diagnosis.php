@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * A recorded diagnosis of an organization, team or user (04).
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'name', 'description', 'organization_id', 'level', 'team_id', 'user_id',
     'diagnosis_type_id', 'diagnosed_on', 'diagnosed_until', 'creator_kind', 'status', 'aggregation', 'material_id', 'speaker',
+    'parent_id', 'value_set_version_id', 'excluded_at',
 ])]
 class Diagnosis extends Model
 {
@@ -39,6 +41,7 @@ class Diagnosis extends Model
             'diagnosed_on' => 'date',
             'diagnosed_until' => 'date',
             'aggregation' => 'array',
+            'excluded_at' => 'datetime',
         ];
     }
 
@@ -74,6 +77,49 @@ class Diagnosis extends Model
     public function material(): BelongsTo
     {
         return $this->belongsTo(Material::class);
+    }
+
+    /**
+     * The main diagnosis this one belongs to (17 · 17.4).
+     *
+     * @return BelongsTo<Diagnosis, $this>
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Diagnosis::class, 'parent_id');
+    }
+
+    /**
+     * @return HasMany<Diagnosis, $this>
+     */
+    public function subdiagnoses(): HasMany
+    {
+        return $this->hasMany(Diagnosis::class, 'parent_id');
+    }
+
+    /**
+     * What a main diagnosis needs to run (17); null for every other diagnosis.
+     *
+     * @return HasOne<MainDiagnosis, $this>
+     */
+    public function main(): HasOne
+    {
+        return $this->hasOne(MainDiagnosis::class);
+    }
+
+    /**
+     * The organization's value set version a Megélés diagnosis answered (08 · 8.4).
+     *
+     * @return BelongsTo<Version, $this>
+     */
+    public function valueSetVersion(): BelongsTo
+    {
+        return $this->belongsTo(Version::class, 'value_set_version_id');
+    }
+
+    public function isSubdiagnosis(): bool
+    {
+        return $this->parent_id !== null;
     }
 
     /**
