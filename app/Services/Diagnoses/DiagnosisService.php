@@ -3,6 +3,7 @@
 namespace App\Services\Diagnoses;
 
 use App\Enums\DiagnosisCreator;
+use App\Enums\DiagnosisLevel;
 use App\Enums\DiagnosisRowKind;
 use App\Enums\DiagnosisStatus;
 use App\Enums\ExperienceState;
@@ -10,8 +11,10 @@ use App\Enums\ScoreState;
 use App\Enums\TreeElement;
 use App\Enums\ValueOrigin;
 use App\Exceptions\DiagnosisException;
+use App\Jobs\RecalculateMainDiagnosis;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisRow;
+use App\Models\User;
 use App\Models\Value;
 use App\Services\Values\ValueService;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +45,8 @@ class DiagnosisService
         return DB::transaction(function () use ($attributes, $creator, $status): Diagnosis {
             $diagnosis = Diagnosis::create([...$attributes, 'creator_kind' => $creator, 'status' => $status]);
 
-            foreach (TreeElement::cases() as $position => $element) {
+            // A process diagnosis has no brand base block (13 · 13.1).
+            foreach ($diagnosis->level === DiagnosisLevel::Process ? [] : TreeElement::cases() as $position => $element) {
                 $diagnosis->rows()->create([
                     'kind' => DiagnosisRowKind::TreeElement,
                     'tree_element' => $element,
@@ -141,7 +145,8 @@ class DiagnosisService
 
         $row->fill([
             ...$this->scoreAttributes($input['score'] ?? null),
-            ...$this->experienceAttributes($input['experience'] ?? null),
+            // A calculated diagnosis keeps the experience of its people (18 · 18.4).
+            ...(array_key_exists('experience', $input) ? $this->experienceAttributes($input['experience']) : []),
             'experience_met_example' => $input['experience_met_example'] ?? null,
             'experience_unmet_example' => $input['experience_unmet_example'] ?? null,
             'reasoning' => $input['reasoning'] ?? null,
@@ -154,6 +159,74 @@ class DiagnosisService
         }
 
         $row->save();
+    }
+
+    /**
+     * A calculated row written by hand (13 · 13.5, 18): the reason is required,
+     * who and when is kept, and the automatic value stays next to it.
+     */
+    public function overrideRow(DiagnosisRow $row, ?string $score, string $reason, User $admin): void
+    {
+        $this->ensureEditable($row->diagnosis);
+
+        $row->forceFill([
+            ...$this->scoreAttributes($score),
+            'override_reason' => trim($reason),
+            'overridden_by' => $admin->id,
+            'overridden_at' => now(),
+        ])->save();
+
+        $this->recalculate($row->diagnosis);
+    }
+
+    /**
+     * Back to the calculated value of the row.
+     */
+    public function resetRowOverride(DiagnosisRow $row): void
+    {
+        $this->ensureEditable($row->diagnosis);
+
+        $row->forceFill([
+            'score' => $row->automatic_score,
+            'score_state' => $row->automatic_score_state,
+            'override_reason' => null,
+            'overridden_by' => null,
+            'overridden_at' => null,
+        ])->save();
+
+        $this->recalculate($row->diagnosis);
+    }
+
+    /**
+     * The point of a process diagnosis written by hand (13 · 13.5).
+     */
+    public function overrideScore(Diagnosis $diagnosis, ?string $score, string $reason, User $admin): void
+    {
+        $this->ensureEditable($diagnosis);
+
+        $diagnosis->forceFill([
+            ...$this->scoreAttributes($score),
+            'score_override_reason' => trim($reason),
+            'score_overridden_by' => $admin->id,
+            'score_overridden_at' => now(),
+        ])->save();
+
+        $this->recalculate($diagnosis);
+    }
+
+    public function resetScoreOverride(Diagnosis $diagnosis): void
+    {
+        $this->ensureEditable($diagnosis);
+
+        $diagnosis->forceFill([
+            'score' => $diagnosis->automatic_score,
+            'score_state' => $diagnosis->automatic_score_state,
+            'score_override_reason' => null,
+            'score_overridden_by' => null,
+            'score_overridden_at' => null,
+        ])->save();
+
+        $this->recalculate($diagnosis);
     }
 
     public function removeRow(DiagnosisRow $row): void
@@ -214,6 +287,18 @@ class DiagnosisService
             $experience === self::DONT_KNOW => ['experience' => null, 'experience_state' => ExperienceState::DontKnow],
             default => ['experience' => (float) $experience, 'experience_state' => ExperienceState::Answered],
         };
+    }
+
+    /**
+     * A hand-written value changes the ring, the step and the process rows (18 · 18.4).
+     */
+    private function recalculate(Diagnosis $diagnosis): void
+    {
+        $main = $diagnosis->main ?? $diagnosis->parent?->main;
+
+        if ($main !== null) {
+            RecalculateMainDiagnosis::dispatch($main);
+        }
     }
 
     private function logTransition(Diagnosis $diagnosis, ?DiagnosisStatus $from, DiagnosisStatus $to): void

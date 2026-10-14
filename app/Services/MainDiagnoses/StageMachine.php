@@ -3,6 +3,7 @@
 namespace App\Services\MainDiagnoses;
 
 use App\Enums\MainDiagnosisStage;
+use App\Events\MainDiagnosisStageChanged;
 use App\Exceptions\DiagnosisException;
 use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
@@ -57,6 +58,8 @@ class StageMachine
                 'to_stage' => $to,
                 'created_by' => $actor?->id ?? auth()->id(),
             ]);
+
+            MainDiagnosisStageChanged::dispatch($main, $from, $to, $actor);
         });
     }
 }

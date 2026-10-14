@@ -17,6 +17,11 @@
         </x-slot:actions>
     </x-admin.page-header>
 
+    <div class="mb-4 flex gap-2 text-sm" role="group" aria-label="{{ __('admin.garden.title') }}">
+        <a href="{{ route('admin.diagnoses.index') }}" class="rounded-pill border border-charcoal px-3 py-1 font-semibold text-charcoal no-underline">{{ __('admin.garden.view_garden') }}</a>
+        <span class="rounded-pill bg-charcoal px-3 py-1 font-semibold text-cream" aria-current="page">{{ __('admin.garden.view_list') }}</span>
+    </div>
+
     <x-admin.list-toolbar>
         <x-admin.filter name="organization" :label="__('admin.diagnoses.organization')" :options="$organizations" />
         <x-admin.filter name="level" :label="__('admin.diagnoses.level')" :options="$levels" />

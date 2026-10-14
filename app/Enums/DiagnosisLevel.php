@@ -3,13 +3,15 @@
 namespace App\Enums;
 
 /**
- * Who a diagnosis is about (04 · 4.3). The process level comes with 11.
+ * Who a diagnosis is about (04 · 4.3, 13 · 13.1).
  */
 enum DiagnosisLevel: string
 {
     case Organization = 'organization';
     case Team = 'team';
     case User = 'user';
+    // One process of the organization (13 · 13.1).
+    case Process = 'process';
 
     public function label(): string
     {
@@ -21,6 +23,6 @@ enum DiagnosisLevel: string
      */
     public function canAggregate(): bool
     {
-        return $this !== self::User;
+        return in_array($this, [self::Organization, self::Team], true);
     }
 }

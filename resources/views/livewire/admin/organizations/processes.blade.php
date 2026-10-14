@@ -4,6 +4,36 @@
 
     <x-admin.page-header :title="__('admin.organizations.tabs.processes')" class="mb-0" />
 
+    @if ($unclassified->isNotEmpty())
+        {{-- Besorolásra vár (12 · 12.6) --}}
+        <section class="flex flex-col gap-2 rounded-card bg-paper p-4" aria-labelledby="unclassified-title">
+            <h2 id="unclassified-title" class="text-lg font-semibold">{{ __('admin.occasions.unclassified') }}</h2>
+            <ul class="flex flex-col gap-2">
+                @foreach ($unclassified as $material)
+                    <li wire:key="unclassified-{{ $material->uuid }}" class="flex flex-col gap-3 rounded-card border border-grey-250 bg-white p-4">
+                        <p>
+                            <a href="{{ route('admin.materials.show', $material) }}" class="font-semibold">{{ $material->is_situation ? __('processes.occasions.situation') : ($material->original_name ?? $material->source->label()) }}</a>
+                            · {{ $material->user?->name ?? $material->creator?->name ?? '–' }}
+                            · {{ $material->placed_at->format('Y.m.d.') }}
+                            · {{ $material->status->label() }}
+                        </p>
+                        <form wire:submit="classifyMaterial('{{ $material->uuid }}')" class="flex flex-wrap items-end gap-3">
+                            <x-form.select name="classify.{{ $material->uuid }}.process_id" wire:model="classify.{{ $material->uuid }}.process_id" :label="__('admin.occasions.process')">
+                                <option value="">–</option>
+                                @foreach ($parents as $parent)
+                                    <option value="{{ $parent->id }}">{{ $parent->name }}</option>
+                                @endforeach
+                            </x-form.select>
+                            <x-form.input name="classify.{{ $material->uuid }}.date" type="date" wire:model="classify.{{ $material->uuid }}.date" :label="__('admin.occasions.date')" :max="today()->toDateString()" />
+                            <x-ui.button type="submit" size="sm">{{ __('admin.occasions.classify') }}</x-ui.button>
+                            <x-ui.button tone="outline" size="sm" wire:click="markOther('{{ $material->uuid }}')">{{ __('admin.occasions.other') }}</x-ui.button>
+                        </form>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
     {{-- Naptár --}}
     <section class="flex flex-col gap-2" aria-labelledby="calendar-rows">
         <h2 id="calendar-rows" class="text-lg font-semibold">{{ __('admin.processes.calendar') }}</h2>
@@ -75,7 +105,7 @@
                     @else
                         <tr wire:key="process-{{ $process->id }}">
                             <td class="px-3 py-2">
-                                <span class="font-semibold">{{ $process->name }}</span>
+                                <a href="{{ route('admin.organizations.process-occasions', [$organization, $process]) }}" class="font-semibold">{{ $process->name }}</a>
                                 @if ($process->renames->isNotEmpty())
                                     <span class="block text-xs text-grey-600">{{ __('processes.list.renamed_from', ['name' => $process->renames->last()->old_name]) }}</span>
                                 @endif

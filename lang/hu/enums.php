@@ -68,6 +68,7 @@ return [
         'organization' => 'Szervezet',
         'team' => 'Csapat',
         'user' => 'Felhasználói',
+        'process' => 'Folyamat',
     ],
 
     'diagnosis_status' => [
@@ -123,6 +124,7 @@ return [
         'mirror' => 'Értéktükör',
         'admin_upload' => 'Admin feltöltés',
         'dictation' => 'Elmondott mező',
+        'occasion' => 'Alkalom anyaga',
     ],
 
     'material_source' => [

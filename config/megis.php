@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'version' => '0.50',
+    'version' => '0.60',
 
     // Set by the deploy script, shown on Rendszer → Health (docs/uzemeltetes.md · 3).
     'deployed_at' => env('MEGIS_DEPLOYED_AT'),
@@ -57,7 +57,7 @@ return [
         // Shown on every upload form (NFR · 3). ".doc" is not read: it needs
         // LibreOffice, so the form asks for docx (plan, open question 7).
         'audio_extensions' => ['mp3', 'm4a', 'wav', 'webm'],
-        'text_extensions' => ['txt', 'md', 'docx'],
+        'text_extensions' => ['txt', 'md', 'docx', 'pdf'],
         'audio_max_kilobytes' => 300 * 1024,
         'audio_max_minutes' => 90,
         'text_max_kilobytes' => 10 * 1024,

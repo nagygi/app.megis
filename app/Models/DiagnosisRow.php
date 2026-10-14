@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * A value or brand base row of a diagnosis with its score and self-reported
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'score', 'score_state', 'experience', 'experience_state',
     'experience_met_example', 'experience_unmet_example', 'reasoning', 'quotes',
     'assigned_on', 'aggregation_stats', 'manually_modified',
+    'process_id', 'area_id', 'automatic_score', 'automatic_score_state', 'override_reason', 'overridden_by', 'overridden_at',
 ])]
 class DiagnosisRow extends Model
 {
@@ -43,6 +45,9 @@ class DiagnosisRow extends Model
             'aggregation_stats' => 'array',
             'quotes' => 'array',
             'manually_modified' => 'boolean',
+            'automatic_score' => 'float',
+            'automatic_score_state' => ScoreState::class,
+            'overridden_at' => 'datetime',
         ];
     }
 
@@ -70,11 +75,55 @@ class DiagnosisRow extends Model
         return $this->belongsTo(Version::class, 'value_version_id');
     }
 
+    /**
+     * @return BelongsTo<Process, $this>
+     */
+    public function process(): BelongsTo
+    {
+        return $this->belongsTo(Process::class);
+    }
+
+    /**
+     * @return BelongsTo<Area, $this>
+     */
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Area::class);
+    }
+
+    /**
+     * @return HasMany<EvidenceTrace, $this>
+     */
+    public function traces(): HasMany
+    {
+        return $this->hasMany(EvidenceTrace::class)->orderBy('recorded_on')->orderBy('id');
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function overrider(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'overridden_by');
+    }
+
     public function label(): string
     {
-        return $this->kind === DiagnosisRowKind::Value
-            ? (string) $this->value?->name
-            : (string) $this->tree_element?->label();
+        return match ($this->kind) {
+            DiagnosisRowKind::Value => (string) $this->value?->name,
+            DiagnosisRowKind::Process => (string) $this->process?->name,
+            DiagnosisRowKind::Area => (string) $this->area?->name,
+            default => (string) $this->tree_element?->label(),
+        };
+    }
+
+    /**
+     * A row written by hand whose calculated value differs (13 · 13.4).
+     */
+    public function differsFromAutomatic(): bool
+    {
+        return $this->overridden_at !== null
+            && ($this->automatic_score !== $this->score || $this->automatic_score_state !== $this->score_state);
     }
 
     /**

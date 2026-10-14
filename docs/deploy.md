@@ -29,6 +29,7 @@ A noindex-et az `X-Robots-Tag` fejléc, a `robots.txt` és a lapok meta-tagje ad
 | Értéktükör, anyagok (06) | `MEGIS_TRANSCRIBER=ai` (élesben kötelező), `FFPROBE_PATH`, `MEGIS_INDIVIDUAL_PRODUCT` (a regisztrált magánszemély szervezetének alap terméke), `MEGIS_BOOKING_URL` (az „Időpontot foglalok” naptára), `LIVEWIRE_TEMPORARY_FILE_UPLOAD_DISK=materials` (a nagy feltöltések közvetlenül az S3-ba mennek) |
 | Naptár (09) | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` (alap: `/naptar/google/visszahivas`); `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`, `MICROSOFT_REDIRECT_URI` (alap: `/naptar/microsoft/visszahivas`), `MICROSOFT_TENANT=common`. Kulcsok nélkül csak iCal link, ICS fájl és beszélgetés választható. |
 | Queue | `REDIS_QUEUE_RETRY_AFTER` / `DB_QUEUE_RETRY_AFTER` (alap: 330 másodperc, az AI-jobok 300 másodperces időkorlátja fölött) |
+| Diagnózis (18) | `DIAGNOSIS_RECALCULATION_DELAY` (alap: 20 másodperc): ennyit vár a fő diagnózis újraszámolása, így az egymás után érkező anyagok és megélések egyszer számolódnak |
 
 A titkok csak környezeti változóban vannak. AWS-en javasolt az AWS Secrets Manager vagy az SSM Parameter Store.
 

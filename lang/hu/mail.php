@@ -99,4 +99,32 @@ return [
         'action' => 'Kezdem',
     ],
 
+    // From the Futás tab (19 · E-mailek).
+    'diagnosis_reminder' => [
+        'leader_subject' => 'Folytatod? · :subject',
+        'leader_body' => 'Még :count lépés van hátra a(z) :subject diagnózisából, kb. :minutes perc.',
+        'leader_action' => 'Folytatom',
+        'peer_subject' => ':leader kíváncsi, hogyan látod te',
+        'peer_body' => ':leader kíváncsi, hogyan látod te. Kb. :minutes perc.',
+        'peer_action' => 'Kezdem',
+        'threshold_subject' => 'Még néhány társ hangja kell · :subject',
+        'threshold_body' => 'A rés csak akkor látszik, ha legalább 3 társ válaszol. Most :answered válaszolt, még :missing kell. Szólnál nekik?',
+        'threshold_action' => 'Társak',
+        'window_subject' => 'Új dátum · :subject',
+        'window_body' => 'A(z) :subject diagnózisa :date-ra készül el.',
+        'window_action' => 'Megnézem',
+    ],
+
+    // The 8:00 summary and the booking (22, question 2).
+    'inbox_digest' => [
+        'subject' => 'Beérkező · :count nyitott sor',
+        'intro' => 'Ma :count dolog vár rád a szervezeteidnél:',
+        'action' => 'Beérkező',
+    ],
+
+    'mirror_booking' => [
+        'subject' => 'Időpontot foglalna valaki',
+        'action' => 'Beérkező',
+    ],
+
 ];

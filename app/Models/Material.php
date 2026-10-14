@@ -22,6 +22,7 @@ use Illuminate\Support\Str;
     'context', 'source', 'organization_id', 'user_id', 'original_name',
     'audio_path', 'audio_mime', 'audio_seconds', 'text', 'segments', 'speaker_assignments', 'diagnosis_type_id', 'diagnosed_on',
     'status', 'error', 'transcription_ai_call_id', 'processed_at', 'created_by', 'parent_diagnosis_id',
+    'process_occasion_id', 'is_situation', 'recording_consent_at', 'recording_consent_by', 'classified_other_at', 'placed_at',
 ])]
 class Material extends Model
 {
@@ -52,6 +53,10 @@ class Material extends Model
             'speaker_assignments' => 'array',
             'diagnosed_on' => 'date',
             'processed_at' => 'datetime',
+            'is_situation' => 'boolean',
+            'recording_consent_at' => 'datetime',
+            'classified_other_at' => 'datetime',
+            'placed_at' => 'datetime',
         ];
     }
 
@@ -77,6 +82,16 @@ class Material extends Model
     }
 
     /**
+     * Who added it: the owner, or the admin for an admin upload (06 · 6.3, 12 · 12.6).
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
      * @return HasMany<RawDetection, $this>
      */
     public function detections(): HasMany
@@ -98,6 +113,34 @@ class Material extends Model
     public function diagnoses(): HasMany
     {
         return $this->hasMany(Diagnosis::class);
+    }
+
+    /**
+     * The occasion of a process the material belongs to (12 · 12.2).
+     *
+     * @return BelongsTo<ProcessOccasion, $this>
+     */
+    public function occasion(): BelongsTo
+    {
+        return $this->belongsTo(ProcessOccasion::class, 'process_occasion_id');
+    }
+
+    /**
+     * The main diagnosis the material belongs to (17 · 17.4, 18 · 18.4).
+     *
+     * @return BelongsTo<Diagnosis, $this>
+     */
+    public function parentDiagnosis(): BelongsTo
+    {
+        return $this->belongsTo(Diagnosis::class, 'parent_diagnosis_id');
+    }
+
+    /**
+     * An occasion material that waits for the admin: "Egyikhez sem" (12 · 12.2, 12.6).
+     */
+    public function isUnclassified(): bool
+    {
+        return $this->context === MaterialContext::Occasion && $this->process_occasion_id === null && $this->classified_other_at === null;
     }
 
     public function hasAudio(): bool

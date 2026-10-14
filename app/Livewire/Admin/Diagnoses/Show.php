@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Diagnoses;
 
+use App\Enums\DiagnosisLevel;
 use App\Enums\DiagnosisStatus;
 use App\Enums\ExperienceState;
 use App\Enums\ScoreState;
@@ -11,6 +12,7 @@ use App\Models\DiagnosisRow;
 use App\Models\Value;
 use App\Services\Diagnoses\DiagnosisAggregator;
 use App\Services\Diagnoses\DiagnosisService;
+use App\Services\Diagnoses\ProcessOccasionBreakdown;
 use App\Services\Materials\MaterialStore;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -18,7 +20,9 @@ use Livewire\Component;
 
 /**
  * A diagnosis with its two blocks, values and the brand base (04 · 4.4),
- * the status steps with their log (4.3) and the aggregated data (4.5).
+ * the status steps with their log (4.3) and the aggregated data (4.5). A
+ * calculated one (13, 18) is written over with a reason, next to the
+ * automatic value; a process diagnosis lists its occasions (13 · 13.5).
  */
 class Show extends Component
 {
@@ -44,6 +48,14 @@ class Show extends Component
     public string $rowReasoning = '';
 
     public string $rowAssignedOn = '';
+
+    public string $rowOverrideReason = '';
+
+    public bool $editingScore = false;
+
+    public string $scoreInput = '';
+
+    public string $scoreReason = '';
 
     public bool $showAggregationPreview = false;
 
@@ -103,6 +115,7 @@ class Show extends Component
         $this->rowUnmetExample = (string) $row->experience_unmet_example;
         $this->rowReasoning = (string) $row->reasoning;
         $this->rowAssignedOn = $row->assigned_on->toDateString();
+        $this->rowOverrideReason = (string) $row->override_reason;
         $this->resetValidation();
     }
 
@@ -117,6 +130,13 @@ class Show extends Component
         Gate::authorize('update', $this->diagnosis);
 
         $row = $this->findRow((int) $this->editingRowId);
+
+        if ($row->automatic_score_state !== null) {
+            $this->overrideRow($row, $diagnoses);
+
+            return;
+        }
+
         // The score is required on value rows, except in a Megélés diagnosis (04 · 4.4).
         $scoreRequired = $row->kind->value === 'value' && ! $this->diagnosis->type->isExperience();
 
@@ -147,7 +167,8 @@ class Show extends Component
         $this->attempt(function () use ($diagnoses, $row, $validated): void {
             $diagnoses->updateRow($row, [
                 'score' => $validated['rowScore'],
-                'experience' => $validated['rowExperience'],
+                // A calculated diagnosis keeps the experience of its people (18 · 18.4).
+                ...($this->diagnosis->isCalculated() ? [] : ['experience' => $validated['rowExperience']]),
                 'experience_met_example' => filled($validated['rowMetExample']) ? $validated['rowMetExample'] : null,
                 'experience_unmet_example' => filled($validated['rowUnmetExample']) ? $validated['rowUnmetExample'] : null,
                 'reasoning' => filled($validated['rowReasoning']) ? $validated['rowReasoning'] : null,
@@ -156,6 +177,70 @@ class Show extends Component
 
             $this->editingRowId = null;
             session()->flash('status', __('admin.diagnoses.row_saved'));
+        });
+    }
+
+    /**
+     * Back to the calculated value (13 · 13.4).
+     */
+    public function resetRow(int $rowId, DiagnosisService $diagnoses): void
+    {
+        Gate::authorize('update', $this->diagnosis);
+
+        $row = $this->findRow($rowId);
+
+        $this->attempt(function () use ($diagnoses, $row): void {
+            $diagnoses->resetRowOverride($row);
+            $this->editingRowId = null;
+            session()->flash('status', __('admin.diagnoses.override.reset_done'));
+        });
+    }
+
+    public function editScore(): void
+    {
+        Gate::authorize('update', $this->diagnosis);
+
+        $this->editingScore = true;
+        $this->scoreInput = match (true) {
+            $this->diagnosis->score_state === ScoreState::NoTrace => DiagnosisService::NO_TRACE,
+            $this->diagnosis->score === null => '',
+            default => number_format($this->diagnosis->score, 1, '.', ''),
+        };
+        $this->scoreReason = (string) $this->diagnosis->score_override_reason;
+        $this->resetValidation();
+    }
+
+    /**
+     * The point of a process diagnosis, written over with a reason (13 · 13.5).
+     */
+    public function saveScore(DiagnosisService $diagnoses): void
+    {
+        Gate::authorize('update', $this->diagnosis);
+        abort_unless($this->diagnosis->isCalculated() && $this->diagnosis->level === DiagnosisLevel::Process, 404);
+
+        $validated = $this->validate([
+            'scoreInput' => ['required', 'string', $this->scoreRule()],
+            'scoreReason' => ['required', 'string', 'min:3', 'max:1000'],
+        ], attributes: [
+            'scoreInput' => __('admin.diagnoses.process_point'),
+            'scoreReason' => __('admin.diagnoses.override.reason'),
+        ]);
+
+        $this->attempt(function () use ($diagnoses, $validated): void {
+            $diagnoses->overrideScore($this->diagnosis, $validated['scoreInput'], $validated['scoreReason'], auth('admin')->user());
+            $this->editingScore = false;
+            session()->flash('status', __('admin.diagnoses.override.saved'));
+        });
+    }
+
+    public function resetScore(DiagnosisService $diagnoses): void
+    {
+        Gate::authorize('update', $this->diagnosis);
+
+        $this->attempt(function () use ($diagnoses): void {
+            $diagnoses->resetScoreOverride($this->diagnosis);
+            $this->editingScore = false;
+            session()->flash('status', __('admin.diagnoses.override.reset_done'));
         });
     }
 
@@ -206,14 +291,15 @@ class Show extends Component
         });
     }
 
-    public function render(DiagnosisAggregator $aggregator): View
+    public function render(DiagnosisAggregator $aggregator, ProcessOccasionBreakdown $breakdown): View
     {
         $this->diagnosis->refresh()->load([
             'organization', 'team', 'user', 'type', 'creator', 'transitions.creator', 'material',
-            'main.leader', 'main.participants', 'parent',
+            'main.leader', 'main.participants', 'parent', 'process', 'scoreOverrider',
         ]);
 
-        $rows = $this->diagnosis->rows()->with(['value', 'valueVersion'])->get();
+        $rows = $this->diagnosis->rows()->with(['value', 'valueVersion', 'process', 'area', 'overrider'])->get();
+        $isProcess = $this->diagnosis->level === DiagnosisLevel::Process;
         $valueRows = $rows->where('kind.value', 'value')->values();
 
         $preview = null;
@@ -229,6 +315,11 @@ class Show extends Component
         return view('livewire.admin.diagnoses.show', [
             'valueRows' => $valueRows,
             'treeRows' => $rows->where('kind.value', 'tree_element')->values(),
+            'processRows' => $rows->where('kind.value', 'process')->values(),
+            'areaRows' => $rows->where('kind.value', 'area')->values(),
+            'isCalculated' => $this->diagnosis->isCalculated(),
+            'occasions' => $isProcess ? $breakdown->occasions($this->diagnosis) : collect(),
+            'newOccasions' => $isProcess ? $breakdown->newSincePublishing($this->diagnosis) : 0,
             'isEditable' => $this->diagnosis->status->isEditable(),
             'main' => $this->diagnosis->main,
             // Status buttons only for diagnoses that move on their own (17 · 17.4, 17.5).
@@ -263,6 +354,39 @@ class Show extends Component
         } catch (DiagnosisException $exception) {
             session()->flash('error', $exception->getMessage());
         }
+    }
+
+    /**
+     * A calculated row written over: the score and a reason (13 · 13.5).
+     */
+    private function overrideRow(DiagnosisRow $row, DiagnosisService $diagnoses): void
+    {
+        $validated = $this->validate([
+            'rowScore' => ['required', 'string', $this->scoreRule()],
+            'rowOverrideReason' => ['required', 'string', 'min:3', 'max:1000'],
+            'rowReasoning' => ['nullable', 'string', 'max:2000'],
+        ], attributes: [
+            'rowScore' => __('admin.diagnoses.score'),
+            'rowOverrideReason' => __('admin.diagnoses.override.reason'),
+            'rowReasoning' => __('admin.diagnoses.reasoning'),
+        ]);
+
+        $this->attempt(function () use ($diagnoses, $row, $validated): void {
+            $diagnoses->overrideRow($row, $validated['rowScore'], $validated['rowOverrideReason'], auth('admin')->user());
+            $row->update(['reasoning' => filled($validated['rowReasoning']) ? $validated['rowReasoning'] : null]);
+
+            $this->editingRowId = null;
+            session()->flash('status', __('admin.diagnoses.override.saved'));
+        });
+    }
+
+    private function scoreRule(): \Closure
+    {
+        return function (string $attribute, mixed $input, \Closure $fail): void {
+            if ($input !== DiagnosisService::NO_TRACE && ! preg_match(self::NUMBER_PATTERN, (string) $input)) {
+                $fail(__('validation.in', ['attribute' => __('admin.diagnoses.score')]));
+            }
+        };
     }
 
     private function findRow(int $rowId): DiagnosisRow

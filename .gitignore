@@ -28,3 +28,6 @@ Thumbs.db
 /tests/Browser/Screenshots
 docs/jegyzet.md
 docs/mvp-terv.md
+
+# A local SQLite file named after DB_DATABASE (artisan --database=sqlite without .env.testing).
+/megis_dev

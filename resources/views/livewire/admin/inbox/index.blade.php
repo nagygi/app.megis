@@ -50,7 +50,59 @@
                         </td>
                     @else
                         <td class="px-3 py-2 text-right">
-                            <x-ui.button tone="outline" size="sm" wire:click="close({{ $item->id }})" aria-label="{{ __('admin.inbox.close') }}: {{ $item->summary }}">{{ __('admin.inbox.close') }}</x-ui.button>
+                            @php($viewUrl = $this->viewUrl($item))
+                            <div class="flex flex-wrap items-end justify-end gap-2">
+                                @switch($item->type)
+                                    @case(\App\Enums\InboxItemType::Classification)
+                                        @if ($item->subject instanceof \App\Models\Material)
+                                            <form wire:submit="classifyMaterial({{ $item->id }})" class="flex flex-wrap items-end justify-end gap-2 text-left">
+                                                <x-form.select name="classify.{{ $item->id }}.process_id" wire:model="classify.{{ $item->id }}.process_id" :label="__('admin.occasions.process')">
+                                                    <option value="">–</option>
+                                                    @foreach ($processes->get($item->organization_id, collect()) as $process)
+                                                        <option value="{{ $process->id }}">{{ $process->name }}</option>
+                                                    @endforeach
+                                                </x-form.select>
+                                                <x-form.input name="classify.{{ $item->id }}.date" type="date" wire:model="classify.{{ $item->id }}.date" :label="__('admin.occasions.date')" :max="today()->toDateString()" />
+                                                <x-ui.button type="submit" size="sm">{{ __('admin.inbox.done') }}</x-ui.button>
+                                                <x-ui.button tone="outline" size="sm" wire:click="markOther({{ $item->id }})">{{ __('admin.occasions.other') }}</x-ui.button>
+                                            </form>
+                                        @endif
+                                        @break
+                                    @case(\App\Enums\InboxItemType::ProcessingError)
+                                        @if ($item->subject instanceof \App\Models\Material || $item->subject instanceof \App\Models\MainDiagnosis)
+                                            <x-ui.button size="sm" wire:click="retry({{ $item->id }})">{{ __('admin.inbox.retry') }}</x-ui.button>
+                                        @endif
+                                        @if ($viewUrl)
+                                            <x-ui.button tone="outline" size="sm" :href="$viewUrl">{{ __('admin.inbox.view') }}</x-ui.button>
+                                        @endif
+                                        @break
+                                    @case(\App\Enums\InboxItemType::Invitation)
+                                        <x-ui.button size="sm" wire:click="remind({{ $item->id }})">{{ __('admin.inbox.remind') }}</x-ui.button>
+                                        <x-ui.button tone="outline" size="sm" wire:click="reinvite({{ $item->id }})">{{ __('admin.inbox.reinvite') }}</x-ui.button>
+                                        @break
+                                    @case(\App\Enums\InboxItemType::Completion)
+                                        <x-ui.button size="sm" wire:click="remind({{ $item->id }})">{{ __('admin.inbox.remind') }}</x-ui.button>
+                                        @if ($viewUrl)
+                                            <x-ui.button tone="outline" size="sm" :href="$viewUrl">{{ __('admin.inbox.view') }}</x-ui.button>
+                                        @endif
+                                        @break
+                                    @case(\App\Enums\InboxItemType::Threshold)
+                                        @if ($viewUrl)
+                                            <x-ui.button size="sm" :href="$viewUrl">{{ __('admin.inbox.to_run') }}</x-ui.button>
+                                        @endif
+                                        @break
+                                    @case(\App\Enums\InboxItemType::Publication)
+                                        @if ($viewUrl)
+                                            <x-ui.button size="sm" :href="$viewUrl">{{ __('admin.inbox.to_reading') }}</x-ui.button>
+                                        @endif
+                                        @break
+                                    @default
+                                        @if ($viewUrl)
+                                            <x-ui.button tone="outline" size="sm" :href="$viewUrl">{{ __('admin.inbox.view') }}</x-ui.button>
+                                        @endif
+                                @endswitch
+                                <x-ui.button tone="outline" size="sm" wire:click="close({{ $item->id }})" aria-label="{{ __('admin.inbox.close') }}: {{ $item->summary }}">{{ $item->type === \App\Enums\InboxItemType::MirrorBooking ? __('admin.inbox.done') : __('admin.inbox.close') }}</x-ui.button>
+                            </div>
                         </td>
                     @endif
                 </tr>

@@ -52,4 +52,12 @@ return [
         'imported' => ':count érték bekerült az Értéktárba, mindegyik v1-ként.',
     ],
 
+    'inbox_scan' => [
+        'done' => 'Beérkező átnézve: :opened új sor, :closed lezárva.',
+    ],
+
+    'inbox_digest' => [
+        'done' => ':count összefoglaló ment ki.',
+    ],
+
 ];

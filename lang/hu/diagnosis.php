@@ -32,6 +32,7 @@ return [
     'cannot_start' => 'A diagnózis most nem indítható.',
     'step_missing' => 'Még hiányzik: :step.',
     'overview_back' => 'Mi vár rád',
+    'home_back' => 'Kezdőlap',
     'locked' => 'Ez a lépés már nem módosítható.',
     'peer_link' => 'A(z) :subject diagnózisában társ vagy',
     'peer_steps_lead' => 'Két lépés most, egy, amíg fut.',
@@ -74,6 +75,37 @@ return [
         'required' => 'A kezdéshez ehhez hozzá kell járulnod.',
     ],
 
+    // V10, V10·b · the leader's home while it runs and is read (26 · 26.1, 26.2).
+    'home' => [
+        'title' => 'A ti diagnózisotok',
+        'subtitle' => ':product · :stage · :from → :to',
+        'ring' => 'Belső működés · :count mérőpont',
+        'where' => 'Hol tartunk',
+        'week_of' => ':current. hét / :count',
+        'day_of' => ':current. nap / :count',
+        'states' => [
+            'done' => 'kész',
+            'now' => 'most',
+            'later' => 'később',
+        ],
+        'onboarding' => 'Onboarding',
+        'onboarding_help' => 'értékek · folyamatok · a márkád alapja · :date',
+        'peers' => 'Társak',
+        'peers_count' => ':answered / :total kitöltötte',
+        'remind' => 'Emlékeztető',
+        'reminded' => 'Szóltunk azoknak, akik még nem töltötték ki.',
+        'missing_peers' => '{1} Még :count társ hangja kell, hogy lássátok a rést.|[2,*] Még :count társ hangja kell, hogy lássátok a rést.',
+        'conversations' => ':held megtartva',
+        'conversation_next' => 'következő: :date · :admin',
+        'contributions' => 'Amit hozzátesztek',
+        'contributions_count' => ':recordings felvétel · :documents dokumentum · :situations elmondott helyzet',
+        'reading' => 'A mégis olvasata',
+        'report' => 'A riport',
+        'deepening' => 'Belső működés · értékek · folyamatok · területek · a márkád alapja · :date',
+        'deepening_snapshot' => 'Belső működés · értékek · folyamatok · a márkád alapja · :date',
+        'correcting' => 'A mégis javítja a diagnózisotokat. Hamarosan újra elérhető.',
+    ],
+
     'peer_home' => [
         'title' => 'A csapat hangja',
         'subtitle' => ':subject · :product · :stage · :week. hét / :weeks · publikálás: :date',
@@ -82,6 +114,8 @@ return [
         'library_help' => 'a csapat értékei, definícióval',
         'withdrawn' => 'Visszavontad a hozzájárulásodat: a válaszaid kikerültek a diagnózisból, és Útravalót sem kapsz.',
         'leader_link' => 'A(z) :subject diagnózisát te vezeted',
+        'situations' => 'A helyzeteid',
+        'situations_count' => ':count beküldve',
     ],
 
     'visibility' => [

@@ -45,6 +45,15 @@
             </x-form.select>
         @endif
 
+        @if ($level === \App\Enums\DiagnosisLevel::Process->value)
+            <x-form.select name="process_id" wire:model="process_id" :label="__('admin.diagnoses.process')" required>
+                <option value="">{{ __('admin.diagnoses.process_select') }}</option>
+                @foreach ($processes as $processOption)
+                    <option value="{{ $processOption->id }}">{{ $processOption->name }}</option>
+                @endforeach
+            </x-form.select>
+        @endif
+
         @if ($level === \App\Enums\DiagnosisLevel::User->value)
             <x-form.select name="user_id" wire:model="user_id" :label="__('admin.diagnoses.user')" required>
                 <option value="">{{ __('admin.diagnoses.user_select') }}</option>

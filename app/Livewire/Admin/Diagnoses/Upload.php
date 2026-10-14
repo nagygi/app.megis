@@ -48,6 +48,15 @@ class Upload extends Component
 
         $this->diagnosed_on = today()->toDateString();
         $this->diagnosis_type_id = DiagnosisType::query()->where('key', 'workshop')->value('id');
+
+        // From the Futás tab: a conversation of the mégis, bound to the main diagnosis (19 · 19.5).
+        $parent = Diagnosis::query()->whereKey((int) request()->query('diagnozis'))->whereHas('main')->first();
+
+        if ($parent !== null) {
+            $this->organization_id = $parent->organization_id;
+            $this->parent_diagnosis_id = $parent->id;
+            $this->diagnosis_type_id = DiagnosisType::query()->where('key', 'conversation')->value('id') ?? $this->diagnosis_type_id;
+        }
     }
 
     public function save(MaterialStore $materials, MaterialPipeline $pipeline): void

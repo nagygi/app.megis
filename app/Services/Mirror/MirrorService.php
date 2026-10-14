@@ -7,6 +7,8 @@ use App\Enums\MembershipStatus;
 use App\Enums\MirrorStatus;
 use App\Enums\OrganizationType;
 use App\Enums\TokenPurpose;
+use App\Enums\UserRole;
+use App\Mail\MirrorBookingMail;
 use App\Mail\MirrorConfirmationMail;
 use App\Models\AnonymousValueStat;
 use App\Models\Diagnosis;
@@ -272,7 +274,7 @@ class MirrorService
         $who = $session->user?->name ?? $session->email ?? __('mirror.someone');
         $curiosity = collect($session->curiosity ?? [])->map(fn (string $key) => __('mirror.curiosity.'.$key.'.short'))->implode(', ');
 
-        $this->inbox->open(
+        $item = $this->inbox->open(
             InboxItemType::MirrorBooking,
             $curiosity === ''
                 ? __('mirror.booking_summary', ['name' => $who])
@@ -281,6 +283,15 @@ class MirrorService
             subject: $session,
             dedupeKey: 'mirror-booking:'.$session->id,
         );
+
+        if ($item->wasRecentlyCreated) {
+            $contact = $session->organization?->contactAdmin;
+            $recipients = $contact !== null ? collect([$contact]) : User::query()->where('role', UserRole::Superadmin)->whereNull('deactivated_at')->get();
+
+            foreach ($recipients as $recipient) {
+                Mail::to($recipient)->send(new MirrorBookingMail($item));
+            }
+        }
 
         $session->update(['booking_requested_at' => now()]);
     }

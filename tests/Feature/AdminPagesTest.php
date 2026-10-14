@@ -9,6 +9,7 @@ use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\Membership;
 use App\Models\Organization;
+use App\Models\Process;
 use App\Models\Product;
 use App\Models\Team;
 use App\Models\User;
@@ -42,6 +43,7 @@ it('renders every admin page for a superadmin', function (Closure $route) {
     'members' => fn (array $models) => route('admin.organizations.members', $models['organization']),
     'organization values' => fn (array $models) => route('admin.organizations.values', $models['organization']),
     'organization processes' => fn (array $models) => route('admin.organizations.processes', $models['organization']),
+    'process occasions' => fn (array $models) => route('admin.organizations.process-occasions', [$models['organization'], Process::factory()->for($models['organization'])->create()]),
     'organization diagnoses' => fn (array $models) => route('admin.organizations.diagnoses', $models['organization']),
     'start diagnosis' => fn (array $models) => route('admin.main-diagnoses.create', ['szervezet' => $models['organization']->id]),
     'main diagnosis' => fn () => route('admin.diagnoses.show', MainDiagnosis::factory()->create()->diagnosis),
@@ -76,6 +78,7 @@ it('renders every admin page for a superadmin', function (Closure $route) {
     'new value category' => fn () => route('admin.value-categories.create'),
     'edit value category' => fn (array $models) => route('admin.value-categories.edit', $models['category']),
     'legal documents' => fn () => route('admin.settings.legal'),
+    'areas' => fn () => route('admin.settings.areas'),
     'profile' => fn () => route('admin.profile'),
     'system' => fn () => route('admin.system.index'),
     'health' => fn () => route('admin.system.health'),

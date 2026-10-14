@@ -4,7 +4,6 @@ use App\Enums\AuditEventType;
 use App\Enums\ConsentKind;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\ParticipantRole;
-use App\Enums\StepMark;
 use App\Livewire\Client\Diagnosis\Experience;
 use App\Livewire\Client\Diagnosis\OrganizationValues;
 use App\Livewire\Client\Diagnosis\Overview;
@@ -14,40 +13,14 @@ use App\Livewire\Mirror\Record;
 use App\Models\AuditEvent;
 use App\Models\Consent;
 use App\Models\Diagnosis;
-use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\Team;
 use App\Services\Auth\LandingResolver;
 use App\Services\MainDiagnoses\ExperienceService;
-use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\MainDiagnoses\StageMachine;
 use App\Services\Organizations\OrganizationValueSetService;
 use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
-
-/**
- * A team diagnosis the leader started: it runs and the peers are invited (23 · 23.4).
- *
- * @return array{0: array<string, mixed>, 1: MainDiagnosis}
- */
-function runningDiagnosis(bool $showQuotes = true): array
-{
-    $setup = diagnosisTeam(peers: 2);
-    $main = startMainDiagnosis($setup, overrides: ['show_peer_quotes' => $showQuotes]);
-    confirmOwnValues($setup['leader']);
-    $version = app(OrganizationValueSetService::class)->forOrganization($setup['organization'])->latestVersion;
-    $rows = app(ExperienceService::class)->rows($version->snapshot);
-    app(ExperienceService::class)->submit($main, $setup['leader'], $version, collect($rows)->mapWithKeys(fn ($row) => [$row['key'] => '4'])->all());
-    $main->stepMarks()->create(['user_id' => $setup['leader']->id, 'step' => 'processes', 'mark' => StepMark::Skipped]);
-    app(MainDiagnosisService::class)->start($main->refresh(), $setup['leader']);
-
-    return [$setup, $main->refresh()];
-}
-
-function peerParams(array $setup, $main): array
-{
-    return ['organization' => $setup['organization'], 'diagnosis' => $main->diagnosis];
-}
 
 it('asks the peer for the consents before anything else (T1)', function () {
     [$setup, $main] = runningDiagnosis();

@@ -5,16 +5,23 @@ namespace App\Livewire\Client\Diagnosis;
 use App\Enums\AuditEventType;
 use App\Enums\ConsentKind;
 use App\Enums\MainDiagnosisStage;
+use App\Enums\MaterialContext;
+use App\Enums\MaterialStatus;
 use App\Enums\ParticipantRole;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
 use App\Models\Consent;
 use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
+use App\Models\Material;
 use App\Models\Organization;
 use App\Models\PersonalValueSet;
 use App\Services\Audit\AuditLogger;
+use App\Services\Diagnoses\ThresholdPolicy;
+use App\Services\MainDiagnoses\DiagnosisRunService;
 use App\Services\MainDiagnoses\MainDiagnosisService;
+use App\Services\MainDiagnoses\StepList;
 use App\Services\MainDiagnoses\StepProgress;
+use App\Services\Processes\OccasionService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -22,7 +29,8 @@ use Livewire\Component;
 
 /**
  * The entry of a main diagnosis. The leader sees "Mi vár rád" and later
- * "Innen folytatod" (V1, V1·b, 23 · 23.1, 23.2); a peer sees the invitation
+ * "Innen folytatod" (V1, V1·b, 23 · 23.1, 23.2), then the home while it runs
+ * and is read (V10, V10·b, 26 · 26.1, 26.2); a peer sees the invitation
  * with the consents (T1), then "Mi vár rád" (T2) and their home (T5, 25).
  */
 class Overview extends Component
@@ -89,6 +97,19 @@ class Overview extends Component
         });
     }
 
+    /**
+     * "Emlékeztető" on V10 (26, question 2): every peer who has not answered,
+     * the 48-hour limit of 19 · 19.4; the leader does not see who got it.
+     */
+    public function remindPeers(DiagnosisRunService $run): void
+    {
+        abort_unless($this->isLeader() && $this->main()->stage === MainDiagnosisStage::Running && $this->main()->hasPeers(), 403);
+        abort_if($this->isImpersonating(), 403, __('impersonation.forbidden'));
+
+        $run->remindPeers($this->main(), $this->user());
+        session()->flash('status', __('diagnosis.home.reminded'));
+    }
+
     public function render(StepProgress $progress): View
     {
         $main = $this->main();
@@ -97,15 +118,21 @@ class Overview extends Component
         $current = $steps->current();
 
         $view = match (true) {
+            $this->isLeader() && in_array($main->stage, [MainDiagnosisStage::Running, MainDiagnosisStage::Reading], true) => 'livewire.client.diagnosis.overview-running',
             $this->isLeader() => 'livewire.client.diagnosis.overview-leader',
             $participant->started_at === null => 'livewire.client.diagnosis.invitation',
             default => 'livewire.client.diagnosis.overview-peer',
         };
 
+        $canContribute = app(OccasionService::class)->canContribute($main, $this->user());
+        // The coral plus: only while it runs, only on the homes (15 · 15.5).
+        $plus = $canContribute ? route('client.diagnosis.contribute', [$this->organization, $this->diagnosis]) : null;
+
         $layout = match ($view) {
+            'livewire.client.diagnosis.overview-running' => ['title' => __('diagnosis.home.title'), 'subtitle' => $this->runningSubtitle(), 'color' => 'charcoal', 'plus' => $plus],
             'livewire.client.diagnosis.invitation' => ['title' => __('diagnosis.invitation.title'), 'color' => 'coral'],
             'livewire.client.diagnosis.overview-peer' => $steps->current() === null
-                ? ['title' => __('diagnosis.peer_home.title'), 'subtitle' => $this->peerHomeSubtitle(), 'color' => 'charcoal']
+                ? ['title' => __('diagnosis.peer_home.title'), 'subtitle' => $this->peerHomeSubtitle(), 'color' => 'charcoal', 'plus' => $plus]
                 : ['title' => __('diagnosis.what_awaits'), 'color' => 'cream'],
             default => ['title' => __('diagnosis.what_awaits'), 'color' => 'cream'],
         };
@@ -121,7 +148,67 @@ class Overview extends Component
             'experience' => $progress->experienceDiagnosis($main, $this->user()),
             'leaderName' => $main->leader->name,
             'otherRoles' => $this->otherRoles(),
+            'home' => $view === 'livewire.client.diagnosis.overview-running' ? $this->runningHome($main, $steps) : null,
+            'situationCount' => Material::query()->where('parent_diagnosis_id', $main->diagnosis_id)->where('user_id', $this->user()->id)->where('context', MaterialContext::Occasion)->whereNotNull('placed_at')->count(),
         ])->layout('layouts::client', $layout)->title($layout['title']);
+    }
+
+    /**
+     * "{Termék} · fut · {kezdés} → {publikálás}" (26 · 26.1).
+     */
+    private function runningSubtitle(): string
+    {
+        $main = $this->main();
+
+        return __('diagnosis.home.subtitle', [
+            'product' => $main->product_name,
+            'stage' => mb_strtolower($main->stage->label()),
+            'from' => ($main->running_at ?? $main->starts_on)?->format('m.d.') ?? '–',
+            'to' => $main->publishes_on->format('m.d.'),
+        ]);
+    }
+
+    /**
+     * V10 · "Hol tartunk" (26 · 26.1): the weeks (days in a snapshot), the
+     * steps of the run, numbers and never answers.
+     *
+     * @return array<string, mixed>
+     */
+    private function runningHome(MainDiagnosis $main, StepList $steps): array
+    {
+        $start = ($main->running_at ?? $main->starts_on ?? now())->copy()->startOfDay();
+        $unit = $main->isSnapshot() ? 1 : 7;
+        $count = max(1, (int) ceil(($start->diffInDays($main->publishes_on) + 1) / $unit));
+        $current = min($count, max(1, (int) floor($start->diffInDays(now()) / $unit) + 1));
+        $threshold = app(ThresholdPolicy::class);
+        $materials = Material::query()->where('parent_diagnosis_id', $main->diagnosis_id)->where('status', '!=', MaterialStatus::Failed)->get();
+        $conversations = $main->conversations()->with('admin')->orderBy('held_at')->get();
+        $next = $conversations->first(fn ($conversation) => $conversation->held_at->isFuture());
+        $peers = $main->peers()->count();
+        $reading = $main->stage === MainDiagnosisStage::Reading;
+
+        return [
+            'unit' => $main->isSnapshot() ? 'day' : 'week',
+            'segments' => collect(range(1, $count))->map(fn (int $index) => $index < $current ? 'done' : ($index === $current ? 'now' : 'later'))->all(),
+            'current' => $current,
+            'count' => $count,
+            'measuringPoints' => $main->diagnosis->rows()->count(),
+            'onboarding' => ['done' => $steps->current() === null, 'date' => $main->running_at],
+            'peers' => $main->hasPeers() ? [
+                'answered' => $threshold->peersAnswered($main),
+                'total' => $peers,
+                'missing' => $threshold->missingPeers($main),
+            ] : null,
+            'conversations' => ['held' => $conversations->filter(fn ($conversation) => $conversation->held_at->isPast())->count(), 'next' => $next],
+            'contributions' => [
+                'recordings' => $materials->filter(fn (Material $material) => ! $material->is_situation && $material->source->hasAudio())->count(),
+                'documents' => $materials->filter(fn (Material $material) => ! $material->is_situation && ! $material->source->hasAudio() && $material->context !== MaterialContext::Dictation)->count(),
+                'situations' => $materials->where('is_situation', true)->count(),
+            ],
+            'reading' => ['state' => $reading ? 'now' : 'later', 'from' => $main->readingStartsOn(), 'to' => $main->publishes_on->copy()->subDay()],
+            // Withdrawn after publishing, the mégis corrects it (21 · 21.5).
+            'correcting' => $reading && $main->published_at !== null,
+        ];
     }
 
     /**

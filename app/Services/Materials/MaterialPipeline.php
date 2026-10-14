@@ -7,12 +7,15 @@ use App\Enums\MaterialContext;
 use App\Enums\MaterialStatus;
 use App\Enums\MirrorStatus;
 use App\Jobs\AnalyzeMaterial;
+use App\Jobs\RecalculateMainDiagnosis;
 use App\Jobs\TranscribeMaterial;
 use App\Models\DiagnosisType;
+use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\User;
 use App\Services\Engine\AutomaticDiagnosisBuilder;
+use App\Services\Engine\ValueCatalog;
 use Throwable;
 
 /**
@@ -73,8 +76,11 @@ class MaterialPipeline
             MaterialContext::PublicMirror => $this->mirrorSession($material)?->update(['status' => MirrorStatus::Ready]),
             MaterialContext::Mirror => $this->finishSignedInMirror($material),
             MaterialContext::AdminUpload => $this->buildUploadDiagnoses($material),
-            MaterialContext::Dictation => null,
+            MaterialContext::Dictation, MaterialContext::Occasion => null,
         };
+
+        // A material of a main diagnosis recalculates it (13 · 13.4, 18 · 18.4).
+        $this->recalculateParent($material);
     }
 
     public function failed(Material $material, ?Throwable $exception): void
@@ -85,6 +91,35 @@ class MaterialPipeline
         ]);
 
         $this->mirrorSession($material)?->update(['status' => MirrorStatus::Failed]);
+    }
+
+    /**
+     * The values the engine matches to: for a material of a main diagnosis
+     * the organization's values in its own words, from the recorded version (13 · 13.2).
+     */
+    public function catalogFor(Material $material): ValueCatalog
+    {
+        $snapshot = $this->mainOf($material)?->valueSetVersion?->snapshot;
+
+        return $snapshot === null || $material->organization === null
+            ? ValueCatalog::forOrganization($material->organization)
+            : ValueCatalog::forDiagnosis($material->organization, $snapshot);
+    }
+
+    public function recalculateParent(Material $material): void
+    {
+        $main = $this->mainOf($material);
+
+        if ($main !== null) {
+            RecalculateMainDiagnosis::dispatch($main);
+        }
+    }
+
+    private function mainOf(Material $material): ?MainDiagnosis
+    {
+        return $material->parent_diagnosis_id === null
+            ? null
+            : MainDiagnosis::query()->where('diagnosis_id', $material->parent_diagnosis_id)->first();
     }
 
     public function contextFor(Material $material): AiContext
@@ -105,7 +140,10 @@ class MaterialPipeline
             return [null];
         }
 
-        return array_map('strval', array_keys(array_filter($material->speaker_assignments ?? [], fn ($userId) => $userId !== null)));
+        $speakers = array_map('strval', array_keys(array_filter($material->speaker_assignments ?? [], fn ($userId) => $userId !== null)));
+
+        // Attached to a main diagnosis, the whole conversation counts there too (18 · 18.4).
+        return $material->parent_diagnosis_id === null ? $speakers : [...$speakers, null];
     }
 
     private function mirrorSession(Material $material): ?MirrorSession

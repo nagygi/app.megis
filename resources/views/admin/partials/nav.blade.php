@@ -30,6 +30,7 @@
             'label' => __('admin.nav.settings'),
             'items' => [
                 ['route' => 'admin.settings.legal', 'active' => 'admin.settings.legal', 'label' => __('admin.nav.legal_documents')],
+                ['route' => 'admin.settings.areas', 'active' => 'admin.settings.areas', 'label' => __('admin.nav.areas')],
             ],
         ],
     ];

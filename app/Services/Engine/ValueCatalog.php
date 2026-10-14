@@ -22,8 +22,9 @@ final class ValueCatalog
 
     /**
      * @param  Collection<int, Value>  $values  with latestVersion loaded
+     * @param  array<int, array<string, list<string>>>  $definitions  value id => the organization's own words, by label
      */
-    public function __construct(Collection $values)
+    public function __construct(Collection $values, private array $definitions = [])
     {
         foreach ($values->values() as $index => $value) {
             $ref = 'E'.($index + 1);
@@ -38,6 +39,46 @@ final class ValueCatalog
     public static function forOrganization(?Organization $organization): self
     {
         return new self(Value::query()->availableTo($organization)->with('latestVersion')->orderBy('id')->get());
+    }
+
+    /**
+     * For the materials of a main diagnosis (13 · 13.2, 18 · 18.4): the
+     * organization's values in its own words from the recorded value set
+     * version, next to the rest of the Értéktár.
+     *
+     * @param  array<string, mixed>  $valueSetSnapshot
+     */
+    public static function forDiagnosis(Organization $organization, array $valueSetSnapshot): self
+    {
+        $definitions = [];
+
+        foreach ($valueSetSnapshot['values'] ?? [] as $item) {
+            $definitions[(int) $item['value_id']] = array_filter([
+                'Mit jelent' => array_values(array_filter([$item['meaning'] ?? null])),
+                'Mit nem jelent' => array_values(array_filter([$item['non_meaning'] ?? null])),
+                '6 · Mikor teljesül nagyon' => array_values(array_filter([$item['high_example'] ?? null])),
+                '1 · Mikor nagyon nem teljesül' => array_values(array_filter([$item['low_example'] ?? null])),
+                'Példák' => array_values(array_filter([$item['example'] ?? null])),
+            ]);
+        }
+
+        $values = Value::query()
+            ->where(fn ($query) => $query->availableTo($organization)->orWhereIn('id', array_keys($definitions)))
+            ->with('latestVersion')
+            ->orderBy('id')
+            ->get();
+
+        return new self($values, $definitions);
+    }
+
+    /**
+     * The values every material of a diagnosis is scored on (13 · 13.2).
+     *
+     * @return list<int>
+     */
+    public function requiredValueIds(): array
+    {
+        return array_values(array_filter(array_keys($this->definitions), fn (int $valueId) => isset($this->refByValueId[$valueId])));
     }
 
     public function isEmpty(): bool
@@ -83,6 +124,18 @@ final class ValueCatalog
     {
         $value = $this->byRef[$ref];
         $lines = ['['.$ref.']'];
+
+        if (isset($this->definitions[$value->id])) {
+            foreach ($this->definitions[$value->id] as $label => $texts) {
+                $lines[] = $label.': '.implode(' | ', $texts);
+            }
+
+            if ($value->keywords !== []) {
+                $lines[] = 'Jellemző kifejezések: '.implode(' | ', $value->keywords);
+            }
+
+            return implode("\n", $lines);
+        }
 
         foreach ([
             'meanings' => 'Mit jelent',

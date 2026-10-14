@@ -11,6 +11,8 @@
     'guest' => false,
     // "3 / 6" on the filling pages (23 · 23.3).
     'step' => null,
+    // The coral plus to V11, on the homes of a running diagnosis (15 · 15.5).
+    'plus' => null,
 ])
 
 @php
@@ -121,6 +123,16 @@
             </main>
         </div>
     </div>
+
+    @if ($plus)
+        <a
+            href="{{ $plus }}"
+            class="fixed bottom-0 left-1/2 z-20 grid h-14 w-28 -translate-x-1/2 place-items-center rounded-t-full bg-coral pt-2 text-3xl font-light text-black no-underline shadow-lg hover:bg-coral-dark hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-charcoal"
+        >
+            <span aria-hidden="true">+</span>
+            <span class="sr-only">{{ __('processes.occasions.contribute_title') }}</span>
+        </a>
+    @endif
 
     @livewireScriptConfig
 </body>

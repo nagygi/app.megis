@@ -11,6 +11,7 @@ use App\Http\Middleware\ResolveOrganization;
 use App\Models\CalendarConnection;
 use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
+use App\Models\MainDiagnosisParticipant;
 use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\OrganizationValueSet;
@@ -82,6 +83,7 @@ class AppServiceProvider extends ServiceProvider
             'personal_value_set' => PersonalValueSet::class,
             'process_conversation' => ProcessConversation::class,
             'calendar_connection' => CalendarConnection::class,
+            'main_diagnosis_participant' => MainDiagnosisParticipant::class,
         ]);
 
         // Livewire update requests run these again, so actions are checked like page loads.

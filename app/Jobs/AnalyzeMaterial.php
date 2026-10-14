@@ -5,7 +5,6 @@ namespace App\Jobs;
 use App\Enums\MaterialStatus;
 use App\Models\Material;
 use App\Models\Organization;
-use App\Services\Engine\ValueCatalog;
 use App\Services\Engine\ValueMeasurementEngine;
 use App\Services\Materials\MaterialPipeline;
 use Illuminate\Database\Eloquent\Model;
@@ -27,7 +26,7 @@ class AnalyzeMaterial extends AiTaskJob
 
         $engine->analyze(
             $this->material,
-            ValueCatalog::forOrganization($this->material->organization),
+            $pipeline->catalogFor($this->material),
             $pipeline->contextFor($this->material),
             $pipeline->speakersToScore($this->material),
         );

@@ -65,4 +65,7 @@ return [
         'individual_min' => 3,
     ],
 
+    // A burst of events (materials, experiences) is recalculated once (plan 3.6).
+    'recalculation_delay_seconds' => (int) env('DIAGNOSIS_RECALCULATION_DELAY', 20),
+
 ];

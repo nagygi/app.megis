@@ -69,7 +69,8 @@ it('walks the leader from V1 to "Indul a diagnózis"', function () {
     $page->assertSee('Egy lap, a diagnózis végéig érvényes.')->assertNoAccessibilityIssues();
     $page->press('Indul a diagnózis');
 
-    $page->assertSee('A diagnózis fut')->assertNoAccessibilityIssues();
+    // V10: the home while it runs (26 · 26.1).
+    $page->assertSee('Hol tartunk')->assertNoAccessibilityIssues();
 });
 
 it('walks a peer from the consent to the experience', function () {

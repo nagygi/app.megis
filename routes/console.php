@@ -44,6 +44,18 @@ Schedule::command('megis:calendar:prune')
     ->name('prune:calendar-metadata')
     ->onOneServer();
 
+// The Beérkező's daily scan, then the 8:00 summary to the contacts (22 · 22.2, question 2).
+Schedule::command('megis:inbox:scan')
+    ->dailyAt('07:30')
+    ->name('inbox:scan')
+    ->onOneServer()
+    ->withoutOverlapping();
+
+Schedule::command('megis:inbox:digest')
+    ->dailyAt('08:00')
+    ->name('inbox:digest')
+    ->onOneServer();
+
 // Anonymous Értéktükör runs live 24 hours; only the anonymous statistics stay (06 · 6.1).
 Schedule::command('megis:mirror:prune')
     ->hourly()

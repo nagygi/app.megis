@@ -1,29 +1,53 @@
-{{-- Tabs of a main diagnosis (17): the diagnosis, its settings (A1), its subdiagnoses (17 · 17.4). --}}
+{{--
+    The header and the tabs of a main diagnosis (17, 19 · 19.1): the diagnosis,
+    its settings (A1), the Futás tab for the contact and the superadmin, its
+    subdiagnoses (17 · 17.4). The header carries the organization's colour.
+--}}
 @props(['diagnosis'])
 
 @php
-    $tabs = [
+    $main = $diagnosis->main;
+    $tabs = array_values(array_filter([
         ['route' => 'admin.diagnoses.show', 'label' => __('admin.main_diagnoses.tabs.overview')],
         ['route' => 'admin.main-diagnoses.edit', 'label' => __('admin.main_diagnoses.tabs.settings')],
+        auth()->user()?->can('run', $diagnosis) ? ['route' => 'admin.main-diagnoses.run', 'label' => __('admin.main_diagnoses.tabs.run')] : null,
         ['route' => 'admin.main-diagnoses.subdiagnoses', 'label' => __('admin.main_diagnoses.tabs.subdiagnoses')],
-    ];
+    ]));
+    $days = $main?->dayCount();
 @endphp
 
-<nav {{ $attributes->class(['border-b border-grey-250']) }} aria-label="{{ $diagnosis->name }}">
-    <ul class="flex gap-1 overflow-x-auto">
-        @foreach ($tabs as $tab)
-            @php($isActive = request()->routeIs($tab['route']))
-            <li>
-                <a
-                    href="{{ route($tab['route'], $diagnosis) }}"
-                    @class([
-                        'block whitespace-nowrap border-b-2 px-4 py-2 text-sm font-semibold no-underline',
-                        'border-charcoal text-charcoal' => $isActive,
-                        'border-transparent text-grey-700 hover:text-charcoal' => ! $isActive,
-                    ])
-                    @if ($isActive) aria-current="page" @endif
-                >{{ $tab['label'] }}</a>
-            </li>
-        @endforeach
-    </ul>
-</nav>
+<div {{ $attributes->class(['flex flex-col gap-3']) }}>
+    @if ($main)
+        <p class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-yellow-pale px-3 py-2 text-sm">
+            <span class="font-semibold">{{ $diagnosis->organization->name }}</span>
+            @if ($diagnosis->team)
+                <span>{{ $diagnosis->team->name }}</span>
+            @endif
+            <span>{{ $main->product_name }}</span>
+            <span>{{ $main->stage->label() }}</span>
+            @if ($days)
+                <span>{{ __('admin.run.day_count', $days) }}</span>
+            @endif
+            <span>{{ __('admin.run.contact', ['name' => $diagnosis->organization->contactAdmin?->name ?? '–']) }}</span>
+        </p>
+    @endif
+
+    <nav class="border-b border-grey-250" aria-label="{{ $diagnosis->name }}">
+        <ul class="flex gap-1 overflow-x-auto">
+            @foreach ($tabs as $tab)
+                @php($isActive = request()->routeIs($tab['route']))
+                <li>
+                    <a
+                        href="{{ route($tab['route'], $diagnosis) }}"
+                        @class([
+                            'block whitespace-nowrap border-b-2 px-4 py-2 text-sm font-semibold no-underline',
+                            'border-charcoal text-charcoal' => $isActive,
+                            'border-transparent text-grey-700 hover:text-charcoal' => ! $isActive,
+                        ])
+                        @if ($isActive) aria-current="page" @endif
+                    >{{ $tab['label'] }}</a>
+                </li>
+            @endforeach
+        </ul>
+    </nav>
+</div>

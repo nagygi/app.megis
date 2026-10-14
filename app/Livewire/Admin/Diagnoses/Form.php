@@ -36,6 +36,8 @@ class Form extends Component
 
     public ?int $user_id = null;
 
+    public ?int $process_id = null;
+
     public ?int $diagnosis_type_id = null;
 
     public string $diagnosed_on = '';
@@ -68,6 +70,7 @@ class Form extends Component
             $this->level = $diagnosis->level->value;
             $this->team_id = $diagnosis->team_id;
             $this->user_id = $diagnosis->user_id;
+            $this->process_id = $diagnosis->process_id;
             $this->diagnosis_type_id = $diagnosis->diagnosis_type_id;
             $this->diagnosed_on = $diagnosis->diagnosed_on->toDateString();
             $this->isPeriod = $diagnosis->diagnosed_until !== null;
@@ -86,6 +89,7 @@ class Form extends Component
     {
         $this->team_id = null;
         $this->user_id = null;
+        $this->process_id = null;
         $this->parent_id = null;
     }
 
@@ -116,6 +120,11 @@ class Form extends Component
                 'nullable',
                 Rule::exists('organization_user', 'user_id')->where('organization_id', $this->organization_id),
             ],
+            'process_id' => [
+                Rule::requiredIf($this->level === DiagnosisLevel::Process->value),
+                'nullable',
+                Rule::exists('processes', 'id')->where('organization_id', $this->organization_id),
+            ],
             'diagnosis_type_id' => ['required', Rule::exists('diagnosis_types', 'id')->where(fn ($query) => $query->whereNull('key')->orWhere('key', '!=', DiagnosisType::MAIN))],
             'parent_id' => ['nullable', Rule::in($this->mainDiagnosisOptions()->pluck('id'))],
             'diagnosed_on' => ['required', 'date'],
@@ -128,6 +137,7 @@ class Form extends Component
             'level' => __('admin.diagnoses.level'),
             'team_id' => __('admin.diagnoses.team'),
             'user_id' => __('admin.diagnoses.user'),
+            'process_id' => __('admin.diagnoses.process'),
             'diagnosis_type_id' => __('admin.diagnoses.type'),
             'diagnosed_on' => $this->isPeriod ? __('admin.diagnoses.date_from') : __('admin.diagnoses.date'),
             'diagnosed_until' => __('admin.diagnoses.date_until'),
@@ -142,6 +152,7 @@ class Form extends Component
             'level' => $level,
             'team_id' => $level === DiagnosisLevel::Team ? $validated['team_id'] : null,
             'user_id' => $level === DiagnosisLevel::User ? $validated['user_id'] : null,
+            'process_id' => $level === DiagnosisLevel::Process ? $validated['process_id'] : null,
             'diagnosis_type_id' => $validated['diagnosis_type_id'],
             'diagnosed_on' => $validated['diagnosed_on'],
             'diagnosed_until' => $this->isPeriod ? $validated['diagnosed_until'] : null,
@@ -182,6 +193,7 @@ class Form extends Component
                 ->reject(fn (DiagnosisLevel $level) => $level === DiagnosisLevel::Team && $organization?->isIndividual())
                 ->values(),
             'teams' => $organization?->teams()->orderBy('name')->get(['id', 'name']) ?? collect(),
+            'processes' => $organization?->processes()->orderBy('name')->get(['id', 'name']) ?? collect(),
             'members' => $organization === null ? collect() : Membership::query()
                 ->where('organization_id', $organization->id)
                 ->where('status', '!=', MembershipStatus::Inactive)

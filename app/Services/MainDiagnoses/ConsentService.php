@@ -6,6 +6,7 @@ use App\Enums\AuditEventType;
 use App\Enums\ConsentKind;
 use App\Enums\MainDiagnosisStage;
 use App\Exceptions\DiagnosisException;
+use App\Jobs\RecalculateMainDiagnosis;
 use App\Models\Consent;
 use App\Models\Diagnosis;
 use App\Models\User;
@@ -58,5 +59,10 @@ class ConsentService
                 'kind' => $consent->kind->value,
             ]);
         });
+
+        // The rows are calculated again without the peer (18 · 18.6).
+        if ($consent->kind === ConsentKind::Answers) {
+            RecalculateMainDiagnosis::dispatch($consent->mainDiagnosis);
+        }
     }
 }

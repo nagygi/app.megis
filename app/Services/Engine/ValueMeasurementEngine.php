@@ -40,6 +40,29 @@ class ValueMeasurementEngine
     }
 
     /**
+     * Every value the catalog requires gets a row: "nincs adat" where the
+     * material says nothing about it (13 · 13.2, 18 · 18.4).
+     */
+    private function fillRequired(Material $material, ?string $speaker, ValueCatalog $catalog): void
+    {
+        $scored = $material->scores()
+            ->when($speaker === null, fn ($query) => $query->whereNull('speaker'), fn ($query) => $query->where('speaker', $speaker))
+            ->pluck('value_id')
+            ->all();
+
+        foreach (array_diff($catalog->requiredValueIds(), $scored) as $valueId) {
+            $material->scores()->create([
+                'speaker' => $speaker,
+                'value_id' => $valueId,
+                'value_version_id' => $catalog->resolve((string) $catalog->refFor($valueId))?->latestVersion?->id,
+                'state' => ScoreResultState::NoData,
+                'score' => null,
+                'detection_ids' => [],
+            ]);
+        }
+    }
+
+    /**
      * Step A: read the transcript in parts, keep every detection raw.
      */
     public function detect(Material $material, AiContext $context): void
@@ -127,6 +150,8 @@ class ValueMeasurementEngine
         $detections = $this->matchedDetections($material, $speaker);
 
         if ($detections->isEmpty()) {
+            $this->fillRequired($material, $speaker, $catalog);
+
             return;
         }
 
@@ -169,6 +194,8 @@ class ValueMeasurementEngine
                 'ai_call_id' => $result->call->id,
             ]);
         }
+
+        $this->fillRequired($material, $speaker, $catalog);
     }
 
     /**

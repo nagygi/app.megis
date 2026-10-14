@@ -155,7 +155,7 @@ return [
             'temperature' => 0.3,
             'timeout' => 180,
             'prompt' => 'diagnozis-allitasok',
-            'prompt_version' => null,
+            'prompt_version' => 1,
         ],
         'reading_texts' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
@@ -164,7 +164,7 @@ return [
             'temperature' => 0.4,
             'timeout' => 180,
             'prompt' => 'olvasat-szovegek',
-            'prompt_version' => null,
+            'prompt_version' => 1,
         ],
     ],
 

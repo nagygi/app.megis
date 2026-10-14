@@ -7,6 +7,7 @@ use App\Enums\DiagnosisLevel;
 use App\Enums\DiagnosisRowKind;
 use App\Enums\ExperienceState;
 use App\Enums\TreeElement;
+use App\Jobs\RecalculateMainDiagnosis;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisType;
 use App\Models\MainDiagnosis;
@@ -81,7 +82,7 @@ class ExperienceService
     {
         $rows = $this->rows($version->snapshot);
 
-        return DB::transaction(function () use ($main, $user, $version, $answers, $rows): Diagnosis {
+        $experience = DB::transaction(function () use ($main, $user, $version, $answers, $rows): Diagnosis {
             $diagnosis = $this->progress->experienceDiagnosis($main, $user);
             $parent = $main->diagnosis;
 
@@ -124,6 +125,11 @@ class ExperienceService
 
             return $diagnosis;
         });
+
+        // The team experience and the gaps change (18 · 18.4).
+        RecalculateMainDiagnosis::dispatch($main);
+
+        return $experience;
     }
 
     /**

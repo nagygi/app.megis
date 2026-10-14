@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'diagnosis_id', 'subject', 'product_id', 'product_key', 'product_name', 'leader_id', 'stage',
     'starts_on', 'publishes_on', 'show_peer_quotes', 'value_set_version_id',
+    'threshold_overridden_at', 'threshold_overridden_by', 'threshold_snoozed_until', 'calculation', 'calculated_at',
 ])]
 class MainDiagnosis extends Model
 {
@@ -48,6 +49,10 @@ class MainDiagnosis extends Model
             'reading_at' => 'datetime',
             'published_at' => 'datetime',
             'closed_at' => 'datetime',
+            'threshold_overridden_at' => 'datetime',
+            'threshold_snoozed_until' => 'date',
+            'calculation' => 'array',
+            'calculated_at' => 'datetime',
         ];
     }
 
@@ -109,6 +114,22 @@ class MainDiagnosis extends Model
     public function processes(): BelongsToMany
     {
         return $this->belongsToMany(Process::class, 'main_diagnosis_processes')->withTimestamps();
+    }
+
+    /**
+     * @return HasMany<MegisConversation, $this>
+     */
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(MegisConversation::class)->orderBy('held_at');
+    }
+
+    /**
+     * @return HasMany<ReminderDispatch, $this>
+     */
+    public function reminders(): HasMany
+    {
+        return $this->hasMany(ReminderDispatch::class);
     }
 
     /**
@@ -223,6 +244,36 @@ class MainDiagnosis extends Model
     public function isLeader(User $user): bool
     {
         return $this->leader_id === $user->id;
+    }
+
+    /**
+     * "23. nap / 47" (19 · 19.1): from the start (or the invitation) to publishing.
+     *
+     * @return array{day: int, total: int}|null
+     */
+    public function dayCount(): ?array
+    {
+        $start = ($this->starts_on ?? $this->invited_at)?->copy()->startOfDay();
+
+        if ($start === null || $this->publishes_on === null) {
+            return null;
+        }
+
+        $total = max(1, (int) $start->diffInDays($this->publishes_on) + 1);
+
+        return ['day' => max(0, min($total, (int) $start->diffInDays(today(), false) + 1)), 'total' => $total];
+    }
+
+    /**
+     * The tab of the stage, where the main diagnosis opens (19 · 19.1).
+     */
+    public function stageRoute(?User $admin = null): string
+    {
+        return match (true) {
+            $this->stage->isBeforeRunning() => 'admin.main-diagnoses.edit',
+            $this->stage === MainDiagnosisStage::Running && $admin?->can('run', $this->diagnosis) => 'admin.main-diagnoses.run',
+            default => 'admin.diagnoses.show',
+        };
     }
 
     /**

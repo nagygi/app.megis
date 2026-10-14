@@ -1,15 +1,25 @@
 <?php
 
+use App\Enums\DiagnosisLevel;
 use App\Enums\MainDiagnosisSubject;
+use App\Enums\MaterialContext;
+use App\Enums\MaterialStatus;
+use App\Enums\ScoreResultState;
+use App\Enums\StepMark;
+use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
+use App\Models\Material;
 use App\Models\Membership;
 use App\Models\Organization;
 use App\Models\OrganizationValueSet;
 use App\Models\PersonalValueSet;
+use App\Models\Process;
+use App\Models\ProcessOccasion;
 use App\Models\Product;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\Auth\GuardSession;
+use App\Services\MainDiagnoses\ExperienceService;
 use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\Organizations\OrganizationValueSetService;
 use App\Services\Values\PersonalValueSetService;
@@ -223,6 +233,88 @@ function confirmOwnValues(User $user, int $count = 1): PersonalValueSet
     $service->save($set, $items, recordVersion: true);
 
     return $set->refresh();
+}
+
+/**
+ * A team diagnosis the leader started: it runs and the peers are invited (23 · 23.4).
+ *
+ * @return array{0: array<string, mixed>, 1: MainDiagnosis}
+ */
+function runningDiagnosis(bool $showQuotes = true): array
+{
+    $setup = diagnosisTeam(peers: 2);
+    $main = startMainDiagnosis($setup, overrides: ['show_peer_quotes' => $showQuotes]);
+    confirmOwnValues($setup['leader']);
+    $version = app(OrganizationValueSetService::class)->forOrganization($setup['organization'])->latestVersion;
+    $rows = app(ExperienceService::class)->rows($version->snapshot);
+    app(ExperienceService::class)->submit($main, $setup['leader'], $version, collect($rows)->mapWithKeys(fn ($row) => [$row['key'] => '4'])->all());
+    $main->stepMarks()->create(['user_id' => $setup['leader']->id, 'step' => 'processes', 'mark' => StepMark::Skipped]);
+    app(MainDiagnosisService::class)->start($main->refresh(), $setup['leader']);
+
+    return [$setup, $main->refresh()];
+}
+
+function peerParams(array $setup, $main): array
+{
+    return ['organization' => $setup['organization'], 'diagnosis' => $main->diagnosis];
+}
+
+/**
+ * A processed material of the diagnosis with its scores per value: value
+ * position => score, or null for "nincs adat".
+ *
+ * @param  array<int, ?float>  $scores
+ */
+function scoredMaterial(MainDiagnosis $main, ?ProcessOccasion $occasion, array $scores, ?User $user = null): Material
+{
+    $material = Material::factory()->create([
+        'context' => $occasion === null ? MaterialContext::Mirror : MaterialContext::Occasion,
+        'status' => MaterialStatus::Processed,
+        'parent_diagnosis_id' => $main->diagnosis_id,
+        'organization_id' => $main->diagnosis->organization_id,
+        'process_occasion_id' => $occasion?->id,
+        'user_id' => $user?->id,
+        'placed_at' => now(),
+    ]);
+    $values = $main->valueSetVersion->snapshot['values'];
+
+    foreach ($scores as $position => $score) {
+        $material->scores()->create([
+            'value_id' => $values[$position]['value_id'],
+            'state' => $score === null ? ScoreResultState::NoData : ScoreResultState::Scored,
+            'score' => $score,
+            'detection_ids' => [],
+        ]);
+    }
+
+    return $material;
+}
+
+/**
+ * @return array{0: array<string, mixed>, 1: MainDiagnosis, 2: Process}
+ */
+function calculatedDiagnosis(string $product = Product::FULL): array
+{
+    [$setup, $main] = runningDiagnosis();
+
+    if ($product !== Product::FULL) {
+        $main->update(['product_key' => $product]);
+    }
+
+    $process = Process::factory()->accepted()->for($setup['organization'])->create(['name' => 'Retró']);
+    $main->processes()->sync([$process->id]);
+
+    return [$setup, $main->refresh(), $process];
+}
+
+function occasionOn(Process $process, int $daysAgo): ProcessOccasion
+{
+    return ProcessOccasion::create(['process_id' => $process->id, 'occurred_at' => now()->subDays($daysAgo), 'source' => 'manual']);
+}
+
+function processDiagnosisOf(MainDiagnosis $main, Process $process): Diagnosis
+{
+    return Diagnosis::query()->where('parent_id', $main->diagnosis_id)->where('level', DiagnosisLevel::Process)->where('process_id', $process->id)->sole();
 }
 
 /**

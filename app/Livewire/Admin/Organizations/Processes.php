@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Organizations;
 
+use App\Enums\MaterialContext;
 use App\Enums\MembershipStatus;
 use App\Enums\ProcessConfidence;
 use App\Enums\ProcessKind;
@@ -9,10 +10,13 @@ use App\Enums\ProcessRhythm;
 use App\Exceptions\DiagnosisException;
 use App\Models\CalendarConnection;
 use App\Models\MainDiagnosis;
+use App\Models\Material;
 use App\Models\Organization;
 use App\Models\Process;
 use App\Models\User;
+use App\Services\Processes\OccasionService;
 use App\Services\Processes\ProcessService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -22,7 +26,7 @@ use Livewire\Component;
 /**
  * The organization's "Folyamatok" tab (11 · 11.6): the same rules as for
  * the leader, the calendar row, uncertain and other rows apart for review,
- * and "A mégis javaslata" for V6·f.
+ * "A mégis javaslata" for V6·f, and the materials waiting to be classified (12 · 12.6).
  */
 class Processes extends Component
 {
@@ -42,6 +46,13 @@ class Processes extends Component
     public ?string $newRhythm = null;
 
     public ?int $newParentId = null;
+
+    /**
+     * "Besorolásra vár": material uuid => process id and date (12 · 12.6).
+     *
+     * @var array<string, array{process_id: ?string, date: string}>
+     */
+    public array $classify = [];
 
     public function mount(Organization $organization): void
     {
@@ -129,6 +140,39 @@ class Processes extends Component
         $this->reset(['newName', 'newRhythm', 'newParentId']);
     }
 
+    /**
+     * An "Egyikhez sem" material goes to a process and a date (12 · 12.6).
+     */
+    public function classifyMaterial(string $uuid, OccasionService $occasions): void
+    {
+        Gate::authorize('update', $this->organization);
+        $material = $this->unclassifiedMaterial($uuid);
+
+        $this->validate([
+            "classify.{$uuid}.process_id" => ['required', Rule::in(Process::query()->whereBelongsTo($this->organization)->pluck('id')->map(fn ($id) => (string) $id))],
+            "classify.{$uuid}.date" => ['required', 'date', 'before_or_equal:today'],
+        ], attributes: [
+            "classify.{$uuid}.process_id" => __('admin.occasions.process'),
+            "classify.{$uuid}.date" => __('admin.occasions.date'),
+        ]);
+
+        $occasions->classify($material, $this->process((int) $this->classify[$uuid]['process_id']), $this->classify[$uuid]['date'], auth('admin')->user());
+        unset($this->classify[$uuid]);
+        session()->flash('status', __('admin.occasions.classified'));
+    }
+
+    /**
+     * "Egyéb": processed and kept as a trace, without a process diagnosis (13 · 13.2).
+     */
+    public function markOther(string $uuid, OccasionService $occasions): void
+    {
+        Gate::authorize('update', $this->organization);
+
+        $occasions->markOther($this->unclassifiedMaterial($uuid));
+        unset($this->classify[$uuid]);
+        session()->flash('status', __('admin.occasions.marked_other'));
+    }
+
     public function render(): View
     {
         $processes = Process::query()
@@ -144,13 +188,39 @@ class Processes extends Component
             || $process->unclear
             || in_array($process->confidence, [ProcessConfidence::Medium, ProcessConfidence::Low], true);
 
+        $unclassified = $this->unclassifiedMaterials()->with(['user', 'creator'])->get();
+
+        foreach ($unclassified as $material) {
+            $this->classify[$material->uuid] ??= ['process_id' => null, 'date' => $material->placed_at->toDateString()];
+        }
+
         return view('livewire.admin.organizations.processes', [
+            'unclassified' => $unclassified,
             'main' => $processes->reject($isForReview)->values(),
             'review' => $processes->filter($isForReview)->values(),
             'connections' => CalendarConnection::query()->whereBelongsTo($this->organization)->with('user')->latest('id')->get(),
             'members' => $this->members(),
             'parents' => $processes->whereNull('parent_id')->values(),
         ])->layout('layouts::admin', ['organization' => $this->organization])->title($this->organization->name);
+    }
+
+    /**
+     * @return Builder<Material>
+     */
+    private function unclassifiedMaterials(): Builder
+    {
+        return Material::query()
+            ->where('context', MaterialContext::Occasion)
+            ->whereNotNull('placed_at')
+            ->whereNull('process_occasion_id')
+            ->whereNull('classified_other_at')
+            ->whereHas('parentDiagnosis', fn ($query) => $query->where('organization_id', $this->organization->id))
+            ->oldest('placed_at');
+    }
+
+    private function unclassifiedMaterial(string $uuid): Material
+    {
+        return $this->unclassifiedMaterials()->where('uuid', $uuid)->firstOrFail();
     }
 
     private function process(int $id): Process

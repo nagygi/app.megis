@@ -48,6 +48,14 @@
             </a>
         </section>
 
+        <a href="{{ route('client.diagnosis.situations', [$main->diagnosis->organization, $main->diagnosis]) }}" class="flex items-center justify-between gap-3 rounded-card bg-white px-4 py-3 text-charcoal no-underline hover:bg-paper">
+            <span>
+                <span class="block font-semibold">{{ __('diagnosis.peer_home.situations') }}</span>
+                <span class="block text-sm text-grey-700">{{ __('diagnosis.peer_home.situations_count', ['count' => $situationCount]) }}</span>
+            </span>
+            <x-megis.icon name="chevron-right" class="size-4" />
+        </a>
+
         <div class="flex items-center justify-between gap-3 rounded-card border border-dashed border-grey-350 px-4 py-3 text-grey-700">
             <span>
                 <span class="block font-semibold">{{ __('diagnosis.end.takeaway') }}</span>

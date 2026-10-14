@@ -6,6 +6,7 @@ use App\Enums\DiagnosisCreator;
 use App\Enums\DiagnosisLevel;
 use App\Enums\DiagnosisRowKind;
 use App\Enums\DiagnosisStatus;
+use App\Enums\ScoreState;
 use App\Models\Concerns\Blameable;
 use Carbon\CarbonInterface;
 use Database\Factories\DiagnosisFactory;
@@ -22,7 +23,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[Fillable([
     'name', 'description', 'organization_id', 'level', 'team_id', 'user_id',
     'diagnosis_type_id', 'diagnosed_on', 'diagnosed_until', 'creator_kind', 'status', 'aggregation', 'material_id', 'speaker',
-    'parent_id', 'value_set_version_id', 'excluded_at',
+    'parent_id', 'value_set_version_id', 'excluded_at', 'process_id',
+    'score', 'score_state', 'automatic_score', 'automatic_score_state', 'score_override_reason', 'score_overridden_by', 'score_overridden_at',
 ])]
 class Diagnosis extends Model
 {
@@ -42,6 +44,11 @@ class Diagnosis extends Model
             'diagnosed_until' => 'date',
             'aggregation' => 'array',
             'excluded_at' => 'datetime',
+            'score' => 'float',
+            'score_state' => ScoreState::class,
+            'automatic_score' => 'float',
+            'automatic_score_state' => ScoreState::class,
+            'score_overridden_at' => 'datetime',
         ];
     }
 
@@ -117,6 +124,61 @@ class Diagnosis extends Model
         return $this->belongsTo(Version::class, 'value_set_version_id');
     }
 
+    /**
+     * The process of a Folyamat level diagnosis (13 · 13.1).
+     *
+     * @return BelongsTo<Process, $this>
+     */
+    public function process(): BelongsTo
+    {
+        return $this->belongsTo(Process::class);
+    }
+
+    /**
+     * @return HasMany<DiagnosisClaim, $this>
+     */
+    public function claims(): HasMany
+    {
+        return $this->hasMany(DiagnosisClaim::class)->orderBy('id');
+    }
+
+    /**
+     * @return HasMany<DiagnosisText, $this>
+     */
+    public function texts(): HasMany
+    {
+        return $this->hasMany(DiagnosisText::class);
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function scoreOverrider(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'score_overridden_by');
+    }
+
+    /**
+     * Calculated from the materials until publishing (13, 18): the main
+     * diagnosis and its process diagnoses. Rows are written over with a reason.
+     */
+    public function isCalculated(): bool
+    {
+        return $this->main !== null || ($this->level === DiagnosisLevel::Process && $this->parent_id !== null);
+    }
+
+    /**
+     * "4,3", "–" (no trace) or empty: the point of a process diagnosis (13 · 13.1).
+     */
+    public function scoreLabel(): string
+    {
+        return match (true) {
+            $this->score_state === ScoreState::NoTrace, $this->score_state === ScoreState::InsufficientData => '–',
+            $this->score === null => '',
+            default => number_format($this->score, 1, ',', ''),
+        };
+    }
+
     public function isSubdiagnosis(): bool
     {
         return $this->parent_id !== null;
@@ -178,6 +240,7 @@ class Diagnosis extends Model
         return match ($this->level) {
             DiagnosisLevel::Team => $this->level->label().' · '.$this->team?->name,
             DiagnosisLevel::User => $this->level->label().' · '.$this->user?->name,
+            DiagnosisLevel::Process => $this->level->label().' · '.$this->process?->name,
             default => $this->level->label(),
         };
     }

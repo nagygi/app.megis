@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AiUsageExportController;
 use App\Http\Controllers\Admin\ImpersonationController as AdminImpersonationController;
 use App\Http\Controllers\Admin\LegalDocumentVersionController;
 use App\Http\Controllers\Admin\MaterialAudioController;
+use App\Http\Controllers\Admin\OpenMainDiagnosisController;
 use App\Http\Controllers\Client\CalendarOAuthController;
 use App\Http\Controllers\Client\CustomerLoginController;
 use App\Http\Controllers\Client\CustomerLogoutController;
@@ -78,6 +79,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('szervezetek/{organization}/felhasznalok', Admin\Organizations\Members::class)->name('organizations.members');
         Route::livewire('szervezetek/{organization}/ertekek', Admin\Organizations\Values::class)->name('organizations.values');
         Route::livewire('szervezetek/{organization}/folyamatok', Admin\Organizations\Processes::class)->name('organizations.processes');
+        Route::livewire('szervezetek/{organization}/folyamatok/{process}', Admin\Organizations\ProcessOccasions::class)->whereNumber('process')->name('organizations.process-occasions');
         Route::livewire('szervezetek/{organization}/diagnozisok', Admin\Organizations\Diagnoses::class)->name('organizations.diagnoses');
         Route::livewire('szervezetek/{organization}/felhasznalok/meghivas', Admin\Organizations\MemberForm::class)->name('organizations.members.create');
         Route::livewire('szervezetek/{organization}/felhasznalok/{membership}/szerkesztes', Admin\Organizations\MemberForm::class)
@@ -97,6 +99,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('diagnozisok/{diagnosis}/adatok', Admin\Diagnoses\Form::class)->name('diagnoses.edit');
         Route::livewire('diagnozisok/{diagnosis}/beallitas', Admin\MainDiagnoses\Form::class)->name('main-diagnoses.edit');
         Route::livewire('diagnozisok/{diagnosis}/reszdiagnozisok', Admin\MainDiagnoses\Subdiagnoses::class)->name('main-diagnoses.subdiagnoses');
+        Route::livewire('diagnozisok/{diagnosis}/futas', Admin\MainDiagnoses\Run::class)->name('main-diagnoses.run');
+        Route::get('diagnozisok/{diagnosis}/megnyitas', OpenMainDiagnosisController::class)->name('main-diagnoses.open');
         Route::livewire('diagnozis-tipusok', Admin\DiagnosisTypes\Index::class)->name('diagnosis-types.index');
         Route::livewire('diagnozis-tipusok/uj', Admin\DiagnosisTypes\Form::class)->name('diagnosis-types.create');
         Route::livewire('diagnozis-tipusok/{type}/szerkesztes', Admin\DiagnosisTypes\Form::class)->name('diagnosis-types.edit');
@@ -114,6 +118,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('ugyfelek/{user}/neveben', [AdminImpersonationController::class, 'store'])->name('impersonate');
 
         Route::livewire('beallitasok/jogi-dokumentumok', Admin\Settings\LegalDocuments::class)->name('settings.legal');
+        Route::livewire('beallitasok/teruletek', Admin\Settings\Areas::class)->name('settings.areas');
         Route::get('jogi-dokumentumok/{version}', LegalDocumentVersionController::class)->name('legal.version');
 
         Route::middleware('superadmin')->group(function () {
@@ -201,6 +206,12 @@ Route::middleware('customer')->name('client.')->group(function () {
                 Route::livewire('diagnozis/{diagnosis}/folyamatok/osszegzes', Client\Diagnosis\ProcessSummary::class)->name('diagnosis.process-summary');
                 Route::livewire('diagnozis/{diagnosis}/folyamatok/{process}', Client\ProcessSheet::class)->whereNumber('process')->name('diagnosis.process');
                 Route::livewire('diagnozis/{diagnosis}/ki-lat-mit', Client\Diagnosis\Visibility::class)->name('diagnosis.ki-lat-mit');
+                // The occasions of a running diagnosis (12): V11, V11·b, V11·c, T5·b.
+                Route::livewire('diagnozis/{diagnosis}/hozzateszek', Client\Diagnosis\Contribute::class)->name('diagnosis.contribute');
+                Route::livewire('diagnozis/{diagnosis}/helyzet', Client\Diagnosis\Situation::class)->name('diagnosis.situation');
+                Route::livewire('diagnozis/{diagnosis}/helyzeteim', Client\Diagnosis\Situations::class)->name('diagnosis.situations');
+                Route::livewire('diagnozis/{diagnosis}/anyag/{material}/hova', Client\Diagnosis\PlaceMaterial::class)->name('diagnosis.place');
+                Route::livewire('diagnozis/{diagnosis}/anyag/{material}/megeles', Client\Diagnosis\OccasionExperienceForm::class)->name('diagnosis.occasion-experience');
             });
     });
 });

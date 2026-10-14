@@ -2,6 +2,30 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 0.60 · {hash} · 2026-10-14
+
+M5 · Futás (12, 13, 18, 19, 22, 26.1–26.2, 26.4).
+
+- **Alkalmak (12):**
+  - V11 Hozzáteszek: Értéktükör, „Egy helyzet” elmondva vagy leírva, feltöltés egy dobozban (hang, txt, md, docx, pdf), feldolgozás-lista állapotokkal, „Újra” és „Kiveszem”;
+  - V11·b Hova tartozik: a jogosult mért folyamatok (társnak csak, amelyben résztvevő), a „nem mérjük” szaggatottan, a naptár legutóbbi alkalma előre kijelölve, dátum, felvétel-hozzájárulás (ki és mikor), „Egyikhez sem”;
+  - V11·c A megélésed: soronként 1–6 vagy „nem tudom”, eredményesség, megjegyzés diktálással, „Beküldöm” vagy „Kihagyom”;
+  - T5·b A helyzeteid: időrendben, „megélés hiányzik” linkkel, a saját hang törölhető;
+  - admin: „Besorolásra vár” blokk a *Folyamatok* fülön, folyamatonkénti alkalom-lap az anyagokkal és a megélések számával, „+ Anyag”.
+- **Folyamat-diagnózis (13):** Folyamat szintű részdiagnózis folyamatonként; alkalmanként egy pont az anyagok átlagából; n, szórás, minimum (Teljes 2, snapshot 1 „Egy alkalomból” jelzéssel), alfolyamat a szülőbe; megélés vezető és társak szerint; eredményesség-összesítés; kézi átírás kötelező indoklással, az automatikus érték mellette; alkalmak listája pontokkal és idézetekkel; összesítés-leírás; „N új alkalom a publikálás óta”.
+- **Számítás (18):**
+  - a fő diagnózis négy blokkja: értékek az összes anyagból, folyamatok a folyamat-diagnózisból, területek (Teljes) és a fa kézi pontozásra, megélés és rés;
+  - gyűrű-%, lépcső és pont a kerekítetlen értékekből, „–” sorok nélkül; a legnagyobb rés; magánszemélynél és egy embernél az önkép és a helyzetek rése;
+  - újraszámolás egyedi, késleltetett jobbal: feldolgozott anyag, megélés, visszavont hozzájárulás, indítás, vezetőcsere, kézi átírás;
+  - küszöb (3 társ) és a „csapat-szám nélkül megy” döntés; nézetek adatai (Csapat · Egyén · Szervezet);
+  - olvasat indulásakor AI-vázlat az állításokhoz (`diagnozis-allitasok` v1) és az olvasat szövegeihez (`olvasat-szovegek` v1), nevek nélkül; az admin munkája megmarad;
+  - *Beállítások → Területek*.
+- **Futás (19):** a fő diagnózis fejléce („23. nap / 47”, kapcsolattartó) és *Futás* füle a kapcsolattartónak és a szuperadminnak; mindig a szakasz füle nyílik; kert-nézet szakasz-oszlopokkal, coral kerettel és szűrőkkel, a lista váltóval; Futás lap: időablak, vezető, társak, folyamatok, anyagok, naptár; küszöb-sáv (Szólok · Várok 5 napot · Csapat-szám nélkül megy); emlékeztetők 48 órás korláttal; időablak-módosítás e-maillel; olvasat indítása; beszélgetések a mégisszel.
+- **Beérkező (22):** napi átnézés (meghívó 5 napja vagy lejárt, kitöltés a kezdés napjáig, küszöb, publikálás napja), automatikus lezárás, soronkénti gombok (besorolás, újra, emlékeztetem, új meghívó, → Futás), 8:00-s összefoglaló a kapcsolattartóknak, azonnali e-mail foglalásnál.
+- **Kezdőlap (26):** V10 és V10·b hetekkel vagy napokkal, onboarding, társak „k / n kitöltötte” és vezetői emlékeztető, beszélgetések, „Amit hozzátesztek”, olvasat és riport dátuma; olvasat alatt csak olvasható; coral plusz a V10-en és a T5-ön; a kezdőlap a vezetett, majd a társ-diagnózist nyitja (26.4).
+- **Ütemezett feladatok:** `inbox:scan` (07:30), `inbox:digest` (08:00).
+- **Javítás:** a véletlenül verziókezelt `megis_dev` SQLite-fájl kikerült, és a `.gitignore`-ba került.
+
 ## 0.50 · 225e376 · 2026-10-14
 
 M4 · Fő diagnózis indítása és kitöltés (17, 23, 24, 08 kliens, 11, 10, 09, 25, 31.5–31.6 részben).

@@ -9,4 +9,7 @@ enum DiagnosisRowKind: string
 {
     case Value = 'value';
     case TreeElement = 'tree_element';
+    // Rows of a main diagnosis (18 · 18.1).
+    case Process = 'process';
+    case Area = 'area';
 }

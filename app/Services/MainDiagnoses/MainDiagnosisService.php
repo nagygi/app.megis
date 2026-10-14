@@ -9,6 +9,7 @@ use App\Enums\MainDiagnosisSubject;
 use App\Enums\MembershipStatus;
 use App\Enums\ParticipantRole;
 use App\Exceptions\DiagnosisException;
+use App\Jobs\RecalculateMainDiagnosis;
 use App\Mail\DiagnosisLeaderInvitationMail;
 use App\Mail\DiagnosisPeerInvitationMail;
 use App\Models\DiagnosisType;
@@ -19,6 +20,7 @@ use App\Models\Organization;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\Diagnoses\DiagnosisService;
+use App\Services\Inbox\InboxService;
 use App\Services\Organizations\MembershipService;
 use App\Services\Organizations\OrganizationValueSetService;
 use Carbon\CarbonImmutable;
@@ -123,6 +125,8 @@ class MainDiagnosisService
             throw new DiagnosisException(__('admin.main_diagnoses.locked_after_reading'));
         }
 
+        $previousPublishing = $main->publishes_on?->toDateString();
+
         DB::transaction(function () use ($main, $data): void {
             $startsOn = filled($data['starts_on'] ?? null) ? $data['starts_on'] : null;
 
@@ -147,6 +151,11 @@ class MainDiagnosisService
                 }
             }
         });
+
+        // A new publishing day is told to the leader (19 · 19.4).
+        if ($previousPublishing !== $main->refresh()->publishes_on->toDateString()) {
+            app(DiagnosisRunService::class)->notifyWindowChanged($main);
+        }
     }
 
     /**
@@ -236,6 +245,9 @@ class MainDiagnosisService
                 $this->sendLeaderInvitation($main->refresh(), $actor);
             }
         });
+
+        // The leader counts as one person in the team experience (18 · 18.4).
+        RecalculateMainDiagnosis::dispatch($main);
     }
 
     /**
@@ -254,6 +266,7 @@ class MainDiagnosisService
     {
         if ($participant->opened_at === null) {
             $participant->update(['opened_at' => now()]);
+            app(InboxService::class)->closeAutomatically('invitation:'.$participant->id);
         }
 
         if ($participant->role === ParticipantRole::Leader && $main->stage === MainDiagnosisStage::Invited) {
@@ -289,6 +302,9 @@ class MainDiagnosisService
                 $this->invitePeer($peer);
             }
         });
+
+        // The rows of the four blocks exist from the start (18 · 18.1).
+        RecalculateMainDiagnosis::dispatch($main);
     }
 
     /**
@@ -334,6 +350,22 @@ class MainDiagnosisService
         $peer->update(['invited_at' => now()]);
 
         Mail::to($peer->user->email)->queue(new DiagnosisPeerInvitationMail($main, $peer->user, $token));
+    }
+
+    /**
+     * "Új meghívó" from the Beérkező (22 · 22.2): a fresh link to the leader or the peer.
+     */
+    public function resendInvitation(MainDiagnosisParticipant $participant, User $actor): void
+    {
+        $main = $participant->mainDiagnosis;
+
+        if ($participant->role === ParticipantRole::Leader) {
+            $this->sendLeaderInvitation($main, $actor);
+
+            return;
+        }
+
+        $this->invitePeer($participant, $actor);
     }
 
     /**

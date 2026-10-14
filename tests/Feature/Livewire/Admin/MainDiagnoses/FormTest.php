@@ -173,7 +173,7 @@ it('lists the stage on the diagnoses list and filters by it', function () {
     $manual = Diagnosis::factory()->create(['name' => 'Kézi workshop']);
     actingAsAdmin($setup['admin']);
 
-    Livewire::test(Index::class)
+    Livewire::withQueryParams(['nezet' => 'lista'])->test(Index::class)
         ->assertSee($invited->diagnosis->name)
         ->assertSee('Meghívva')
         ->assertSee('Kézi workshop')

@@ -13,6 +13,8 @@ enum MaterialContext: string
     case Mirror = 'mirror';
     case AdminUpload = 'admin_upload';
     case Dictation = 'dictation';
+    // An occasion of a process: an upload or "Egy helyzet" (12).
+    case Occasion = 'occasion';
 
     public function label(): string
     {
