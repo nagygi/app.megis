@@ -67,6 +67,23 @@ php artisan megis:values:import ertekek.xlsx
 - A listák elemei egy cellán belül külön sorban vannak. Az elején álló `-`, `•` vagy sorszám lemarad. Egy elem 2–255 karakter.
 - Minden érték v1-ként, átnézve kerül be. Ami már az Értéktárban van, kimarad, így a parancs újra futtatható. Ha bármelyik sor hibás, semmi nem kerül be.
 
+## Értéktükör és értékmérés helyben (06)
+
+- Az elemzés (A, B, C lépcső) az `ai` queue-n fut, ezért kell a queue worker. AI-kulcs nélkül a feldolgozás „Nem tudtuk feldolgozni” állapotba kerül.
+- Hangot az átíró dolgoz fel. Amíg a 12.7 PoC nem választott szolgáltatót, helyben a minta-átíró használható: `MEGIS_TRANSCRIBER=fake`. Ez mindig ugyanazt a rövid átiratot adja, élesben nem indul el.
+- A felvételek hosszát az `ffprobe` méri (`FFPROBE_PATH`). Nélküle a böngésző által mért hossz marad, és a setup check figyelmeztet.
+- A névtelen tükrök takarítása: `php artisan megis:mirror:prune` (óránként ütemezve).
+
+### Átíró szolgáltatók összevetése (12.7)
+
+```bash
+php artisan megis:transcription:compare felvetel.mp3 --model=openai:gpt-4o-transcribe-diarize --model=eleven:scribe_v1
+```
+
+- Ugyanazt a felvételt minden megadott `szolgáltató:modell` párral átíratja. Táblázatban mutatja az időt, a beszélők és a szavak számát, a perceket és a költséget.
+- Az átiratok a `storage/app/private/transcription-poc/` alá kerülnek. A hívások a Rendszer → AI használat lapon is látszanak.
+- **A felvétel személyes adatot tartalmaz:** ne kerüljön a kódtárba, és a próba után töröld.
+
 ## Jogi dokumentumok
 
 Az ügyféloldali belépés és a meghívó elfogadása a három jogi PDF-et kéri (adatkezelési tájékoztató, ÁSZF, cookie-tájékoztató). Töltsd fel őket az adminban: *Beállítások → Jogi dokumentumok*. Amíg hiányoznak, a setup check figyelmeztet (élesben hibát jelez).
@@ -117,4 +134,6 @@ $env:NODE_EXTRA_CA_CERTS = "C:\út\windows-roots.pem" # npm run build (Bunny-fon
 | `php artisan megis:setup:check` | A környezet ellenőrzése (docs/uzemeltetes.md · 7) |
 | `php artisan megis:admin:create [--role=superadmin\|admin] [--invite]` | Admin létrehozása vagy meghívása (01 · 1.1) |
 | `php artisan megis:values:import {file} [--dry-run]` | Az Értéktár kezdő értékeinek betöltése táblázatból (03 · 3.6) |
+| `php artisan megis:mirror:prune` | A 24 óránál régebbi, fiókhoz nem kötött Értéktükrök törlése (06 · 6.1) |
+| `php artisan megis:transcription:compare {file} --model=…` | Átíró szolgáltatók összevetése egy felvételen (12 · 12.7) |
 | `php artisan megis:admin:unlock {email}` | Zárolt admin feloldása 10 hibás belépés után. A zárolás csak így oldható fel (01 · 1.2). |

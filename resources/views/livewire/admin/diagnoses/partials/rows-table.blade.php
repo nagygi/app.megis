@@ -26,6 +26,14 @@
                             : __('admin.diagnoses.aggregation.divided') }}</x-ui.badge>
                     @endforeach
                 </span>
+                @if (($row->quotes ?? []) !== [])
+                    {{-- The quotes behind an automatic row, read-only (06 · 6.5) --}}
+                    <ul class="mt-2 flex flex-col gap-1 text-sm text-grey-700">
+                        @foreach ($row->quotes as $quote)
+                            <li>„{{ $quote['quote'] }}”</li>
+                        @endforeach
+                    </ul>
+                @endif
             </td>
             <td class="px-3 py-2 text-base font-semibold">
                 {{ $row->scoreLabel() }}

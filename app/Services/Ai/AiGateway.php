@@ -14,7 +14,10 @@ use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\JsonSchemaTypeFactory;
 use Illuminate\Support\Facades\Log;
 use Laravel\Ai\Gateway\FakeTextGateway;
+use Laravel\Ai\PendingResponses\PendingTranscriptionGeneration;
 use Laravel\Ai\Responses\StructuredAgentResponse;
+use Laravel\Ai\Responses\TranscriptionResponse;
+use Laravel\Ai\Transcription;
 use RuntimeException;
 use Throwable;
 
@@ -68,12 +71,12 @@ class AiGateway
                 timeout: $config['timeout'] ?? null,
             );
         } catch (Throwable $exception) {
-            $this->log($task, $context, $config, $prompt, $startedAt, error: $exception);
+            $this->log($task->key(), $context, $config, $prompt, $startedAt, error: $exception);
 
             throw $exception;
         }
 
-        $call = $this->log($task, $context, $config, $prompt, $startedAt, usage: [
+        $call = $this->log($task->key(), $context, $config, $prompt, $startedAt, usage: [
             'input_tokens' => $response->usage->inputTokens,
             'output_tokens' => $response->usage->outputTokens,
             'cache_read_tokens' => $response->usage->cacheReadInputTokens ?? 0,
@@ -85,6 +88,68 @@ class AiGateway
             structured: $response instanceof StructuredAgentResponse ? $response->structured : null,
             call: $call,
         );
+    }
+
+    /**
+     * Transcription with speaker recognition, logged with the audio minutes
+     * (16 · 16.1, 16.4). The provider and model come from the "transcription" task.
+     *
+     * @return array{response: TranscriptionResponse, call: AiCall}
+     */
+    public function transcribe(string $disk, string $path, AiContext $context = new AiContext): array
+    {
+        $config = config('ai.tasks.transcription');
+
+        if (! is_array($config) || blank($config['model'] ?? null)) {
+            throw new RuntimeException('The transcription task has no model yet (12.7 PoC).');
+        }
+
+        return $this->runTranscription(Transcription::fromStorage($path, $disk), $config, $context);
+    }
+
+    /**
+     * A local file with any provider and model, for the 12.7 comparison; the
+     * calls are logged and priced like every other.
+     *
+     * @return array{response: TranscriptionResponse, call: AiCall}
+     */
+    public function transcribeFile(string $localPath, string $provider, string $model, int $timeout = 1800): array
+    {
+        return $this->runTranscription(Transcription::fromPath($localPath), [
+            'provider' => $provider,
+            'model' => $model,
+            'timeout' => $timeout,
+        ], new AiContext);
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     * @return array{response: TranscriptionResponse, call: AiCall}
+     */
+    private function runTranscription(PendingTranscriptionGeneration $pending, array $config, AiContext $context): array
+    {
+        $startedAt = hrtime(true);
+
+        try {
+            $response = $pending
+                ->diarize()
+                ->language('hu')
+                ->timeout((int) ($config['timeout'] ?? 300))
+                ->generate(provider: $config['provider'], model: $config['model']);
+        } catch (Throwable $exception) {
+            $this->log('transcription', $context, $config, null, $startedAt, error: $exception);
+
+            throw $exception;
+        }
+
+        $call = $this->log('transcription', $context, $config, null, $startedAt, usage: [
+            'input_tokens' => $response->usage->inputTokens,
+            'output_tokens' => $response->usage->outputTokens,
+            'cache_read_tokens' => 0,
+            'cache_write_tokens' => 0,
+        ], modelVersion: $response->meta->model, audioMinutes: $response->usage->audioSeconds === null ? null : round($response->usage->audioSeconds / 60, 2));
+
+        return ['response' => $response, 'call' => $call];
     }
 
     /**
@@ -108,27 +173,29 @@ class AiGateway
      * @param  array{input_tokens: int, output_tokens: int, cache_read_tokens: int, cache_write_tokens: int}|null  $usage
      */
     private function log(
-        AiTask $task,
+        string $task,
         AiContext $context,
         array $config,
-        Prompt $prompt,
+        ?Prompt $prompt,
         int|float $startedAt,
         ?array $usage = null,
         ?string $modelVersion = null,
         ?Throwable $error = null,
+        ?float $audioMinutes = null,
     ): AiCall {
         $usage ??= ['input_tokens' => 0, 'output_tokens' => 0, 'cache_read_tokens' => 0, 'cache_write_tokens' => 0];
 
         $call = new AiCall([
-            'task' => $task->key(),
+            'task' => $task,
             'provider' => $config['provider'],
             'model' => $config['model'],
             'model_version' => $modelVersion,
-            'prompt' => $prompt->name,
-            'prompt_version' => $prompt->version,
+            'prompt' => $prompt?->name,
+            'prompt_version' => $prompt?->version,
             'status' => $error === null ? AiCallStatus::Succeeded : AiCallStatus::Failed,
             'error' => $error === null ? null : mb_substr(class_basename($error).': '.$error->getMessage(), 0, 1000),
             ...$usage,
+            'audio_minutes' => $audioMinutes,
             'organization_id' => $context->organization?->id,
             'organization_name' => $context->organization?->name,
             'public_mirror' => $context->publicMirror,
@@ -138,6 +205,7 @@ class AiGateway
                 $usage['output_tokens'],
                 $usage['cache_read_tokens'],
                 $usage['cache_write_tokens'],
+                $audioMinutes,
             ),
             'duration_ms' => (int) round((hrtime(true) - $startedAt) / 1_000_000),
         ]);

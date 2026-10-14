@@ -96,6 +96,30 @@
         @endforelse
     </section>
 
+    @if ($mirrors->isNotEmpty())
+        {{-- Értéktükrök with the ticked curiosity questions (06 · 6.1, ET5) --}}
+        <section class="rounded-card border border-grey-250 bg-white p-6">
+            <h2 class="mb-4 text-lg font-semibold">{{ __('admin.clients.section_mirrors') }}</h2>
+            @foreach ($mirrors as $mirror)
+                <div class="border-b border-grey-200 py-2 last:border-0">
+                    <p>
+                        <span class="font-semibold">{{ $mirror->created_at->format('Y.m.d.') }}</span>
+                        @if ($mirror->diagnosis)
+                            · <a href="{{ route('admin.diagnoses.show', $mirror->diagnosis) }}" class="text-charcoal">{{ $mirror->diagnosis->name }}</a>
+                        @endif
+                        @if ($mirror->booking_requested_at)
+                            <x-ui.badge tone="yellow" class="ml-1">{{ __('admin.clients.mirror_booking') }}</x-ui.badge>
+                        @endif
+                    </p>
+                    <p class="text-sm text-grey-700">
+                        {{ __('admin.clients.mirror_curiosity') }}:
+                        {{ collect($mirror->curiosity ?? [])->map(fn ($key) => __('mirror.curiosity.'.$key.'.question'))->implode(' · ') ?: __('admin.common.none') }}
+                    </p>
+                </div>
+            @endforeach
+        </section>
+    @endif
+
     <section class="rounded-card border border-grey-250 bg-white p-6">
         <h2 class="mb-4 text-lg font-semibold">{{ __('admin.clients.section_log') }}</h2>
         @forelse ($events as $event)

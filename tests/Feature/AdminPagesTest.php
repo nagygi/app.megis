@@ -5,6 +5,7 @@ use App\Models\Diagnosis;
 use App\Models\DiagnosisRow;
 use App\Models\DiagnosisType;
 use App\Models\LegalDocumentVersion;
+use App\Models\Material;
 use App\Models\Membership;
 use App\Models\Organization;
 use App\Models\Product;
@@ -54,6 +55,9 @@ it('renders every admin page for a superadmin', function (Closure $route) {
     'new diagnosis' => fn () => route('admin.diagnoses.create'),
     'diagnosis' => fn (array $models) => route('admin.diagnoses.show', $models['diagnosis']),
     'diagnosis data' => fn (array $models) => route('admin.diagnoses.edit', $models['diagnosis']),
+    'upload' => fn () => route('admin.diagnoses.upload'),
+    'material' => fn (array $models) => route('admin.materials.show', Material::factory()->transcribed([['speaker' => 'Beszélő 1', 'text' => 'Szöveg.']])->create(['organization_id' => $models['organization']->id, 'context' => 'admin_upload', 'status' => 'awaiting_speakers'])),
+    'support questions' => fn () => route('admin.support-questions.index'),
     'diagnosis types' => fn () => route('admin.diagnosis-types.index'),
     'new diagnosis type' => fn () => route('admin.diagnosis-types.create'),
     'edit diagnosis type' => fn (array $models) => route('admin.diagnosis-types.edit', $models['diagnosisType']),

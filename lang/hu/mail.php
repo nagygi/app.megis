@@ -32,6 +32,13 @@ return [
         'unlock' => 'Feloldás konzolból: php artisan megis:admin:unlock :email',
     ],
 
+    'mirror_confirmation' => [
+        'subject' => 'Erősítsd meg a mégis-fiókodat',
+        'body' => 'Köszönjük, hogy belenéztél az Értéktükörbe. Erősítsd meg az e-mail címedet, és a tükröd a fiókodba kerül.',
+        'action' => 'Megerősítem',
+        'validity' => 'A link 24 óráig él. Ha addig nem erősíted meg, a tükröd törlődik.',
+    ],
+
     'client_invitation' => [
         'subject' => 'Meghívó a mégis-be',
         'body' => ':inviter meghívott a mégis-be, a(z) :organization felhasználójaként.',

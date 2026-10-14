@@ -1,4 +1,6 @@
 <div class="flex max-w-xl flex-col gap-8">
+    <x-ui.flash />
+
     <section class="flex flex-col gap-5" aria-labelledby="profile-me">
         <div class="flex items-center gap-4">
             <span class="grid size-14 place-items-center rounded-pill bg-charcoal text-lg font-bold text-cream" aria-hidden="true">{{ $user->initials }}</span>
@@ -64,6 +66,35 @@
                     <x-ui.button type="submit" class="self-start">{{ __('client.profile.save_password') }}</x-ui.button>
                 @endif
             </form>
+        @endif
+    </section>
+
+    {{-- Felvételeim (31 · 31.5, 06 · 6.6) --}}
+    <section class="flex flex-col gap-3" aria-labelledby="recordings-title">
+        <h2 id="recordings-title" class="text-lg font-semibold">{{ __('client.recordings.title') }}</h2>
+        <p class="text-sm text-grey-700">{{ __('client.recordings.lead') }}</p>
+        @if ($recordings->isEmpty())
+            <p class="text-grey-600">{{ __('client.recordings.empty') }}</p>
+        @else
+            <ul class="flex flex-col gap-2">
+                @foreach ($recordings as $recording)
+                    <li wire:key="recording-{{ $recording->uuid }}" class="flex flex-wrap items-center justify-between gap-3 rounded-card bg-white px-4 py-3">
+                        <span>
+                            <span class="block font-semibold">{{ $recording->context->label() }}</span>
+                            <span class="block text-sm text-grey-700">{{ $recording->created_at->format('Y.m.d.') }}@if ($recording->durationLabel()) · {{ $recording->source->label() }} · {{ $recording->durationLabel() }}@endif</span>
+                        </span>
+                        @unless ($isImpersonating)
+                            <x-ui.button
+                                tone="outline"
+                                size="sm"
+                                wire:click="deleteRecording('{{ $recording->uuid }}')"
+                                wire:confirm="{{ __('client.recordings.confirm_delete') }}"
+                                aria-label="{{ __('client.recordings.delete_label', ['date' => $recording->created_at->format('Y.m.d.')]) }}"
+                            >{{ __('client.recordings.delete') }}</x-ui.button>
+                        @endunless
+                    </li>
+                @endforeach
+            </ul>
         @endif
     </section>
 </div>

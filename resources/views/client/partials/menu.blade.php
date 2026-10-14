@@ -18,9 +18,31 @@
     </div>
 
     <nav class="flex-1" aria-label="{{ __('client.menu.title') }}">
-        <ul class="flex flex-col gap-1">
-            {{-- Riportok, Fejezetek, Tárak, Bölcsességtár: added by tickets 27, 30, 32. --}}
-        </ul>
+        @if ($currentOrganization)
+            @php
+                $menuItems = [
+                    ['route' => 'client.mirror.record', 'active' => 'client.mirror.*', 'label' => __('client.menu.mirror')],
+                    ['route' => 'client.values', 'active' => 'client.values', 'label' => __('client.menu.value_library')],
+                ];
+            @endphp
+            {{-- Riportok, Fejezetek, Bölcsességtár: added by tickets 27, 32. --}}
+            <ul class="flex flex-col gap-1">
+                @foreach ($menuItems as $item)
+                    @php($isActive = request()->routeIs($item['active']))
+                    <li>
+                        <a
+                            href="{{ route($item['route'], $currentOrganization) }}"
+                            @class([
+                                'block rounded-lg px-4 py-2 no-underline',
+                                'bg-charcoal font-semibold text-cream' => $isActive,
+                                'text-charcoal hover:bg-grey-100' => ! $isActive,
+                            ])
+                            @if ($isActive) aria-current="page" @endif
+                        >{{ $item['label'] }}</a>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
     </nav>
 
     <div class="flex flex-col gap-3 border-t border-grey-250 pt-4">

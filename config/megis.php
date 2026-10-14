@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'version' => '0.30',
+    'version' => '0.40',
 
     // Set by the deploy script, shown on Rendszer → Health (docs/uzemeltetes.md · 3).
     'deployed_at' => env('MEGIS_DEPLOYED_AT'),
@@ -42,6 +42,55 @@ return [
 
     // External booking calendar used by "Időpontot foglalok" and "Beszéljünk róla" (06, 26, 27).
     'booking_url' => env('MEGIS_BOOKING_URL'),
+
+    // The product of the private-person organization created from the Értéktükör
+    // (06 · 6.1); the real product is chosen at the conversation.
+    'individual_product' => env('MEGIS_INDIVIDUAL_PRODUCT', 'Snapshot · Belső'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Materials and the value measurement (06)
+    |--------------------------------------------------------------------------
+    */
+
+    'materials' => [
+        // Shown on every upload form (NFR · 3). ".doc" is not read: it needs
+        // LibreOffice, so the form asks for docx (plan, open question 7).
+        'audio_extensions' => ['mp3', 'm4a', 'wav', 'webm'],
+        'text_extensions' => ['txt', 'md', 'docx'],
+        'audio_max_kilobytes' => 300 * 1024,
+        'audio_max_minutes' => 90,
+        'text_max_kilobytes' => 10 * 1024,
+        // The browser recorder (06 · 6.1, ET2).
+        'recording_max_seconds' => 600,
+        'recording_warning_seconds' => 480,
+        'recording_recommended_seconds' => 60,
+        'silence_seconds' => 5,
+        'text_max_characters' => 20000,
+    ],
+
+    // "ai": the provider of config('ai.tasks.transcription'); "fake": a fixed
+    // sample transcript, for local work without an API key.
+    'transcriber' => env('MEGIS_TRANSCRIBER', 'ai'),
+
+    // Measures audio length; MediaRecorder webm files carry none (plan 3.3).
+    'ffprobe_path' => env('FFPROBE_PATH', 'ffprobe'),
+
+    'engine' => [
+        // A match counts from this confidence on (06 · 6.4, step B).
+        'match_threshold' => 0.5,
+        // Long transcripts are read in parts by step A.
+        'chunk_characters' => 12000,
+        // Detections sent to step B in one call.
+        'matching_batch' => 60,
+    ],
+
+    'mirror' => [
+        // An unclaimed mirror is deleted after this; only the anonymous statistics stay (06 · 6.1).
+        'anonymous_hours' => 24,
+        // Public submissions per IP address and hour.
+        'submissions_per_hour' => 5,
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -99,6 +148,7 @@ return [
         Checks\SchedulerCheck::class,
         Checks\LegalDocumentsCheck::class,
         Checks\AiConfigurationCheck::class,
+        Checks\TranscriptionCheck::class,
         Checks\EnvironmentPolicyCheck::class,
     ],
 
@@ -152,6 +202,7 @@ return [
     // Named routes listed in sitemap.xml. Only public pages belong here (NFR · 6).
     'sitemap_routes' => [
         'public.home',
+        'mirror.record',
     ],
 
     // First URL segments that can never become an organization slug, on top

@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable([
     'kind', 'value_id', 'value_version_id', 'tree_element', 'position',
     'score', 'score_state', 'experience', 'experience_state',
-    'experience_met_example', 'experience_unmet_example', 'reasoning',
+    'experience_met_example', 'experience_unmet_example', 'reasoning', 'quotes',
     'assigned_on', 'aggregation_stats', 'manually_modified',
 ])]
 class DiagnosisRow extends Model
@@ -41,6 +41,7 @@ class DiagnosisRow extends Model
             'experience_state' => ExperienceState::class,
             'assigned_on' => 'date',
             'aggregation_stats' => 'array',
+            'quotes' => 'array',
             'manually_modified' => 'boolean',
         ];
     }

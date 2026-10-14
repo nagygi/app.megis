@@ -5,6 +5,7 @@
 
     <x-admin.page-header :title="__('admin.diagnoses.title')">
         <x-slot:actions>
+            <x-ui.button tone="outline" :href="route('admin.diagnoses.upload')">{{ __('admin.upload.create') }}</x-ui.button>
             <x-ui.button :href="route('admin.diagnoses.create')">{{ __('admin.diagnoses.create') }}</x-ui.button>
         </x-slot:actions>
     </x-admin.page-header>

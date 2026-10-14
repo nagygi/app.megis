@@ -21,6 +21,16 @@ return [
         'unlocked' => ':email fiókja feloldva, a hibás próbálkozások számlálója nullázva.',
     ],
 
+    'mirror_prune' => [
+        'done' => ':count lejárt névtelen tükör törölve.',
+    ],
+
+    'transcription_compare' => [
+        'usage' => 'Adj meg egy hangfájlt és legalább egy --model=szolgáltató:modell opciót.',
+        'invalid_model' => 'Hibás modell: :option (szolgáltató:modell kell).',
+        'columns' => ['Szolgáltató:modell', 'Idő (s)', 'Beszélők', 'Szavak', 'Perc', 'Költség', 'Átirat / hiba'],
+    ],
+
     'values_import' => [
         'invalid_file' => 'Nem található xlsx vagy csv fájl: :path',
         'missing_name_column' => 'Hiányzik a „Név” oszlop az első sorból.',

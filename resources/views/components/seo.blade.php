@@ -6,6 +6,7 @@
     'title' => null,
     'description' => null,
     'canonical' => null,
+    'noindex' => false,
 ])
 
 @php
@@ -17,9 +18,9 @@
 <title>{{ $fullTitle }}</title>
 <meta name="description" content="{{ $description }}">
 <link rel="canonical" href="{{ $canonical }}">
-@unless (app()->isProduction())
+@if ($noindex || ! app()->isProduction())
     <meta name="robots" content="noindex, nofollow">
-@endunless
+@endif
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{ __('ui.brand') }}">
 <meta property="og:locale" content="hu_HU">

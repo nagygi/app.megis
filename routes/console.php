@@ -30,3 +30,9 @@ Schedule::command('model:prune', ['--model' => [UserToken::class]])
     ->at('03:00')
     ->name('prune:user-tokens')
     ->onOneServer();
+
+// Anonymous Értéktükör runs live 24 hours; only the anonymous statistics stay (06 · 6.1).
+Schedule::command('megis:mirror:prune')
+    ->hourly()
+    ->name('prune:mirror-sessions')
+    ->onOneServer();

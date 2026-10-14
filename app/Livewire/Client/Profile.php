@@ -5,10 +5,12 @@ namespace App\Livewire\Client;
 use App\Enums\TokenPurpose;
 use App\Mail\PasswordChangedMail;
 use App\Mail\PasswordConfirmationCodeMail;
+use App\Models\Material;
 use App\Models\Organization;
 use App\Services\Auth\GuardSession;
 use App\Services\Auth\ImpersonationService;
 use App\Services\Auth\TokenService;
+use App\Services\Materials\MaterialStore;
 use App\Support\PasswordRules;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
@@ -16,8 +18,9 @@ use Illuminate\View\View;
 use Livewire\Component;
 
 /**
- * Profil (31, first part): name and password (14 · 14.3). The diagnosis,
- * consent, calendar, recordings and deletion blocks come with their tickets.
+ * Profil (31, first part): name and password (14 · 14.3), and the own
+ * recordings (31.5). The diagnosis, consent, calendar and deletion blocks
+ * come with their tickets.
  */
 class Profile extends Component
 {
@@ -115,6 +118,20 @@ class Profile extends Component
         $this->passwordSaved = true;
     }
 
+    /**
+     * Felvételeim (31 · 31.5): only the audio goes, the transcript and the
+     * diagnosis stay (06 · 6.6). Not in the user's name (14 · 14.6).
+     */
+    public function deleteRecording(string $uuid, MaterialStore $materials, ImpersonationService $impersonation): void
+    {
+        abort_if($impersonation->isImpersonating(), 403, __('impersonation.forbidden'));
+
+        $material = Material::query()->where('uuid', $uuid)->where('user_id', auth()->id())->firstOrFail();
+        $materials->deleteAudio($material);
+
+        session()->flash('status', __('client.recordings.deleted'));
+    }
+
     public function render(): View
     {
         $user = auth()->user();
@@ -126,6 +143,12 @@ class Profile extends Component
             'roleLine' => collect($membership?->tagLabels() ?? [])->merge($teams)->implode(' · '),
             'hasPassword' => $user->password !== null,
             'isImpersonating' => app(ImpersonationService::class)->isImpersonating(),
+            'recordings' => Material::query()
+                ->where('user_id', $user->id)
+                ->whereNotNull('audio_path')
+                ->whereNull('audio_deleted_at')
+                ->latest('id')
+                ->get(),
         ])->layout('layouts::client', [
             'title' => __('client.profile.title'),
             'color' => 'white',

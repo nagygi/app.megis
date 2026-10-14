@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Values;
 
 use App\Livewire\Admin\Concerns\EditsLists;
 use App\Livewire\Admin\Values\Concerns\ManagesValueState;
+use App\Models\RawDetection;
 use App\Models\Value;
 use App\Models\ValueCategory;
 use App\Services\Values\ValueService;
@@ -148,6 +149,13 @@ class Form extends Component
         return view('livewire.admin.values.form', [
             'title' => $title,
             'categories' => ValueCategory::query()->orderBy('name')->get(['id', 'name']),
+            // Where an AI-detected value came up, with which quote (03 · 3.7, 06 · 6.4).
+            'occurrences' => $this->value === null ? collect() : RawDetection::query()
+                ->where('unmatched_value_id', $this->value->id)
+                ->with('material.diagnoses')
+                ->latest('id')
+                ->limit(50)
+                ->get(),
         ])->layout('layouts::admin')->title($title);
     }
 

@@ -9,11 +9,16 @@ use App\Http\Middleware\EnsureSuperadmin;
 use App\Http\Middleware\ForbidWhileImpersonating;
 use App\Http\Middleware\ResolveOrganization;
 use App\Models\Diagnosis;
+use App\Models\Material;
+use App\Models\MirrorSession;
 use App\Models\OrganizationValueSet;
 use App\Models\User;
 use App\Models\Value;
 use App\Services\Alerting\ErrorAlerter;
 use App\Services\Auth\ImpersonationService;
+use App\Services\Transcription\AiTranscriber;
+use App\Services\Transcription\FakeTranscriber;
+use App\Services\Transcription\Transcriber;
 use App\Support\CurrentOrganization;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -37,6 +42,11 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->scoped(CurrentOrganization::class);
         $this->app->scoped(ImpersonationService::class);
+
+        // The fake transcriber is for local work only, never in production.
+        $this->app->bind(Transcriber::class, fn ($app) => config('megis.transcriber') === 'fake' && ! $app->isProduction()
+            ? new FakeTranscriber
+            : $app->make(AiTranscriber::class));
     }
 
     /**
@@ -56,6 +66,8 @@ class AppServiceProvider extends ServiceProvider
             'value' => Value::class,
             'organization_value_set' => OrganizationValueSet::class,
             'diagnosis' => Diagnosis::class,
+            'material' => Material::class,
+            'mirror_session' => MirrorSession::class,
         ]);
 
         // Livewire update requests run these again, so actions are checked like page loads.

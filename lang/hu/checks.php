@@ -86,6 +86,14 @@ return [
         'missing' => 'Nincs feltöltve: :documents',
     ],
 
+    'transcription' => [
+        'label' => 'Átírás',
+        'ok' => 'Az átíró és az ffprobe rendben.',
+        'fake_in_production' => 'Élesben nem futhat a minta-átíró (MEGIS_TRANSCRIBER=fake).',
+        'no_model' => 'Nincs átíró modell (AI_TRANSCRIPTION_MODEL); a 12.7 PoC után kell beállítani.',
+        'no_ffprobe' => 'Nem található az ffprobe (FFPROBE_PATH), a felvételek hosszát nem tudjuk mérni.',
+    ],
+
     'ai' => [
         'label' => 'AI-feladatok',
         'none_active' => 'Még egyik AI-feladatnak sincs aktív promptja.',

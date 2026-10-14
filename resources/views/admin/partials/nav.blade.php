@@ -16,6 +16,7 @@
             'items' => [
                 ['route' => 'admin.diagnoses.index', 'active' => 'admin.diagnoses.*', 'label' => __('admin.nav.all_diagnoses')],
                 ['route' => 'admin.diagnosis-types.index', 'active' => 'admin.diagnosis-types.*', 'label' => __('admin.nav.diagnosis_types')],
+                ['route' => 'admin.support-questions.index', 'active' => 'admin.support-questions.*', 'label' => __('admin.nav.support_questions')],
             ],
         ],
         [

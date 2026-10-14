@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 #[Fillable([
     'name', 'description', 'organization_id', 'level', 'team_id', 'user_id',
-    'diagnosis_type_id', 'diagnosed_on', 'diagnosed_until', 'creator_kind', 'status', 'aggregation',
+    'diagnosis_type_id', 'diagnosed_on', 'diagnosed_until', 'creator_kind', 'status', 'aggregation', 'material_id', 'speaker',
 ])]
 class Diagnosis extends Model
 {
@@ -64,6 +64,16 @@ class Diagnosis extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * The source file of an automatic diagnosis (06 · 6.3, 6.5).
+     *
+     * @return BelongsTo<Material, $this>
+     */
+    public function material(): BelongsTo
+    {
+        return $this->belongsTo(Material::class);
     }
 
     /**

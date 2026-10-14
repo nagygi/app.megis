@@ -3,6 +3,7 @@
 use App\Enums\LegalDocumentType;
 use App\Models\LegalDocumentVersion;
 use App\Services\Checks\Heartbeat;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
@@ -13,7 +14,12 @@ beforeEach(function () {
         'services.turnstile.site_key' => 'site-key',
         'services.turnstile.secret_key' => 'secret-key',
         'megis.health.min_free_disk_mb' => 0,
+        // The AI tasks with a prompt have a key and a price; audio is handled locally.
+        'ai.providers.anthropic.key' => 'test-key',
+        'ai.prices' => ['claude-sonnet-5-5' => ['input' => 3.0, 'output' => 15.0]],
+        'megis.transcriber' => 'fake',
     ]);
+    Process::fake();
 
     foreach (LegalDocumentType::cases() as $type) {
         LegalDocumentVersion::factory()->ofType($type)->create();

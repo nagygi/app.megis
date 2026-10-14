@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminPasswordSetupController;
 use App\Http\Controllers\Admin\AiUsageExportController;
 use App\Http\Controllers\Admin\ImpersonationController as AdminImpersonationController;
 use App\Http\Controllers\Admin\LegalDocumentVersionController;
+use App\Http\Controllers\Admin\MaterialAudioController;
 use App\Http\Controllers\Client\CustomerLoginController;
 use App\Http\Controllers\Client\CustomerLogoutController;
 use App\Http\Controllers\Client\HomeController;
@@ -16,8 +17,10 @@ use App\Http\Controllers\Client\LegalAcceptanceController;
 use App\Http\Controllers\Client\LoginCodeController;
 use App\Http\Controllers\Client\LoginLinkController;
 use App\Http\Controllers\LegalDocumentController;
+use App\Http\Controllers\MirrorConfirmationController;
 use App\Livewire\Admin;
 use App\Livewire\Client;
+use App\Livewire\Mirror;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +30,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::view('/', 'public.home')->name('public.home');
+
+// The public Értéktükör (06 · 6.1); a result opens only in the browser that made it.
+Route::livewire('ertektukor', Mirror\Record::class)->name('mirror.record');
+Route::get('ertektukor/megerosites/{token}', [MirrorConfirmationController::class, 'show'])->name('mirror.confirmation.show');
+Route::post('ertektukor/megerosites/{token}', [MirrorConfirmationController::class, 'store'])->middleware('throttle:public-form')->name('mirror.confirmation.store');
+Route::livewire('ertektukor/{session}', Mirror\Result::class)->name('mirror.result');
 
 Route::get('/{document}', LegalDocumentController::class)
     ->whereIn('document', array_column(LegalDocumentType::cases(), 'value'))
@@ -76,6 +85,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::livewire('diagnozisok', Admin\Diagnoses\Index::class)->name('diagnoses.index');
         Route::livewire('diagnozisok/uj', Admin\Diagnoses\Form::class)->name('diagnoses.create');
+        Route::livewire('diagnozisok/feltoltes', Admin\Diagnoses\Upload::class)->name('diagnoses.upload');
+        Route::livewire('anyagok/{material}', Admin\Materials\Show::class)->name('materials.show');
+        Route::get('anyagok/{material}/hang', MaterialAudioController::class)->name('materials.audio');
+        Route::livewire('tamogato-kerdesek', Admin\SupportQuestions\Index::class)->name('support-questions.index');
         Route::livewire('diagnozisok/{diagnosis}', Admin\Diagnoses\Show::class)->name('diagnoses.show');
         Route::livewire('diagnozisok/{diagnosis}/adatok', Admin\Diagnoses\Form::class)->name('diagnoses.edit');
         Route::livewire('diagnozis-tipusok', Admin\DiagnosisTypes\Index::class)->name('diagnosis-types.index');
@@ -153,6 +166,10 @@ Route::middleware('customer')->name('client.')->group(function () {
             ->group(function () {
                 Route::get('/', HomeController::class)->name('home');
                 Route::livewire('profil', Client\Profile::class)->name('profile');
+                Route::livewire('ertektar', Client\ValueLibrary::class)->name('values');
+                // Not in the user's name: the recording is the user's own voice (14 · 14.6).
+                Route::livewire('ertektukor', Mirror\Record::class)->middleware('not-impersonating')->name('mirror.record');
+                Route::livewire('ertektukor/{session}', Mirror\Result::class)->name('mirror.result');
             });
     });
 });

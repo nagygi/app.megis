@@ -1,13 +1,23 @@
-{{--
-    Temporary public home with the legal links, published early because the
-    Google verification of the calendar app needs it (09). The Értéktükör (06 · ET1) replaces it.
---}}
-<x-layouts::public>
-    <section class="flex flex-col gap-6 py-12 sm:py-20">
-        <x-megis.symbol name="tree-of-life" class="size-20 text-charcoal" />
-        <h1 class="text-5xl leading-none font-extrabold uppercase sm:text-7xl">{{ __('public.home.headline') }}</h1>
-        <p class="max-w-prose text-lg">{{ __('public.home.lead') }}</p>
-        <x-ui.button :href="route('client.login')" class="self-start">{{ __('public.home.login') }}</x-ui.button>
+{{-- ET1 · the opening of the Értéktükör, the public home (06 · 6.1). --}}
+<x-layouts::public tone="coral" :title="__('mirror.meta_title')" :description="__('mirror.meta_description')">
+    <section class="relative flex flex-col gap-8 overflow-hidden py-10 sm:py-16">
+        <x-megis.symbol name="fire" class="pointer-events-none absolute -right-16 -bottom-10 size-80 text-coral-dark opacity-60 sm:size-[28rem]" />
+
+        <h1 class="relative text-5xl leading-[0.95] font-extrabold uppercase sm:text-7xl">
+            <span class="block text-black">{{ __('mirror.manifesto.line1') }}</span>
+            <span class="block text-black">{{ __('mirror.manifesto.line2') }}</span>
+            <span class="block text-cream">{{ __('mirror.manifesto.line3') }}</span>
+        </h1>
+
+        <div class="relative flex max-w-prose flex-col gap-3 text-xl text-black">
+            <p>{{ __('mirror.manifesto.body') }}</p>
+            <p class="font-semibold">{{ __('mirror.manifesto.closing') }}</p>
+        </div>
+
+        <div class="relative flex flex-wrap gap-3">
+            <x-ui.button size="lg" :href="route('mirror.record')">{{ __('mirror.start') }}</x-ui.button>
+            <x-ui.button size="lg" tone="cream" :href="route('client.login')">{{ __('mirror.have_account') }}</x-ui.button>
+        </div>
     </section>
 
     <x-slot:footer>

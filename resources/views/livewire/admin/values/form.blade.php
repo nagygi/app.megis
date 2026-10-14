@@ -45,4 +45,25 @@
             <x-ui.button tone="outline" :href="route('admin.values.index')">{{ __('admin.common.back') }}</x-ui.button>
         </div>
     </form>
+
+    @if ($occurrences->isNotEmpty())
+        <section class="mt-6 flex flex-col gap-3" aria-labelledby="occurrences">
+            <h2 id="occurrences" class="text-lg font-semibold">{{ __('admin.values.occurrences') }}</h2>
+            <ul class="flex flex-col gap-2">
+                @foreach ($occurrences as $occurrence)
+                    @php($occurrenceDiagnosis = $occurrence->material?->diagnoses->first(fn ($diagnosis) => $diagnosis->speaker === null || $diagnosis->speaker === $occurrence->speaker))
+                    <li wire:key="occurrence-{{ $occurrence->id }}" class="rounded-card border border-grey-250 bg-white p-4 text-sm">
+                        <p>„{{ $occurrence->quote }}”</p>
+                        <p class="mt-1 text-grey-600">
+                            {{ $occurrence->created_at->format('Y.m.d.') }}
+                            @if ($occurrence->speaker) · {{ $occurrence->speaker }}@endif
+                            @if ($occurrenceDiagnosis)
+                                · <a href="{{ route('admin.diagnoses.show', $occurrenceDiagnosis) }}" class="text-charcoal">{{ $occurrenceDiagnosis->name }}</a>
+                            @endif
+                        </p>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
 </div>

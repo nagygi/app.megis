@@ -11,6 +11,7 @@ use App\Models\DiagnosisRow;
 use App\Models\Value;
 use App\Services\Diagnoses\DiagnosisAggregator;
 use App\Services\Diagnoses\DiagnosisService;
+use App\Services\Materials\MaterialStore;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -170,6 +171,18 @@ class Show extends Component
         });
     }
 
+    /**
+     * The admin may delete the recording; the transcript and the diagnosis stay (06 · 6.6).
+     */
+    public function deleteAudio(MaterialStore $materials): void
+    {
+        abort_if($this->diagnosis->material === null, 404);
+        Gate::authorize('update', $this->diagnosis->material);
+
+        $materials->deleteAudio($this->diagnosis->material);
+        session()->flash('status', __('admin.materials.audio_deleted'));
+    }
+
     public function previewAggregation(): void
     {
         Gate::authorize('update', $this->diagnosis);
@@ -195,7 +208,7 @@ class Show extends Component
 
     public function render(DiagnosisAggregator $aggregator): View
     {
-        $this->diagnosis->refresh()->load(['organization', 'team', 'user', 'type', 'creator', 'transitions.creator']);
+        $this->diagnosis->refresh()->load(['organization', 'team', 'user', 'type', 'creator', 'transitions.creator', 'material']);
 
         $rows = $this->diagnosis->rows()->with(['value', 'valueVersion'])->get();
         $valueRows = $rows->where('kind.value', 'value')->values();
@@ -223,6 +236,14 @@ class Show extends Component
                 : collect(),
             'preview' => $preview,
             'editingRow' => $this->editingRowId === null ? null : $rows->firstWhere('id', $this->editingRowId),
+            // "Egyéb detektált értékek": what matched nothing, without a score (06 · 6.5).
+            'otherDetected' => $this->diagnosis->material === null ? collect() : $this->diagnosis->material->detections()
+                ->kept()
+                ->whereNotNull('unmatched_value_id')
+                ->when($this->diagnosis->speaker !== null, fn ($query) => $query->where('speaker', $this->diagnosis->speaker))
+                ->with('unmatchedValue')
+                ->get()
+                ->groupBy('unmatched_value_id'),
         ])->layout('layouts::admin')->title($this->diagnosis->name);
     }
 

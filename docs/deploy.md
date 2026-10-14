@@ -26,6 +26,7 @@ A noindex-et az `X-Robots-Tag` fejléc, a `robots.txt` és a lapok meta-tagje ad
 | mégis | `MEGIS_SUPPORT_EMAIL`, `MEGIS_BOOKING_URL`, `MEGIS_ALERT_RECIPIENTS`, `MEGIS_HEALTH_TOKEN`, `MEGIS_HEALTH_MIN_FREE_DISK_MB`, `MEGIS_MAIL_ALLOWLIST`, `MEGIS_STAGING_*` |
 | Napló | `LOG_CHANNEL=stack`, `LOG_STACK=app`, `LOG_LEVEL`, `LOG_DAILY_DAYS` (helyi rotáció) |
 | AI (16) | `AI_DEFAULT_PROVIDER`, `AI_DEFAULT_MODEL`, `AI_SMALL_MODEL`, `AI_TRANSCRIPTION_PROVIDER`, `AI_TRANSCRIPTION_MODEL`; kulcsok: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` (`OPENAI_URL` alapból az EU-s `https://eu.api.openai.com/v1`), `GEMINI_API_KEY`; Claude EU-ban: Amazon Bedrock, `AWS_BEDROCK_REGION=eu-central-1` |
+| Értéktükör, anyagok (06) | `MEGIS_TRANSCRIBER=ai` (élesben kötelező), `FFPROBE_PATH`, `MEGIS_INDIVIDUAL_PRODUCT` (a regisztrált magánszemély szervezetének alap terméke), `MEGIS_BOOKING_URL` (az „Időpontot foglalok” naptára), `LIVEWIRE_TEMPORARY_FILE_UPLOAD_DISK=materials` (a nagy feltöltések közvetlenül az S3-ba mennek) |
 | Queue | `REDIS_QUEUE_RETRY_AFTER` / `DB_QUEUE_RETRY_AFTER` (alap: 330 másodperc, az AI-jobok 300 másodperces időkorlátja fölött) |
 
 A titkok csak környezeti változóban vannak. AWS-en javasolt az AWS Secrets Manager vagy az SSM Parameter Store.
@@ -35,6 +36,8 @@ A titkok csak környezeti változóban vannak. AWS-en javasolt az AWS Secrets Ma
 - **Redis:** a session és a queue adatbázisa kiürítés nélkül fusson (`maxmemory-policy noeviction`). A cache külön adatbázisban van (`REDIS_CACHE_DB`).
 - **Fájltár (S3, EU-régió):** privát bucket, nyilvános hozzáférés nélkül, verziózás bekapcsolva. A régi verziókra 30 napos életciklus-szabály kell.
 - **Napló:** a `storage/logs/{app,auth,ai,mail,queue}-*.log` fájlok naponta rotálódnak. A központi log-tárba csatornánként kell szállítani őket, 365 napos megőrzéssel (AWS esetén CloudWatch Logs).
+- **ffprobe:** az ffmpeg csomag része, a szerveren telepítve kell lennie. A böngészős webm-felvételekben nincs hossz, ezt méri.
+- **Feltöltés:** a Livewire ideiglenes feltöltései S3-on közvetlenül a bucketbe mennek (aláírt URL), így a 300 MB-os hangfájlra a PHP és az nginx feltöltési korlátja nem vonatkozik. Helyi disknél az `upload_max_filesize` és a `post_max_size` legyen legalább 300M.
 - **Levélküldő:** a megis.hu domainen SPF, DKIM és DMARC kell. AWS esetén SES (eu-central-1), bounce- és complaint-értesítéssel.
 - **Uptime-figyelés:** UptimeRobot vagy Better Stack hívja percenként a `GET /health`-et. Hiba esetén e-mailt küld a riasztási listára.
 

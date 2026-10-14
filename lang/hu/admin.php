@@ -25,6 +25,7 @@ return [
         'diagnoses' => 'Diagnózisok',
         'all_diagnoses' => 'Diagnózisok listája',
         'diagnosis_types' => 'Diagnózis típusok',
+        'support_questions' => 'Támogató kérdések',
         'inbox' => 'Beérkező',
     ],
 
@@ -191,6 +192,9 @@ return [
         'show_title' => 'Ügyfél',
         'section_organizations' => 'Szervezetek',
         'section_acceptances' => 'Elfogadott jogi dokumentumok',
+        'section_mirrors' => 'Értéktükrök',
+        'mirror_curiosity' => 'Kíváncsi',
+        'mirror_booking' => 'időpontot foglalna',
         'section_log' => 'Napló',
         'accepted_at' => 'Elfogadva',
         'no_acceptances' => 'Még nem fogadott el jogi dokumentumot.',
@@ -312,6 +316,7 @@ return [
         'review_notice' => 'Átnézésre vár: amíg nem jelölöd „Átnézve”-nek, csak ott választható, ahol létrejött (:place).',
         'review_notice_nowhere' => 'Átnézésre vár: amíg nem jelölöd „Átnézve”-nek, máshol nem választható.',
         'missing_endpoints' => 'Hiányzik a skála egyik vége, ezért a felhasználók még nem választhatják.',
+        'occurrences' => 'Előfordulások',
     ],
 
     'versions' => [
@@ -411,6 +416,7 @@ return [
         'value_already_added' => 'A(z) „:name” érték már szerepel ebben a diagnózisban.',
         'tree_row_fixed' => 'A márkád alapja négy sora fix, nem törölhető.',
         'no_values' => 'Még nincs érték a diagnózisban.',
+        'other_detected' => 'Egyéb detektált értékek',
         'score' => 'Mérőszám',
         'score_help' => 'PHI 1–6: 1 nincs · 2 csak szavak · 3 ad-hoc · 4 néha · 5 többnyire · 6 beépült. Ha nincs nyoma: „–”.',
         'score_none' => 'nincs megadva',
@@ -611,6 +617,48 @@ return [
         'saved_version_changed' => 'Mentve, új verzió: :version. A korábbi értékek nem törlődnek, az új diagnózisok az új értékek szerint futnak.',
         'saved_unchanged' => 'Nem változott semmi, nem készült új verzió.',
         'no_versions' => 'Még nincs mentett verzió.',
+    ],
+
+    'upload' => [
+        'title' => 'Feltöltés',
+        'create' => '+ Feltöltés',
+        'file' => 'Fájl',
+        'rules' => 'Hang: :audio, legfeljebb :audio_max_minutes perc és :audio_max_mb MB. Leirat: :text, legfeljebb :text_max_mb MB. A .doc fájlt mentsd docx-ként.',
+        'uploading' => 'Feltöltés…',
+        'speakers_next' => 'A következő lapon a felismert beszélőket a szervezet felhasználóihoz rendeled; minden hozzárendelt beszélőhöz külön felhasználói diagnózis készül.',
+        'submit' => 'Feltöltöm',
+    ],
+
+    'materials' => [
+        'source' => 'Forrás',
+        'open' => 'Az anyag lapja',
+        'transcript' => 'Átirat',
+        'delete_audio' => 'Hang törlése',
+        'confirm_delete_audio' => 'Biztosan törlöd a hangot? Az átirat és a diagnózis megmarad.',
+        'audio_deleted' => 'A hang törölve. Az átirat és a diagnózis megmaradt.',
+        'audio_was_deleted' => 'A hangot :date-án törölték, az átirat megmaradt.',
+        'failed' => 'Nem tudtuk feldolgozni.',
+        'retry' => 'Újra',
+        'speakers' => 'Beszélők',
+        'speakers_help' => 'Minden beszélőhöz válaszd ki a szervezet egy felhasználóját, vagy hagyd ki. Minden hozzárendelt beszélőhöz külön felhasználói diagnózis készül.',
+        'user' => 'Felhasználó',
+        'skip' => 'Kihagyom',
+        'assign_one' => 'Legalább egy beszélőt rendelj hozzá egy felhasználóhoz.',
+        'start_analysis' => 'Elemzés indítása',
+        'analysis_started' => 'Az elemzés elindult.',
+        'diagnoses' => 'Létrejött diagnózisok',
+    ],
+
+    'support_questions' => [
+        'title' => 'Támogató kérdések',
+        'create' => '+ Új kérdés',
+        'help' => 'Felvétel közben 5 másodperc csend után jelennek meg, ebben a sorrendben. A sorrendet húzással vagy a nyilakkal állíthatod.',
+        'text' => 'Kérdés',
+        'active' => 'Aktív',
+        'active_help' => 'Az inaktív kérdés nem jelenik meg a felvételnél.',
+        'inactive' => 'inaktív',
+        'up' => ':text feljebb',
+        'down' => ':text lejjebb',
     ],
 
 ];

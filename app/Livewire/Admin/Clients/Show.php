@@ -8,6 +8,7 @@ use App\Mail\EmailChangedMail;
 use App\Models\AuditEvent;
 use App\Models\LegalAcceptance;
 use App\Models\Membership;
+use App\Models\MirrorSession;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use App\Services\Organizations\MembershipService;
@@ -140,6 +141,12 @@ class Show extends Component
                 ->with('actor')
                 ->latest('id')
                 ->limit(100)
+                ->get(),
+            'mirrors' => MirrorSession::query()
+                ->whereBelongsTo($this->user)
+                ->whereNotNull('claimed_at')
+                ->with('diagnosis')
+                ->latest('id')
                 ->get(),
             'canChangeEmail' => Gate::allows('changeEmail', $this->user),
             'canImpersonate' => Gate::allows('impersonate', $this->user),

@@ -109,6 +109,31 @@
         @endif
     </section>
 
+    @if ($otherDetected->isNotEmpty())
+        {{-- What matched nothing in the Értéktár, without a score (06 · 6.5) --}}
+        <section class="flex flex-col gap-3" aria-labelledby="other-detected">
+            <h2 id="other-detected" class="text-lg font-semibold">{{ __('admin.diagnoses.other_detected') }}</h2>
+            <ul class="flex flex-col gap-2">
+                @foreach ($otherDetected as $detections)
+                    @php($detectedValue = $detections->first()->unmatchedValue)
+                    <li class="rounded-card border border-grey-250 bg-white p-4">
+                        <a href="{{ route('admin.values.edit', $detectedValue) }}" class="font-semibold text-charcoal">{{ $detectedValue->name }}</a>
+                        <x-ui.badge class="ml-2">{{ $detectedValue->origin->label() }}</x-ui.badge>
+                        <ul class="mt-2 flex flex-col gap-1 text-sm text-grey-700">
+                            @foreach ($detections as $detection)
+                                <li>„{{ $detection->quote }}”</li>
+                            @endforeach
+                        </ul>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
+    @if ($diagnosis->material)
+        @include('livewire.admin.materials.partials.source', ['material' => $diagnosis->material, 'highlightSpeaker' => $diagnosis->speaker])
+    @endif
+
     {{-- The brand base: four fixed rows (04 · 4.4) --}}
     <section class="flex flex-col gap-3" aria-labelledby="tree-title">
         <h2 id="tree-title" class="text-lg font-semibold">{{ __('admin.diagnoses.tree_block') }}</h2>

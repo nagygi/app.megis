@@ -2,6 +2,31 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 0.40 · (még nincs commitolva) · 2026-10-14
+
+M3 · Értékmérés-motor és Értéktükör (06, 12.7 előkészítés, 30 alap, 31.5 részben).
+
+- **Értékmérés-motor (06 · 6.4):**
+  - A: szabad detektálás értéklista nélkül, hosszú átiratnál darabolva;
+  - B: illesztés az Értéktár név nélküli, csak jelentésből és példákból álló listájára;
+  - C: pontozás „nincs adat” vagy 1–6, idézet-hivatkozással;
+  - nyers detektálás minden eredménnyel és AI-hívással; a nem illeszkedő értékek „AI által detektált” értékként kerülnek az Értéktárba, a névszabályokkal;
+  - promptok: `ertektukor-detektalas`, `ertektukor-illesztes`, `ertektukor-pontozas` (v1).
+- **Nyilvános Értéktükör (06 · 6.1):**
+  - ET1 nyitó a kezdőlapon;
+  - ET2 böngészős felvétel számlálóval, telő körrel, biztató szövegekkel, csendnél támogató kérdéssel; szöveg vagy fájl is;
+  - ET3 értékek idézetekkel és „nem az enyém”; ET5 teljes kép kíváncsiság-kérdésekkel;
+  - fiók e-mail-megerősítéssel, magánszemély-szervezettel és a jogi elfogadások rögzítésével; meglévő fiók helyben belép jelszóval vagy kóddal;
+  - „Időpontot foglalok” Beérkező-sorral; Turnstile, IP-korlát; a névtelen tükör 24 óráig él, utána csak névtelen statisztika marad.
+- **Értéktükör a saját menüből (6.2):** a diagnózis az aktív szervezethez kerül.
+- **Automatikus diagnózis (6.5):** Értéktükör típus, Automatikus, Jóváhagyásra vár; a sorokon idézetek, „Egyéb detektált értékek”, a forrás átirata és hangja az admin oldalán.
+- **Admin feltöltés (6.3):** hang vagy leirat, beszélők felismerése és hozzárendelése, beszélőnként felhasználói diagnózis.
+- **Hangfelvételek (6.6, 31.5):** privát tárhely, admin lejátszás, törlés a Profil Felvételeim blokkjából vagy az adminból; csak a hang törlődik.
+- **Támogató kérdések (6.7)** rendezéssel és aktív/inaktív kapcsolóval.
+- **Ügyféloldali Értéktár (30 alap):** a szervezet értékei a saját definíciójukkal; az Értéktár böngészője keresővel és kategóriaszűrővel.
+- **Átírás:** `Transcriber` interfész a `laravel/ai`-ra építve; minta-átíró helyi munkához; `megis:transcription:compare` a 12.7 PoC-hoz.
+- **Ütemezett feladat:** `prune:mirror-sessions` óránként. Új setup-check sor: Átírás.
+
 ## 0.30 · 8256e0e · 2026-10-14
 
 M2 · Tárak, értékszett, AI-réteg, kézi diagnózisok (03, 08 adatmodell, 04, 16, 22 alap).

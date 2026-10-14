@@ -115,4 +115,26 @@ return [
         'failed' => 'Sikertelen',
     ],
 
+    'material_context' => [
+        'public_mirror' => 'Nyilvános Értéktükör',
+        'mirror' => 'Értéktükör',
+        'admin_upload' => 'Admin feltöltés',
+    ],
+
+    'material_source' => [
+        'recording' => 'elmondva',
+        'text' => 'leírva',
+        'audio_upload' => 'feltöltött hang',
+        'text_upload' => 'feltöltött leirat',
+    ],
+
+    'material_status' => [
+        'pending' => 'sorban áll',
+        'transcribing' => 'átírás',
+        'awaiting_speakers' => 'beszélők hozzárendelésére vár',
+        'analyzing' => 'elemzés',
+        'processed' => 'kész',
+        'failed' => 'sikertelen',
+    ],
+
 ];
