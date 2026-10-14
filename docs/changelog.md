@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 0.20 · (még nincs commitolva) · 2026-10-14
+## 0.20 · 8015e33 · 2026-10-14
 
 M1 · Identitás, szervezetek, belépés, keret (01, 02, 05, 14, 15, 31 alap, 33 alap).
 
@@ -28,7 +28,7 @@ M1 · Identitás, szervezetek, belépés, keret (01, 02, 05, 14, 15, 31 alap, 33
 - Minimális nyilvános kezdőlap jogi linkekkel a láblécben.
 - Ütemezett feladat: lejárt tokenek takarítása (`prune:user-tokens`).
 
-## 0.10 · (még nincs commitolva) · 2026-10-14
+## 0.10 · 8015e33 · 2026-10-14 (az M1-gyel közös commit)
 
 M0 · Alapozás.
 
