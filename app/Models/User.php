@@ -56,6 +56,8 @@ class User extends Authenticatable
             'failed_login_attempts' => 'integer',
             'failed_password_attempts' => 'integer',
             'auth_epoch' => 'integer',
+            'deletion_requested_at' => 'datetime',
+            'anonymized_at' => 'datetime',
         ];
     }
 
@@ -77,6 +79,11 @@ class User extends Authenticatable
     protected function name(): Attribute
     {
         return Attribute::make(get: function (): string {
+            // A deleted account keeps its row as a tombstone (31 · 31.7, 33 · 33.7).
+            if ($this->anonymized_at !== null) {
+                return __('client.deleted_user', ['id' => $this->id]);
+            }
+
             $name = trim(($this->last_name ?? '').' '.($this->first_name ?? ''));
 
             return $name !== '' ? $name : $this->email;
@@ -233,6 +240,11 @@ class User extends Authenticatable
     /**
      * Ends every other session of this user (password change, reset, deactivation).
      */
+    public function isAnonymized(): bool
+    {
+        return $this->anonymized_at !== null;
+    }
+
     public function invalidateSessions(): void
     {
         $this->increment('auth_epoch');

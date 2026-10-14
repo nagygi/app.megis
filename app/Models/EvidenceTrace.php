@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * A trace of a diagnosis row: a quote or observation, its source, the role
  * and date; the name only for the admin (18 · 18.2).
  */
-#[Fillable(['diagnosis_row_id', 'material_id', 'process_occasion_id', 'raw_detection_id', 'quote', 'source_type', 'role', 'user_id', 'recorded_on'])]
+#[Fillable(['diagnosis_row_id', 'material_id', 'process_occasion_id', 'raw_detection_id', 'quote', 'source_type', 'role', 'user_id', 'recorded_on', 'excluded_at', 'highlighted_at', 'created_by'])]
 class EvidenceTrace extends Model
 {
     public const SOURCE_CONVERSATION = 'conversation';
@@ -23,6 +23,19 @@ class EvidenceTrace extends Model
 
     public const SOURCE_MIRROR = 'mirror';
 
+    public const SOURCE_CALENDAR = 'calendar';
+
+    public const SOURCE_EXPERIENCE = 'experience';
+
+    public const SOURCES = [self::SOURCE_CONVERSATION, self::SOURCE_RECORDING, self::SOURCE_NOTE, self::SOURCE_DOCUMENT, self::SOURCE_MIRROR, self::SOURCE_CALENDAR, self::SOURCE_EXPERIENCE];
+
+    public const ROLES = ['leader', 'peer', 'external'];
+
+    public function isIncluded(): bool
+    {
+        return $this->excluded_at === null;
+    }
+
     /**
      * @return array<string, string>
      */
@@ -30,6 +43,8 @@ class EvidenceTrace extends Model
     {
         return [
             'recorded_on' => 'date',
+            'excluded_at' => 'datetime',
+            'highlighted_at' => 'datetime',
         ];
     }
 

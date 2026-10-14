@@ -1,12 +1,17 @@
 <?php
 
 use App\Enums\DiagnosisLevel;
+use App\Enums\DiagnosisRowKind;
+use App\Enums\MainDiagnosisStage;
 use App\Enums\MainDiagnosisSubject;
 use App\Enums\MaterialContext;
 use App\Enums\MaterialStatus;
+use App\Enums\ParticipantRole;
 use App\Enums\ScoreResultState;
 use App\Enums\StepMark;
+use App\Models\Consent;
 use App\Models\Diagnosis;
+use App\Models\EvidenceTrace;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\Membership;
@@ -19,9 +24,13 @@ use App\Models\Product;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\Auth\GuardSession;
+use App\Services\Diagnoses\DiagnosisCalculator;
+use App\Services\Diagnoses\ReadingService;
 use App\Services\MainDiagnoses\ExperienceService;
 use App\Services\MainDiagnoses\MainDiagnosisService;
+use App\Services\MainDiagnoses\StageMachine;
 use App\Services\Organizations\OrganizationValueSetService;
+use App\Services\Report\PublishService;
 use App\Services\Values\PersonalValueSetService;
 use App\Services\Values\ValueService;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -315,6 +324,61 @@ function occasionOn(Process $process, int $daysAgo): ProcessOccasion
 function processDiagnosisOf(MainDiagnosis $main, Process $process): Diagnosis
 {
     return Diagnosis::query()->where('parent_id', $main->diagnosis_id)->where('level', DiagnosisLevel::Process)->where('process_id', $process->id)->sole();
+}
+
+/**
+ * A Teljes diagnosis in reading with everything approved: a quote on the
+ * first value, two occasions of the process, and the first peer's T4.
+ *
+ * @return array{0: array<string, mixed>, 1: MainDiagnosis}
+ */
+function approvedReading(): array
+{
+    [$setup, $main, $process] = calculatedDiagnosis();
+    $peer = $setup['peers'][0];
+    $main->participantFor($peer, ParticipantRole::Peer)->update(['started_at' => now()]);
+    Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => 'answers', 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
+    app(ExperienceService::class)->submit($main, $peer, $main->valueSetVersion, collect(app(ExperienceService::class)->rows($main->valueSetVersion->snapshot))->mapWithKeys(fn ($row) => [$row['key'] => '3'])->all());
+
+    $material = scoredMaterial($main, null, [0 => 4, 1 => 2, 2 => 5], $setup['leader']);
+    $detection = $material->detections()->create(['quote' => 'Szóltam a csúszásról, mielőtt kérdezték volna.', 'free_name' => 'Őszinteség', 'strength' => 3]);
+    $material->scores()->where('value_id', $main->valueSetVersion->snapshot['values'][0]['value_id'])->update(['detection_ids' => json_encode([$detection->id])]);
+    scoredMaterial($main, occasionOn($process, 5), [0 => 3, 1 => 3, 2 => 3]);
+    scoredMaterial($main, occasionOn($process, 2), [0 => 5, 1 => 5, 2 => 5]);
+    app(DiagnosisCalculator::class)->recalculate($main);
+    app(StageMachine::class)->transition($main->refresh(), MainDiagnosisStage::Reading, $setup['admin']);
+    $main->update(['threshold_overridden_at' => now(), 'threshold_overridden_by' => $setup['admin']->id]);
+
+    $reading = app(ReadingService::class);
+    $admin = $setup['admin'];
+    $trace = EvidenceTrace::query()->firstOrFail();
+    $reading->approveClaim($reading->saveClaim($main, null, ['diagnosis_row_id' => $trace->diagnosis_row_id, 'kind' => 'strength', 'text' => 'Nálatok szólnak a csúszásról.', 'trace_ids' => [$trace->id]], $admin), $admin);
+
+    foreach ($main->diagnosis->rows()->get() as $row) {
+        in_array($row->kind, [DiagnosisRowKind::Area, DiagnosisRowKind::TreeElement], true) ? $reading->scoreRow($row, '3', $admin) : $reading->approveRow($row, $admin);
+    }
+
+    foreach ($reading->requiredTexts($main) as $key) {
+        $reading->approveText($reading->saveText($main, $key, 'A '.$key.' mondata.', $key === 'recommendation' ? ['row_id' => $trace->diagnosis_row_id, 'from' => 2, 'to' => 3] : null, $admin), $admin);
+    }
+
+    $reading->approveGap($main->refresh(), null, $admin);
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    return [$setup, $main->refresh()];
+}
+
+/**
+ * The approved reading, published (21 · 21.3).
+ *
+ * @return array{0: array<string, mixed>, 1: MainDiagnosis}
+ */
+function publishedReport(): array
+{
+    [$setup, $main] = approvedReading();
+    app(PublishService::class)->publish($main, $setup['admin']);
+
+    return [$setup, $main->refresh()];
 }
 
 /**

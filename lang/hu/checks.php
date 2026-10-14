@@ -118,4 +118,11 @@ return [
         'staging_allowlist_empty' => 'Üres a MEGIS_MAIL_ALLOWLIST. Csak akkor rendben, ha a MAIL_MAILER levélcsapdára (pl. Mailpit) mutat.',
     ],
 
+    'pdf' => [
+        'label' => 'PDF-motor',
+        'ok' => 'A Gotenberg elérhető: :url',
+        'other' => 'A PDF-motor: :driver. Élesben Gotenberg ajánlott (deploy.md).',
+        'unreachable' => 'A Gotenberg nem érhető el: :url. A riport és az Útravaló PDF-je nem tölthető le.',
+    ],
+
 ];

@@ -23,6 +23,8 @@ class DiagnosisNoticeMail extends Mailable implements ShouldQueue
         public string $body,
         public string $action,
         public string $url,
+        public ?string $secondaryAction = null,
+        public ?string $secondaryUrl = null,
     ) {
         $this->afterCommit();
     }
@@ -36,7 +38,7 @@ class DiagnosisNoticeMail extends Mailable implements ShouldQueue
     {
         return new Content(
             markdown: 'mail.diagnosis-notice',
-            with: ['body' => $this->body, 'action' => $this->action, 'url' => $this->url],
+            with: ['body' => $this->body, 'action' => $this->action, 'url' => $this->url, 'secondaryAction' => $this->secondaryAction, 'secondaryUrl' => $this->secondaryUrl],
         );
     }
 }

@@ -6,7 +6,10 @@ use App\Enums\AuditEventType;
 use App\Exceptions\HeadcountLimitReachedException;
 use App\Mail\EmailChangedMail;
 use App\Models\AuditEvent;
+use App\Models\Consent;
+use App\Models\Diagnosis;
 use App\Models\LegalAcceptance;
+use App\Models\MainDiagnosis;
 use App\Models\Membership;
 use App\Models\MirrorSession;
 use App\Models\User;
@@ -129,6 +132,24 @@ class Show extends Component
         $teamsByOrganization = $this->user->teams()->get()->groupBy('organization_id');
 
         return view('livewire.admin.clients.show', [
+            // The main diagnoses as leader or peer, with the user's subdiagnoses (33 · 33.3).
+            'mains' => MainDiagnosis::query()
+                ->whereHas('participants', fn ($query) => $query->where('user_id', $this->user->id))
+                ->with(['diagnosis.organization', 'participants' => fn ($query) => $query->where('user_id', $this->user->id)])
+                ->latest('id')
+                ->get(),
+            'subdiagnoses' => Diagnosis::query()
+                ->where('user_id', $this->user->id)
+                ->whereNotNull('parent_id')
+                ->with('type')
+                ->get()
+                ->groupBy('parent_id'),
+            // Hozzájárulások per diagnosis, read only (33 · 33.5).
+            'consents' => Consent::query()
+                ->where('user_id', $this->user->id)
+                ->with('mainDiagnosis.diagnosis')
+                ->latest('id')
+                ->get(),
             'memberships' => $memberships,
             'teamsByOrganization' => $teamsByOrganization,
             'acceptances' => LegalAcceptance::query()

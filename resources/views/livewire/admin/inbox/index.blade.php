@@ -86,6 +86,21 @@
                                             <x-ui.button tone="outline" size="sm" :href="$viewUrl">{{ __('admin.inbox.view') }}</x-ui.button>
                                         @endif
                                         @break
+                                    @case(\App\Enums\InboxItemType::Feedback)
+                                        @if ($viewUrl)
+                                            <x-ui.button size="sm" :href="$viewUrl">{{ __('admin.inbox.incorporate') }}</x-ui.button>
+                                        @endif
+                                        @if ($item->subject instanceof \App\Models\ReportFeedback && $item->subject->user)
+                                            @if ($replyingTo === $item->id)
+                                                <form wire:submit="reply({{ $item->id }})" class="flex w-full flex-col items-end gap-2 text-left">
+                                                    <x-form.textarea name="replies.{{ $item->id }}" wire:model="replies.{{ $item->id }}" :label="__('admin.inbox.reply_text')" rows="3" />
+                                                    <x-ui.button type="submit" size="sm">{{ __('admin.inbox.send_reply') }}</x-ui.button>
+                                                </form>
+                                            @else
+                                                <x-ui.button tone="outline" size="sm" wire:click="$set('replyingTo', {{ $item->id }})">{{ __('admin.inbox.reply') }}</x-ui.button>
+                                            @endif
+                                        @endif
+                                        @break
                                     @case(\App\Enums\InboxItemType::Threshold)
                                         @if ($viewUrl)
                                             <x-ui.button size="sm" :href="$viewUrl">{{ __('admin.inbox.to_run') }}</x-ui.button>

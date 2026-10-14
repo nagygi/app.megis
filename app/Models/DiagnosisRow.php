@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'experience_met_example', 'experience_unmet_example', 'reasoning', 'quotes',
     'assigned_on', 'aggregation_stats', 'manually_modified',
     'process_id', 'area_id', 'automatic_score', 'automatic_score_state', 'override_reason', 'overridden_by', 'overridden_at',
+    'approved_at', 'approved_by',
 ])]
 class DiagnosisRow extends Model
 {
@@ -48,6 +49,7 @@ class DiagnosisRow extends Model
             'automatic_score' => 'float',
             'automatic_score_state' => ScoreState::class,
             'overridden_at' => 'datetime',
+            'approved_at' => 'datetime',
         ];
     }
 
@@ -97,6 +99,34 @@ class DiagnosisRow extends Model
     public function traces(): HasMany
     {
         return $this->hasMany(EvidenceTrace::class)->orderBy('recorded_on')->orderBy('id');
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * @return HasMany<DiagnosisClaim, $this>
+     */
+    public function claims(): HasMany
+    {
+        return $this->hasMany(DiagnosisClaim::class)->orderBy('id');
+    }
+
+    /**
+     * The reading's state of a row (20 · 20.1): vár, jóváhagyva or átírva.
+     */
+    public function reviewState(): string
+    {
+        return match (true) {
+            $this->approved_at === null => 'pending',
+            $this->overridden_at !== null => 'overridden',
+            default => 'approved',
+        };
     }
 
     /**

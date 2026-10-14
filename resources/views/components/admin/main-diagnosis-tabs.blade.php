@@ -11,6 +11,11 @@
         ['route' => 'admin.diagnoses.show', 'label' => __('admin.main_diagnoses.tabs.overview')],
         ['route' => 'admin.main-diagnoses.edit', 'label' => __('admin.main_diagnoses.tabs.settings')],
         auth()->user()?->can('run', $diagnosis) ? ['route' => 'admin.main-diagnoses.run', 'label' => __('admin.main_diagnoses.tabs.run')] : null,
+        // The reading opens with its stage (20 · 20.1).
+        $main && $main->reading_at !== null ? ['route' => 'admin.main-diagnoses.reading', 'label' => __('admin.main_diagnoses.tabs.reading')] : null,
+        // Publikálás opens when everything is approved (20 · 20.5), and stays after publishing.
+        $main && ($main->stage === \App\Enums\MainDiagnosisStage::Published || app(\App\Services\Diagnoses\ReadingService::class)->progress($main)['complete'])
+            ? ['route' => 'admin.main-diagnoses.publish', 'label' => __('admin.main_diagnoses.tabs.publish')] : null,
         ['route' => 'admin.main-diagnoses.subdiagnoses', 'label' => __('admin.main_diagnoses.tabs.subdiagnoses')],
     ]));
     $days = $main?->dayCount();

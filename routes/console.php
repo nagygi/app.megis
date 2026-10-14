@@ -56,6 +56,13 @@ Schedule::command('megis:inbox:digest')
     ->name('inbox:digest')
     ->onOneServer();
 
+// "Adataim törlése" finishes within 24 hours of the request (31 · 31.7).
+Schedule::command('megis:accounts:purge')
+    ->hourly()
+    ->name('purge:deleted-accounts')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Anonymous Értéktükör runs live 24 hours; only the anonymous statistics stay (06 · 6.1).
 Schedule::command('megis:mirror:prune')
     ->hourly()

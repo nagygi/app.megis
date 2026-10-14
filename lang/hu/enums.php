@@ -48,6 +48,29 @@ return [
         'impersonation_ended' => 'Belépés a nevében: befejezés',
         'impersonation_action' => 'Módosítás a nevében',
         'email_changed' => 'E-mail cím módosítása',
+        'account_deletion_requested' => 'Fióktörlés kérve',
+        'account_deleted' => 'Fiók és adatok törölve',
+        'recording_deleted' => 'Felvétel hangja törölve',
+    ],
+
+    'capability_level' => [
+        'individual' => 'egyén',
+        'team' => 'csapat',
+        'organization' => 'szervezet',
+        'ecosystem' => 'ökoszisztéma',
+    ],
+
+    'capability_status' => [
+        'used' => 'használt',
+        'candidate' => 'jelölt',
+        'literature' => 'csak irodalom',
+        'set_aside' => 'félretett',
+    ],
+
+    'capability_nature' => [
+        'capability' => 'képesség',
+        'skill_like' => 'készség-jellegű',
+        'questionable' => 'kérdéses',
     ],
 
     'value_origin' => [

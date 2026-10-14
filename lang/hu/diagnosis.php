@@ -106,6 +106,19 @@ return [
         'correcting' => 'A mégis javítja a diagnózisotokat. Hamarosan újra elérhető.',
     ],
 
+    // V12, V12·b · after publishing (26 · 26.3).
+    'published_home' => [
+        'subtitle' => ':product · publikálva :date',
+        'points' => ':points / :max pont',
+        'internal' => 'Belső működés · értékek · folyamatok · területek',
+        'snapshot' => 'Belső működés · értékek · folyamatok · a márkád alapja',
+        'brand' => 'A márkád alapja · gyökér · törzs · korona · árnyék',
+        'open' => 'Megnyitom',
+        'measure_title' => 'Értékmérés · a diagnózis után kapcsolható be',
+        'measure_text' => 'Az értékalapú működés nyomás alatt és hosszabb távon jobban tart.',
+        'measure_action' => 'Beszéljünk róla',
+    ],
+
     'peer_home' => [
         'title' => 'A csapat hangja',
         'subtitle' => ':subject · :product · :stage · :week. hét / :weeks · publikálás: :date',

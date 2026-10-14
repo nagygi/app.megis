@@ -22,6 +22,7 @@ use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\MainDiagnoses\StepList;
 use App\Services\MainDiagnoses\StepProgress;
 use App\Services\Processes\OccasionService;
+use App\Services\Report\ReportService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -117,7 +118,10 @@ class Overview extends Component
         $steps = $this->steps();
         $current = $steps->current();
 
+        $snapshot = $this->isLeader() && $main->stage === MainDiagnosisStage::Published ? app(ReportService::class)->snapshot($main) : null;
+
         $view = match (true) {
+            $snapshot !== null => 'livewire.client.diagnosis.overview-published',
             $this->isLeader() && in_array($main->stage, [MainDiagnosisStage::Running, MainDiagnosisStage::Reading], true) => 'livewire.client.diagnosis.overview-running',
             $this->isLeader() => 'livewire.client.diagnosis.overview-leader',
             $participant->started_at === null => 'livewire.client.diagnosis.invitation',
@@ -129,6 +133,7 @@ class Overview extends Component
         $plus = $canContribute ? route('client.diagnosis.contribute', [$this->organization, $this->diagnosis]) : null;
 
         $layout = match ($view) {
+            'livewire.client.diagnosis.overview-published' => ['title' => __('diagnosis.home.title'), 'subtitle' => __('diagnosis.published_home.subtitle', ['product' => $main->product_name, 'date' => $main->published_at?->format('m.d.') ?? '–']), 'color' => 'charcoal'],
             'livewire.client.diagnosis.overview-running' => ['title' => __('diagnosis.home.title'), 'subtitle' => $this->runningSubtitle(), 'color' => 'charcoal', 'plus' => $plus],
             'livewire.client.diagnosis.invitation' => ['title' => __('diagnosis.invitation.title'), 'color' => 'coral'],
             'livewire.client.diagnosis.overview-peer' => $steps->current() === null
@@ -149,6 +154,11 @@ class Overview extends Component
             'leaderName' => $main->leader->name,
             'otherRoles' => $this->otherRoles(),
             'home' => $view === 'livewire.client.diagnosis.overview-running' ? $this->runningHome($main, $steps) : null,
+            'report' => $snapshot?->data,
+            'reports' => $snapshot === null ? collect() : app(ReportService::class)->reportsFor($this->user(), $this->organization),
+            // The Útravaló row lives from publishing (29 · 29.2).
+            'takeawayReady' => $main->stage === MainDiagnosisStage::Published
+                && isset(app(ReportService::class)->snapshot($main)?->data['takeaways'][$this->user()->id]),
             'situationCount' => Material::query()->where('parent_diagnosis_id', $main->diagnosis_id)->where('user_id', $this->user()->id)->where('context', MaterialContext::Occasion)->whereNotNull('placed_at')->count(),
         ])->layout('layouts::client', $layout)->title($layout['title']);
     }

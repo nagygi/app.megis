@@ -2,6 +2,7 @@
 
 namespace App\Services\MainDiagnoses;
 
+use App\Enums\DiagnosisStatus;
 use App\Enums\MainDiagnosisStage;
 use App\Events\MainDiagnosisStageChanged;
 use App\Exceptions\DiagnosisException;
@@ -25,7 +26,7 @@ class StageMachine
         'closed' => 'closed_at',
     ];
 
-    public function transition(MainDiagnosis $main, MainDiagnosisStage $to, ?User $actor = null): void
+    public function transition(MainDiagnosis $main, MainDiagnosisStage $to, ?User $actor = null, ?string $reason = null): void
     {
         $from = $main->stage;
 
@@ -33,10 +34,13 @@ class StageMachine
             throw new DiagnosisException(__('admin.main_diagnoses.stage_not_allowed', ['from' => $from->label(), 'to' => $to->label()]));
         }
 
-        DB::transaction(function () use ($main, $from, $to, $actor): void {
+        DB::transaction(function () use ($main, $from, $to, $actor, $reason): void {
             $diagnosis = $main->diagnosis;
             $fromStatus = $diagnosis->status;
-            $toStatus = $to->status() ?? $fromStatus;
+            // Withdrawn after publishing: back in reading with the Draft status (21 · 21.5, plan 3.6).
+            $toStatus = $from === MainDiagnosisStage::Published && $to === MainDiagnosisStage::Reading
+                ? DiagnosisStatus::Draft
+                : ($to->status() ?? $fromStatus);
 
             $main->stage = $to;
 
@@ -57,6 +61,7 @@ class StageMachine
                 'from_stage' => $from,
                 'to_stage' => $to,
                 'created_by' => $actor?->id ?? auth()->id(),
+                'reason' => $reason,
             ]);
 
             MainDiagnosisStageChanged::dispatch($main, $from, $to, $actor);

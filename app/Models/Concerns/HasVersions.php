@@ -47,11 +47,12 @@ trait HasVersions
     }
 
     /**
-     * Records a new version when the content differs from the latest one.
+     * Records a new version when the content differs from the latest one,
+     * with an optional note on what changed and why (07 · 7.3).
      */
-    public function recordVersion(): ?Version
+    public function recordVersion(?string $note = null): ?Version
     {
-        return DB::transaction(function (): ?Version {
+        return DB::transaction(function () use ($note): ?Version {
             // Serialises concurrent saves of the same entity, so numbers do not collide.
             static::query()->whereKey($this->getKey())->lockForUpdate()->first();
 
@@ -68,6 +69,7 @@ trait HasVersions
                 'number' => ($latest->number ?? 0) + 1,
                 'snapshot' => $content,
                 'changed_fields' => static::changedFields($previous, $content),
+                'note' => filled($note) ? $note : null,
                 'created_by' => auth()->id(),
             ]);
 

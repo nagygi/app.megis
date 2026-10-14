@@ -27,6 +27,46 @@
         </div>
     </section>
 
+    @if ($leaderMain)
+        {{-- A diagnózisod (31 · 31.2) --}}
+        <section class="flex flex-col gap-2 border-t border-grey-250 pt-6" aria-labelledby="profile-diagnosis">
+            <h2 id="profile-diagnosis" class="text-lg font-semibold">{{ __('client.profile.diagnosis_title') }}</h2>
+            <p>{{ __('client.profile.diagnosis_window', ['product' => $leaderMain->product_name, 'from' => ($leaderMain->starts_on ?? $leaderMain->running_at)?->format('m.d.') ?? '–', 'to' => $leaderMain->publishes_on->format('m.d.')]) }}</p>
+            <p class="text-sm text-grey-700">{{ $stateLine }}</p>
+            <p class="text-sm text-grey-700">{{ __('client.profile.contact', ['name' => $leaderMain->diagnosis->organization->contactAdmin?->name ?? '–']) }}</p>
+            <a href="{{ route('client.diagnosis.ki-lat-mit', [$organization, $leaderMain->diagnosis]) }}" class="self-start text-sm font-semibold">{{ __('client.profile.visibility') }}</a>
+        </section>
+    @endif
+
+    @if ($awaiting !== [])
+        {{-- Rád vár (31 · 31.3) --}}
+        <section class="flex flex-col gap-2" aria-labelledby="profile-awaiting">
+            <h2 id="profile-awaiting" class="text-lg font-semibold">{{ __('client.profile.awaiting_title') }}</h2>
+            <ul class="flex flex-col gap-2">
+                @foreach ($awaiting as $row)
+                    <li>
+                        <a href="{{ $row['url'] }}" class="flex items-center justify-between gap-3 rounded-card bg-white px-4 py-3 text-charcoal no-underline hover:bg-paper">
+                            <span>{{ $row['label'] }}</span>
+                            <x-megis.icon name="chevron-right" class="size-4 shrink-0" />
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
+    @if ($people)
+        {{-- Emberek (31 · 31.4) --}}
+        <section class="flex flex-col gap-2" aria-labelledby="profile-people">
+            <h2 id="profile-people" class="text-lg font-semibold">{{ __('client.profile.people_title') }}</h2>
+            <p>{{ __('client.profile.people_count', $people) }}</p>
+            <p class="text-sm text-grey-700">{{ __('client.profile.people_rule') }}</p>
+            @if ($people['can_remind'] && $people['answered'] < $people['total'] && ! $isImpersonating)
+                <x-ui.button tone="outline" size="sm" class="self-start" wire:click="remindPeers({{ $leaderMain->id }})">{{ __('client.profile.remind') }}</x-ui.button>
+            @endif
+        </section>
+    @endif
+
     <section class="flex flex-col gap-5 border-t border-grey-250 pt-6" aria-labelledby="profile-password">
         <h2 id="profile-password" class="text-lg font-semibold">{{ __('client.profile.password_title') }}</h2>
 
@@ -156,4 +196,37 @@
             </ul>
         @endif
     </section>
+
+    @unless ($isImpersonating)
+        {{-- Adataim törlése (31 · 31.7) --}}
+        <section class="flex flex-col gap-3 border-t border-grey-250 pt-6" aria-labelledby="profile-deletion">
+            <h2 id="profile-deletion" class="text-lg font-semibold">{{ __('client.deletion.title') }}</h2>
+            @if ($confirmingDeletion)
+                <div class="flex flex-col gap-2 rounded-card bg-white p-4 text-sm">
+                    <p>{{ __('client.deletion.what_goes') }}</p>
+                    <p>{{ __('client.deletion.what_stays') }}</p>
+                    <p>{{ __('client.deletion.when') }}</p>
+                </div>
+                <form wire:submit="deleteAccount" class="flex flex-col gap-3">
+                    @if ($hasPassword)
+                        <x-form.input name="deletionPassword" type="password" wire:model="deletionPassword" :label="__('client.profile.current_password')" autocomplete="current-password" required />
+                    @else
+                        @if ($deletionCodeSent)
+                            <x-form.input name="deletionCode" wire:model="deletionCode" :label="__('client.profile.code')" autocomplete="one-time-code" inputmode="numeric" required />
+                        @else
+                            <x-ui.button tone="outline" size="sm" class="self-start" wire:click="sendDeletionCode">{{ __('client.profile.send_code') }}</x-ui.button>
+                        @endif
+                    @endif
+                    <div class="flex gap-2">
+                        @if ($hasPassword || $deletionCodeSent)
+                            <x-ui.button type="submit" tone="coral" size="sm">{{ __('client.deletion.confirm') }}</x-ui.button>
+                        @endif
+                        <x-ui.button tone="outline" size="sm" wire:click="$set('confirmingDeletion', false)">{{ __('client.deletion.cancel') }}</x-ui.button>
+                    </div>
+                </form>
+            @else
+                <x-ui.button tone="outline" size="sm" class="self-start" wire:click="$set('confirmingDeletion', true)">{{ __('client.deletion.start') }}</x-ui.button>
+            @endif
+        </section>
+    @endunless
 </div>

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * A status change of a diagnosis, who and when (04 · 4.3); for a main
  * diagnosis also its stage (17 · 17.5). Written once.
  */
-#[Fillable(['from_status', 'to_status', 'from_stage', 'to_stage', 'created_by'])]
+#[Fillable(['from_status', 'to_status', 'from_stage', 'to_stage', 'created_by', 'reason'])]
 class DiagnosisTransition extends Model
 {
     public const UPDATED_AT = null;

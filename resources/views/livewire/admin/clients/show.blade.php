@@ -6,6 +6,12 @@
 <div class="flex max-w-4xl flex-col gap-6">
     <x-ui.flash />
 
+    @if ($user->isAnonymized())
+        {{-- A deleted user: only the log, without name and e-mail (33 · 33.7) --}}
+        <section class="rounded-card border border-grey-250 bg-white p-6">
+            <h1 class="text-2xl font-semibold">{{ __('admin.clients.deleted_title', ['id' => $user->id, 'date' => $user->anonymized_at->format('Y.m.d.')]) }}</h1>
+        </section>
+    @else
     <section class="rounded-card border border-grey-250 bg-white p-6">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
@@ -96,6 +102,38 @@
         @endforelse
     </section>
 
+    {{-- Diagnózisok (33 · 33.3) --}}
+    <section class="rounded-card border border-grey-250 bg-white p-6">
+        <h2 class="mb-4 text-lg font-semibold">{{ __('admin.clients.section_diagnoses') }}</h2>
+        @forelse ($mains as $main)
+            <div class="border-b border-grey-200 py-2 last:border-0">
+                <p>
+                    <a href="{{ route('admin.main-diagnoses.open', $main->diagnosis) }}" class="font-semibold">{{ $main->diagnosis->name }}</a>
+                    <span class="text-grey-600">· {{ $main->participants->map(fn ($participant) => __('enums.participant_role.'.$participant->role->value))->unique()->implode(', ') }} · {{ $main->stage->label() }}</span>
+                </p>
+                @foreach ($subdiagnoses->get($main->diagnosis_id, collect()) as $subdiagnosis)
+                    <p class="pl-4 text-sm"><a href="{{ route('admin.diagnoses.show', $subdiagnosis) }}">{{ $subdiagnosis->type->name }} · {{ $subdiagnosis->diagnosed_on->format('Y.m.d.') }}</a></p>
+                @endforeach
+            </div>
+        @empty
+            <p class="text-grey-600">{{ __('admin.clients.no_diagnoses') }}</p>
+        @endforelse
+    </section>
+
+    {{-- Hozzájárulások (33 · 33.5), read only --}}
+    @if ($consents->isNotEmpty())
+        <section class="rounded-card border border-grey-250 bg-white p-6">
+            <h2 class="mb-4 text-lg font-semibold">{{ __('admin.clients.section_consents') }}</h2>
+            @foreach ($consents as $consent)
+                <div class="border-b border-grey-200 py-2 last:border-0">
+                    <p>{{ __('enums.consent_kind.'.$consent->kind->value) }} · {{ $consent->mainDiagnosis?->diagnosis?->name }}</p>
+                    <p class="text-sm text-grey-700">„{{ $consent->text }}” · {{ $consent->text_version }}</p>
+                    <p class="text-sm text-grey-600">{{ __('admin.clients.consent_given', ['date' => $consent->given_at->format('Y.m.d. H:i')]) }}@if ($consent->revoked_at) · {{ __('admin.clients.consent_revoked', ['date' => $consent->revoked_at->format('Y.m.d. H:i')]) }}@endif</p>
+                </div>
+            @endforeach
+        </section>
+    @endif
+
     @if ($mirrors->isNotEmpty())
         {{-- Értéktükrök with the ticked curiosity questions (06 · 6.1, ET5) --}}
         <section class="rounded-card border border-grey-250 bg-white p-6">
@@ -118,6 +156,8 @@
                 </div>
             @endforeach
         </section>
+    @endif
+
     @endif
 
     <section class="rounded-card border border-grey-250 bg-white p-6">

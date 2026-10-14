@@ -381,6 +381,16 @@ class DiagnosisCalculator
         };
         $rounded = ScoreMath::round1($score);
 
+        // An approved row whose calculated value changes waits again, with the reason in the log (20, question 5).
+        if ($row->exists && $row->approved_at !== null && $row->overridden_at === null
+            && ($row->automatic_score !== $rounded || $row->automatic_score_state !== $state)) {
+            app(ReadingService::class)->log($diagnosis, $row, 'fell_back', null, [
+                'from' => $row->automatic_score_state === ScoreState::Scored ? $row->automatic_score : '–',
+                'to' => $state === ScoreState::Scored ? $rounded : '–',
+            ]);
+            $row->forceFill(['approved_at' => null, 'approved_by' => null]);
+        }
+
         $row->forceFill([
             ...$attributes,
             'assigned_on' => $row->assigned_on ?? $diagnosis->diagnosed_on,
@@ -545,7 +555,8 @@ class DiagnosisCalculator
             $keep[] = $trace->id;
         }
 
-        $row->traces()->whereNotNull('raw_detection_id')->whereNotIn('id', $keep)->delete();
+        // Traces added or chosen by hand stay (20 · 20.2).
+        $row->traces()->whereNotNull('raw_detection_id')->whereNull('created_by')->whereNotIn('id', $keep)->delete();
     }
 
     private function sourceType(Material $material): string
@@ -571,8 +582,9 @@ class DiagnosisCalculator
 
     /**
      * The ring, the step, the points, the biggest gap and the threshold (18 · 18.3, 18.4, 18.6).
+     * Also after a correction of a published diagnosis, from its rows only (21 · 21.4).
      */
-    private function summarize(MainDiagnosis $main): void
+    public function summarize(MainDiagnosis $main): void
     {
         $rows = $main->diagnosis->rows()->get();
         $scored = $rows->filter(fn (DiagnosisRow $row) => $row->score_state === ScoreState::Scored && $row->score !== null);

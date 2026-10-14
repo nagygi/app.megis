@@ -2,7 +2,7 @@
 <div class="flex max-w-2xl flex-col gap-6">
     @if ($withdrawn)
         <p class="rounded-card bg-grey-100 p-4">{{ __('diagnosis.peer_home.withdrawn') }}</p>
-    @elseif ($current)
+    @elseif ($current && $main->acceptsInput())
         {{-- T2 --}}
         <div class="flex flex-col gap-1">
             <p class="text-xl font-semibold">{{ __('diagnosis.peer_steps_lead') }}</p>
@@ -10,6 +10,7 @@
         </div>
 
         <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" />
+        <a href="{{ route('client.wisdom.show', [$main->diagnosis->organization, 'folyamat']) }}" class="self-start text-sm font-semibold">{{ __('wisdom.more') }}</a>
 
         <div class="flex items-center gap-3 rounded-card bg-grey-100 px-4 py-3 text-grey-700">
             <span class="grid size-7 shrink-0 place-items-center rounded-pill bg-grey-300 text-xs font-bold" aria-hidden="true">+</span>
@@ -56,13 +57,23 @@
             <x-megis.icon name="chevron-right" class="size-4" />
         </a>
 
-        <div class="flex items-center justify-between gap-3 rounded-card border border-dashed border-grey-350 px-4 py-3 text-grey-700">
-            <span>
-                <span class="block font-semibold">{{ __('diagnosis.end.takeaway') }}</span>
-                <span class="block text-sm">{{ __('diagnosis.end.takeaway_help') }}</span>
-            </span>
-            <span class="text-sm">{{ $main->publishes_on->format('m.d.') }}</span>
-        </div>
+        @if ($takeawayReady)
+            <a href="{{ route('client.diagnosis.takeaway', [$main->diagnosis->organization, $main->diagnosis]) }}" class="flex items-center justify-between gap-3 rounded-card bg-green px-4 py-3 text-cream no-underline on-dark">
+                <span>
+                    <span class="block font-semibold">{{ __('takeaway.home_row') }}</span>
+                    <span class="block text-sm">{{ __('takeaway.home_row_help') }}</span>
+                </span>
+                <x-megis.icon name="chevron-right" class="size-4" />
+            </a>
+        @else
+            <div class="flex items-center justify-between gap-3 rounded-card border border-dashed border-grey-350 px-4 py-3 text-grey-700">
+                <span>
+                    <span class="block font-semibold">{{ __('diagnosis.end.takeaway') }}</span>
+                    <span class="block text-sm">{{ __('diagnosis.end.takeaway_help') }}</span>
+                </span>
+                <span class="text-sm">{{ $main->publishes_on->format('m.d.') }}</span>
+            </div>
+        @endif
 
         <a href="{{ route('client.values', $main->diagnosis->organization) }}" class="flex items-center justify-between gap-3 rounded-card bg-white px-4 py-3 text-charcoal no-underline hover:bg-paper">
             <span>

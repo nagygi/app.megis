@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 /**
  * One saved state of a versioned entity (03 · 3.3, 08 · 8.4). Written once, never updated.
  */
-#[Fillable(['number', 'snapshot', 'changed_fields', 'created_by'])]
+#[Fillable(['number', 'snapshot', 'changed_fields', 'note', 'created_by'])]
 class Version extends Model
 {
     public const UPDATED_AT = null;

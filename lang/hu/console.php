@@ -60,4 +60,8 @@ return [
         'done' => ':count összefoglaló ment ki.',
     ],
 
+    'accounts_purge' => [
+        'done' => ':count fiók adatai törölve.',
+    ],
+
 ];

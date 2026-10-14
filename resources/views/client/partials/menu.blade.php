@@ -30,7 +30,34 @@
                     $menuItems[] = ['route' => 'client.processes', 'active' => 'client.processes*', 'label' => __('client.menu.processes')];
                 }
             @endphp
-            {{-- Riportok, Fejezetek, Bölcsességtár: added by tickets 27, 32. --}}
+            @php
+                // Riportok and Fejezetek after publishing (27 · 27.12).
+                $reports = app(\App\Services\Report\ReportService::class)->reportsFor($user, $currentOrganization);
+                $latestReport = $reports->first();
+            @endphp
+            @if ($reports->isNotEmpty())
+                <p class="px-4 pb-1 text-xs font-semibold uppercase tracking-wide text-grey-600">{{ __('report.menu.reports') }}</p>
+                <ul class="mb-4 flex flex-col gap-1">
+                    @foreach ($reports as $reportMain)
+                        <li>
+                            <a href="{{ route('client.report.show', [$currentOrganization, $reportMain->diagnosis]) }}" class="block rounded-lg px-4 py-2 text-charcoal no-underline hover:bg-grey-100">
+                                {{ __('report.menu.report_row', ['product' => $reportMain->product_name, 'date' => $reportMain->published_at?->format('m.d.') ?? '–', 'percent' => $reportMain->calculation['ring'] ?? '–']) }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+                <ul class="mb-4 flex flex-col gap-1">
+                    <li><a href="{{ route('client.report.appendix', [$currentOrganization, $latestReport->diagnosis]) }}" class="block rounded-lg px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.appendix_link') }}</a></li>
+                </ul>
+                @unless ($latestReport->isSnapshot())
+                    <p class="px-4 pb-1 text-xs font-semibold uppercase tracking-wide text-grey-600">{{ __('report.menu.chapters') }}</p>
+                    <ul class="mb-4 flex flex-col gap-1">
+                        <li><a href="{{ route('client.report.internal', [$currentOrganization, $latestReport->diagnosis]) }}" class="block rounded-lg px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.menu.internal') }}</a></li>
+                        <li><a href="{{ route('client.report.chapter', [$currentOrganization, $latestReport->diagnosis, 'markad-alapja']) }}" class="block rounded-lg px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.menu.brand') }}</a></li>
+                    </ul>
+                @endunless
+            @endif
+            @php($menuItems[] = ['route' => 'client.wisdom.index', 'active' => 'client.wisdom.*', 'label' => __('wisdom.menu')])
             <ul class="flex flex-col gap-1">
                 @foreach ($menuItems as $item)
                     @php($isActive = request()->routeIs($item['active']))

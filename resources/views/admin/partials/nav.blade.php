@@ -27,6 +27,14 @@
             ],
         ],
         [
+            'label' => __('admin.nav.capability_library'),
+            'items' => [
+                ['route' => 'admin.capabilities.index', 'active' => ['admin.capabilities.index', 'admin.capabilities.create', 'admin.capabilities.edit', 'admin.capabilities.versions'], 'label' => __('admin.nav.capabilities')],
+                ['route' => 'admin.capability-groups.index', 'active' => 'admin.capability-groups.*', 'label' => __('admin.nav.capability_groups')],
+                ['route' => 'admin.capabilities.import', 'active' => 'admin.capabilities.import', 'label' => __('admin.nav.capability_import')],
+            ],
+        ],
+        [
             'label' => __('admin.nav.settings'),
             'items' => [
                 ['route' => 'admin.settings.legal', 'active' => 'admin.settings.legal', 'label' => __('admin.nav.legal_documents')],
@@ -66,7 +74,7 @@
                 @endif
                 <ul class="flex flex-col gap-1">
                     @foreach ($group['items'] as $item)
-                        @php($isActive = request()->routeIs($item['active']))
+                        @php($isActive = request()->routeIs(...(array) $item['active']))
                         <li>
                             <a
                                 href="{{ route($item['route']) }}"

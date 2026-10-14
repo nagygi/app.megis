@@ -2,6 +2,9 @@
 
 return [
 
+    // The tombstone of a deleted account (31 · 31.7, 33 · 33.7).
+    'deleted_user' => 'Törölt felhasználó · #:id',
+
     'menu' => [
         'open' => 'Menü megnyitása',
         'close' => 'Menü bezárása',
@@ -38,6 +41,13 @@ return [
             'example' => 'Példa',
             'examples' => 'Példák',
         ],
+        'edit' => 'Szerkesztem',
+        'score_from' => 'a :date-i diagnózisból',
+        'older_definition' => 'A :date-i diagnózis a korábbi definícióval mért.',
+        'add_to_own' => 'Hozzáadom a sajátjaimhoz',
+        'added_to_own' => 'A(z) :name bekerült a saját értékeid közé.',
+        'already_own' => 'A(z) :name már a saját értékeid között van.',
+        'own_full' => 'Legfeljebb :max saját értéked lehet.',
     ],
 
     'recordings' => [
@@ -86,6 +96,36 @@ return [
         'code_invalid' => 'Hibás vagy lejárt kód.',
         'save_password' => 'Jelszó mentése',
         'password_saved' => 'Megváltozott a jelszavad. A többi eszközön kiléptettünk.',
+        'current_password' => 'Jelenlegi jelszó',
+        'diagnosis_title' => 'A diagnózisod',
+        'diagnosis_window' => ':product · :from → :to',
+        'contact' => 'Kapcsolattartó a mégistől: :name',
+        'state_running' => 'fut · :week. hét a :weeks-ból',
+        'state_published' => 'publikálva · :date',
+        'awaiting_title' => 'Rád vár',
+        'awaiting' => [
+            'report' => 'Új riport · :product · :date',
+            'peers' => ':count társ még nem válaszolt · emlékeztető küldhető',
+            'experience' => 'Megélés hiányzik · :process · :date',
+            'peer' => 'A(z) :subject diagnózisában társ vagy · Kezdem',
+        ],
+        'people_title' => 'Emberek',
+        'people_count' => ':total társ · :answered kitöltötte',
+        'people_rule' => 'névvel csak ők és a mégis látják · összesítve 3 kitöltő fölött',
+        'remind' => 'Emlékeztető',
+        'visibility' => 'Ki lát mit',
+    ],
+
+    // Adataim törlése (31 · 31.7).
+    'deletion' => [
+        'title' => 'Adataim törlése',
+        'what_goes' => 'Törlődik: a fiókod és minden személyes adatod – felvételek, átiratok, saját értékek, megélések, Értéktükrök.',
+        'what_stays' => 'Marad: a publikált diagnózisok összesített számai. A szó szerinti idézeteid kikerülnek a riportból.',
+        'when' => 'A fiókod azonnal inaktív lesz, és kiléptetünk; a végleges törlés legkésőbb 24 órán belül lefut. A mentésekben az adat még legfeljebb 30 napig megvan.',
+        'start' => 'Törlöm a fiókomat',
+        'confirm' => 'Véglegesen törlöm',
+        'cancel' => 'Mégse',
+        'requested' => 'Kérésedre töröljük a fiókodat és az adataidat. Erről e-mailt is küldünk.',
     ],
 
 ];

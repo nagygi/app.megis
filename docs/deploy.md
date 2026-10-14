@@ -30,6 +30,7 @@ A noindex-et az `X-Robots-Tag` fejléc, a `robots.txt` és a lapok meta-tagje ad
 | Naptár (09) | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` (alap: `/naptar/google/visszahivas`); `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`, `MICROSOFT_REDIRECT_URI` (alap: `/naptar/microsoft/visszahivas`), `MICROSOFT_TENANT=common`. Kulcsok nélkül csak iCal link, ICS fájl és beszélgetés választható. |
 | Queue | `REDIS_QUEUE_RETRY_AFTER` / `DB_QUEUE_RETRY_AFTER` (alap: 330 másodperc, az AI-jobok 300 másodperces időkorlátja fölött) |
 | Diagnózis (18) | `DIAGNOSIS_RECALCULATION_DELAY` (alap: 20 másodperc): ennyit vár a fő diagnózis újraszámolása, így az egymás után érkező anyagok és megélések egyszer számolódnak |
+| PDF (28) | `LARAVEL_PDF_DRIVER=gotenberg`, `GOTENBERG_URL` (a Gotenberg konténer címe, például `http://gotenberg:3000`) |
 
 A titkok csak környezeti változóban vannak. AWS-en javasolt az AWS Secrets Manager vagy az SSM Parameter Store.
 
@@ -42,6 +43,8 @@ A titkok csak környezeti változóban vannak. AWS-en javasolt az AWS Secrets Ma
 - **Feltöltés:** a Livewire ideiglenes feltöltései S3-on közvetlenül a bucketbe mennek (aláírt URL), így a 300 MB-os hangfájlra a PHP és az nginx feltöltési korlátja nem vonatkozik. Helyi disknél az `upload_max_filesize` és a `post_max_size` legyen legalább 300M.
 - **Naptár-alkalmazások:** a Google-alkalmazás (Calendar API, `calendar.events.readonly`) és a Microsoft Entra multi-tenant alkalmazás (`Calendars.Read`, `offline_access`) a mégis céges fiókján. A visszahívási cím: `{APP_URL}/naptar/google/visszahivas`, illetve `{APP_URL}/naptar/microsoft/visszahivas`. A Google-ellenőrzésig legfeljebb 100 tesztfelhasználó köthet össze.
 - **Levélküldő:** a megis.hu domainen SPF, DKIM és DMARC kell. AWS esetén SES (eu-central-1), bounce- és complaint-értesítéssel.
+- **PDF (28 · 28.3):** a riport és az Útravaló PDF-je a Gotenberg konténerben (Chromium) készül, a `spatie/laravel-pdf` Gotenberg-driverével. A konténer csak belső hálózaton legyen elérhető: `docker run -d --restart unless-stopped -p 127.0.0.1:3000:3000 gotenberg/gotenberg:8`. A setup check jelzi, ha nem válaszol.
+- **Képességtár (07 · 7.6):** a mégis tárát az adminban kell betölteni: *Képességtár → Frissítés a mégis tárából*, a „Képességrendszer · tárak” Sheet xlsx-exportjával. A fájl nem kerül a kódtárba és a szerverre sem: a betöltés után törlődik.
 - **Uptime-figyelés:** UptimeRobot vagy Better Stack hívja percenként a `GET /health`-et. Hiba esetén e-mailt küld a riasztási listára.
 
 ## Kiadás lépései

@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'diagnosis_id', 'subject', 'product_id', 'product_key', 'product_name', 'leader_id', 'stage',
     'starts_on', 'publishes_on', 'show_peer_quotes', 'value_set_version_id',
     'threshold_overridden_at', 'threshold_overridden_by', 'threshold_snoozed_until', 'calculation', 'calculated_at',
+    'biggest_gap_row_id', 'biggest_gap_approved_at', 'biggest_gap_approved_by',
 ])]
 class MainDiagnosis extends Model
 {
@@ -51,6 +52,7 @@ class MainDiagnosis extends Model
             'closed_at' => 'datetime',
             'threshold_overridden_at' => 'datetime',
             'threshold_snoozed_until' => 'date',
+            'biggest_gap_approved_at' => 'datetime',
             'calculation' => 'array',
             'calculated_at' => 'datetime',
         ];
@@ -272,6 +274,8 @@ class MainDiagnosis extends Model
         return match (true) {
             $this->stage->isBeforeRunning() => 'admin.main-diagnoses.edit',
             $this->stage === MainDiagnosisStage::Running && $admin?->can('run', $this->diagnosis) => 'admin.main-diagnoses.run',
+            $this->stage === MainDiagnosisStage::Reading => 'admin.main-diagnoses.reading',
+            $this->stage === MainDiagnosisStage::Published => 'admin.main-diagnoses.publish',
             default => 'admin.diagnoses.show',
         };
     }

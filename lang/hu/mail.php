@@ -127,4 +127,30 @@ return [
         'action' => 'Beérkező',
     ],
 
+    // Publishing (21 · E-mailek).
+    'diagnosis_published' => [
+        'leader_subject' => 'Elkészült a(z) :subject diagnózisa',
+        'leader_body' => 'Elkészült a(z) :subject diagnózisa.',
+        'leader_action' => 'Megnézem',
+        'booking_lead' => 'Ha átbeszélnéd velünk:',
+        'booking_action' => 'Időpontot foglalok',
+        'peer_subject' => 'Itt az Útravalód',
+        'peer_body' => 'Elkészült a(z) :subject diagnózisa, és vele az Útravalód: a te értékeid, ahogy a helyzeteidben látszanak.',
+        'peer_action' => 'Megnézem',
+    ],
+
+    // "Válaszolok" (22, question 1).
+    'feedback_reply' => [
+        'subject' => 'A mégis válasza · :chapter',
+        'greeting' => 'Kedves :name!',
+        'lead' => 'Köszönjük a visszajelzésedet. Ezt írtad:',
+        'action' => 'A riport',
+    ],
+
+    // "Törlés megtörtént" (31 · E-mailek).
+    'account_deleted' => [
+        'subject' => 'Töröltük a fiókodat',
+        'body' => 'A fiókodat és az adataidat töröltük a mégis-ből. Ha nem te kérted, írj nekünk: :support.',
+    ],
+
 ];

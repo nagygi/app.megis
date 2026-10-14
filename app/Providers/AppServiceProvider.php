@@ -9,7 +9,12 @@ use App\Http\Middleware\EnsureSuperadmin;
 use App\Http\Middleware\ForbidWhileImpersonating;
 use App\Http\Middleware\ResolveOrganization;
 use App\Models\CalendarConnection;
+use App\Models\Capability;
 use App\Models\Diagnosis;
+use App\Models\DiagnosisClaim;
+use App\Models\DiagnosisRow;
+use App\Models\DiagnosisText;
+use App\Models\EvidenceTrace;
 use App\Models\MainDiagnosis;
 use App\Models\MainDiagnosisParticipant;
 use App\Models\Material;
@@ -17,6 +22,7 @@ use App\Models\MirrorSession;
 use App\Models\OrganizationValueSet;
 use App\Models\PersonalValueSet;
 use App\Models\ProcessConversation;
+use App\Models\ReportFeedback;
 use App\Models\User;
 use App\Models\Value;
 use App\Services\Alerting\ErrorAlerter;
@@ -75,6 +81,7 @@ class AppServiceProvider extends ServiceProvider
         // Stable names in polymorphic columns (versions, inbox), independent of class names.
         Relation::enforceMorphMap([
             'value' => Value::class,
+            'capability' => Capability::class,
             'organization_value_set' => OrganizationValueSet::class,
             'diagnosis' => Diagnosis::class,
             'material' => Material::class,
@@ -84,6 +91,11 @@ class AppServiceProvider extends ServiceProvider
             'process_conversation' => ProcessConversation::class,
             'calendar_connection' => CalendarConnection::class,
             'main_diagnosis_participant' => MainDiagnosisParticipant::class,
+            'diagnosis_row' => DiagnosisRow::class,
+            'diagnosis_claim' => DiagnosisClaim::class,
+            'diagnosis_text' => DiagnosisText::class,
+            'evidence_trace' => EvidenceTrace::class,
+            'report_feedback' => ReportFeedback::class,
         ]);
 
         // Livewire update requests run these again, so actions are checked like page loads.

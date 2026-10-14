@@ -14,6 +14,12 @@
                     'organization' => $organization->name,
                     'date' => ($valueSet->latestVersion?->created_at ?? $valueSet->updated_at)->format('Y.m.d.'),
                 ]) }}</p>
+                @if ($report && $olderDefinition)
+                    <p class="text-sm text-grey-600">{{ __('client.value_library.older_definition', ['date' => $report->published_at?->format('m.d.')]) }}</p>
+                @endif
+                @if ($organizationEditUrl)
+                    <x-ui.button tone="outline" size="sm" class="self-start" :href="$organizationEditUrl">{{ __('client.value_library.edit') }}</x-ui.button>
+                @endif
             </div>
 
             <ul class="flex flex-col gap-3">
@@ -28,6 +34,13 @@
                                 @endif
                                 <p class="text-sm text-grey-700">{{ __('client.value_library.low') }}: {{ $item->low_example }} {{ __('client.value_library.high') }}: {{ $item->high_example }}</p>
                             </div>
+                            @php($score = $scores->get(mb_strtolower(trim($item->name))))
+                            @if ($score && $report)
+                                <a href="{{ route('client.report.item', [$organization, $report->diagnosis, 'ertekek', $score['id']]) }}" class="shrink-0 text-right text-charcoal no-underline">
+                                    <span class="block text-2xl font-extrabold tabular-nums">{{ \App\Services\Report\ReportText::score($score) }} ›</span>
+                                    <span class="block text-xs text-grey-600">{{ __('client.value_library.score_from', ['date' => $report->published_at?->format('m.d.')]) }}</span>
+                                </a>
+                            @endif
                             <button type="button" wire:click="toggleItem('{{ $item->key }}')" class="shrink-0 text-sm font-semibold underline" aria-expanded="{{ $isOpen ? 'true' : 'false' }}">
                                 {{ $isOpen ? __('client.value_library.hide') : __('client.value_library.show') }}
                             </button>
@@ -40,6 +53,29 @@
                                 @endforeach
                             </dl>
                         @endif
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
+    @if ($ownItems->isNotEmpty())
+        {{-- 30.3 · the own values with their state (24 · 24.4) --}}
+        <section class="flex flex-col gap-3" aria-labelledby="own-values">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <h2 id="own-values" class="text-xl font-semibold">{{ __('client.value_library.own_values') }}</h2>
+                @if ($ownEditUrl)
+                    <x-ui.button tone="outline" size="sm" :href="$ownEditUrl">{{ __('client.value_library.edit') }}</x-ui.button>
+                @endif
+            </div>
+            <ul class="grid gap-3 sm:grid-cols-2">
+                @foreach ($ownItems as $ownItem)
+                    <li wire:key="own-{{ $ownItem->key }}" class="flex flex-col gap-1 rounded-card bg-white p-4">
+                        <span class="font-semibold">{{ $ownItem->name }}</span>
+                        @if ($ownItem->meaning)
+                            <span class="text-sm">{{ $ownItem->meaning }}</span>
+                        @endif
+                        <span class="text-xs text-grey-700">{{ __('diagnosis.own_values.state.'.$ownState($ownItem)) }}</span>
                     </li>
                 @endforeach
             </ul>
@@ -105,6 +141,9 @@
                                 @endif
                             @endforeach
                         </dl>
+                        <div class="border-t border-grey-200 px-5 py-3">
+                            <x-ui.button tone="outline" size="sm" wire:click="addToOwn({{ $value->id }})">{{ __('client.value_library.add_to_own') }}</x-ui.button>
+                        </div>
                     @endif
                 </li>
             @empty

@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Inbox;
 use App\Enums\InboxItemType;
 use App\Jobs\DraftReading;
 use App\Livewire\Admin\Concerns\WithDataTable;
+use App\Mail\FeedbackReplyMail;
 use App\Models\InboxItem;
 use App\Models\MainDiagnosis;
 use App\Models\MainDiagnosisParticipant;
@@ -12,12 +13,14 @@ use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\Process;
+use App\Models\ReportFeedback;
 use App\Models\User;
 use App\Services\Inbox\InboxService;
 use App\Services\MainDiagnoses\DiagnosisRunService;
 use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\Processes\OccasionService;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -37,6 +40,15 @@ class Index extends Component
      * @var array<int, array{process_id: ?string, date: string}>
      */
     public array $classify = [];
+
+    /**
+     * "Válaszolok": item id => the e-mail text (22, question 1).
+     *
+     * @var array<int, string>
+     */
+    public array $replies = [];
+
+    public ?int $replyingTo = null;
 
     public function mount(): void
     {
@@ -129,6 +141,25 @@ class Index extends Component
         session()->flash('status', __('admin.inbox.reinvited'));
     }
 
+    /**
+     * "Válaszolok": the answer goes by e-mail, the row closes (22 · 22.2).
+     */
+    public function reply(int $itemId, InboxService $inbox): void
+    {
+        $item = $this->openItem($itemId, InboxItemType::Feedback);
+        abort_unless($item->subject instanceof ReportFeedback && $item->subject->user !== null, 404);
+
+        $this->validate(["replies.{$itemId}" => ['required', 'string', 'min:3', 'max:3000']], attributes: ["replies.{$itemId}" => __('admin.inbox.reply_text')]);
+
+        Mail::to($item->subject->user)->send(new FeedbackReplyMail($item->subject, trim($this->replies[$itemId])));
+        $item->subject->update(['answered_at' => now()]);
+        $inbox->close($item, auth()->user());
+
+        unset($this->replies[$itemId]);
+        $this->replyingTo = null;
+        session()->flash('status', __('admin.inbox.replied'));
+    }
+
     public function render(): View
     {
         $showClosed = $this->filter('state') === 'closed';
@@ -186,6 +217,8 @@ class Index extends Component
         return match (true) {
             $item->type === InboxItemType::Threshold && $item->diagnosis !== null => route('admin.main-diagnoses.run', $item->diagnosis),
             $item->subject instanceof Material => route('admin.materials.show', $item->subject),
+            // "Beépítem": the reading, with the feedback next to its chapter (22 · 22.2).
+            $item->subject instanceof ReportFeedback && $item->diagnosis !== null => route('admin.main-diagnoses.reading', [$item->diagnosis, 'visszajelzes' => $item->subject->id]),
             $item->subject instanceof MirrorSession && $item->subject->user !== null => route('admin.clients.show', $item->subject->user),
             $item->diagnosis !== null => route('admin.diagnoses.show', $item->diagnosis),
             default => null,

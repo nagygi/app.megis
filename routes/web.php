@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ImpersonationController as AdminImpersonationCont
 use App\Http\Controllers\Admin\LegalDocumentVersionController;
 use App\Http\Controllers\Admin\MaterialAudioController;
 use App\Http\Controllers\Admin\OpenMainDiagnosisController;
+use App\Http\Controllers\Admin\ReportPreviewController;
 use App\Http\Controllers\Client\CalendarOAuthController;
 use App\Http\Controllers\Client\CustomerLoginController;
 use App\Http\Controllers\Client\CustomerLogoutController;
@@ -18,11 +19,16 @@ use App\Http\Controllers\Client\LandingController;
 use App\Http\Controllers\Client\LegalAcceptanceController;
 use App\Http\Controllers\Client\LoginCodeController;
 use App\Http\Controllers\Client\LoginLinkController;
+use App\Http\Controllers\Client\ReportController;
+use App\Http\Controllers\Client\ReportPdfController;
+use App\Http\Controllers\Client\TakeawayController;
+use App\Http\Controllers\Client\WisdomController;
 use App\Http\Controllers\LegalDocumentController;
 use App\Http\Controllers\MirrorConfirmationController;
 use App\Livewire\Admin;
 use App\Livewire\Client;
 use App\Livewire\Mirror;
+use App\Services\Report\ReportService;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -100,6 +106,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('diagnozisok/{diagnosis}/beallitas', Admin\MainDiagnoses\Form::class)->name('main-diagnoses.edit');
         Route::livewire('diagnozisok/{diagnosis}/reszdiagnozisok', Admin\MainDiagnoses\Subdiagnoses::class)->name('main-diagnoses.subdiagnoses');
         Route::livewire('diagnozisok/{diagnosis}/futas', Admin\MainDiagnoses\Run::class)->name('main-diagnoses.run');
+        Route::livewire('diagnozisok/{diagnosis}/olvasat', Admin\MainDiagnoses\Reading::class)->name('main-diagnoses.reading');
+        Route::livewire('diagnozisok/{diagnosis}/publikalas', Admin\MainDiagnoses\Publish::class)->name('main-diagnoses.publish');
+        Route::get('diagnozisok/{diagnosis}/elonezet/{page?}/{row?}', [ReportPreviewController::class, 'report'])->whereNumber('row')->name('main-diagnoses.preview');
+        Route::get('diagnozisok/{diagnosis}/elonezet-utravalo/{peer}', [ReportPreviewController::class, 'takeaway'])->name('main-diagnoses.preview-takeaway');
         Route::get('diagnozisok/{diagnosis}/megnyitas', OpenMainDiagnosisController::class)->name('main-diagnoses.open');
         Route::livewire('diagnozis-tipusok', Admin\DiagnosisTypes\Index::class)->name('diagnosis-types.index');
         Route::livewire('diagnozis-tipusok/uj', Admin\DiagnosisTypes\Form::class)->name('diagnosis-types.create');
@@ -112,6 +122,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('ertektar/kategoriak', Admin\ValueCategories\Index::class)->name('value-categories.index');
         Route::livewire('ertektar/kategoriak/uj', Admin\ValueCategories\Form::class)->name('value-categories.create');
         Route::livewire('ertektar/kategoriak/{category}/szerkesztes', Admin\ValueCategories\Form::class)->name('value-categories.edit');
+
+        Route::livewire('kepessegtar/kepessegek', Admin\Capabilities\Index::class)->name('capabilities.index');
+        Route::livewire('kepessegtar/kepessegek/uj', Admin\Capabilities\Form::class)->name('capabilities.create');
+        Route::livewire('kepessegtar/frissites', Admin\Capabilities\Import::class)->name('capabilities.import');
+        Route::livewire('kepessegtar/kepessegek/{capability}', Admin\Capabilities\Form::class)->name('capabilities.edit');
+        Route::livewire('kepessegtar/kepessegek/{capability}/verziok', Admin\Capabilities\Versions::class)->name('capabilities.versions');
+        Route::livewire('kepessegtar/csoportok', Admin\CapabilityGroups\Index::class)->name('capability-groups.index');
+        Route::livewire('kepessegtar/csoportok/uj', Admin\CapabilityGroups\Form::class)->name('capability-groups.create');
+        Route::livewire('kepessegtar/csoportok/{group}/szerkesztes', Admin\CapabilityGroups\Form::class)->name('capability-groups.edit');
 
         Route::livewire('ugyfelek', Admin\Clients\Index::class)->name('clients.index');
         Route::livewire('ugyfelek/{user}', Admin\Clients\Show::class)->name('clients.show');
@@ -206,6 +225,24 @@ Route::middleware('customer')->name('client.')->group(function () {
                 Route::livewire('diagnozis/{diagnosis}/folyamatok/osszegzes', Client\Diagnosis\ProcessSummary::class)->name('diagnosis.process-summary');
                 Route::livewire('diagnozis/{diagnosis}/folyamatok/{process}', Client\ProcessSheet::class)->whereNumber('process')->name('diagnosis.process');
                 Route::livewire('diagnozis/{diagnosis}/ki-lat-mit', Client\Diagnosis\Visibility::class)->name('diagnosis.ki-lat-mit');
+                // Bölcsességtár (32).
+                Route::get('bolcsessegtar', [WisdomController::class, 'index'])->name('wisdom.index');
+                Route::get('bolcsessegtar/{topic}', [WisdomController::class, 'show'])->name('wisdom.show');
+                // The peer's Útravaló (29).
+                Route::get('diagnozis/{diagnosis}/utravalo', TakeawayController::class)->name('diagnosis.takeaway');
+                Route::get('diagnozis/{diagnosis}/utravalo/pdf', [ReportPdfController::class, 'takeaway'])->name('diagnosis.takeaway.pdf');
+                // The report of a published main diagnosis (27).
+                Route::controller(ReportController::class)->prefix('riport/{diagnosis}')->name('report.')->group(function () {
+                    Route::get('/', 'answer')->name('show');
+                    Route::get('osszefoglalo', 'summary')->name('summary');
+                    Route::get('belso-mukodes', 'internal')->name('internal');
+                    Route::get('osszevetes', 'compare')->name('compare');
+                    Route::get('zarolap', 'closing')->name('closing');
+                    Route::get('melleklet', 'appendix')->name('appendix');
+                    Route::get('pdf', [ReportPdfController::class, 'report'])->name('pdf');
+                    Route::get('{chapter}', 'chapter')->whereIn('chapter', array_values(ReportService::SLUGS))->name('chapter');
+                    Route::get('{chapter}/{row}', 'item')->whereIn('chapter', array_values(ReportService::SLUGS))->whereNumber('row')->name('item');
+                });
                 // The occasions of a running diagnosis (12): V11, V11·b, V11·c, T5·b.
                 Route::livewire('diagnozis/{diagnosis}/hozzateszek', Client\Diagnosis\Contribute::class)->name('diagnosis.contribute');
                 Route::livewire('diagnozis/{diagnosis}/helyzet', Client\Diagnosis\Situation::class)->name('diagnosis.situation');

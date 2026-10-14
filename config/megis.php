@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'version' => '0.60',
+    'version' => '0.70',
 
     // Set by the deploy script, shown on Rendszer → Health (docs/uzemeltetes.md · 3).
     'deployed_at' => env('MEGIS_DEPLOYED_AT'),
@@ -157,6 +157,7 @@ return [
         Checks\AiConfigurationCheck::class,
         Checks\TranscriptionCheck::class,
         Checks\CalendarConfigurationCheck::class,
+        Checks\PdfEngineCheck::class,
         Checks\EnvironmentPolicyCheck::class,
     ],
 

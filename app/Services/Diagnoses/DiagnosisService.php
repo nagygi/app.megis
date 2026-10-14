@@ -7,6 +7,7 @@ use App\Enums\DiagnosisLevel;
 use App\Enums\DiagnosisRowKind;
 use App\Enums\DiagnosisStatus;
 use App\Enums\ExperienceState;
+use App\Enums\MainDiagnosisStage;
 use App\Enums\ScoreState;
 use App\Enums\TreeElement;
 use App\Enums\ValueOrigin;
@@ -167,7 +168,7 @@ class DiagnosisService
      */
     public function overrideRow(DiagnosisRow $row, ?string $score, string $reason, User $admin): void
     {
-        $this->ensureEditable($row->diagnosis);
+        $this->ensureCorrectable($row->diagnosis);
 
         $row->forceFill([
             ...$this->scoreAttributes($score),
@@ -184,7 +185,7 @@ class DiagnosisService
      */
     public function resetRowOverride(DiagnosisRow $row): void
     {
-        $this->ensureEditable($row->diagnosis);
+        $this->ensureCorrectable($row->diagnosis);
 
         $row->forceFill([
             'score' => $row->automatic_score,
@@ -202,7 +203,7 @@ class DiagnosisService
      */
     public function overrideScore(Diagnosis $diagnosis, ?string $score, string $reason, User $admin): void
     {
-        $this->ensureEditable($diagnosis);
+        $this->ensureCorrectable($diagnosis);
 
         $diagnosis->forceFill([
             ...$this->scoreAttributes($score),
@@ -216,7 +217,7 @@ class DiagnosisService
 
     public function resetScoreOverride(Diagnosis $diagnosis): void
     {
-        $this->ensureEditable($diagnosis);
+        $this->ensureCorrectable($diagnosis);
 
         $diagnosis->forceFill([
             'score' => $diagnosis->automatic_score,
@@ -238,6 +239,21 @@ class DiagnosisService
         }
 
         $row->delete();
+    }
+
+    /**
+     * A calculated diagnosis can be corrected after publishing too, with a
+     * reason and a new snapshot (21 · 21.4); everything else follows 04.
+     */
+    public function ensureCorrectable(Diagnosis $diagnosis): void
+    {
+        $main = $diagnosis->main ?? $diagnosis->parent?->main;
+
+        if ($main !== null && $main->stage === MainDiagnosisStage::Published) {
+            return;
+        }
+
+        $this->ensureEditable($diagnosis);
     }
 
     public function ensureEditable(Diagnosis $diagnosis): void

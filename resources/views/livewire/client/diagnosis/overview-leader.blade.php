@@ -22,6 +22,10 @@
 
     <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" />
 
+    @if ($main->stage->isBeforeRunning())
+        <a href="{{ route('client.wisdom.show', [$main->diagnosis->organization, 'folyamat']) }}" class="self-start text-sm font-semibold">{{ __('wisdom.more') }}</a>
+    @endif
+
     @if ($current && $main->acceptsInput())
         <div class="flex flex-wrap items-center gap-3">
             <x-ui.button tone="coral" size="lg" :href="$stepUrl($current->step)">

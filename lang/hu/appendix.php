@@ -1,0 +1,24 @@
+<?php
+
+return [
+
+    // RM · Melléklet (28 · 28.2).
+    'title' => 'Honnan tudjuk?',
+    'who' => 'Kire',
+    'who_text' => ':leader és a(z) :subject · 1 vezető · :peers társ, :answered kitöltötte',
+    'who_alone' => ':leader',
+    'from' => 'Miből',
+    'from_text' => ':conversations beszélgetés · :recordings felvétel · :documents dokumentum · :mirrors Értéktükör',
+    'calendar' => 'naptár, 90 nap',
+    'when' => 'Mikor',
+    'read_by' => 'Ki olvasta',
+    'read_by_text' => 'mégis · publikálva :date',
+    'quotes' => 'Idézetek · :count',
+    'claims' => 'Állítások bizonyítékkal · erősség :strength · repedés :crack · sejtés :hunch',
+    'rows' => 'Mérőpontok · :count',
+    'overrides' => 'Amit a mégis átírt',
+    'override_by' => 'mégis · :date',
+    'no_overrides' => 'A mégis egyetlen gépi számot sem írt át.',
+    'pdf_title' => 'Melléklet',
+
+];
