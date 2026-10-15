@@ -28,6 +28,7 @@ use App\Services\Values\PersonalValueSetService;
 use App\Services\Values\ValueService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use RuntimeException;
 
 /**
@@ -78,6 +79,11 @@ class DemoDiagnosisSeeder extends Seeder
         $admin = User::query()->where('role', 'superadmin')->orderBy('id')->first()
             ?? User::query()->where('role', 'admin')->orderBy('id')->first()
             ?? throw new RuntimeException('Create an admin first: php artisan megis:admin:create');
+
+        // The recalculation is called directly at the end. Its unique-job lock
+        // would fail inside the transaction on pgsql (a duplicate lock insert
+        // aborts it), so nothing is queued while seeding.
+        Queue::fake();
 
         $main = DB::transaction(fn (): MainDiagnosis => $this->seed($admin));
 
