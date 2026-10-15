@@ -27,6 +27,7 @@ use App\Services\Processes\ProcessService;
 use App\Services\Values\PersonalValueSetService;
 use App\Services\Values\ValueService;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use RuntimeException;
@@ -81,11 +82,20 @@ class DemoDiagnosisSeeder extends Seeder
             ?? throw new RuntimeException('Create an admin first: php artisan megis:admin:create');
 
         // The recalculation is called directly at the end. Its unique-job lock
-        // would fail inside the transaction on pgsql (a duplicate lock insert
-        // aborts it), so nothing is queued while seeding.
+        // is taken on the cache store at dispatch, and a duplicate lock insert
+        // aborts the transaction on pgsql, so the seed runs on the array cache
+        // and queues nothing.
+        $cacheDriver = config('cache.default');
+        Cache::setDefaultDriver('array');
+        app()->forgetInstance('cache.store');
         Queue::fake();
 
-        $main = DB::transaction(fn (): MainDiagnosis => $this->seed($admin));
+        try {
+            $main = DB::transaction(fn (): MainDiagnosis => $this->seed($admin));
+        } finally {
+            Cache::setDefaultDriver($cacheDriver);
+            app()->forgetInstance('cache.store');
+        }
 
         $this->command?->info('Demó diagnózis: '.$main->diagnosis->name.' · fut, a küszöb teljesült. Az olvasat az adminban indítható.');
     }
