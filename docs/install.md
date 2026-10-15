@@ -57,6 +57,7 @@ php artisan megis:values:import ertekek.xlsx --dry-run   # csak ellenőriz
 php artisan megis:values:import ertekek.xlsx
 ```
 
+- Minta: `docs/ertektar-import-minta.xlsx` (három példaérték, a második munkalapon útmutató).
 - xlsx vagy csv, az első munkalap számít. Az első sor a fejléc, soronként egy érték.
 - Oszlopok (a sorrend mindegy, a kis- és nagybetű és az írásjelek nem számítanak):
   - `Név` (kötelező);

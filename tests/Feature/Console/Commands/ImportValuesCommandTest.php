@@ -94,6 +94,16 @@ it('only checks the file on a dry run', function () {
     expect(Value::query()->count())->toBe(0);
 });
 
+it('loads the sample file in docs', function () {
+    $this->artisan('megis:values:import', ['file' => base_path('docs/ertektar-import-minta.xlsx')])
+        ->expectsOutputToContain('3 érték bekerült')
+        ->assertSuccessful();
+
+    expect(Value::query()->firstWhere('name', 'Felelősségvállalás'))
+        ->meanings->toBe(['Vállalom a döntésem következményét.', 'Szólok, ha hibáztam.'])
+        ->and(Value::query()->firstWhere('name', 'Biztonság')->keywords)->toBe(['kiszámíthatóság', 'stabilitás', 'rend']);
+});
+
 it('refuses a file without the name column', function () {
     $path = valuesSpreadsheet([['Érték', 'Leírás'], ['Bátorság', 'x']]);
 
