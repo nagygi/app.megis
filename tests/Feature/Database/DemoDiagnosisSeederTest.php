@@ -8,6 +8,7 @@ use App\Models\Material;
 use App\Models\Organization;
 use App\Models\Product;
 use Database\Seeders\DemoDiagnosisSeeder;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 
@@ -18,7 +19,7 @@ beforeEach(function () {
 });
 
 it('seeds a running Teljes diagnosis with a leader, four peers and scored situations (M7)', function () {
-    actingAsAdmin();
+    $admin = actingAsAdmin();
 
     $this->seed(DemoDiagnosisSeeder::class);
 
@@ -32,7 +33,9 @@ it('seeds a running Teljes diagnosis with a leader, four peers and scored situat
         ->and($main->calculation['threshold_met'])->toBeTrue()
         ->and($main->calculation['peers_answered'])->toBe(4)
         ->and(Material::query()->where('parent_diagnosis_id', $main->diagnosis_id)->where('status', MaterialStatus::Processed)->count())->toBe(4)
-        ->and(EvidenceTrace::query()->whereIn('diagnosis_row_id', $main->diagnosis->rows()->pluck('id'))->exists())->toBeTrue();
+        ->and(EvidenceTrace::query()->whereIn('diagnosis_row_id', $main->diagnosis->rows()->pluck('id'))->exists())->toBeTrue()
+        // The admin opens the leader's side on their behalf (14 · 14.6).
+        ->and(Gate::forUser($admin)->allows('impersonate', $main->leader))->toBeTrue();
 
     // A second run leaves it alone.
     $this->seed(DemoDiagnosisSeeder::class);

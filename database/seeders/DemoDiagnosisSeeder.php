@@ -118,6 +118,8 @@ class DemoDiagnosisSeeder extends Seeder
                 ['email' => 'demo-'.mb_strtolower(str_replace(['á', 'é'], ['a', 'e'], $name[0])).'@example.com'],
                 ['first_name' => $name[0], 'last_name' => $name[1]],
             );
+            // As if registered: the admin can open their side with "Belépés a nevében" (14 · 14.6).
+            $user->forceFill(['activated_at' => $user->activated_at ?? now()])->save();
             Membership::create(['organization_id' => $organization->id, 'user_id' => $user->id, 'status' => 'active', 'is_organization_leader' => $index === 0]);
             $team->users()->attach($user->id, ['is_leader' => $index === 0]);
 
