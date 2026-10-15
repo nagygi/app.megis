@@ -68,11 +68,39 @@
 
     <nav aria-label="{{ __('admin.title') }}" class="flex flex-1 flex-col gap-6">
         @foreach ($groups as $group)
-            <div>
+            @php($groupActive = collect($group['items'])->contains(fn ($item) => request()->routeIs(...(array) $item['active'])))
+            <div
                 @if ($group['label'])
-                    <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-grey-600">{{ $group['label'] }}</p>
+                    x-data="{
+                        key: 'admin-nav:{{ $loop->index }}',
+                        open: true,
+                        init() {
+                            try { if (localStorage.getItem(this.key) === 'closed') this.open = {{ $groupActive ? 'true' : 'false' }}; } catch (e) {}
+                        },
+                        toggle() {
+                            this.open = ! this.open;
+                            try { localStorage.setItem(this.key, this.open ? 'open' : 'closed'); } catch (e) {}
+                        },
+                    }"
                 @endif
-                <ul class="flex flex-col gap-1">
+            >
+                @if ($group['label'])
+                    <button
+                        type="button"
+                        class="flex w-full items-center justify-between gap-2 rounded-lg px-3 pb-1 text-left text-xs font-semibold uppercase tracking-wide text-grey-600"
+                        aria-controls="admin-nav-group-{{ $loop->index }}"
+                        :aria-expanded="open"
+                        @click="toggle()"
+                    >
+                        <span>{{ $group['label'] }}</span>
+                        <svg class="size-3 transition-transform" :class="open || '-rotate-90'" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 4l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                @endif
+                <ul
+                    id="admin-nav-group-{{ $loop->index }}"
+                    class="flex flex-col gap-1"
+                    @if ($group['label']) x-show="open" @endif
+                >
                     @foreach ($group['items'] as $item)
                         @php($isActive = request()->routeIs(...(array) $item['active']))
                         <li>
