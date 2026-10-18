@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Admin\Values;
 
+use App\Enums\ValueGrade;
 use App\Enums\ValueOrigin;
+use App\Enums\ValueSvsStatus;
 use App\Livewire\Admin\Concerns\WithDataTable;
 use App\Models\Value;
 use App\Models\ValueCategory;
@@ -56,7 +58,9 @@ class Index extends Component
         $query = Value::query()->with(['category', 'latestVersion.creator', 'originOrganization']);
 
         if ($term = $this->searchTerm()) {
-            $query->whereLike('search_text', mb_strtolower($term));
+            $query->where(fn ($search) => $search
+                ->whereLike('search_text', mb_strtolower($term))
+                ->orWhere('code', trim($this->search)));
         }
 
         match ($this->filter('status')) {
@@ -67,6 +71,18 @@ class Index extends Component
 
         if ($category = $this->filter('category')) {
             $query->where('value_category_id', $category);
+        }
+
+        if ($higherOrder = $this->filter('higher_order')) {
+            $query->whereHas('category', fn ($categories) => $categories->where('higher_order', $higherOrder));
+        }
+
+        if (($evidence = ValueGrade::tryFrom((string) $this->filter('evidence'))) !== null) {
+            $query->where('evidence', $evidence);
+        }
+
+        if (($svs = ValueSvsStatus::tryFrom((string) $this->filter('svs'))) !== null) {
+            $query->where('svs_status', $svs);
         }
 
         if (($origin = ValueOrigin::tryFrom((string) $this->filter('origin'))) !== null) {
@@ -82,6 +98,9 @@ class Index extends Component
         return view('livewire.admin.values.index', [
             'values' => $this->applySorting($query)->paginate(25),
             'categories' => ValueCategory::query()->orderBy('name')->pluck('name', 'id')->all(),
+            'higherOrders' => ValueCategory::query()->whereNotNull('higher_order')->distinct()->orderBy('higher_order')->pluck('higher_order', 'higher_order')->all(),
+            'grades' => collect(ValueGrade::cases())->mapWithKeys(fn (ValueGrade $grade) => [$grade->value => $grade->label()])->all(),
+            'svsStatuses' => collect(ValueSvsStatus::cases())->mapWithKeys(fn (ValueSvsStatus $status) => [$status->value => $status->label()])->all(),
             'origins' => collect(ValueOrigin::cases())->mapWithKeys(fn (ValueOrigin $origin) => [$origin->value => $origin->label()])->all(),
         ])->layout('layouts::admin')->title(__('admin.values.title'));
     }

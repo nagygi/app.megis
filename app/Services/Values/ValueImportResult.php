@@ -7,18 +7,29 @@ namespace App\Services\Values;
  */
 class ValueImportResult
 {
-    public int $imported = 0;
+    /** @var list<string> names of the new values */
+    public array $created = [];
 
-    public int $wouldImport = 0;
+    /** @var list<array{name: string, fields: list<string>}> values with a new version */
+    public array $updated = [];
 
-    /** @var list<string> names already in the Értéktár */
-    public array $skipped = [];
+    /** @var list<string> names of the values the file left as they were */
+    public array $unchanged = [];
+
+    /** @var list<string> names of the values the load marked reviewed */
+    public array $reviewed = [];
 
     /** @var list<string> */
     public array $createdCategories = [];
 
     /** @var list<string> */
+    public array $updatedCategories = [];
+
+    /** @var list<string> */
     public array $ignoredColumns = [];
+
+    /** @var list<string> */
+    public array $warnings = [];
 
     /** @var list<string> */
     public array $errors = [];

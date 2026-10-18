@@ -2,6 +2,17 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.10 · {hash} · 2026-10-18
+
+Az Értéktár a mégis 58 értékével (`docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx`).
+
+- **Értékkártya:** azonosító, angol név, definíció (magyar, angol), hamis pozitívok, átfedések más értékekkel, szakirodalom, szakirodalmi alátámasztottság, transzponálhatóság, SVS-index. A kategória Schwartz alapértéke angol névvel és felsőbb szinttel.
+- **Betöltés:** a `megis:values:import` a mégis táblázatának fejléceit is ismeri, a listákat sortörésnél vagy „ · ”-nál bontja. Az értéket az azonosító, ennek hiányában a név alapján frissíti: változásnál új verzió megjegyzéssel, a parancs mezőnként kiírja a változást, a dry-run pontosan megmutatja. Csak a fájl oszlopai íródnak felül. Új minta: `docs/ertektar-import-minta.xlsx`.
+- **Admin:** az új mezők szakaszokra bontott űrlapon; szűrés felsőbb szintre, alátámasztottságra és SVS-indexre; keresés angol névben és azonosítóban; a verzió-összevetés a minősítéseket címkével mutatja.
+- **Ügyféloldal:** az Értéktárban a név alatt a definíció; a hamis pozitívok, a szakirodalom és a minősítések az adminé.
+- **Értékmérés:** az illesztés és a pontozás a definíciót, a hamis pozitívokat és az átfedéseket is megkapja (`ertektukor-illesztes` v2, `ertektukor-pontozas` v2). Más értékek angol neve helyett a kódjuk megy, így az illesztés továbbra sem név alapján dönt.
+- **Verziók:** a később felvett, üres mező nem számít változásnak, így a meglévő értékek nem kapnak üres új verziót.
+
 ## 1.00 · 8618d4d · 2026-10-15
 
 M7 · Stabilizálás: az első éles kiadás jelöltje. Az élesítés feltételei a `docs/deploy.md` „Élesítés előtt (1.00)” listáján.

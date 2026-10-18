@@ -81,6 +81,18 @@ return [
         'user' => 'Felhasználó által felvett',
     ],
 
+    'value_grade' => [
+        'strong' => 'erős',
+        'medium' => 'közepes',
+        'weak' => 'gyenge',
+    ],
+
+    'value_svs_status' => [
+        'yes' => 'igen',
+        'x_coded' => 'nem (X-kódolt)',
+        'to_verify' => 'nem (ellenőrizendő)',
+    ],
+
     'version_event_type' => [
         'archived' => 'Archiválva',
         'restored' => 'Visszaállítva',

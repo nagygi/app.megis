@@ -60,3 +60,22 @@ it('opens from the menu', function () {
         ->assertSee(route('client.values', $organization))
         ->assertSee(route('client.mirror.record', $organization));
 });
+
+it('shows the definition of a value, and keeps the admin fields to the admin', function () {
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+    $value = Value::factory()->create([
+        'name' => 'Kíváncsiság',
+        'definition' => 'Érdeklődés mindenre.',
+        'meanings' => ['A nem tudás megengedése.'],
+        'false_positives' => ['Kötelező e-learning óraszám.'],
+        'literature' => ['Kashdan CEI-II.'],
+    ]);
+
+    Livewire::test(ValueLibrary::class, ['organization' => $organization])
+        ->assertSee('Érdeklődés mindenre.')
+        ->call('toggleValue', $value->id)
+        ->assertSee('A nem tudás megengedése.')
+        ->assertDontSee('Kötelező e-learning óraszám.')
+        ->assertDontSee('Kashdan CEI-II.');
+});

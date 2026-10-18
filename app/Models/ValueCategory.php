@@ -10,9 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Category of Értéktár values (03 · 3.4). A value has at most one.
+ * Category of Értéktár values (03 · 3.4), one of Schwartz's basic values with
+ * its higher order value. A value has at most one.
  */
-#[Fillable(['name', 'description'])]
+#[Fillable(['name', 'name_en', 'higher_order', 'description'])]
 class ValueCategory extends Model
 {
     /** @use HasFactory<ValueCategoryFactory> */
@@ -24,5 +25,15 @@ class ValueCategory extends Model
     public function values(): HasMany
     {
         return $this->hasMany(Value::class);
+    }
+
+    /**
+     * "Önállóság (Self-direction)".
+     */
+    public function label(): string
+    {
+        return filled($this->name_en) && $this->name_en !== $this->name
+            ? $this->name.' ('.$this->name_en.')'
+            : $this->name;
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\ValueGrade;
 use App\Enums\ValueOrigin;
+use App\Enums\ValueSvsStatus;
 use App\Enums\VersionEventType;
 use App\Livewire\Admin\Values\Form;
 use App\Models\Organization;
@@ -143,4 +145,55 @@ it('is not available to customers', function () {
     actingAsCustomer(customerOf());
 
     $this->get(route('admin.values.create'))->assertForbidden();
+});
+
+it('saves the full value card with its ratings', function () {
+    actingAsAdmin();
+
+    fillValueForm(Livewire::test(Form::class))
+        ->set('code', '1')
+        ->set('name_en', 'Curious')
+        ->set('definition', 'Érdeklődés mindenre.')
+        ->set('false_positives', ['Kötelező e-learning.'])
+        ->set('overlaps', ['Kreativitás: ugyanaz a gondolati pólus.'])
+        ->set('literature', [str_repeat('a', 500)])
+        ->set('evidence', 'strong')
+        ->set('transposability', 'medium')
+        ->set('svs_status', 'x_coded')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(Value::query()->sole())
+        ->code->toBe('1')
+        ->name_en->toBe('Curious')
+        ->definition->toBe('Érdeklődés mindenre.')
+        ->definition_en->toBeNull()
+        ->false_positives->toBe(['Kötelező e-learning.'])
+        ->overlaps->toBe(['Kreativitás: ugyanaz a gondolati pólus.'])
+        ->evidence->toBe(ValueGrade::Strong)
+        ->transposability->toBe(ValueGrade::Medium)
+        ->svs_status->toBe(ValueSvsStatus::XCoded);
+});
+
+it('keeps the code once set and refuses one already in use', function () {
+    actingAsAdmin();
+    Value::factory()->create(['code' => '1']);
+    $value = Value::factory()->create(['code' => '2', 'name' => 'Kíváncsiság']);
+
+    fillValueForm(Livewire::test(Form::class), 'Kreativitás')->set('code', '1')->call('save')->assertHasErrors(['code' => 'unique']);
+
+    Livewire::test(Form::class, ['value' => $value])->set('code', '3')->call('save')->assertHasNoErrors();
+
+    expect($value->refresh()->code)->toBe('2');
+});
+
+it('takes literature items up to 500 characters and other items up to 255', function () {
+    actingAsAdmin();
+
+    fillValueForm(Livewire::test(Form::class))
+        ->set('false_positives', [str_repeat('a', 256)])
+        ->set('literature', [str_repeat('a', 501)])
+        ->set('evidence', 'nagyon erős')
+        ->call('save')
+        ->assertHasErrors(['false_positives.0' => 'max', 'literature.0' => 'max', 'evidence']);
 });

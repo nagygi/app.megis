@@ -9,13 +9,18 @@ use Illuminate\View\View;
 use Livewire\Component;
 
 /**
- * New and edited value category: name (unique) and description (03 · 3.4).
+ * New and edited value category: name (unique), English name, higher order
+ * value and description (03 · 3.4).
  */
 class Form extends Component
 {
     public ?ValueCategory $category = null;
 
     public string $name = '';
+
+    public string $name_en = '';
+
+    public string $higher_order = '';
 
     public string $description = '';
 
@@ -25,6 +30,8 @@ class Form extends Component
             Gate::authorize('update', $category);
             $this->category = $category;
             $this->name = $category->name;
+            $this->name_en = (string) $category->name_en;
+            $this->higher_order = (string) $category->higher_order;
             $this->description = (string) $category->description;
 
             return;
@@ -41,11 +48,18 @@ class Form extends Component
 
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('value_categories', 'name')->ignore($this->category?->id)],
+            'name_en' => ['nullable', 'string', 'max:255'],
+            'higher_order' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
+        ], attributes: [
+            'name_en' => __('admin.value_categories.name_en'),
+            'higher_order' => __('admin.value_categories.higher_order'),
         ]);
 
         $attributes = [
             'name' => trim($validated['name']),
+            'name_en' => filled(trim($validated['name_en'])) ? trim($validated['name_en']) : null,
+            'higher_order' => filled(trim($validated['higher_order'])) ? trim($validated['higher_order']) : null,
             'description' => filled($validated['description']) ? $validated['description'] : null,
         ];
 

@@ -48,8 +48,9 @@ Ez az ET5 ígérete is: „részletesen az Értéktárban, és még {n} érték 
 ### 30.4 Az Értéktár
 
 - Az Értéktár (03) aktív és átnézett értékei, csak olvashatóan.
-- Kereső (név, szinonimák, kulcsszavak) és kategória-szűrő (03 · 3.4).
-- **Egy érték lapja:** Mit jelent · Mit nem jelent · 1 · 6 · Példák, az aktuális verzióból.
+- Kereső (név magyarul és angolul, szinonimák, kulcsszavak) és kategória-szűrő (03 · 3.4).
+- **Soronként:** a név és a definíció; definíció nélkül az első „Mit jelent” mondat.
+- **Egy érték lapja:** Mit jelent · Mit nem jelent · 1 · 6 · Példák, az aktuális verzióból. A hamis pozitívok, az átfedések, a szakirodalom és a minősítések az adminé (03 · 3.2).
 - **„Hozzáadom a sajátjaimhoz”:** a 24 · 24.3 űrlapja nyílik, előre kitöltve.
 
 ## Nincs benne

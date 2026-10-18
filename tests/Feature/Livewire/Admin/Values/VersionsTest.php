@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ValueGrade;
 use App\Livewire\Admin\Values\Versions;
 use App\Models\Value;
 use App\Services\Values\ValueService;
@@ -63,4 +64,27 @@ it('shows archiving in the history', function () {
     app(ValueService::class)->archive($value);
 
     Livewire::test(Versions::class, ['value' => $value])->assertSee('Archiválva');
+});
+
+it('compares the definition and the ratings by their labels', function () {
+    actingAsAdmin();
+    $values = app(ValueService::class);
+    $value = $values->create([
+        'name' => 'Kíváncsiság',
+        'definition' => 'Érdeklődés mindenre.',
+        'high_examples' => ['A kérdés az első mondat.'],
+        'low_examples' => ['Már eldöntöttem.'],
+        'evidence' => ValueGrade::Strong,
+    ]);
+    $values->update($value, ['definition' => 'A megismerés önmagáért.', 'evidence' => ValueGrade::Medium]);
+
+    Livewire::test(Versions::class, ['value' => $value->fresh()])
+        ->assertSee('Definíció, Szakirodalmi alátámasztottság')
+        ->set('left', 1)
+        ->set('right', 2)
+        ->call('compare')
+        ->assertSee('mindenre.')
+        ->assertSee('önmagáért.')
+        ->assertSee('erős')
+        ->assertSee('közepes');
 });

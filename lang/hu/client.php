@@ -25,7 +25,7 @@ return [
         'set_header' => ':count érték · a(z) :organization definíciója · :date',
         'library' => 'Az Értéktár',
         'library_lead' => 'A mégis Értéktára: :count érték, böngészhetően.',
-        'search' => 'Keresés névben, szinonimákban',
+        'search' => 'Keresés névben (magyarul, angolul), szinonimákban',
         'category' => 'Kategória',
         'all_categories' => 'Minden kategória',
         'empty' => 'Nincs ilyen érték.',

@@ -19,8 +19,8 @@ Szuperadmin és Admin egyaránt használhatja (lásd 01).
 Bal oldali menüpont: *Értéktár*. Almenük: *Értékek*, *Kategóriák*. A lista az NFR listaszabályai szerint működik.
 
 - Oszlopok: név, kategória, verzió (pl. „v3”), utolsó módosítás (ki, mikor), állapot (Aktív / Archivált), eredet-címke: „Diagnózisnál felvett”, „AI által detektált” vagy „Szervezet által felvett” (lásd 3.7).
-- Kereső: név, valamint szinonimák és kulcsszavak.
-- Szűrők: kategória, állapot, eredet-címke. Az archivált értékek alapból rejtve vannak.
+- Kereső: azonosító, név (magyarul és angolul), valamint szinonimák és kulcsszavak.
+- Szűrők: felsőbb szint, kategória, szakirodalmi alátámasztottság, SVS-index, állapot, eredet-címke. Az archivált értékek alapból rejtve vannak.
 - „+ Új érték” gomb.
 - Sorműveletek: szerkesztés, verziók, archiválás / visszaállítás.
 
@@ -28,19 +28,24 @@ Bal oldali menüpont: *Értéktár*. Almenük: *Értékek*, *Kategóriák*. A li
 
 A mezők a V2·c értékkártyát követik.
 
-- **Név** (kötelező, egyedi).
+- **Név** (kötelező, egyedi) és **Név (angol)** (opcionális).
+- **Azonosító** (opcionális, egyedi): a mégis táblázatának állandó kódja, a betöltés ez alapján frissít (3.6). Megadás után nem változik; az ügyfél és az AI nem látja.
 - **Slug** (kötelező, egyedi): a névből képződik automatikusan, és a „Szerkesztés” gombbal írható át, ugyanúgy, mint a szervezetnél (02).
 - **Kategória** (opcionális): választás a kategórialistából. Egy értéknek csak egy kategóriája lehet.
+- **Definíció** és **Definíció (angol)** (opcionális, egy mondat): az ügyfél az Értéktárban a név alatt látja, az AI is megkapja.
 - **Mit jelent?** (opcionális lista).
 - **Mit nem jelent?** (opcionális lista).
+- **Hamis pozitívok** (opcionális lista): ami hasonlít rá, de nem ez az érték. Az AI megkapja, az ügyfél nem látja.
+- **Átfedések más értékekkel** (opcionális lista): a szomszédos értékek és a határ. Az AI a más értékek neve helyett a kódjukat kapja (06 · 6.4).
 - **6 · Mikor teljesül nagyon?** (lista, legalább 1 elem kötelező).
 - **1 · Mikor nagyon nem teljesül?** (lista, legalább 1 elem kötelező).
 - **Példák** (opcionális lista): konkrét helyzetek, mint a V2·b kártyán a „Például” sor.
 - **Szinonimák, kulcsszavak** (opcionális lista): ezekből ismeri fel az AI az értéket egy szövegben.
+- **Szakirodalom, mérési eszközök** (opcionális lista), **szakirodalmi alátámasztottság** és **transzponálhatóság** (erős / közepes / gyenge), **SVS-index** (igen / nem (X-kódolt) / nem (ellenőrizendő)). Csak az adminban látszanak.
 
 **Listák** (az NFR lista-szerkesztője szerint):
 
-- Egy elem 2–255 karakter lehet, egy szó vagy egy-két mondat.
+- Egy elem 2–255 karakter lehet, egy szó vagy egy-két mondat. A szakirodalom eleme legfeljebb 500 karakter.
 - Az elemek sorrendje drag and droppal állítható. A sorrend a prioritás: az első a legfontosabb.
 
 Az 1 és a 6 a skála két vége, a diagnózis ehhez mér (R2·b). Az űrlapon ugyanaz a jelölés látszik, mint a V2·c-n: coral 1, zöld 6.
@@ -64,7 +69,8 @@ Az 1 és a 6 a skála két vége, a diagnózis ehhez mér (R2·b). Az űrlapon u
 
 Almenü: *Értéktár → Kategóriák*. Lista, „+ Új kategória” gomb, szerkesztés.
 
-- Mezők: név (kötelező, egyedi), leírás (opcionális).
+- Mezők: név (kötelező, egyedi), angol név, felsőbb szint (Schwartz felsőbb rendű értéke, pl. „Megőrzés (Conservation)”), leírás (mind opcionális).
+- A kategóriák Schwartz alapértékei (Önállóság, Stimuláció … Univerzalizmus); a felsőbb szint a kategória tulajdonsága, nem külön szint.
 - Törölni csak olyan kategóriát lehet, amelyikhez nem tartozik érték.
 
 ### 3.5 Archiválás
@@ -75,8 +81,8 @@ Almenü: *Értéktár → Kategóriák*. Lista, „+ Új kategória” gomb, sze
 
 ### 3.6 Kezdő adatok
 
-- A mégis átadja a 36 értéket, az Oszi által bővített Schwartz-féle rendszer szerint, a kategóriákkal együtt. Az átadás formája táblázat, oszloponként a fenti mezőkkel.
-- Az értékek egyszeri betöltéssel kerülnek be, mindegyik v1-ként.
+- A mégis átadta az 58 értéket, az Oszi által bővített Schwartz-féle rendszer szerint, a kategóriákkal és a felsőbb szintekkel együtt: `docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx`. Oszloponként a fenti mezők; a formátum a `docs/install.md`-ben.
+- Az új értékek v1-ként kerülnek be. Az újratöltés az azonosító (ennek hiányában a név) alapján frissít: változásnál új verzió készül megjegyzéssel, a változatlan érték változatlan marad.
 
 ### 3.7 Máshonnan felvett értékek
 

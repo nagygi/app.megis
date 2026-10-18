@@ -114,7 +114,9 @@
                     <button type="button" wire:click="toggleValue({{ $value->id }})" class="flex w-full items-center justify-between gap-3 px-5 py-3 text-left" aria-expanded="{{ $isOpen ? 'true' : 'false' }}">
                         <span>
                             <span class="block font-semibold">{{ $value->name }}</span>
-                            @if ($value->meanings !== [])
+                            @if (filled($value->definition))
+                                <span class="block text-sm text-grey-700">{{ $value->definition }}</span>
+                            @elseif ($value->meanings !== [])
                                 <span class="block text-sm text-grey-700">{{ $value->meanings[0] }}</span>
                             @endif
                         </span>

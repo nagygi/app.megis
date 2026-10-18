@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Admin\Values;
 
+use App\Enums\ValueGrade;
+use App\Enums\ValueSvsStatus;
 use App\Livewire\Admin\Concerns\ShowsVersionHistory;
 use App\Livewire\Admin\Values\Concerns\ManagesValueState;
 use App\Models\Value;
@@ -41,10 +43,17 @@ class Versions extends Component
     public static function fields(): array
     {
         return [
+            'code' => SnapshotComparison::TEXT,
             'name' => SnapshotComparison::TEXT,
+            'name_en' => SnapshotComparison::TEXT,
             'slug' => SnapshotComparison::TEXT,
             'category' => SnapshotComparison::TEXT,
+            'definition' => SnapshotComparison::TEXT,
+            'definition_en' => SnapshotComparison::TEXT,
             ...array_fill_keys(Value::LISTS, SnapshotComparison::LIST),
+            'evidence' => SnapshotComparison::TEXT,
+            'transposability' => SnapshotComparison::TEXT,
+            'svs_status' => SnapshotComparison::TEXT,
         ];
     }
 
@@ -54,7 +63,8 @@ class Versions extends Component
     }
 
     /**
-     * The snapshot with the category as its name, as the comparison shows it.
+     * The snapshot with the category as its name and the ratings by their
+     * labels, as the comparison shows it.
      *
      * @return array<string, mixed>
      */
@@ -62,6 +72,9 @@ class Versions extends Component
     {
         $snapshot = $version->snapshot;
         $snapshot['category'] = $snapshot['category']['name'] ?? '';
+        $snapshot['evidence'] = ValueGrade::tryFrom((string) ($snapshot['evidence'] ?? ''))?->label() ?? '';
+        $snapshot['transposability'] = ValueGrade::tryFrom((string) ($snapshot['transposability'] ?? ''))?->label() ?? '';
+        $snapshot['svs_status'] = ValueSvsStatus::tryFrom((string) ($snapshot['svs_status'] ?? ''))?->label() ?? '';
 
         return $snapshot;
     }

@@ -44,7 +44,11 @@ class Index extends Component
         $query = ValueCategory::query()->withCount('values');
 
         if ($term = $this->searchTerm()) {
-            $query->where(fn (Builder $search) => $search->whereLike('name', $term)->orWhereLike('description', $term));
+            $query->where(fn (Builder $search) => $search
+                ->whereLike('name', $term)
+                ->orWhereLike('name_en', $term)
+                ->orWhereLike('higher_order', $term)
+                ->orWhereLike('description', $term));
         }
 
         return view('livewire.admin.value-categories.index', [
@@ -56,6 +60,7 @@ class Index extends Component
     {
         return [
             'name' => 'name',
+            'higher_order' => 'higher_order',
             'values' => 'values_count',
         ];
     }

@@ -19,10 +19,11 @@ class ValueService
 {
     /**
      * @param  array<string, mixed>  $attributes  name, optional slug and category, the lists
+     * @param  string|null  $note  on the first version, e.g. where the value came from
      */
-    public function create(array $attributes, ValueOrigin $origin = ValueOrigin::Admin, ?Organization $organization = null): Value
+    public function create(array $attributes, ValueOrigin $origin = ValueOrigin::Admin, ?Organization $organization = null, ?string $note = null): Value
     {
-        return DB::transaction(function () use ($attributes, $origin, $organization): Value {
+        return DB::transaction(function () use ($attributes, $origin, $organization, $note): Value {
             $value = new Value([
                 ...$attributes,
                 'slug' => filled($attributes['slug'] ?? null) ? $attributes['slug'] : $this->slugFor($attributes['name']),
@@ -31,7 +32,7 @@ class ValueService
                 'reviewed_at' => $origin->needsReview() ? null : now(),
             ]);
             $value->save();
-            $value->recordVersion();
+            $value->recordVersion($note);
 
             return $value;
         });
@@ -53,12 +54,12 @@ class ValueService
      *
      * @param  array<string, mixed>  $attributes
      */
-    public function update(Value $value, array $attributes): ?Version
+    public function update(Value $value, array $attributes, ?string $note = null): ?Version
     {
-        return DB::transaction(function () use ($value, $attributes): ?Version {
+        return DB::transaction(function () use ($value, $attributes, $note): ?Version {
             $value->fill($attributes)->save();
 
-            return $value->recordVersion();
+            return $value->recordVersion($note);
         });
     }
 

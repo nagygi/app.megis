@@ -9,11 +9,11 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
 /**
- * Loads the starting values of the Értéktár from a table (03 · 3.6).
+ * Loads and updates the values of the Értéktár from a table (03 · 3.6).
  * The column format is in docs/install.md.
  */
 #[Signature('megis:values:import {file : Az xlsx vagy csv fájl útvonala} {--dry-run : Csak ellenőriz, nem tölt be semmit}')]
-#[Description('Kezdő értékek betöltése az Értéktárba táblázatból (03 · 3.6)')]
+#[Description('Értékek betöltése és frissítése az Értéktárban táblázatból (03 · 3.6)')]
 class ImportValuesCommand extends Command
 {
     public function handle(ValueImporter $importer): int
@@ -34,10 +34,6 @@ class ImportValuesCommand extends Command
             $this->warn(__('console.values_import.ignored_column', ['column' => $column]));
         }
 
-        foreach ($result->skipped as $name) {
-            $this->warn(__('console.values_import.skipped', ['name' => $name]));
-        }
-
         if ($result->failed()) {
             foreach ($result->errors as $error) {
                 $this->error($error);
@@ -48,17 +44,42 @@ class ImportValuesCommand extends Command
             return self::FAILURE;
         }
 
-        if ($dryRun) {
-            $this->info(__('console.values_import.dry_run', ['count' => $result->wouldImport]));
-
-            return self::SUCCESS;
+        foreach ($result->warnings as $warning) {
+            $this->warn($warning);
         }
 
         foreach ($result->createdCategories as $category) {
             $this->line(__('console.values_import.category_created', ['name' => $category]));
         }
 
-        $this->info(__('console.values_import.imported', ['count' => $result->imported]));
+        foreach ($result->updatedCategories as $category) {
+            $this->line(__('console.values_import.category_updated', ['name' => $category]));
+        }
+
+        foreach ($result->updated as $value) {
+            $this->line(__('console.values_import.updated_value', [
+                'name' => $value['name'],
+                'fields' => implode(', ', array_map(fn (string $field): string => __('admin.values.fields.'.$field), $value['fields'])),
+            ]));
+        }
+
+        foreach ($result->reviewed as $name) {
+            $this->line(__('console.values_import.reviewed', ['name' => $name]));
+        }
+
+        $counts = ['created' => count($result->created), 'updated' => count($result->updated), 'unchanged' => count($result->unchanged)];
+
+        if ($dryRun) {
+            $this->info(__('console.values_import.dry_run', $counts));
+
+            return self::SUCCESS;
+        }
+
+        $this->info(__('console.values_import.imported', ['count' => $counts['created']]));
+
+        if ($counts['updated'] + $counts['unchanged'] > 0) {
+            $this->info(__('console.values_import.updated', $counts));
+        }
 
         return self::SUCCESS;
     }

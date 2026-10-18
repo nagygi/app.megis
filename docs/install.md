@@ -50,23 +50,42 @@ php artisan megis:admin:create
 
 Belépés: `/admin/belepes`.
 
-## Az Értéktár kezdő értékei (03 · 3.6)
+## Az Értéktár értékei (03 · 3.6)
 
 ```bash
-php artisan megis:values:import ertekek.xlsx --dry-run   # csak ellenőriz
-php artisan megis:values:import ertekek.xlsx
+php artisan megis:values:import "docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx" --dry-run   # csak ellenőriz, és kiírja, mi változna
+php artisan megis:values:import "docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx"
 ```
 
-- Minta: `docs/ertektar-import-minta.xlsx` (három példaérték, a második munkalapon útmutató).
+- A mégis táblázata: `docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx` (58 érték). Minta: `docs/ertektar-import-minta.xlsx` (három példaérték, a második munkalapon útmutató).
 - xlsx vagy csv, az első munkalap számít. Az első sor a fejléc, soronként egy érték.
-- Oszlopok (a sorrend mindegy, a kis- és nagybetű és az írásjelek nem számítanak):
-  - `Név` (kötelező);
-  - `Kategória` (ha nincs ilyen, létrejön);
-  - `Mit jelent?`, `Mit nem jelent?`;
-  - `6 · Mikor teljesül nagyon?` és `1 · Mikor nagyon nem teljesül?` (mindkettőben legalább egy elem kell);
-  - `Példák`, `Szinonimák, kulcsszavak`.
-- A listák elemei egy cellán belül külön sorban vannak. Az elején álló `-`, `•` vagy sorszám lemarad. Egy elem 2–255 karakter.
-- Minden érték v1-ként, átnézve kerül be. Ami már az Értéktárban van, kimarad, így a parancs újra futtatható. Ha bármelyik sor hibás, semmi nem kerül be.
+- Oszlopok. A sorrend mindegy; a kis- és nagybetű, az ékezet és az írásjel nem számít. A minta fejléce és a mégis táblázatáé is jó:
+
+  | Minta | A mégis táblázata | Mező |
+  |---|---|---|
+  | `Azonosító` | `id` | állandó kód, ez alapján frissül az érték |
+  | `Név` (kötelező) | `name_hu` | név |
+  | `Név (angol)` | `name_en` | angol név |
+  | `Kategória` | `category_hu` | kategória (ha nincs ilyen, létrejön) |
+  | `Kategória (angol)` | `category_en` | a kategória angol neve |
+  | `Felsőbb szint` | `higher_order` | a kategória felsőbb rendű értéke |
+  | `Definíció`, `Definíció (angol)` | `definition_hu`, `definition_en` | egy mondat, nem lista |
+  | `Mit jelent?`, `Mit nem jelent?` | `mit_jelent`, `mit_nem_jelent` | lista |
+  | `Hamis pozitívok`, `Átfedések` | `hamis_pozitivok`, `atfedesek` | lista |
+  | `6 · Mikor teljesül nagyon?` (kötelező) | `mikor_teljesul_nagyon` | lista, legalább egy elem |
+  | `1 · Mikor nagyon nem teljesül?` (kötelező) | `mikor_nagyon_nem_teljesul` | lista, legalább egy elem |
+  | `Példák`, `Szinonimák, kulcsszavak` | `peldak`, `szinonimak` | lista |
+  | `Szakirodalom` | `szakirodalom` | lista, elemenként legfeljebb 500 karakter |
+  | `Alátámasztottság`, `Transzponálhatóság` | `alatamasztottsag`, `transzponalhatosag` | erős, közepes vagy gyenge |
+  | `SVS-index` | `svs_index` | igen, nem (X-kódolt) vagy nem (ellenőrizendő) |
+
+- A listák elemei egy cellán belül külön sorban vannak, vagy ` · ` (szóköz, középpont, szóköz) választja el őket. Az elején álló `-`, `•` vagy sorszám lemarad, az ismétlődő elem kiesik. Egy elem 2–255 karakter, a szakirodalomé legfeljebb 500.
+- Egy kategóriának egy angol neve és egy felsőbb szintje lehet; ha két sor másképp adja meg, az hiba.
+- Egyeztetés: az import az értéket az azonosító, ennek hiányában a név alapján találja meg. A név szerint megtalált érték megkapja a fájl azonosítóját.
+  - Az új érték v1-ként, átnézve kerül be.
+  - A meglévő értéknél, ha valami változott, új verzió készül „Betöltés táblázatból (fájl), dátum” megjegyzéssel; a parancs mezőnként kiírja a változást. Az át nem nézett érték átnézett lesz. A slug és az eredet nem változik.
+  - Csak a fájlban szereplő oszlopok íródnak felül. A fájlból hiányzó érték az Értéktárban marad.
+- A parancs újra futtatható: változatlan fájlnál minden érték „változatlan”. Ha bármelyik sor hibás, semmi nem kerül be.
 
 ## Értéktükör és értékmérés helyben (06)
 
@@ -147,7 +166,7 @@ $env:NODE_EXTRA_CA_CERTS = "C:\út\windows-roots.pem" # npm run build (Bunny-fon
 |---|---|
 | `php artisan megis:setup:check` | A környezet ellenőrzése (docs/uzemeltetes.md · 7) |
 | `php artisan megis:admin:create [--role=superadmin\|admin] [--invite]` | Admin létrehozása vagy meghívása (01 · 1.1) |
-| `php artisan megis:values:import {file} [--dry-run]` | Az Értéktár kezdő értékeinek betöltése táblázatból (03 · 3.6) |
+| `php artisan megis:values:import {file} [--dry-run]` | Az Értéktár értékeinek betöltése és frissítése táblázatból (03 · 3.6) |
 | `php artisan megis:mirror:prune` | A 24 óránál régebbi, fiókhoz nem kötött Értéktükrök törlése (06 · 6.1) |
 | `php artisan megis:transcription:compare {file} --model=…` | Átíró szolgáltatók összevetése egy felvételen (12 · 12.7) |
 | `php artisan megis:calendar:sync` | Az összekötött naptárak frissítése, új alkalmak az elfogadott folyamatokhoz, szétkötés az időablak végén (09 · 9.4, 9.5) |

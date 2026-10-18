@@ -20,6 +20,12 @@ final class ValueCatalog
     /** @var array<int, string> */
     private array $refByValueId = [];
 
+    /** Built on first use; empty when no value has an English name. */
+    private ?string $namePattern = null;
+
+    /** @var array<string, string> English value name => what the prompt says instead */
+    private array $nameReplacements = [];
+
     /**
      * @param  Collection<int, Value>  $values  with latestVersion loaded
      * @param  array<int, array<string, list<string>>>  $definitions  value id => the organization's own words, by label
@@ -88,7 +94,8 @@ final class ValueCatalog
 
     public function resolve(string $ref): ?Value
     {
-        return $this->byRef[strtoupper(trim($ref))] ?? null;
+        // "[E7]" too: the boundaries name the other values by their code in brackets.
+        return $this->byRef[strtoupper(trim($ref, " \t\n\r[]"))] ?? null;
     }
 
     public function refFor(int $valueId): ?string
@@ -120,36 +127,75 @@ final class ValueCatalog
         )));
     }
 
+    /**
+     * The organization's own words replace the definition and the content
+     * lists; the boundaries against the other values and the synonyms go
+     * along either way. Literature, ratings, code and names never do.
+     */
     private function describe(string $ref): string
     {
         $value = $this->byRef[$ref];
         $lines = ['['.$ref.']'];
 
-        if (isset($this->definitions[$value->id])) {
-            foreach ($this->definitions[$value->id] as $label => $texts) {
-                $lines[] = $label.': '.implode(' | ', $texts);
-            }
+        $boundaries = [
+            'Hamis pozitívok (hasonlít, de nem ez)' => $value->false_positives,
+            'Átfedések más értékekkel' => $value->overlaps,
+        ];
 
-            if ($value->keywords !== []) {
-                $lines[] = 'Jellemző kifejezések: '.implode(' | ', $value->keywords);
-            }
+        $sections = isset($this->definitions[$value->id])
+            ? [...$this->definitions[$value->id], ...$boundaries]
+            : [
+                'Definíció' => array_values(array_filter([$value->definition])),
+                'Mit jelent' => $value->meanings,
+                'Mit nem jelent' => $value->non_meanings,
+                ...$boundaries,
+                '6 · Mikor teljesül nagyon' => $value->high_examples,
+                '1 · Mikor nagyon nem teljesül' => $value->low_examples,
+                'Példák' => $value->examples,
+            ];
 
-            return implode("\n", $lines);
-        }
+        $sections['Jellemző kifejezések'] = $value->keywords;
 
-        foreach ([
-            'meanings' => 'Mit jelent',
-            'non_meanings' => 'Mit nem jelent',
-            'high_examples' => '6 · Mikor teljesül nagyon',
-            'low_examples' => '1 · Mikor nagyon nem teljesül',
-            'examples' => 'Példák',
-            'keywords' => 'Jellemző kifejezések',
-        ] as $field => $label) {
-            if ($value->{$field} !== []) {
-                $lines[] = $label.': '.implode(' | ', $value->{$field});
+        foreach ($sections as $label => $texts) {
+            if ($texts !== []) {
+                $lines[] = $label.': '.implode(' | ', array_map(fn (string $text): string => $this->withoutNames($text), $texts));
             }
         }
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * Other values come up by their English name in the boundaries ("Creativity
+     * (SDT)"): a catalog value becomes its code, any other "egy másik érték",
+     * so the engine still never matches on a name.
+     */
+    private function withoutNames(string $text): string
+    {
+        if ($this->namePattern === null) {
+            $this->namePattern = '';
+            $this->nameReplacements = [];
+
+            foreach (Value::query()->whereNotNull('name_en')->pluck('name_en', 'id') as $valueId => $name) {
+                $name = trim((string) $name);
+
+                if ($name !== '') {
+                    $this->nameReplacements[$name] = isset($this->refByValueId[$valueId]) ? '['.$this->refByValueId[$valueId].']' : 'egy másik érték';
+                }
+            }
+
+            if ($this->nameReplacements !== []) {
+                $names = array_keys($this->nameReplacements);
+                // The longest first, so "Self-respect" wins over a shorter name inside it.
+                usort($names, fn (string $a, string $b): int => mb_strlen($b) <=> mb_strlen($a));
+                $this->namePattern = '/(?<![\p{L}\p{N}])(?:'.implode('|', array_map(fn (string $name): string => preg_quote($name, '/'), $names)).')(?![\p{L}\p{N}])/u';
+            }
+        }
+
+        if ($this->namePattern === '') {
+            return $text;
+        }
+
+        return preg_replace_callback($this->namePattern, fn (array $match): string => $this->nameReplacements[$match[0]], $text) ?? $text;
     }
 }

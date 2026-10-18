@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\ValueGrade;
 use App\Enums\ValueOrigin;
+use App\Enums\ValueSvsStatus;
 use App\Models\Concerns\Blameable;
 use App\Models\Concerns\HasVersions;
 use Database\Factories\ValueFactory;
@@ -17,8 +19,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * A value of the global Értéktár (03). Every saved change is a new version.
  */
 #[Fillable([
-    'name', 'slug', 'value_category_id',
-    'meanings', 'non_meanings', 'high_examples', 'low_examples', 'examples', 'keywords',
+    'code', 'name', 'name_en', 'slug', 'value_category_id', 'definition', 'definition_en',
+    'meanings', 'non_meanings', 'false_positives', 'overlaps', 'high_examples', 'low_examples', 'examples', 'keywords', 'literature',
+    'evidence', 'transposability', 'svs_status',
     'origin', 'origin_organization_id', 'origin_user_id', 'reviewed_at', 'archived_at',
 ])]
 class Value extends Model
@@ -29,7 +32,14 @@ class Value extends Model
     /**
      * The list fields of the value card, in the order of the form (03 · 3.2).
      */
-    public const LISTS = ['meanings', 'non_meanings', 'high_examples', 'low_examples', 'examples', 'keywords'];
+    public const LISTS = ['meanings', 'non_meanings', 'false_positives', 'overlaps', 'high_examples', 'low_examples', 'examples', 'keywords', 'literature'];
+
+    public const ITEM_MAX_LENGTH = 255;
+
+    /**
+     * A literature item names the source and the measure, so it runs longer.
+     */
+    public const LITERATURE_ITEM_MAX_LENGTH = 500;
 
     /**
      * @var array<string, mixed>
@@ -37,10 +47,13 @@ class Value extends Model
     protected $attributes = [
         'meanings' => '[]',
         'non_meanings' => '[]',
+        'false_positives' => '[]',
+        'overlaps' => '[]',
         'high_examples' => '[]',
         'low_examples' => '[]',
         'examples' => '[]',
         'keywords' => '[]',
+        'literature' => '[]',
         'search_text' => '',
     ];
 
@@ -48,7 +61,7 @@ class Value extends Model
     {
         static::saving(function (Value $value): void {
             $value->has_endpoints = $value->high_examples !== [] && $value->low_examples !== [];
-            $value->search_text = mb_strtolower(implode("\n", [$value->name, ...$value->keywords]));
+            $value->search_text = mb_strtolower(implode("\n", array_filter([$value->name, $value->name_en, ...$value->keywords])));
         });
     }
 
@@ -60,10 +73,16 @@ class Value extends Model
         return [
             'meanings' => 'array',
             'non_meanings' => 'array',
+            'false_positives' => 'array',
+            'overlaps' => 'array',
             'high_examples' => 'array',
             'low_examples' => 'array',
             'examples' => 'array',
             'keywords' => 'array',
+            'literature' => 'array',
+            'evidence' => ValueGrade::class,
+            'transposability' => ValueGrade::class,
+            'svs_status' => ValueSvsStatus::class,
             'has_endpoints' => 'boolean',
             'origin' => ValueOrigin::class,
             'reviewed_at' => 'datetime',
@@ -117,11 +136,6 @@ class Value extends Model
     }
 
     /**
-     * Came from outside the admin form and nobody has reviewed it yet (03 · 3.7).
-     *
-     * @param  Builder<Value>  $query
-     */
-    /**
      * What a user may choose for their own values (24 · 24.3): reviewed values,
      * the ones they added themselves and the ones of their organization.
      */
@@ -137,6 +151,11 @@ class Value extends Model
         });
     }
 
+    /**
+     * Came from outside the admin form and nobody has reviewed it yet (03 · 3.7).
+     *
+     * @param  Builder<Value>  $query
+     */
     #[Scope]
     protected function awaitingReview(Builder $query): void
     {
@@ -153,15 +172,27 @@ class Value extends Model
         return $this->reviewed_at !== null;
     }
 
+    public static function itemMaxLength(string $list): int
+    {
+        return $list === 'literature' ? self::LITERATURE_ITEM_MAX_LENGTH : self::ITEM_MAX_LENGTH;
+    }
+
     public function versionSnapshot(): array
     {
         $category = $this->value_category_id === null ? null : $this->category()->first();
 
         return [
+            'code' => $this->code,
             'name' => $this->name,
+            'name_en' => $this->name_en,
             'slug' => $this->slug,
             'category' => $category === null ? null : ['id' => $category->id, 'name' => $category->name],
+            'definition' => $this->definition,
+            'definition_en' => $this->definition_en,
             ...collect(self::LISTS)->mapWithKeys(fn (string $list): array => [$list => array_values($this->{$list})])->all(),
+            'evidence' => $this->evidence?->value,
+            'transposability' => $this->transposability?->value,
+            'svs_status' => $this->svs_status?->value,
         ];
     }
 }

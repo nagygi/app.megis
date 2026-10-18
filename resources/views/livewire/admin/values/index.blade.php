@@ -10,7 +10,10 @@
     </x-admin.page-header>
 
     <x-admin.list-toolbar :search-label="__('admin.values.search_label')">
+        <x-admin.filter name="higher_order" :label="__('admin.values.higher_order')" :options="$higherOrders" />
         <x-admin.filter name="category" :label="__('admin.values.category')" :options="$categories" />
+        <x-admin.filter name="evidence" :label="__('admin.values.evidence')" :options="$grades" />
+        <x-admin.filter name="svs" :label="__('admin.values.svs')" :options="$svsStatuses" />
         <x-admin.filter name="status" :label="__('admin.values.status')" :all-label="__('admin.values.active')" :options="['archived' => __('admin.values.archived'), 'all' => __('admin.common.all')]" />
         <x-admin.filter name="origin" :label="__('admin.values.origin')" :options="$origins" />
         <x-admin.filter name="review" :label="__('admin.values.review')" :options="['awaiting' => __('admin.values.awaiting_review'), 'reviewed' => __('admin.values.reviewed')]" />

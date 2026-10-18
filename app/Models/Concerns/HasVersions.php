@@ -57,9 +57,9 @@ trait HasVersions
             static::query()->whereKey($this->getKey())->lockForUpdate()->first();
 
             $content = $this->versionSnapshot();
-            $snapshot = static::normalizeSnapshot($content);
+            $snapshot = static::comparable($content);
             $latest = $this->versions()->orderByDesc('number')->first();
-            $previous = $latest === null ? null : static::normalizeSnapshot($latest->snapshot);
+            $previous = $latest === null ? null : static::comparable($latest->snapshot);
 
             if ($previous === $snapshot) {
                 return null;
@@ -106,9 +106,21 @@ trait HasVersions
     }
 
     /**
+     * Normalized, without the empty fields: a field added to the entity later
+     * is no change while it stays empty.
+     *
+     * @param  array<array-key, mixed>  $snapshot
+     * @return array<array-key, mixed>
+     */
+    protected static function comparable(array $snapshot): array
+    {
+        return static::normalizeSnapshot(array_filter($snapshot, fn (mixed $value): bool => $value !== null && $value !== []));
+    }
+
+    /**
      * Changed top-level fields, in the order the entity lists them.
      *
-     * @param  array<string, mixed>|null  $previous  normalized
+     * @param  array<string, mixed>|null  $previous  comparable
      * @param  array<string, mixed>  $current
      * @return list<string>
      */
@@ -118,8 +130,9 @@ trait HasVersions
             return array_keys($current);
         }
 
-        $current = array_map(fn (mixed $value): mixed => is_array($value) ? static::normalizeSnapshot($value) : $value, $current);
-        $keys = array_unique([...array_keys($current), ...array_keys($previous)]);
+        $order = array_keys($current);
+        $current = static::comparable($current);
+        $keys = array_unique([...$order, ...array_keys($previous)]);
 
         return array_values(array_filter(
             $keys,

@@ -36,3 +36,22 @@ it('keeps a category that has values', function () {
 
     $this->assertModelExists($category);
 });
+
+it('saves the English name and the higher order value, and lists them', function () {
+    actingAsAdmin();
+
+    Livewire::test(Form::class)
+        ->set('name', 'Önállóság')
+        ->set('name_en', 'Self-direction')
+        ->set('higher_order', 'Nyitottság a változásra (Openness to change)')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(ValueCategory::query()->sole())
+        ->name_en->toBe('Self-direction')
+        ->higher_order->toBe('Nyitottság a változásra (Openness to change)');
+
+    Livewire::test(Index::class)
+        ->assertSee('Önállóság (Self-direction)')
+        ->assertSee('Nyitottság a változásra (Openness to change)');
+});

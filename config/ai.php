@@ -92,7 +92,7 @@ return [
             'temperature' => 0.0,
             'timeout' => 120,
             'prompt' => 'ertektukor-illesztes',
-            'prompt_version' => 1,
+            'prompt_version' => 2,
         ],
         'mirror_scoring' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
@@ -101,7 +101,7 @@ return [
             'temperature' => 0.0,
             'timeout' => 120,
             'prompt' => 'ertektukor-pontozas',
-            'prompt_version' => 1,
+            'prompt_version' => 2,
         ],
         'calendar_naming' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),

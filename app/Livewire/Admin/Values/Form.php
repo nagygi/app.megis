@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Admin\Values;
 
+use App\Enums\ValueGrade;
+use App\Enums\ValueSvsStatus;
 use App\Livewire\Admin\Concerns\EditsLists;
 use App\Livewire\Admin\Values\Concerns\ManagesValueState;
 use App\Models\RawDetection;
@@ -24,7 +26,14 @@ class Form extends Component
 
     public ?Value $value = null;
 
+    /**
+     * Set once, then fixed: the table load matches on it (03 · 3.6).
+     */
+    public string $code = '';
+
     public string $name = '';
+
+    public string $name_en = '';
 
     public string $slug = '';
 
@@ -35,11 +44,21 @@ class Form extends Component
 
     public ?int $value_category_id = null;
 
+    public string $definition = '';
+
+    public string $definition_en = '';
+
     /** @var list<string> */
     public array $meanings = [];
 
     /** @var list<string> */
     public array $non_meanings = [];
+
+    /** @var list<string> */
+    public array $false_positives = [];
+
+    /** @var list<string> */
+    public array $overlaps = [];
 
     /** @var list<string> */
     public array $high_examples = [];
@@ -53,15 +72,31 @@ class Form extends Component
     /** @var list<string> */
     public array $keywords = [];
 
+    /** @var list<string> */
+    public array $literature = [];
+
+    public string $evidence = '';
+
+    public string $transposability = '';
+
+    public string $svs_status = '';
+
     public function mount(?Value $value = null): void
     {
         if ($value?->exists) {
             Gate::authorize('update', $value);
 
             $this->value = $value;
+            $this->code = (string) $value->code;
             $this->name = $value->name;
+            $this->name_en = (string) $value->name_en;
             $this->slug = $value->slug;
             $this->value_category_id = $value->value_category_id;
+            $this->definition = (string) $value->definition;
+            $this->definition_en = (string) $value->definition_en;
+            $this->evidence = (string) $value->evidence?->value;
+            $this->transposability = (string) $value->transposability?->value;
+            $this->svs_status = (string) $value->svs_status?->value;
 
             foreach (Value::LISTS as $list) {
                 $this->{$list} = $value->{$list};
@@ -95,10 +130,17 @@ class Form extends Component
             ? Gate::authorize('create', Value::class)
             : Gate::authorize('update', $this->value);
 
-        $this->name = trim($this->name);
+        foreach (['code', 'name', 'name_en', 'definition', 'definition_en'] as $field) {
+            $this->{$field} = trim($this->{$field});
+        }
+
         $this->cleanLists();
+        $codeEditable = $this->value?->code === null;
 
         $validated = $this->validate([
+            'code' => $codeEditable
+                ? ['nullable', 'string', 'max:20', Rule::unique('values', 'code')->ignore($this->value?->id)]
+                : [],
             'name' => [
                 'required',
                 'string',
@@ -116,17 +158,43 @@ class Form extends Component
                 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
                 Rule::unique('values', 'slug')->ignore($this->value?->id),
             ],
+            'name_en' => ['nullable', 'string', 'max:255'],
             'value_category_id' => ['nullable', Rule::exists('value_categories', 'id')],
+            'definition' => ['nullable', 'string', 'max:1000'],
+            'definition_en' => ['nullable', 'string', 'max:1000'],
             ...$this->listRules('meanings'),
             ...$this->listRules('non_meanings'),
+            ...$this->listRules('false_positives'),
+            ...$this->listRules('overlaps'),
             ...$this->listRules('high_examples', required: true),
             ...$this->listRules('low_examples', required: true),
             ...$this->listRules('examples'),
             ...$this->listRules('keywords'),
+            ...$this->listRules('literature', maxLength: Value::LITERATURE_ITEM_MAX_LENGTH),
+            'evidence' => ['nullable', Rule::enum(ValueGrade::class)],
+            'transposability' => ['nullable', Rule::enum(ValueGrade::class)],
+            'svs_status' => ['nullable', Rule::enum(ValueSvsStatus::class)],
         ], attributes: $this->validationAttributes());
 
+        $attributes = [
+            'name' => $validated['name'],
+            'name_en' => filled($validated['name_en']) ? $validated['name_en'] : null,
+            'slug' => $validated['slug'],
+            'value_category_id' => $validated['value_category_id'],
+            'definition' => filled($validated['definition']) ? $validated['definition'] : null,
+            'definition_en' => filled($validated['definition_en']) ? $validated['definition_en'] : null,
+            ...array_intersect_key($validated, array_flip(Value::LISTS)),
+            'evidence' => ValueGrade::tryFrom($validated['evidence']),
+            'transposability' => ValueGrade::tryFrom($validated['transposability']),
+            'svs_status' => ValueSvsStatus::tryFrom($validated['svs_status']),
+        ];
+
+        if ($codeEditable && filled($validated['code'])) {
+            $attributes['code'] = $validated['code'];
+        }
+
         if ($this->value === null) {
-            $value = $values->create($validated);
+            $value = $values->create($attributes);
 
             session()->flash('status', __('admin.values.created'));
             $this->redirectRoute('admin.values.edit', $value, navigate: false);
@@ -134,7 +202,7 @@ class Form extends Component
             return;
         }
 
-        $version = $values->update($this->value, $validated);
+        $version = $values->update($this->value, $attributes);
         $this->slugLocked = true;
 
         session()->flash('status', $version === null
@@ -148,7 +216,9 @@ class Form extends Component
 
         return view('livewire.admin.values.form', [
             'title' => $title,
-            'categories' => ValueCategory::query()->orderBy('name')->get(['id', 'name']),
+            'categories' => ValueCategory::query()->orderBy('name')->get(['id', 'name', 'name_en']),
+            'grades' => collect(ValueGrade::cases())->mapWithKeys(fn (ValueGrade $grade) => [$grade->value => $grade->label()])->all(),
+            'svsStatuses' => collect(ValueSvsStatus::cases())->mapWithKeys(fn (ValueSvsStatus $status) => [$status->value => $status->label()])->all(),
             // Where an AI-detected value came up, with which quote (03 · 3.7, 06 · 6.4).
             'occurrences' => $this->value === null ? collect() : RawDetection::query()
                 ->where('unmatched_value_id', $this->value->id)
@@ -170,6 +240,10 @@ class Form extends Component
     private function validationAttributes(): array
     {
         $attributes = ['value_category_id' => __('admin.values.fields.category')];
+
+        foreach (['code', 'name_en', 'definition', 'definition_en', 'evidence', 'transposability', 'svs_status'] as $field) {
+            $attributes[$field] = __('admin.values.fields.'.$field);
+        }
 
         foreach (Value::LISTS as $list) {
             $attributes[$list] = __('admin.values.fields.'.$list);

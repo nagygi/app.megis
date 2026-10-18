@@ -112,7 +112,7 @@ Három lépcső:
   - A prompt nem kap értéklistát.
   - Kimenet soronként: beszélő · szó szerinti idézet · szabad értéknév · rövid indoklás · erősség 1–6.
 - **B · Illesztés**
-  - A szabad értékeket a motor az Értéktár (03) értékeire illeszti, **csak definíció és példák alapján, névegyezés alapján soha**.
+  - A szabad értékeket a motor az Értéktár (03) értékeire illeszti, **csak definíció és példák alapján, névegyezés alapján soha**. A hamis pozitívok és az átfedések is mennek, de az átfedésekben más értékek neve helyett a kódjuk áll (03 · 3.2).
   - Egy szabad érték 0, 1 vagy több Értéktár-értékre illeszkedhet, konfidenciával.
   - A fő diagnózis anyagainál a szervezet értékeire is illeszt (13, 18). A csapat és az egyéni értékszettek bekötése később jön.
 - **C · Pontozás**

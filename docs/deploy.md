@@ -84,7 +84,7 @@ A kód kész, az élesítéshez ezek kellenek a környezetben és a mégistől:
 - [ ] **Infrastruktúra:** Redis `noeviction`, S3 verziózással és 30 napos életciklussal, RDS-mentés 30 napra, Gotenberg konténer belső hálózaton, ffprobe, CloudWatch Logs 365 nappal, uptime-figyelés a `/health`-re.
 - [ ] **Titkok és kulcsok:** `APP_DEBUG=false`, https-es `APP_URL`, éles Turnstile-kulcsok, EU-s AI-kulcsok, `MEGIS_TRANSCRIBER=ai` a 12.7 PoC döntése szerint, `MEGIS_HEALTH_TOKEN`.
 - [ ] **Naptár-alkalmazások:** a Google-ellenőrzés lezárva (addig 100 tesztfelhasználó), Microsoft Entra alkalmazás.
-- [ ] **Tartalom:** az első szuperadmin (`megis:admin:create`), a három jogi PDF, a 36 érték (`megis:values:import`), a Képességtár betöltése, a területek szövegei, a támogató kérdések, a Bölcsességtár szövegeinek átnézése, a foglalási link és a támogatási e-mail.
+- [ ] **Tartalom:** az első szuperadmin (`megis:admin:create`), a három jogi PDF, az 58 érték (`megis:values:import "docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx"`), a Képességtár betöltése, a területek szövegei, a támogató kérdések, a Bölcsességtár szövegeinek átnézése, a foglalási link és a támogatási e-mail.
 - [ ] **Nyitott kérdések a mégisnél:** a T1 és a V9 szövegének bővítése a szervezet vezetőivel (15 · 5.), a foglalási szolgáltatás webhookja (15 · 9.).
 
 ## Rollback
