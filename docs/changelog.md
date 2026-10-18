@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.10 · {hash} · 2026-10-18
+## 1.10 · ca1ac9c · 2026-10-18
 
 Az Értéktár a mégis 58 értékével (`docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx`).
 
