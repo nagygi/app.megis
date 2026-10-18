@@ -59,6 +59,18 @@ A titkok csak környezeti változóban vannak. AWS-en javasolt az AWS Secrets Ma
 
 ### Telepítés
 
+A szerveren, a projekt gyökeréből:
+
+```bash
+./update.sh
+```
+
+A skript karbantartó módban lehúzza a kódot (`git pull --ff-only`), majd lefuttatja a lenti lépéseket. A `composer install`, az `npm ci` és a Vite build csak akkor fut, ha a bemenetük változott. Beírja a `.env`-be a `MEGIS_DEPLOYED_AT`-ot (Rendszer → Health), kikapcsolja a karbantartó módot, és a végén lefuttatja a setup checket és a `/health`-et. Ha az ellenőrzés hibát jelez, a kilépési kód nem nulla. Kapcsolók a fájl fejlécében: `FULL=1` (minden lépés), `FULL_CACHE_CLEAR=1`, `SKIP_CHECKS=1`, `SITE_URL`, `PHP_FPM_SERVICE`.
+
+Az alkalmazás-cache-t a skript nem üríti: abban van a worker és az ütemező heartbeatje.
+
+Kézzel ugyanez:
+
 ```bash
 composer install --no-dev --optimize-autoloader
 npm ci && npm run build
