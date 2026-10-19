@@ -360,12 +360,21 @@
             @foreach ($diagnosis->transitions->sortByDesc('id') as $transition)
                 <li>
                     {{ $transition->created_at->format('Y.m.d. H:i') }} ·
-                    @if ($transition->from_status)
+                    @if ($transition->from_stage && $transition->to_stage && $transition->from_stage !== $transition->to_stage)
+                        {{-- A main diagnosis moves in stages; its status changes only with some of them (17 · 17.5). --}}
+                        {{ $transition->from_stage->label() }} → {{ $transition->to_stage->label() }}
+                        @if ($transition->from_status !== $transition->to_status)
+                            ({{ $transition->from_status?->label() }} → {{ $transition->to_status->label() }})
+                        @endif
+                    @elseif ($transition->from_status)
                         {{ $transition->from_status->label() }} → {{ $transition->to_status->label() }}
                     @else
                         {{ __('admin.diagnoses.created_status', ['status' => $transition->to_status->label()]) }}
                     @endif
                     · {{ $transition->creator?->name ?? __('admin.versions.system') }}
+                    @if ($transition->reason)
+                        · „{{ $transition->reason }}”
+                    @endif
                 </li>
             @endforeach
         </ul>

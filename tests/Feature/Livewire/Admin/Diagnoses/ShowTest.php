@@ -152,6 +152,16 @@ it('steps the status only when every value has a score, and logs each step', fun
     ])->and($diagnosis->transitions()->latest('id')->first()->created_by)->toBe($admin->id);
 });
 
+it('logs the stage change of a main diagnosis, not the unchanged status (17 · 17.5)', function () {
+    $setup = diagnosisTeam(peers: 1);
+    actingAsAdmin($setup['admin']);
+    $main = startMainDiagnosis($setup);
+
+    Livewire::test(Show::class, ['diagnosis' => $main->diagnosis])
+        ->assertSee('Vázlat → Meghívva')
+        ->assertDontSee('Draft → Draft');
+});
+
 it('does not skip from draft to published', function () {
     actingAsAdmin();
     $diagnosis = draftDiagnosis();
