@@ -33,7 +33,34 @@ class HomeController extends Controller
             'organization' => $organization,
             'user' => $user,
             'diagnoses' => $diagnoses,
+            'lead' => $this->lead($organization, $user),
         ]);
+    }
+
+    /**
+     * "amint elindul" while the user waits for a diagnosis (a peer is invited
+     * when it runs, 25 · 25.1) or none of the organization's has started yet;
+     * otherwise the user takes part in none of the started ones, e.g. an
+     * organization leader while someone else leads it.
+     */
+    private function lead(Organization $organization, User $user): string
+    {
+        $inOrganization = fn ($query) => $query->where('organization_id', $organization->id);
+
+        $waiting = MainDiagnosis::query()
+            ->withParticipant($user)
+            ->inStages(MainDiagnosisStage::Invited, MainDiagnosisStage::Filling)
+            ->whereHas('diagnosis', $inOrganization)
+            ->exists();
+
+        $started = MainDiagnosis::query()
+            ->where('stage', '!=', MainDiagnosisStage::Draft->value)
+            ->whereHas('diagnosis', $inOrganization)
+            ->exists();
+
+        return $waiting || ! $started
+            ? __('client.home.lead', ['organization' => $organization->name])
+            : __('client.home.lead_not_participant');
     }
 
     /**

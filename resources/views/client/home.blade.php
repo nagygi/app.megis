@@ -5,7 +5,7 @@
         <h2 class="text-xl font-semibold">{{ __('client.home.greeting', ['name' => $user->first_name ?? $user->name]) }}</h2>
 
         @if ($diagnoses->isEmpty())
-            <p>{{ __('client.home.lead', ['organization' => $organization->name]) }}</p>
+            <p>{{ $lead }}</p>
         @else
             <ul class="flex flex-col gap-2" aria-label="{{ __('client.home.diagnoses') }}">
                 @foreach ($diagnoses as $main)

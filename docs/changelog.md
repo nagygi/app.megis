@@ -2,6 +2,15 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.12 · {hash} · 2026-10-19
+
+Ügyféloldali fejléc és a vezető első belépése a prototípus szerint.
+
+- **Menü mobilon:** 1200 px alatt a menü nem csúszott be (a `translate-x-full` felülírta a `translate-x-0`-t), így a menü és a Kijelentkezés elérhetetlen volt. Javítva, böngészős teszttel telefonméretben.
+- **Fejléc:** a logó mellett a lapcímke („Első belépés”, „3 / 6”, „Diagnózis”, „Kezdőlap”), az avatár a user menüt nyitja (név, szervezet és pozíció, Profil, Kijelentkezés), a menüt egy külön kerek gomb. A fejlécben a cím előtt szimbólum és a cím alatt két sor is állhat.
+- **V1, V1·b, T2:** a spirál, a „Mi vár rád”, a „6 lépés, és indul a diagnózis.” és a „kb. 13 perc · 03.02.-ig” sor a fejlécbe került; a lista alatt egymás mellett a „Kezdjük →” és a „Bővebben”. A társ „Kezdem” gombja után a lap újratöltődik, így a T2 a saját fejlécével nyílik.
+- **Kezdőlap:** aki a szervezet egyik elindult diagnózisában sem vesz részt (pl. szervezeti vezető, amikor más vezeti a diagnózist), annak „Jelenleg nincs olyan diagnózis, amelyben részt veszel.” A „…amint elindul” szöveg csak akkor marad, ha még nem indult diagnózis, vagy a társ a meghívójára vár.
+
 ## 1.11 · 41fb0fe · 2026-10-19
 
 PDF WeasyPrinttel is, Docker nélküli környezetekre (staging).

@@ -2,12 +2,8 @@
     The customer menu (15 · 15.3). Menu items appear only once their feature
     exists, the user may use it and it has content; the diagnosis tickets add
     them. At the bottom: the organization row (15 · 15.4), Profil, Kijelentkezés.
+    The layout passes the current organization and the user's organizations.
 --}}
-@php
-    $currentOrganization = app(\App\Support\CurrentOrganization::class)->get()
-        ?? app(\App\Services\Auth\LandingResolver::class)->organizationFor($user);
-    $organizations = $user->accessibleOrganizations()->orderBy('organizations.name')->get();
-@endphp
 
 <div class="flex min-h-full flex-col gap-6 p-6">
     <div class="flex items-center justify-between">

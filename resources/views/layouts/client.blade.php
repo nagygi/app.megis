@@ -1,6 +1,8 @@
 {{--
     Frame of every customer page (15). Mobile first; from 1200px the menu stays
     open on the side. The header colour is set by the page (15 · 15.2).
+    As in the prototype: the avatar opens the user menu, the round button next
+    to it the menu.
 --}}
 @props([
     'title',
@@ -8,9 +10,15 @@
     'back' => null,
     'backLabel' => null,
     'subtitle' => null,
+    // The second, paler line under the subtitle, e.g. "kb. 13 perc · 03.02.-ig" (23 · 23.1).
+    'note' => null,
+    // A symbol before the title, e.g. the spiral of "Mi vár rád".
+    'symbol' => null,
     'guest' => false,
     // "3 / 6" on the filling pages (23 · 23.3).
     'step' => null,
+    // The page label right of the logo when there is no step, e.g. "Első belépés".
+    'label' => null,
     // The coral plus to V11, on the homes of a running diagnosis (15 · 15.5).
     'plus' => null,
 ])
@@ -26,9 +34,18 @@
         'coral' => 'bg-coral text-black',
         'white' => 'border-b border-grey-250 bg-white text-charcoal',
     ][$color];
+    $onDark = in_array($color, ['charcoal', 'green'], true);
+    // Cream circles on dark headers, charcoal ones on light headers.
+    $circleClasses = $onDark ? 'bg-cream text-charcoal' : 'bg-charcoal text-cream';
 
     $user = $guest ? null : auth('web')->user();
     $impersonation = $guest ? null : app(\App\Services\Auth\ImpersonationService::class)->current();
+
+    $organizations = $user ? $user->accessibleOrganizations()->orderBy('organizations.name')->get() : collect();
+    $currentOrganization = $user
+        ? (app(\App\Support\CurrentOrganization::class)->get() ?? app(\App\Services\Auth\LandingResolver::class)->organizationFor($user))
+        : null;
+    $position = $currentOrganization ? $organizations->firstWhere('id', $currentOrganization->id)?->pivot->position : null;
 @endphp
 
 <!DOCTYPE html>
@@ -64,13 +81,14 @@
 
     <div x-data="{ menuOpen: false }" @keydown.escape.window="menuOpen = false" class="desktop:flex desktop:min-h-dvh">
         @if ($user)
+            {{-- Alpine takes translate-x-full off when it opens; adding translate-x-0 next to it would lose to it in the built CSS. --}}
             <aside
                 id="client-menu"
                 class="fixed inset-y-0 right-0 z-30 w-80 max-w-full translate-x-full overflow-y-auto border-l border-grey-250 bg-white transition-transform desktop:static desktop:order-first desktop:translate-x-0 desktop:border-r desktop:border-l-0"
-                :class="menuOpen && 'translate-x-0'"
+                :class="{ 'translate-x-full': ! menuOpen }"
                 aria-label="{{ __('client.menu.title') }}"
             >
-                @include('client.partials.menu', ['user' => $user])
+                @include('client.partials.menu', ['user' => $user, 'currentOrganization' => $currentOrganization, 'organizations' => $organizations])
             </aside>
 
             <div x-show="menuOpen" x-cloak class="fixed inset-0 z-20 bg-charcoal/40 desktop:hidden" @click="menuOpen = false"></div>
@@ -88,31 +106,75 @@
                             <x-megis.logo :variant="in_array($color, ['charcoal', 'green'], true) ? 'white' : 'red-dark'" class="h-7" />
                         @endif
 
-                        <span class="flex-1"></span>
-
-                        @if ($step)
-                            <span class="text-sm font-semibold tabular-nums">{{ $step }}</span>
-                        @endif
+                        <span class="min-w-0 flex-1 truncate text-right text-xs font-semibold tracking-wider uppercase tabular-nums">{{ $step ?? $label }}</span>
 
                         @if ($user)
+                            <div x-data="{ userOpen: false }" class="relative" @keydown.escape.window="userOpen = false">
+                                <button
+                                    type="button"
+                                    class="grid size-9 place-items-center rounded-pill text-xs font-bold {{ $circleClasses }}"
+                                    aria-haspopup="true"
+                                    aria-controls="client-user-menu"
+                                    :aria-expanded="userOpen"
+                                    @click="userOpen = ! userOpen"
+                                >
+                                    <span aria-hidden="true">{{ $user->initials }}</span>
+                                    <span class="sr-only">{{ __('client.menu.user_menu') }}</span>
+                                </button>
+
+                                <div
+                                    id="client-user-menu"
+                                    x-show="userOpen"
+                                    x-cloak
+                                    @click.outside="userOpen = false"
+                                    class="absolute right-0 z-40 mt-2 w-64 rounded-card border border-grey-250 bg-white p-3 text-charcoal shadow-lg"
+                                >
+                                    <p class="font-semibold">{{ $user->name }}</p>
+                                    @if ($currentOrganization)
+                                        <p class="mt-0.5 text-sm text-grey-700">{{ collect([$currentOrganization->name, $position])->filter()->implode(' · ') }}</p>
+                                    @endif
+                                    <ul class="mt-3 flex flex-col gap-1 border-t border-grey-200 pt-3">
+                                        @if ($currentOrganization)
+                                            <li>
+                                                <a href="{{ route('client.profile', $currentOrganization) }}" class="block rounded-lg px-2 py-1.5 text-charcoal no-underline hover:bg-grey-100">{{ __('client.menu.profile') }}</a>
+                                            </li>
+                                        @endif
+                                        <li>
+                                            <form method="POST" action="{{ route('client.logout') }}">
+                                                @csrf
+                                                <button type="submit" class="w-full rounded-lg px-2 py-1.5 text-left hover:bg-grey-100">{{ __('client.menu.logout') }}</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
                             <button
                                 type="button"
-                                class="grid size-9 place-items-center rounded-pill bg-charcoal text-xs font-bold text-cream ring-2 ring-cream desktop:hidden"
+                                class="grid size-9 place-items-center rounded-pill desktop:hidden {{ $circleClasses }}"
                                 aria-controls="client-menu"
                                 :aria-expanded="menuOpen"
                                 @click="menuOpen = ! menuOpen"
                             >
-                                <span aria-hidden="true">{{ $user->initials }}</span>
+                                <x-megis.icon name="menu" class="size-4" />
                                 <span class="sr-only">{{ __('client.menu.open') }}</span>
                             </button>
                         @endif
                     </div>
 
-                    <div>
-                        <h1 class="text-2xl leading-tight font-extrabold uppercase [text-wrap:pretty]">{{ $title }}</h1>
-                        @if ($subtitle)
-                            <p class="mt-1 text-sm opacity-90">{{ $subtitle }}</p>
+                    <div class="flex items-center gap-3">
+                        @if ($symbol)
+                            <x-megis.symbol :name="$symbol" class="{{ $onDark ? 'text-yellow' : 'text-coral' }}" />
                         @endif
+                        <div>
+                            <h1 class="text-2xl leading-tight font-extrabold uppercase [text-wrap:pretty]">{{ $title }}</h1>
+                            @if ($subtitle)
+                                <p class="mt-1 text-sm opacity-90">{{ $subtitle }}</p>
+                            @endif
+                            @if ($note)
+                                <p class="text-sm opacity-80">{{ $note }}</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </header>

@@ -5,14 +5,8 @@
     @if ($withdrawn)
         <p class="rounded-card bg-grey-100 p-4">{{ __('diagnosis.peer_home.withdrawn') }}</p>
     @elseif ($current && $main->acceptsInput())
-        {{-- T2 --}}
-        <div class="flex flex-col gap-1">
-            <p class="text-xl font-semibold">{{ __('diagnosis.peer_steps_lead') }}</p>
-            <p class="text-grey-700">{{ __('diagnosis.minutes_about', ['minutes' => $steps->totalMinutes()]) }}</p>
-        </div>
-
+        {{-- T2: the lead lines are in the header (Overview::peerWelcomeHeader), as on V1. --}}
         <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" />
-        <a href="{{ route('client.wisdom.show', [$main->diagnosis->organization, 'folyamat']) }}" class="self-start text-sm font-semibold">{{ __('wisdom.more') }}</a>
 
         <div class="flex items-center gap-3 rounded-card bg-grey-100 px-4 py-3 text-grey-700">
             <span class="grid size-7 shrink-0 place-items-center rounded-pill bg-grey-300 text-xs font-bold" aria-hidden="true">+</span>
@@ -22,11 +16,13 @@
             </span>
         </div>
 
-        @if ($main->acceptsInput())
-            <div>
-                <x-ui.button tone="coral" size="lg" :href="$stepUrl($current->step)">{{ $steps->isStarted() ? __('diagnosis.continue') : __('diagnosis.start') }}</x-ui.button>
-            </div>
-        @endif
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
+            <x-ui.button size="lg" :href="$stepUrl($current->step)">
+                {{ $steps->isStarted() ? __('diagnosis.continue') : __('diagnosis.start') }}
+                <x-megis.icon name="arrow-right" class="size-4" />
+            </x-ui.button>
+            <a href="{{ route('client.wisdom.show', [$main->diagnosis->organization, 'folyamat']) }}" class="text-sm font-semibold">{{ __('wisdom.more') }}</a>
+        </div>
 
         <x-diagnosis.end-picture :main="$main" peer />
     @else

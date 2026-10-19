@@ -53,3 +53,23 @@ it('logs a customer in with an e-mailed code', function () {
         ->assertSee('Acme Kft.')
         ->assertNoAccessibilityIssues();
 });
+
+it('opens the menu and the user menu on a phone, and logs the customer out', function () {
+    $organization = Organization::factory()->create(['name' => 'Acme Kft.']);
+    $customer = customerOf($organization);
+
+    $page = loginInBrowser($customer);
+    $page->resize(390, 844);
+    $page->assertPathIs('/'.$organization->slug);
+
+    // The menu slides in from the right; an off-screen link could not be clicked.
+    $page->click('[aria-controls="client-menu"]');
+    $page->click('#client-menu a[href$="/ertektar"]');
+    $page->assertPathIs('/'.$organization->slug.'/ertektar')->assertNoAccessibilityIssues();
+
+    $page->click('[aria-controls="client-user-menu"]');
+    $page->assertSee('Acme Kft.')->assertNoAccessibilityIssues();
+    $page->click('#client-user-menu button[type="submit"]');
+
+    $page->assertPathIs('/belepes');
+});

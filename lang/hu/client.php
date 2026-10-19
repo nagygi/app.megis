@@ -7,6 +7,7 @@ return [
 
     'menu' => [
         'open' => 'Menü megnyitása',
+        'user_menu' => 'Felhasználói menü',
         'close' => 'Menü bezárása',
         'title' => 'Menü',
         'profile' => 'Profil',
@@ -15,6 +16,13 @@ return [
         'mirror' => 'Értéktükör',
         'value_library' => 'Értéktár',
         'processes' => 'Folyamatok',
+    ],
+
+    // The page label in the header, right of the logo (prototype: V1, V10, T5).
+    'header' => [
+        'first_visit' => 'Első belépés',
+        'diagnosis' => 'Diagnózis',
+        'home' => 'Kezdőlap',
     ],
 
     'value_library' => [
@@ -78,6 +86,7 @@ return [
         'title' => 'Kezdőlap',
         'greeting' => 'Szia, :name!',
         'lead' => 'Itt fogod látni a(z) :organization diagnózisát, amint elindul.',
+        'lead_not_participant' => 'Jelenleg nincs olyan diagnózis, amelyben részt veszel.',
         'diagnoses' => 'A diagnózisaid',
         'publishes' => 'publikálás: :date',
     ],

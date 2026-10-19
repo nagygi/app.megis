@@ -35,6 +35,11 @@ it('asks the peer for the consents before anything else (T1)', function () {
         ->set('answersConsent', true)
         ->call('start')
         ->assertHasNoErrors()
+        ->assertRedirect(route('client.diagnosis.show', peerParams($setup, $main)));
+
+    // T2 has its own header, so the page loads again.
+    $this->get(route('client.diagnosis.show', peerParams($setup, $main)))
+        ->assertSee('Első belépés')
         ->assertSee('Két lépés most, egy, amíg fut.');
 
     $consent = Consent::query()->where('user_id', $peer->id)->sole();

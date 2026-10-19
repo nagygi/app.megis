@@ -9,7 +9,6 @@ use App\Enums\ValueOrigin;
 use App\Livewire\Client\Diagnosis\Brand;
 use App\Livewire\Client\Diagnosis\Experience;
 use App\Livewire\Client\Diagnosis\OrganizationValues;
-use App\Livewire\Client\Diagnosis\Overview;
 use App\Livewire\Client\Diagnosis\OwnValues;
 use App\Livewire\Client\Diagnosis\Processes;
 use App\Livewire\Client\Diagnosis\Visibility;
@@ -40,8 +39,13 @@ it('shows the leader what awaits and moves the diagnosis to filling on the first
     $main = startMainDiagnosis($setup);
     actingAsCustomer($setup['leader']);
 
-    Livewire::test(Overview::class, leaderParams($setup, $main))
+    // The lead lines are in the header of the layout, as in the prototype.
+    $this->get(route('client.diagnosis.show', leaderParams($setup, $main)))
+        ->assertOk()
+        ->assertSee('Első belépés')
+        ->assertSee('Mi vár rád')
         ->assertSee('6 lépés, és indul a diagnózis.')
+        ->assertSee('kb. 13 perc · '.$main->starts_on->format('m.d.').'-ig')
         ->assertSee('Saját értékek')
         ->assertSee('A márkád alapja')
         ->assertSee('Ki lát mit')
@@ -58,7 +62,8 @@ it('greets the leader with "Innen folytatod" once a step is done', function () {
     actingAsCustomer($setup['leader']);
 
     // The organization values and the brand base were given already: those steps are done too.
-    Livewire::test(Overview::class, leaderParams($setup, $main))
+    $this->get(route('client.diagnosis.show', leaderParams($setup, $main)))
+        ->assertOk()
         ->assertSee('Innen folytatod.')
         ->assertSee('3 / 6 kész')
         ->assertSee('Folytatom');

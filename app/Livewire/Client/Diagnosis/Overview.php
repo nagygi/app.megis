@@ -96,6 +96,9 @@ class Overview extends Component
 
             $participant->update(['started_at' => now()]);
         });
+
+        // T2 has its own header (peerWelcomeHeader); a Livewire update would keep the one of T1.
+        $this->redirect($this->overviewUrl(), navigate: false);
     }
 
     /**
@@ -133,13 +136,13 @@ class Overview extends Component
         $plus = $canContribute ? route('client.diagnosis.contribute', [$this->organization, $this->diagnosis]) : null;
 
         $layout = match ($view) {
-            'livewire.client.diagnosis.overview-published' => ['title' => __('diagnosis.home.title'), 'subtitle' => __('diagnosis.published_home.subtitle', ['product' => $main->product_name, 'date' => $main->published_at?->format('m.d.') ?? '–']), 'color' => 'charcoal'],
-            'livewire.client.diagnosis.overview-running' => ['title' => __('diagnosis.home.title'), 'subtitle' => $this->runningSubtitle(), 'color' => 'charcoal', 'plus' => $plus],
+            'livewire.client.diagnosis.overview-published' => ['title' => __('diagnosis.home.title'), 'label' => __('client.header.diagnosis'), 'subtitle' => __('diagnosis.published_home.subtitle', ['product' => $main->product_name, 'date' => $main->published_at?->format('m.d.') ?? '–']), 'color' => 'charcoal'],
+            'livewire.client.diagnosis.overview-running' => ['title' => __('diagnosis.home.title'), 'label' => __('client.header.diagnosis'), 'subtitle' => $this->runningSubtitle(), 'color' => 'charcoal', 'plus' => $plus],
             'livewire.client.diagnosis.invitation' => ['title' => __('diagnosis.invitation.title'), 'color' => 'coral'],
             'livewire.client.diagnosis.overview-peer' => $steps->current() === null
-                ? ['title' => __('diagnosis.peer_home.title'), 'subtitle' => $this->peerHomeSubtitle(), 'color' => 'charcoal', 'plus' => $plus]
-                : ['title' => __('diagnosis.what_awaits'), 'color' => 'cream'],
-            default => ['title' => __('diagnosis.what_awaits'), 'color' => 'cream'],
+                ? ['title' => __('diagnosis.peer_home.title'), 'label' => __('client.header.home'), 'subtitle' => $this->peerHomeSubtitle(), 'color' => 'charcoal', 'plus' => $plus]
+                : ['title' => __('diagnosis.what_awaits'), 'color' => 'cream', ...$this->peerWelcomeHeader($steps)],
+            default => ['title' => __('diagnosis.what_awaits'), 'color' => 'cream', ...$this->leaderWelcomeHeader($steps)],
         };
 
         return view($view, [
@@ -161,6 +164,58 @@ class Overview extends Component
                 && isset(app(ReportService::class)->snapshot($main)?->data['takeaways'][$this->user()->id]),
             'situationCount' => Material::query()->where('parent_diagnosis_id', $main->diagnosis_id)->where('user_id', $this->user()->id)->where('context', MaterialContext::Occasion)->whereNotNull('placed_at')->count(),
         ])->layout('layouts::client', $layout)->title($layout['title']);
+    }
+
+    /**
+     * The header of V1 and V1·b, as in the prototype (23 · 23.1, 23.2): "Első
+     * belépés", the spiral, then "6 lépés, és indul a diagnózis." with
+     * "kb. 13 perc · 03.02.-ig", or "Innen folytatod." with what is left.
+     *
+     * @return array{label?: string, symbol?: string, subtitle?: string, note?: string}
+     */
+    private function leaderWelcomeHeader(StepList $steps): array
+    {
+        $main = $this->main();
+
+        if (! $main->stage->isBeforeRunning()) {
+            return [];
+        }
+
+        $header = ['label' => __('client.header.first_visit'), 'symbol' => 'spiral'];
+
+        if ($this->firstVisit || ! $steps->isStarted()) {
+            $until = $main->starts_on ? __('diagnosis.until', ['date' => $main->starts_on->format('m.d.')]) : __('diagnosis.date_open');
+
+            return $header + [
+                'subtitle' => trans_choice($main->isSnapshot() ? 'diagnosis.steps_lead_snapshot' : 'diagnosis.steps_lead', $steps->count(), ['count' => $steps->count()]),
+                // The snapshot says which one it is, as V1·c does.
+                'note' => ($main->isSnapshot() ? $main->product_name.' · ' : '').__('diagnosis.minutes_until', ['minutes' => $steps->totalMinutes()]).' '.$until,
+            ];
+        }
+
+        return $header + [
+            'subtitle' => __('diagnosis.continue_lead'),
+            'note' => __('diagnosis.continue_count', ['done' => $steps->doneCount(), 'count' => $steps->count(), 'minutes' => $steps->remainingMinutes()]),
+        ];
+    }
+
+    /**
+     * The header of T2, the pair of V1 (25 · 25.3): "Két lépés most, egy, amíg fut." · "kb. 5 perc".
+     *
+     * @return array{label?: string, symbol?: string, subtitle?: string, note?: string}
+     */
+    private function peerWelcomeHeader(StepList $steps): array
+    {
+        if ($this->participant()->hasWithdrawn() || ! $this->main()->acceptsInput()) {
+            return [];
+        }
+
+        return [
+            'label' => __('client.header.first_visit'),
+            'symbol' => 'spiral',
+            'subtitle' => __('diagnosis.peer_steps_lead'),
+            'note' => __('diagnosis.minutes_about', ['minutes' => $steps->totalMinutes()]),
+        ];
     }
 
     /**
