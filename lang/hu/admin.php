@@ -1138,6 +1138,7 @@ return [
         'leader_reads' => 'Amit a vezető olvas',
         'gap_sentence' => ':experience-nek látjátok, :score-t mutattok.',
         'gap_now' => 'Most: :label',
+        'gap_below_threshold' => 'Három kitöltő alatt nincs csapat-megélés, ezért rés-szám sincs; a riportban a rés helyén szürke szöveg áll.',
         'max_length' => 'Legfeljebb :max karakter.',
         'log' => 'Napló',
         'feedback' => [

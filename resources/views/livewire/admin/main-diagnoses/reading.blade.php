@@ -355,10 +355,10 @@
         <h2 id="texts-title" class="text-lg font-semibold">{{ __('admin.reading.texts.title') }}</h2>
 
         <div class="flex flex-wrap items-end gap-3 rounded-card border border-grey-250 bg-white p-4">
-            <x-form.select name="gapRowId" wire:model="gapRowId" :label="__('admin.diagnoses.calculation.biggest_gap')" :help="$gapRow ? __('admin.reading.gap_now', ['label' => $gapRow->label()]) : null">
+            <x-form.select name="gapRowId" wire:model="gapRowId" :label="__('admin.diagnoses.calculation.biggest_gap')" :help="$showsExperience ? ($gapRow ? __('admin.reading.gap_now', ['label' => $gapRow->label()]) : null) : __('admin.reading.gap_below_threshold')">
                 <option value="">–</option>
                 @foreach ($gapCandidates as $candidate)
-                    <option value="{{ $candidate->id }}">{{ $candidate->label() }}@if ($candidate->gapLabel() !== '') ({{ $candidate->gapLabel() }})@endif</option>
+                    <option value="{{ $candidate->id }}">{{ $candidate->label() }}@if ($showsExperience && $candidate->gapLabel() !== '') ({{ $candidate->gapLabel() }})@endif</option>
                 @endforeach
             </x-form.select>
             @if ($isOpen)

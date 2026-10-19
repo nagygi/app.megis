@@ -245,6 +245,16 @@ it('lets an approved row fall back when its calculated value changes (20, questi
         ->and(ReviewEvent::query()->where('action', 'fell_back')->sole()->subject_id)->toBe($row->id);
 });
 
+it('offers no gap numbers for the biggest gap below the threshold (Extra inputok 1)', function () {
+    [, $main] = diagnosisInReading();
+    $row = rowOf($main, DiagnosisRowKind::Value)->load('value');
+    $row->update(['score' => 3, 'score_state' => ScoreState::Scored, 'experience' => 3]);
+
+    Livewire::test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->assertSee('Három kitöltő alatt nincs csapat-megélés')
+        ->assertDontSee($row->label().' ('.$row->gapLabel().')');
+});
+
 it('keeps the reading closed before it starts', function () {
     [$setup, $main] = runningDiagnosis();
     app(DiagnosisCalculator::class)->recalculate($main);
