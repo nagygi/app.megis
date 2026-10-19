@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.11 · {hash} · 2026-10-19
+## 1.11 · 41fb0fe · 2026-10-19
 
 PDF WeasyPrinttel is, Docker nélküli környezetekre (staging).
 
