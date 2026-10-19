@@ -51,6 +51,9 @@ return [
     'processing_hint' => 'Egy-két perc. Ezt a lapot nyitva hagyhatod.',
     'failed' => 'Nem tudtuk feldolgozni. Próbáld újra.',
     'try_again' => 'Újra próbálom',
+    'failed_kept' => 'Amit küldtél, megvan, nem kell újra beküldened.',
+    'start_over' => 'Inkább újrakezdem',
+    'retry_limited' => 'Most többször nem próbálhatjuk újra. Kezdd újra, vagy nézz vissza egy óra múlva.',
     'expired' => 'Ez a tükör már nem elérhető. A névtelen tükör 24 óráig él.',
 
     // ET3 · az értékeid

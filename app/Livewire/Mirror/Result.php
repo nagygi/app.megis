@@ -51,6 +51,8 @@ class Result extends Component
 
     public bool $codeSent = false;
 
+    public bool $retryLimited = false;
+
     public function mount(MirrorSession $session, ?Organization $organization = null): void
     {
         $this->organization = $organization?->exists ? $organization : null;
@@ -71,6 +73,27 @@ class Result extends Component
         $this->ensureOwner();
 
         $mirrors->toggle($this->session, $key);
+    }
+
+    /**
+     * "Újra próbálom" goes again from what was sent; every try calls the AI,
+     * so a mirror gets three in an hour.
+     */
+    public function retry(MirrorService $mirrors): void
+    {
+        $this->ensureOwner();
+        abort_unless($mirrors->canRetry($this->session), 403);
+
+        $key = 'mirror-retry:'.$this->session->id;
+
+        if (RateLimiter::tooManyAttempts($key, 3)) {
+            $this->retryLimited = true;
+
+            return;
+        }
+
+        RateLimiter::hit($key, 3600);
+        $mirrors->retry($this->session);
     }
 
     public function showFull(): void
@@ -188,6 +211,7 @@ class Result extends Component
             'keptGroups' => $kept,
             'isPublic' => $this->organization === null,
             'isExpired' => $this->session->isAnonymous() && $this->session->isExpired(),
+            'canRetry' => $mirrors->canRetry($this->session),
             'otherValues' => max(0, Value::query()->availableTo(null)->count() - $kept->whereNotNull('valueId')->count()),
             'bookingUrl' => config('megis.booking_url'),
             'termsUrl' => $legalDocuments->current(LegalDocumentType::Terms) ? route('legal.show', LegalDocumentType::Terms->value) : null,

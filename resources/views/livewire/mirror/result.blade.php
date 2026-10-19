@@ -1,21 +1,32 @@
 {{-- ET3 · the values, ET5 · the full picture (06 · 6.1, 6.2). --}}
 @php($status = $session->status)
 
-<div class="mx-auto flex max-w-xl flex-col gap-6 py-4" @if ($status === \App\Enums\MirrorStatus::Processing) wire:poll.3s @endif>
+<div class="mx-auto flex max-w-xl flex-col gap-6 py-4">
     <x-ui.flash />
 
     @if ($isExpired)
         <p class="rounded-card bg-white p-6">{{ __('mirror.expired') }}</p>
     @elseif ($status === \App\Enums\MirrorStatus::Processing)
-        <div class="flex flex-col items-center gap-4 rounded-card bg-white p-8 text-center" role="status">
+        {{-- The poll sits here, so it also starts after "Újra próbálom" --}}
+        <div wire:key="processing" wire:poll.3s class="flex flex-col items-center gap-4 rounded-card bg-white p-8 text-center" role="status">
             <x-megis.symbol name="growth-rings" class="size-16 animate-spin text-coral [animation-duration:6s]" />
             <p class="text-xl font-semibold">{{ __('mirror.processing') }}</p>
             <p class="text-grey-700">{{ __('mirror.processing_hint') }}</p>
         </div>
     @elseif ($status === \App\Enums\MirrorStatus::Failed)
-        <div class="flex flex-col items-start gap-4 rounded-card bg-white p-6" role="alert">
+        @php($recordUrl = $isPublic ? route('mirror.record') : route('client.mirror.record', $organization))
+        <div wire:key="failed" class="flex flex-col items-start gap-4 rounded-card bg-white p-6" role="alert">
             <p class="text-lg font-semibold">{{ __('mirror.failed') }}</p>
-            <x-ui.button :href="$isPublic ? route('mirror.record') : route('client.mirror.record', $organization)">{{ __('mirror.try_again') }}</x-ui.button>
+            @if ($canRetry && ! $retryLimited)
+                <p class="text-grey-700">{{ __('mirror.failed_kept') }}</p>
+                <x-ui.button wire:click="retry">{{ __('mirror.try_again') }}</x-ui.button>
+                <a href="{{ $recordUrl }}" class="text-sm font-semibold underline">{{ __('mirror.start_over') }}</a>
+            @else
+                @if ($retryLimited)
+                    <p class="text-grey-700">{{ __('mirror.retry_limited') }}</p>
+                @endif
+                <x-ui.button :href="$recordUrl">{{ $retryLimited ? __('mirror.start_over') : __('mirror.try_again') }}</x-ui.button>
+            @endif
         </div>
     @elseif ($step === 'values')
         {{-- ET3 · the values with quotes, no number, no rating --}}

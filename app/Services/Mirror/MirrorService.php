@@ -3,6 +3,7 @@
 namespace App\Services\Mirror;
 
 use App\Enums\InboxItemType;
+use App\Enums\MaterialStatus;
 use App\Enums\MembershipStatus;
 use App\Enums\MirrorStatus;
 use App\Enums\OrganizationType;
@@ -76,6 +77,35 @@ class MirrorService
         $this->pipeline->start($material);
 
         return $session;
+    }
+
+    /**
+     * A failed mirror can go again from what was sent: the recording while
+     * it is kept, or the transcript or text already there.
+     */
+    public function canRetry(MirrorSession $session): bool
+    {
+        $material = $session->material;
+
+        return $session->status === MirrorStatus::Failed
+            && ! ($session->isAnonymous() && $session->isExpired())
+            && $material !== null
+            && ($material->hasAudio() || filled($material->text));
+    }
+
+    /**
+     * "Újra próbálom" without sending it again: the work starts where it
+     * stopped, at the transcription or at the measurement.
+     */
+    public function retry(MirrorSession $session): void
+    {
+        $material = $session->material;
+
+        $session->update(['status' => MirrorStatus::Processing]);
+        $material->update(['status' => MaterialStatus::Pending, 'error' => null]);
+        $this->inbox->closeAutomatically('processing-error:'.$material->getMorphClass().':'.$material->getKey());
+
+        $this->pipeline->start($material);
     }
 
     /**

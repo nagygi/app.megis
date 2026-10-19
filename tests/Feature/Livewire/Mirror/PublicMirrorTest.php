@@ -1,5 +1,6 @@
 <?php
 
+use App\Ai\AiContext;
 use App\Enums\InboxItemType;
 use App\Enums\LegalDocumentType;
 use App\Enums\MirrorStatus;
@@ -17,10 +18,14 @@ use App\Models\User;
 use App\Services\Ai\AiGateway;
 use App\Services\Auth\TokenService;
 use App\Services\Mirror\MirrorService;
+use App\Services\Transcription\FakeTranscriber;
+use App\Services\Transcription\Transcriber;
+use App\Services\Transcription\TranscriptionResult;
 use App\Services\Values\ValueService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Ai\Responses\Data\Meta;
 use Laravel\Ai\Responses\Data\TextUsage;
@@ -133,6 +138,68 @@ it('takes a browser recording to the private disk', function () {
     expect($material->audio_seconds)->toBe(75)
         ->and($material->segments)->not->toBeEmpty();
     Storage::disk('materials')->assertExists($material->audio_path);
+});
+
+it('transcribes a failed recording again without sending it again', function () {
+    Storage::fake('materials');
+    fakeTurnstile();
+    mirrorAiAnswers();
+    app(ValueService::class)->create(['name' => 'Egyenesség', 'meanings' => ['Kimondom.'], 'high_examples' => ['Mindig.'], 'low_examples' => ['Soha.']]);
+    app()->instance(Transcriber::class, new class implements Transcriber
+    {
+        public function transcribe(string $path, AiContext $context): TranscriptionResult
+        {
+            return new TranscriptionResult('', []);
+        }
+    });
+
+    Livewire::test(Record::class)
+        ->set('recording', UploadedFile::fake()->create('felvetel.webm', 200, 'audio/webm'))
+        ->set('turnstileToken', 'token')
+        ->call('submitRecording', 75);
+
+    $session = MirrorSession::query()->sole();
+    $audioPath = $session->material->audio_path;
+    expect($session->status)->toBe(MirrorStatus::Failed)
+        ->and(InboxItem::query()->open()->sole()->type)->toBe(InboxItemType::ProcessingError);
+
+    app()->instance(Transcriber::class, new FakeTranscriber);
+
+    Livewire::test(Result::class, ['session' => $session])
+        ->assertSee('Amit küldtél, megvan, nem kell újra beküldened.')
+        ->call('retry')
+        ->assertSee('Egyenesség');
+
+    expect($session->refresh()->status)->toBe(MirrorStatus::Ready)
+        ->and(MirrorSession::query()->count())->toBe(1)
+        ->and($session->material->audio_path)->toBe($audioPath)
+        ->and($session->material->text)->not->toBeEmpty()
+        ->and(InboxItem::query()->open()->count())->toBe(0);
+});
+
+it('tries a failed mirror three times in an hour, then asks to start over', function () {
+    $session = submitTextMirror();
+    $session->update(['status' => MirrorStatus::Failed]);
+    RateLimiter::increment('mirror-retry:'.$session->id, 3600, 3);
+
+    Livewire::test(Result::class, ['session' => $session])
+        ->call('retry')
+        ->assertSee('Most többször nem próbálhatjuk újra.')
+        ->assertSee('Inkább újrakezdem');
+
+    expect($session->refresh()->status)->toBe(MirrorStatus::Failed);
+});
+
+it('sends back to recording when nothing is left to try again', function () {
+    $session = submitTextMirror();
+    $session->update(['status' => MirrorStatus::Failed]);
+    $session->material->update(['text' => null]);
+
+    Livewire::test(Result::class, ['session' => $session])
+        ->assertDontSee('Amit küldtél, megvan')
+        ->assertSee(route('mirror.record'))
+        ->call('retry')
+        ->assertForbidden();
 });
 
 it('sends a confirmation link and records the accepted documents with the account', function () {
