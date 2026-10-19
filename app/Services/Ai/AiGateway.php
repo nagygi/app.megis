@@ -13,6 +13,9 @@ use Closure;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\JsonSchemaTypeFactory;
 use Illuminate\Support\Facades\Log;
+use Laravel\Ai\Files\Audio;
+use Laravel\Ai\Files\LocalAudio;
+use Laravel\Ai\Files\StoredAudio;
 use Laravel\Ai\Gateway\FakeTextGateway;
 use Laravel\Ai\PendingResponses\PendingTranscriptionGeneration;
 use Laravel\Ai\Responses\StructuredAgentResponse;
@@ -104,7 +107,7 @@ class AiGateway
             throw new RuntimeException('The transcription task has no model yet (12.7 PoC).');
         }
 
-        return $this->runTranscription(Transcription::fromStorage($path, $disk), $config, $context);
+        return $this->runTranscription($this->asAudio(Audio::fromStorage($path, $disk)), $config, $context);
     }
 
     /**
@@ -115,11 +118,26 @@ class AiGateway
      */
     public function transcribeFile(string $localPath, string $provider, string $model, int $timeout = 1800): array
     {
-        return $this->runTranscription(Transcription::fromPath($localPath), [
+        return $this->runTranscription($this->asAudio(Audio::fromPath($localPath)), [
             'provider' => $provider,
             'model' => $model,
             'timeout' => $timeout,
         ], new AiContext);
+    }
+
+    /**
+     * A browser recording (WebM, MP4) is read as video by file detection,
+     * but goes to the provider as audio.
+     */
+    private function asAudio(StoredAudio|LocalAudio $audio): PendingTranscriptionGeneration
+    {
+        $mime = $audio->mimeType();
+
+        if ($mime !== null && str_starts_with($mime, 'video/')) {
+            $audio->withMimeType('audio/'.substr($mime, strlen('video/')));
+        }
+
+        return Transcription::of($audio);
     }
 
     /**

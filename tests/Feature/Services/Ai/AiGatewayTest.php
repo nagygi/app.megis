@@ -5,14 +5,20 @@ use App\Enums\AiCallStatus;
 use App\Enums\InboxItemType;
 use App\Models\AiCall;
 use App\Models\InboxItem;
+use App\Models\Material;
 use App\Models\Organization;
 use App\Models\Value;
 use App\Services\Ai\AiGateway;
 use App\Services\Ai\PromptRepository;
+use Illuminate\Support\Facades\Storage;
+use Laravel\Ai\Prompts\TranscriptionPrompt;
 use Laravel\Ai\Responses\Data\Meta;
 use Laravel\Ai\Responses\Data\TextUsage;
+use Laravel\Ai\Responses\Data\TranscriptionUsage;
 use Laravel\Ai\Responses\StructuredTextResponse;
 use Laravel\Ai\Responses\TextResponse;
+use Laravel\Ai\Responses\TranscriptionResponse;
+use Laravel\Ai\Transcription;
 use Tests\Fixtures\Ai\TestAiJob;
 use Tests\Fixtures\Ai\TestTask;
 
@@ -122,4 +128,18 @@ it('opens one processing error row when a job fails for good', function () {
         ->type->toBe(InboxItemType::ProcessingError)
         ->organization_id->toBe($organization->id)
         ->summary->toBe('Nem tudtuk feldolgozni a teszt anyagot.');
+});
+
+it('sends a browser recording to the transcriber as audio, not video', function () {
+    Storage::fake(Material::DISK);
+    // The start of a WebM file, which file detection reads as video/webm.
+    Storage::disk(Material::DISK)->put('felvetel/audio.webm', "\x1A\x45\xDF\xA3\x9F\x42\x86\x81\x01\x42\xF7\x81\x01\x42\xF2\x81\x04\x42\xF3\x81\x08\x42\x82\x84webm\x42\x87\x81\x04\x42\x85\x81\x02".str_repeat("\0", 64));
+    config(['ai.tasks.transcription.model' => 'gemini-test']);
+    Transcription::fake([
+        new TranscriptionResponse('Szia.', collect(), new TranscriptionUsage(audioSeconds: 2), new Meta('gemini', 'gemini-test')),
+    ]);
+
+    app(AiGateway::class)->transcribe(Material::DISK, 'felvetel/audio.webm');
+
+    Transcription::assertGenerated(fn (TranscriptionPrompt $prompt): bool => $prompt->audio->mimeType() === 'audio/webm');
 });
