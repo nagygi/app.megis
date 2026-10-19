@@ -202,6 +202,16 @@ it('sends back to recording when nothing is left to try again', function () {
         ->assertForbidden();
 });
 
+it('sends back to recording when no value was heard', function () {
+    $session = submitTextMirror();
+    $session->material->detections()->delete();
+
+    Livewire::test(Result::class, ['session' => $session])
+        ->assertSee('Ebből most nem hallottunk ki értéket.')
+        ->assertSee('Újra próbálom')
+        ->assertSee(route('mirror.record'));
+});
+
 it('sends a confirmation link and records the accepted documents with the account', function () {
     Mail::fake();
     $terms = LegalDocumentVersion::factory()->ofType(LegalDocumentType::Terms)->create();

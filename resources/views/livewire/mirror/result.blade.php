@@ -1,5 +1,6 @@
 {{-- ET3 · the values, ET5 · the full picture (06 · 6.1, 6.2). --}}
 @php($status = $session->status)
+@php($recordUrl = $isPublic ? route('mirror.record') : route('client.mirror.record', $organization))
 
 <div class="mx-auto flex max-w-xl flex-col gap-6 py-4">
     <x-ui.flash />
@@ -14,7 +15,6 @@
             <p class="text-grey-700">{{ __('mirror.processing_hint') }}</p>
         </div>
     @elseif ($status === \App\Enums\MirrorStatus::Failed)
-        @php($recordUrl = $isPublic ? route('mirror.record') : route('client.mirror.record', $organization))
         <div wire:key="failed" class="flex flex-col items-start gap-4 rounded-card bg-white p-6" role="alert">
             <p class="text-lg font-semibold">{{ __('mirror.failed') }}</p>
             @if ($canRetry && ! $retryLimited)
@@ -55,7 +55,11 @@
                 </ul>
             </article>
         @empty
-            <p class="rounded-card bg-white p-6">{{ __('mirror.no_values') }}</p>
+            {{-- Read but nothing heard: the same text again would not help, a new one might --}}
+            <div class="flex flex-col items-start gap-4 rounded-card bg-white p-6">
+                <p>{{ __('mirror.no_values') }}</p>
+                <x-ui.button :href="$recordUrl">{{ __('mirror.try_again') }}</x-ui.button>
+            </div>
         @endforelse
 
         @if ($groups->isNotEmpty())
