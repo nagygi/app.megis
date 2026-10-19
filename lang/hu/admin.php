@@ -32,6 +32,7 @@ return [
         'diagnosis_types' => 'Diagnózis típusok',
         'support_questions' => 'Támogató kérdések',
         'inbox' => 'Beérkező',
+        'measurements' => 'Értékmérések',
     ],
 
     'user_menu' => [
@@ -741,6 +742,7 @@ return [
 
     'inbox' => [
         'title' => 'Beérkező',
+        'measurements_title' => 'Értékmérések',
         'state' => 'Sorok',
         'open' => 'Nyitottak',
         'closed' => 'Lezártak',

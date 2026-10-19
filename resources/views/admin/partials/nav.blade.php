@@ -1,10 +1,12 @@
 {{-- Left menu of the admin; the app version sits at the bottom (NFR · 2, 01 · 1.5). --}}
 @php
+    $inbox = app(\App\Services\Inbox\InboxService::class);
+
     $groups = [
         [
             'label' => null,
             'items' => [
-                ['route' => 'admin.inbox.index', 'active' => 'admin.inbox.*', 'label' => __('admin.nav.inbox'), 'count' => app(\App\Services\Inbox\InboxService::class)->openCount()],
+                ['route' => 'admin.inbox.index', 'active' => 'admin.inbox.*', 'label' => __('admin.nav.inbox'), 'count' => $inbox->openCount()],
                 ['route' => 'admin.organizations.index', 'active' => 'admin.organizations.*', 'label' => __('admin.nav.organizations')],
                 ['route' => 'admin.clients.index', 'active' => 'admin.clients.*', 'label' => __('admin.nav.clients')],
                 ['route' => 'admin.products.index', 'active' => 'admin.products.*', 'label' => __('admin.nav.products')],
@@ -17,6 +19,12 @@
                 ['route' => 'admin.diagnoses.index', 'active' => 'admin.diagnoses.*', 'label' => __('admin.nav.all_diagnoses')],
                 ['route' => 'admin.diagnosis-types.index', 'active' => 'admin.diagnosis-types.*', 'label' => __('admin.nav.diagnosis_types')],
                 ['route' => 'admin.support-questions.index', 'active' => 'admin.support-questions.*', 'label' => __('admin.nav.support_questions')],
+            ],
+        ],
+        [
+            'label' => __('admin.nav.measurements'),
+            'items' => [
+                ['route' => 'admin.measurements.index', 'active' => 'admin.measurements.*', 'label' => __('admin.nav.inbox'), 'count' => $inbox->openMeasurementCount()],
             ],
         ],
         [
@@ -72,7 +80,7 @@
             <div
                 @if ($group['label'])
                     x-data="{
-                        key: 'admin-nav:{{ $loop->index }}',
+                        key: 'admin-nav:{{ $group['items'][0]['route'] }}',
                         open: true,
                         init() {
                             try { if (localStorage.getItem(this.key) === 'closed') this.open = {{ $groupActive ? 'true' : 'false' }}; } catch (e) {}

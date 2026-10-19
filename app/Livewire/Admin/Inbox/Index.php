@@ -50,6 +50,11 @@ class Index extends Component
 
     public ?int $replyingTo = null;
 
+    /**
+     * The Értéktükör's rows are listed under Értékmérések, not here.
+     */
+    protected bool $measurements = false;
+
     public function mount(): void
     {
         Gate::authorize('viewAny', InboxItem::class);
@@ -165,6 +170,7 @@ class Index extends Component
         $showClosed = $this->filter('state') === 'closed';
         $query = InboxItem::query()
             ->with(['organization', 'diagnosis.team', 'closer'])
+            ->where('is_measurement', $this->measurements)
             ->when($showClosed, fn ($query) => $query->closed(), fn ($query) => $query->open());
 
         if ($term = $this->searchTerm()) {
@@ -202,11 +208,27 @@ class Index extends Component
                 ->get()
                 ->groupBy('organization_id'),
             'showClosed' => $showClosed,
-            'types' => collect(InboxItemType::cases())->mapWithKeys(fn (InboxItemType $type) => [$type->value => $type->label()])->all(),
+            'title' => $this->title(),
+            'types' => collect($this->types())->mapWithKeys(fn (InboxItemType $type) => [$type->value => $type->label()])->all(),
             'organizations' => Organization::query()->orderBy('name')->pluck('name', 'id')->all(),
             'contacts' => ['all' => __('admin.common.all')] + User::query()->admins()->orderBy('last_name')->get()
                 ->mapWithKeys(fn (User $admin) => [$admin->id => $admin->name])->all(),
-        ])->layout('layouts::admin')->title(__('admin.inbox.title'));
+        ])->layout('layouts::admin')->title($this->title());
+    }
+
+    protected function title(): string
+    {
+        return __('admin.inbox.title');
+    }
+
+    /**
+     * The row types of the type filter.
+     *
+     * @return list<InboxItemType>
+     */
+    protected function types(): array
+    {
+        return array_values(array_filter(InboxItemType::cases(), fn (InboxItemType $type) => $type !== InboxItemType::MirrorBooking));
     }
 
     /**

@@ -3,7 +3,7 @@
 <div>
     <x-ui.flash class="mb-6" />
 
-    <x-admin.page-header :title="__('admin.inbox.title')" />
+    <x-admin.page-header :title="$title" />
 
     <x-admin.list-toolbar>
         <x-admin.filter name="state" :label="__('admin.inbox.state')" :all-label="__('admin.inbox.open')" :options="['closed' => __('admin.inbox.closed')]" />

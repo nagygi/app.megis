@@ -93,6 +93,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->scopeBindings();
 
         Route::livewire('beerkezo', Admin\Inbox\Index::class)->name('inbox.index');
+        Route::livewire('ertekmeresek', Admin\Measurements\Index::class)->name('measurements.index');
 
         Route::livewire('diagnozisok', Admin\Diagnoses\Index::class)->name('diagnoses.index');
         Route::livewire('diagnozisok/uj', Admin\Diagnoses\Form::class)->name('diagnoses.create');

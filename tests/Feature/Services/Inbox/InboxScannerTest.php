@@ -85,6 +85,7 @@ it('mails each contact the open rows of their organizations at 8:00', function (
     [$setup, $main] = runningDiagnosis();
     InboxItem::factory()->create(['organization_id' => $setup['organization']->id, 'diagnosis_id' => $main->diagnosis_id]);
     InboxItem::factory()->closed()->create(['organization_id' => $setup['organization']->id]);
+    InboxItem::factory()->create(['organization_id' => $setup['organization']->id, 'is_measurement' => true]);
 
     $this->artisan('megis:inbox:digest')->assertSuccessful();
 
@@ -100,7 +101,8 @@ it('mails a booking at once to the contact', function () {
     app(MirrorService::class)->recordBooking($session);
     app(MirrorService::class)->recordBooking($session->refresh());
 
-    Mail::assertQueued(MirrorBookingMail::class, fn (MirrorBookingMail $mail) => $mail->hasTo($setup['admin']->email));
+    Mail::assertQueued(MirrorBookingMail::class, fn (MirrorBookingMail $mail) => $mail->hasTo($setup['admin']->email)
+        && str_contains($mail->render(), route('admin.measurements.index')));
     Mail::assertQueued(MirrorBookingMail::class, 1);
 });
 

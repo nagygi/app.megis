@@ -124,7 +124,7 @@ return [
 
     'mirror_booking' => [
         'subject' => 'Időpontot foglalna valaki',
-        'action' => 'Beérkező',
+        'action' => 'Értékmérések',
     ],
 
     // Publishing (21 · E-mailek).

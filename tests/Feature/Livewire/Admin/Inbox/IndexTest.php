@@ -1,9 +1,13 @@
 <?php
 
 use App\Enums\InboxItemType;
+use App\Enums\MaterialContext;
 use App\Livewire\Admin\Inbox\Index;
+use App\Livewire\Admin\Measurements\Index as MeasurementsIndex;
 use App\Models\Diagnosis;
 use App\Models\InboxItem;
+use App\Models\Material;
+use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\User;
 use App\Services\Inbox\InboxService;
@@ -25,15 +29,43 @@ it('starts with the rows of the admin’s own organizations and the unassigned o
     $inbox->open(InboxItemType::Invitation, 'Saját sor', $mine);
     $inbox->open(InboxItemType::Invitation, 'Kolléga sora', $theirs);
     $inbox->open(InboxItemType::Invitation, 'Gazdátlan sor', $nobodys);
-    $inbox->open(InboxItemType::MirrorBooking, 'Foglalás szervezet nélkül');
+    $inbox->open(InboxItemType::ProcessingError, 'Hiba szervezet nélkül');
 
     Livewire::test(Index::class)
         ->assertSee('Saját sor')
         ->assertSee('Gazdátlan sor')
-        ->assertSee('Foglalás szervezet nélkül')
+        ->assertSee('Hiba szervezet nélkül')
         ->assertDontSee('Kolléga sora')
         ->set('filters.contact', 'all')
         ->assertSee('Kolléga sora');
+});
+
+it('lists the Értéktükör rows under Értékmérések, not in the Beérkező', function () {
+    actingAsAdmin();
+    $inbox = app(InboxService::class);
+    $booking = $inbox->open(InboxItemType::MirrorBooking, 'Valaki időpontot foglalna', subject: MirrorSession::factory()->create());
+    $mirrorFailure = $inbox->open(InboxItemType::ProcessingError, 'Nem tudtuk feldolgozni: Nyilvános Értéktükör', subject: Material::factory()->create(['context' => MaterialContext::PublicMirror]));
+    $uploadFailure = $inbox->open(InboxItemType::ProcessingError, 'Nem tudtuk feldolgozni: interju.mp3', subject: Material::factory()->create(['context' => MaterialContext::AdminUpload]));
+
+    expect($booking->is_measurement)->toBeTrue()
+        ->and($mirrorFailure->is_measurement)->toBeTrue()
+        ->and($uploadFailure->is_measurement)->toBeFalse();
+
+    Livewire::test(Index::class)
+        ->assertSee('interju.mp3')
+        ->assertDontSee('Valaki időpontot foglalna')
+        ->assertDontSee('Nyilvános Értéktükör')
+        ->assertDontSee(InboxItemType::MirrorBooking->label());
+
+    Livewire::test(MeasurementsIndex::class)
+        ->assertSee('Értékmérések')
+        ->assertSee('Valaki időpontot foglalna')
+        ->assertSee('Nyilvános Értéktükör')
+        ->assertDontSee('interju.mp3')
+        ->call('close', $booking->id)
+        ->assertDontSee('Valaki időpontot foglalna')
+        ->set('filters.state', 'closed')
+        ->assertSee('Valaki időpontot foglalna');
 });
 
 it('closes a row and shows who closed it under "Lezártak"', function () {
@@ -58,6 +90,16 @@ it('counts the open rows in the menu', function () {
     $this->get(route('admin.organizations.index'))
         ->assertOk()
         ->assertSeeInOrder(['Beérkező', '2']);
+});
+
+it('counts the open Értékmérések rows under their own group in the menu', function () {
+    actingAsAdmin();
+    InboxItem::factory()->create();
+    InboxItem::factory()->count(3)->create(['type' => InboxItemType::MirrorBooking, 'is_measurement' => true]);
+
+    $this->get(route('admin.organizations.index'))
+        ->assertOk()
+        ->assertSeeInOrder(['Beérkező', '1', 'Értékmérések', 'Beérkező', '3']);
 });
 
 it('does not open the same question twice and closes it when the cause goes away', function () {

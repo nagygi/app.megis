@@ -32,6 +32,7 @@ Szuperadmin és Admin egyaránt használhatja (01).
 | Publikálás | a publikálás napja elmúlt (21) | → Olvasat |
 | Értéktükör-foglalás | ET5 „Időpontot foglalok” (06), a jelölt kíváncsiság-kérdésekkel | Megnézem · Kész |
 
+- **Értékmérések:** az Értéktükör sorai (a foglalás és az Értéktükör-felvétel feldolgozási hibája) nem a *Beérkező*ben vannak, hanem külön menücsoportban: *Értékmérések › Beérkező*. Ugyanazok a szűrők és gombok, saját számláló. A reggeli összefoglalóba nem kerülnek bele, a foglalásról azonnali e-mail megy.
 - **Besorolás:** a 12 · 12.6 „Besorolásra vár” sorai itt is megjelennek. Ha bármelyik helyen besorolják, mindkettőből eltűnik.
 - **Beépítem:**
   - megnyitja az érintett fejezetet az olvasatban (20), mellette a visszajelzés szövegével;

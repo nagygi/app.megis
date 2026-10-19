@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 /**
  * A row of the Beérkező: one decision, at most two buttons (22).
  */
-#[Fillable(['type', 'organization_id', 'diagnosis_id', 'summary', 'payload', 'dedupe_key'])]
+#[Fillable(['type', 'is_measurement', 'organization_id', 'diagnosis_id', 'summary', 'payload', 'dedupe_key'])]
 class InboxItem extends Model
 {
     /** @use HasFactory<InboxItemFactory> */
@@ -32,6 +32,7 @@ class InboxItem extends Model
     {
         return [
             'type' => InboxItemType::class,
+            'is_measurement' => 'boolean',
             'payload' => 'array',
             'closed_at' => 'datetime',
         ];
@@ -85,6 +86,29 @@ class InboxItem extends Model
     protected function closed(Builder $query): void
     {
         $query->whereNotNull('closed_at');
+    }
+
+    /**
+     * The Értéktükör rows: bookings and runs that failed to process (06, 22).
+     * They are listed under Értékmérések.
+     *
+     * @param  Builder<InboxItem>  $query
+     */
+    #[Scope]
+    protected function measurements(Builder $query): void
+    {
+        $query->where('is_measurement', true);
+    }
+
+    /**
+     * The Beérkező itself: every row but the Értéktükör's.
+     *
+     * @param  Builder<InboxItem>  $query
+     */
+    #[Scope]
+    protected function withoutMeasurements(Builder $query): void
+    {
+        $query->where('is_measurement', false);
     }
 
     /**

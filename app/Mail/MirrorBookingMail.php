@@ -32,7 +32,7 @@ class MirrorBookingMail extends Mailable implements ShouldQueue
     {
         return new Content(
             markdown: 'mail.mirror-booking',
-            with: ['summary' => $this->item->summary, 'url' => route('admin.inbox.index')],
+            with: ['summary' => $this->item->summary, 'url' => route('admin.measurements.index')],
         );
     }
 }

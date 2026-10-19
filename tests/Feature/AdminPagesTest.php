@@ -60,6 +60,7 @@ it('renders every admin page for a superadmin', function (Closure $route) {
     'clients' => fn () => route('admin.clients.index'),
     'client datasheet' => fn (array $models) => route('admin.clients.show', $models['customer']),
     'inbox' => fn () => route('admin.inbox.index'),
+    'measurements' => fn () => route('admin.measurements.index'),
     'diagnoses' => fn () => route('admin.diagnoses.index'),
     'new diagnosis' => fn () => route('admin.diagnoses.create'),
     'diagnosis' => fn (array $models) => route('admin.diagnoses.show', $models['diagnosis']),

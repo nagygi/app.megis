@@ -5,6 +5,8 @@ namespace App\Services\Inbox;
 use App\Enums\InboxItemType;
 use App\Models\Diagnosis;
 use App\Models\InboxItem;
+use App\Models\Material;
+use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -37,6 +39,10 @@ class InboxService
 
         $item = new InboxItem([
             'type' => $type,
+            // The Értéktükör's rows go under Értékmérések (06, 22).
+            'is_measurement' => $type === InboxItemType::MirrorBooking
+                || $subject instanceof MirrorSession
+                || ($subject instanceof Material && $subject->context->isMirror()),
             'organization_id' => $organization?->id ?? $diagnosis?->organization_id,
             'diagnosis_id' => $diagnosis?->id,
             'summary' => mb_substr($summary, 0, 500),
@@ -79,6 +85,11 @@ class InboxService
 
     public function openCount(): int
     {
-        return InboxItem::query()->open()->count();
+        return InboxItem::query()->open()->withoutMeasurements()->count();
+    }
+
+    public function openMeasurementCount(): int
+    {
+        return InboxItem::query()->open()->measurements()->count();
     }
 }
