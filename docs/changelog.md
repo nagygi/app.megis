@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.14 · {hash} · 2026-10-20
+
+A staging-teszt (`docs/staging-teszt-2026-10-19.md`) javításai.
+
+- **Blur-mentés (B1, S2):** Livewire 4-ben a `wire:model.blur` `.live` nélkül nem küld kérést, így a mezőből kilépéskor mentő hookok nem futottak. Üres márkával a V4 nem volt lezárható (minden magánszemély és minden előre kitöltött márka nélküli szervezetvezető elakadt), a Profil névmódosítása nem mentődött. `wire:model.live.blur` a V3, V4, V6·c és a Profil mezőin; böngészős teszttel.
+- **Feltöltés (B2):** a `wire:submit="upload"` a Livewire saját `$wire.upload()`-ját hívta, a komponens metódusa sosem futott. Nem lehetett jogi dokumentumot, folyamat-alkalmat és V11-es fájlt feltölteni, a „Mégse” (`cancelUpload`) sem zárt. Új nevek: `storeVersion`, `closeUpload`, `storeOccasion`, `storeUpload`; arch-teszt tiltja a `$wire` feltöltő-neveit.
+- **Küszöb (B3):** a küszöb alatt indított olvasat nem volt publikálható, mert a „Csapat-szám nélkül megy” döntés csak futás közben, a publikálás előtti héten látszott. A Futás fülön most futás és olvasat alatt is elérhető, ha a küszöb hiányzik; az „Olvasat indítása” küszöb alatt figyelmeztet.
+- **Beszélgetés (S1):** a „Válasz és tovább” a még feldolgozás alatti válaszok folyamatait elhagyta. Most előbb kinyeri őket; ami a lezárás után érkezik, az is folyamat lesz; a már kinyert választ a job nem küldi újra az AI-nak.
+- **Olvasat-szövegek (K5):** `olvasat-szovegek` v2: erősséget, gyengeséget, rést csak PHI-vel rendelkező sorról állít, a puszta megélésről legfeljebb „így látjátok”.
+- **Mobil Értéktár (K4):** a kártya nem lóg ki telefonon; a pontszám és a „Részletek” a szöveg alá kerül.
+- **Admin:** a státusztörténet a szakaszváltást mutatja („Vázlat → Meghívva”, A3); küszöb alatt a legnagyobb rés választójában nincs rés-szám (A4); azonos nevű szervezetek a választókban a címükkel (A7); az újrapublikálás kérdése nem ígér e-mailt (A9); a jóvá nem hagyott állítás az előnézetben „vázlat” (A10); az Adatok és Értékek fül `h1`-et kap, minden admin oldalra teszttel (A11); az A1 névsúgója alanyfüggő (K6).
+- **Ügyféloldal:** egy logó asztali nézetben (A6); a V11 „Feldolgozás alatt · N” csak a nyitott tételeket listázza (A8).
+- **Egyéb:** az admin belépés oldalain nincs `$persist` JS-hiba (A1); a `{material}` route-ok csak uuid-ot fogadnak, 500 helyett 404 (A2); a demó-seeder valódi hozzájárulás-szöveget ír, a tartalék „Demó ·” értékei a demó szervezetéi (A12); a tesztek AI- és PDF-beállítása független a helyi `.env`-től.
+
 ## 1.13 · 3852f47 · 2026-10-19
 
 Értéktükör: az illesztés csendben üres választ kapott (Értéktükör teszt 1).
