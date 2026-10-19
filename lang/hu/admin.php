@@ -1063,6 +1063,7 @@ return [
         ],
         'publish' => 'Publikálom',
         'confirm' => 'A vezető e-mailt kap, a társak az Útravalójukat. A riport a mai napra fagy. Publikálod?',
+        'confirm_republish' => 'Újrapublikálás: e-mail nem megy ki, a riport és az Útravaló újra elérhető. A riport a mai napra fagy. Publikálod?',
         'published' => 'Publikálva.',
         'not_ready' => 'Még nincs meg minden az ellenőrzőlistán.',
         'not_reading' => 'Publikálni az olvasat után lehet.',

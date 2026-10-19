@@ -84,7 +84,8 @@ it('withdraws with a reason and republishes without e-mails (21 · 21.5)', funct
         ->assertHasErrors(['withdrawReason'])
         ->set('withdrawReason', 'Hibás folyamat-pont.')
         ->call('withdraw')
-        ->assertHasNoErrors();
+        ->assertHasNoErrors()
+        ->assertSeeHtml('Újrapublikálás: e-mail nem megy ki');
 
     $main->refresh();
     expect($main->stage)->toBe(MainDiagnosisStage::Reading)

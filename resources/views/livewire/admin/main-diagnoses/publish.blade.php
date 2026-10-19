@@ -35,7 +35,7 @@
         @if ($isReading)
             <div class="pt-2">
                 @if ($canPublish)
-                    <x-ui.button tone="coral" wire:click="publish" wire:confirm="{{ __('admin.publish.confirm') }}">{{ __('admin.publish.publish') }}</x-ui.button>
+                    <x-ui.button tone="coral" wire:click="publish" wire:confirm="{{ $snapshots->isEmpty() ? __('admin.publish.confirm') : __('admin.publish.confirm_republish') }}">{{ __('admin.publish.publish') }}</x-ui.button>
                 @else
                     <x-ui.button tone="coral" disabled aria-disabled="true">{{ __('admin.publish.publish') }}</x-ui.button>
                 @endif
