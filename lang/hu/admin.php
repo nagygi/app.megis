@@ -1196,6 +1196,7 @@ return [
             'empty' => 'Még nincs állítás.',
             'none_for_row' => 'Ehhez a sorhoz nincs állítás.',
             'marker' => 'a diagnózis állítása · a mégis átnézte · bizonyítékok ›',
+            'marker_draft' => 'vázlat · jóváhagyás után kerül a riportba',
             'kinds' => [
                 'strength' => 'erősség',
                 'crack' => 'repedés',

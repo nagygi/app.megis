@@ -265,7 +265,7 @@
                     <div wire:key="leader-claim-{{ $rowClaim->id }}" class="flex flex-col gap-1 rounded-lg bg-white p-3 text-sm">
                         <x-ui.badge :tone="$rowClaim->isApproved() ? 'green' : 'muted'">{{ __('admin.reading.claims.kinds.'.($main->isSnapshot() && $rowClaim->kind === 'crack' ? 'breakpoint' : $rowClaim->kind)) }}</x-ui.badge>
                         <p>{{ $rowClaim->text }}</p>
-                        <p class="text-xs text-grey-600">{{ __('admin.reading.claims.marker') }}</p>
+                        <p class="text-xs text-grey-600">{{ $rowClaim->isApproved() ? __('admin.reading.claims.marker') : __('admin.reading.claims.marker_draft') }}</p>
                     </div>
                 @empty
                     <p class="text-sm text-grey-600">{{ __('admin.reading.claims.none_for_row') }}</p>

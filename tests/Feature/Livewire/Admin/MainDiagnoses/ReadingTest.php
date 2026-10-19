@@ -176,12 +176,13 @@ it('keeps a claim to the traces of its own row and approves it (20 · 20.3)', fu
         ->assertHasErrors(['claim.text'])
         ->set('claim.text', 'Nálatok szólnak a csúszásról, mielőtt baj lenne.')
         ->call('saveClaim')
-        ->assertHasNoErrors();
+        ->assertHasNoErrors()
+        ->assertSee('vázlat · jóváhagyás után kerül a riportba');
 
     $claim = DiagnosisClaim::query()->sole();
     expect($claim->diagnosis_row_id)->toBe($row->id)->and($claim->status)->toBe('draft');
 
-    $component->call('approveClaim', $claim->id);
+    $component->call('approveClaim', $claim->id)->assertSee('a diagnózis állítása · a mégis átnézte');
     expect($claim->refresh()->isApproved())->toBeTrue()->and($claim->approved_at)->not->toBeNull();
 
     $component->call('deleteClaim', $claim->id);
