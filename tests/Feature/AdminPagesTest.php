@@ -16,7 +16,7 @@ use App\Models\User;
 use App\Models\Value;
 use App\Models\ValueCategory;
 
-it('renders every admin page for a superadmin', function (Closure $route) {
+it('renders every admin page for a superadmin with a page heading', function (Closure $route) {
     $superadmin = actingAsAdmin(User::factory()->superadmin()->create());
     $organization = Organization::factory()->withHeadcountLimit(10)->create(['contact_admin_id' => $superadmin->id]);
     $team = Team::factory()->for($organization)->create();
@@ -34,7 +34,8 @@ it('renders every admin page for a superadmin', function (Closure $route) {
 
     $response = $this->get($route(compact('organization', 'team', 'customer', 'membership', 'otherAdmin', 'category', 'value', 'diagnosis', 'diagnosisType')));
 
-    $response->assertOk();
+    // Every page names itself with one h1 (NFR · akadálymentesség).
+    $response->assertOk()->assertSee('<h1', false);
 })->with([
     'organizations' => fn () => route('admin.organizations.index'),
     'new organization' => fn () => route('admin.organizations.create'),

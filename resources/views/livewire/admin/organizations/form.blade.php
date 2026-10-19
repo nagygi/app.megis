@@ -1,9 +1,7 @@
 <div class="max-w-2xl">
     <x-ui.flash class="mb-6" />
 
-    @unless ($isEditing)
-        <x-admin.page-header :title="__('admin.organizations.create_title')" />
-    @endunless
+    <x-admin.page-header :title="$isEditing ? __('admin.organizations.tabs.data') : __('admin.organizations.create_title')" />
 
     <form wire:submit="save" class="flex flex-col gap-5 rounded-card border border-grey-250 bg-white p-6">
         @if ($isEditing)
