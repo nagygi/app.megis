@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.12 · {hash} · 2026-10-19
+## 1.12 · 69156e5 · 2026-10-19
 
 Ügyféloldali fejléc és a vezető első belépése a prototípus szerint.
 
