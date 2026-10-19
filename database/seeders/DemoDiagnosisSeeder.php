@@ -10,6 +10,7 @@ use App\Enums\ParticipantRole;
 use App\Enums\ProcessRhythm;
 use App\Enums\ScoreResultState;
 use App\Enums\StepMark;
+use App\Enums\ValueOrigin;
 use App\Models\Consent;
 use App\Models\MainDiagnosis;
 use App\Models\Membership;
@@ -133,12 +134,13 @@ class DemoDiagnosisSeeder extends Seeder
         $values = Value::query()->availableTo($organization)->where('has_endpoints', true)->orderBy('name')->limit(4)->get();
 
         if ($values->count() < 3) {
+            // The demo's own values ("Szervezet által felvett"), not in other organizations' Értéktár.
             $values = collect(['Nyíltság', 'Felelősségvállalás', 'Együttműködés'])->map(fn (string $name) => app(ValueService::class)->create([
                 'name' => 'Demó · '.$name,
                 'meanings' => ['Kimondjuk, ami fontos.'],
                 'high_examples' => ['A rossz hír aznap kimegy.'],
                 'low_examples' => ['A rossz hír megvárja, amíg biztos.'],
-            ]));
+            ], ValueOrigin::Organization, $organization));
         }
 
         $valueSets->save($valueSets->forOrganization($organization), $values->map(fn (Value $value) => $valueSets->itemFromValue($value->load('latestVersion')))->all(), [
@@ -182,7 +184,7 @@ class DemoDiagnosisSeeder extends Seeder
         // The peers: consent on T1, then their experience, one lower than the leader's.
         foreach ($peers as $index => $peer) {
             foreach ([ConsentKind::Answers, ConsentKind::Quotes] as $kind) {
-                Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => $kind, 'text_version' => __('diagnosis.consent.version'), 'text' => __('diagnosis.consent.version'), 'given_at' => now()]);
+                Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => $kind, 'text_version' => __('diagnosis.consent.version'), 'text' => __('diagnosis.consent.'.$kind->value, ['leader' => $leader->name]), 'given_at' => now()]);
             }
 
             $main->participantFor($peer, ParticipantRole::Peer)?->update(['opened_at' => now(), 'started_at' => now()]);
