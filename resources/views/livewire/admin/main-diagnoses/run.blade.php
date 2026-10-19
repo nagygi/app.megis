@@ -35,6 +35,12 @@
                 </div>
             @endif
         </section>
+    @elseif ($thresholdOverridable)
+        <section class="flex flex-col gap-3 rounded-card border border-coral bg-white p-5" aria-labelledby="threshold-title" role="region">
+            <h2 id="threshold-title" class="text-lg font-semibold">{{ __('admin.run.threshold.below_title') }}</h2>
+            <p>{{ __('admin.run.threshold.below_text', ['answered' => $main->calculation['peers_answered'] ?? 0, 'missing' => $missingPeers]) }}</p>
+            <x-ui.button tone="outline" size="sm" class="self-start" wire:click="overrideThreshold" wire:confirm="{{ __('admin.run.threshold.confirm_without') }}">{{ __('admin.run.threshold.without') }}</x-ui.button>
+        </section>
     @endif
 
     @if ($main->threshold_overridden_at)
@@ -215,6 +221,8 @@
         <div class="flex flex-wrap items-center gap-3">
             @if ($processingCount > 0)
                 <x-ui.button tone="coral" wire:click="startReading" wire:confirm="{{ __('admin.run.confirm_reading', ['count' => $processingCount]) }}">{{ __('admin.run.start_reading') }}</x-ui.button>
+            @elseif ($thresholdOverridable)
+                <x-ui.button tone="coral" wire:click="startReading" wire:confirm="{{ __('admin.run.confirm_reading_below_threshold', ['count' => $missingPeers]) }}">{{ __('admin.run.start_reading') }}</x-ui.button>
             @else
                 <x-ui.button tone="coral" wire:click="startReading" wire:confirm="{{ __('admin.run.confirm_reading_plain') }}">{{ __('admin.run.start_reading') }}</x-ui.button>
             @endif

@@ -171,6 +171,19 @@ class DiagnosisRunService
     }
 
     /**
+     * Below the threshold the admin can let it go without the team number at
+     * any time before publishing, also after the reading has started early:
+     * the publishing checklist asks for this decision (19 · 19.4, 21 · 21.2).
+     */
+    public function thresholdOverridable(MainDiagnosis $main): bool
+    {
+        return in_array($main->stage, [MainDiagnosisStage::Running, MainDiagnosisStage::Reading], true)
+            && $main->hasPeers()
+            && ! $this->threshold->isMet($main)
+            && ! $this->threshold->isOverridden($main);
+    }
+
+    /**
      * The threshold text for the leader, editable before sending.
      *
      * @return array{subject: string, body: string}

@@ -257,6 +257,7 @@ class Run extends Component
             'connections' => CalendarConnection::query()->whereBelongsTo($organization)->with('user')->latest('id')->get()->unique('user_id'),
             'conversations' => $main->conversations->sortBy('held_at')->values(),
             'thresholdAtRisk' => $run->thresholdAtRisk($main),
+            'thresholdOverridable' => $run->thresholdOverridable($main),
             'thresholdMet' => $threshold->isMet($main),
             'thresholdOverrider' => $main->threshold_overridden_by ? User::query()->find($main->threshold_overridden_by) : null,
             'canRemindLeader' => $run->leaderNeedsReminder($main) && $run->canRemind($main, $main->leader),

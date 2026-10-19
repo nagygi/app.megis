@@ -120,6 +120,23 @@ it('flags the threshold a week before publishing and records the decisions (19 �
         ->assertSee('A küszöb veszélyben.');
 });
 
+it('lets a reading started below the threshold go without the team number (19 · 19.4)', function () {
+    [$setup, $main] = runningDiagnosis();
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Run::class, ['diagnosis' => $main->diagnosis])
+        ->assertSee('A küszöb nem teljesült.')
+        ->call('startReading');
+    expect($main->refresh()->stage)->toBe(MainDiagnosisStage::Reading);
+
+    Livewire::test(Run::class, ['diagnosis' => $main->diagnosis])
+        ->assertSee('A küszöb nem teljesült.')
+        ->call('overrideThreshold')
+        ->assertSee('Csapat-szám nélkül megy · '.$setup['admin']->name)
+        ->assertDontSee('A küszöb nem teljesült.');
+    expect($main->refresh()->threshold_overridden_by)->toBe($setup['admin']->id);
+});
+
 it('moves the publishing day and tells the leader (19 · 19.4)', function () {
     Mail::fake();
     [$setup, $main] = runningDiagnosis();

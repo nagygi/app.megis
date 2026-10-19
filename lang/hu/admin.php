@@ -1330,6 +1330,8 @@ return [
             'snoozed' => 'A küszöb-jelzés :date-ig hallgat.',
             'overridden' => 'Csapat-szám nélkül megy · :name · :date',
             'revoke' => 'Visszavonom',
+            'below_title' => 'A küszöb nem teljesült.',
+            'below_text' => 'A vezetőn kívül :answered társ töltötte ki a megélést, még :missing kell. Publikálni akkor lehet, ha a küszöb teljesül, vagy ha csapat-szám nélkül megy.',
         ],
         'conversations' => [
             'title' => 'Beszélgetések a mégisszel',
@@ -1356,6 +1358,7 @@ return [
         'start_reading_help' => 'A számításba menő adatok zárulnak, és elkészülnek az AI-vázlatok.',
         'confirm_reading' => 'Még :count anyag feldolgozás alatt van. Elindítod az olvasatot?',
         'confirm_reading_plain' => 'Elindítod az olvasatot? A kitöltés és az anyagok zárulnak.',
+        'confirm_reading_below_threshold' => 'A küszöbhöz még :count társ kell, és az olvasat után már nem töltenek ki. Publikálni csak csapat-szám nélkül lehet majd. Elindítod az olvasatot?',
         'reading_started' => 'Az olvasat elindult.',
     ],
 
