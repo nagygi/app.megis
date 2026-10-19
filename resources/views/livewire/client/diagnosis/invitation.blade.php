@@ -3,6 +3,8 @@
     ticked in advance: the consent has to be the peer's own act (GDPR).
 --}}
 <div class="flex max-w-xl flex-col gap-6">
+    <x-ui.flash />
+
     <p class="text-lg">{{ __('diagnosis.invitation.lead', ['leader' => $leaderName, 'subject' => $main->subjectName(), 'minutes' => config('diagnosis.peer_minutes')]) }}</p>
 
     @if (! $main->acceptsInput())

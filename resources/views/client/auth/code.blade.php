@@ -6,6 +6,8 @@
     guest
 >
     <div class="flex max-w-md flex-col gap-6">
+        <x-ui.flash />
+
         <p>{{ __('auth_ui.customer.code_lead', ['email' => $email]) }}</p>
 
         <form method="POST" action="{{ route('client.login.code.store') }}" class="flex flex-col gap-5">

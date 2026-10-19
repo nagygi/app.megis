@@ -1,5 +1,7 @@
 {{-- T2 · Mi vár rád, T5 · the peer's home while it runs (25 · 25.3, 25.5). --}}
 <div class="flex max-w-2xl flex-col gap-6">
+    <x-ui.flash />
+
     @if ($withdrawn)
         <p class="rounded-card bg-grey-100 p-4">{{ __('diagnosis.peer_home.withdrawn') }}</p>
     @elseif ($current && $main->acceptsInput())

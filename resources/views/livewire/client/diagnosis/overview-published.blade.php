@@ -8,6 +8,8 @@
     $snapshot = $report['meta']['snapshot'];
 @endphp
 <div class="flex max-w-2xl flex-col gap-6">
+    <x-ui.flash />
+
     <section class="flex flex-col items-center gap-3 rounded-card bg-white p-6 text-center sm:flex-row sm:text-left" aria-label="{{ __('report.ring.label') }}">
         <x-report.ring :percent="$ring['percent']" />
         <div class="flex flex-col gap-1">

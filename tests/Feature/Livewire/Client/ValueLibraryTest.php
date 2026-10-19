@@ -23,6 +23,16 @@ it('shows the organization’s values in its own words', function () {
         ->assertSee('Nálunk kimondjuk.');
 });
 
+it('shows a flash message once, not again in the layout', function () {
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+
+    $response = $this->withSession(['status' => 'A tükröd a diagnózisok közé került.'])->get(route('client.values', $organization));
+
+    $response->assertOk();
+    expect(substr_count($response->getContent(), 'A tükröd a diagnózisok közé került.'))->toBe(1);
+});
+
 it('leaves the organization block out without a value set', function () {
     $organization = Organization::factory()->create();
     actingAsCustomer(customerOf($organization));

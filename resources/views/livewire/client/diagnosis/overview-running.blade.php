@@ -1,6 +1,8 @@
 {{-- V10, V10·b · the leader's home while it runs and is read (26 · 26.1, 26.2). Numbers, never answers. --}}
 @php($stepState = fn (string $state) => __('diagnosis.home.states.'.$state))
 <div class="flex max-w-2xl flex-col gap-6 pb-16">
+    <x-ui.flash />
+
     @if ($home['correcting'])
         <p class="rounded-card bg-yellow-pale p-4">{{ __('diagnosis.home.correcting') }}</p>
     @endif

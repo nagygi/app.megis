@@ -1,5 +1,7 @@
 {{-- V1 · Mi vár rád, V1·b · Innen folytatod (23 · 23.1, 23.2). --}}
 <div class="flex max-w-2xl flex-col gap-6">
+    <x-ui.flash />
+
     <div class="flex flex-col gap-1">
         @if ($main->stage->isBeforeRunning() && ($firstVisit || ! $steps->isStarted()))
             <p class="text-xl font-semibold">{{ trans_choice($main->isSnapshot() ? 'diagnosis.steps_lead_snapshot' : 'diagnosis.steps_lead', $steps->count(), ['count' => $steps->count()]) }}</p>

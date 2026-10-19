@@ -78,6 +78,14 @@ it('lets a new code be requested only after 60 seconds', function () {
     Mail::assertQueued(LoginCodeMail::class, 1);
 });
 
+it('shows that the code is on its way on B2', function () {
+    $customer = customerOf();
+
+    $response = $this->withSession(['login.email' => $customer->email, 'status' => 'Elküldtük a belépő kódot.'])->get(route('client.login.code'));
+
+    $response->assertOk()->assertSee('Elküldtük a belépő kódot.');
+});
+
 it('sends visitors without a pending e-mail back to B1', function () {
     $response = $this->get(route('client.login.code'));
 

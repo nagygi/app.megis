@@ -117,8 +117,8 @@
                 </div>
             </header>
 
+            {{-- Pages show their own flash messages, so Livewire pages update them after actions too. --}}
             <main id="main" class="mx-auto w-full max-w-3xl flex-1 px-6 py-6 desktop:max-w-5xl">
-                <x-ui.flash class="mb-6" />
                 {{ $slot }}
             </main>
         </div>
