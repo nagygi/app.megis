@@ -241,7 +241,7 @@ class Form extends Component
         return view('livewire.admin.main-diagnoses.form', [
             'title' => $title,
             'organization' => $organization,
-            'organizations' => Organization::query()->whereNull('deactivated_at')->orderBy('name')->get(['id', 'name', 'type']),
+            'organizations' => Organization::query()->whereNull('deactivated_at')->orderBy('name')->get(['id', 'name', 'slug', 'type']),
             'admins' => User::query()->admins()->whereNull('deactivated_at')->orderBy('last_name')->orderBy('first_name')->get(),
             'productName' => $this->main?->product_name ?? $product?->name,
             'hasFlow' => $hasFlow,

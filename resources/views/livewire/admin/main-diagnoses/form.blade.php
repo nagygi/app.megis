@@ -31,9 +31,7 @@
                 @else
                     <x-form.select name="organization_id" wire:model.live="organization_id" :label="__('admin.main_diagnoses.organization')" required>
                         <option value="">{{ __('admin.diagnoses.organization_select') }}</option>
-                        @foreach ($organizations as $option)
-                            <option value="{{ $option->id }}">{{ $option->name }}</option>
-                        @endforeach
+                        <x-admin.organization-options :organizations="$organizations" />
                     </x-form.select>
                 @endif
 

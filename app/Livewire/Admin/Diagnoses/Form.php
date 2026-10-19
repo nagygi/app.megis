@@ -187,7 +187,7 @@ class Form extends Component
 
         return view('livewire.admin.diagnoses.form', [
             'title' => $title,
-            'organizations' => Organization::query()->whereNull('deactivated_at')->orderBy('name')->get(['id', 'name', 'type']),
+            'organizations' => Organization::query()->whereNull('deactivated_at')->orderBy('name')->get(['id', 'name', 'slug', 'type']),
             'organization' => $organization,
             'levels' => collect(DiagnosisLevel::cases())
                 ->reject(fn (DiagnosisLevel $level) => $level === DiagnosisLevel::Team && $organization?->isIndividual())

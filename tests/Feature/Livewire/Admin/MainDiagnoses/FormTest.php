@@ -10,6 +10,7 @@ use App\Mail\DiagnosisLeaderInvitationMail;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisType;
 use App\Models\MainDiagnosis;
+use App\Models\Organization;
 use App\Models\Product;
 use App\Models\Team;
 use App\Models\User;
@@ -52,6 +53,19 @@ it('names the default diagnosis name after the subject on A1 (17 · 17.1)', func
         ->set('subject', 'person')
         ->assertSee('„Név · Termék · a kezdés napja”')
         ->assertDontSee('„Csapat · Termék · a kezdés napja”');
+});
+
+it('tells organizations of the same name apart by their address on A1', function () {
+    actingAsAdmin();
+    Organization::factory()->create(['name' => 'Acme Kft.', 'slug' => 'acme']);
+    Organization::factory()->create(['name' => 'Acme Kft.', 'slug' => 'acme-2']);
+    Organization::factory()->create(['name' => 'Béta Bt.', 'slug' => 'beta']);
+
+    Livewire::test(Form::class)
+        ->assertSee('Acme Kft. · /acme')
+        ->assertSee('Acme Kft. · /acme-2')
+        ->assertSee('Béta Bt.')
+        ->assertDontSee('Béta Bt. · /beta');
 });
 
 it('saves a draft without sending anything', function () {

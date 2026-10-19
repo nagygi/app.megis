@@ -4,9 +4,7 @@
     <form wire:submit="save" class="flex flex-col gap-5 rounded-card border border-grey-250 bg-white p-6">
         <x-form.select name="organization_id" wire:model.live="organization_id" :label="__('admin.diagnoses.organization')" required>
             <option value="">{{ __('admin.diagnoses.organization_select') }}</option>
-            @foreach ($organizations as $organization)
-                <option value="{{ $organization->id }}">{{ $organization->name }}</option>
-            @endforeach
+            <x-admin.organization-options :organizations="$organizations" />
         </x-form.select>
 
         <x-form.select name="diagnosis_type_id" wire:model="diagnosis_type_id" :label="__('admin.diagnoses.type')" required>

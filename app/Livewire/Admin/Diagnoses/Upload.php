@@ -114,7 +114,7 @@ class Upload extends Component
     public function render(): View
     {
         return view('livewire.admin.diagnoses.upload', [
-            'organizations' => Organization::query()->whereNull('deactivated_at')->orderBy('name')->get(['id', 'name']),
+            'organizations' => Organization::query()->whereNull('deactivated_at')->orderBy('name')->get(['id', 'name', 'slug']),
             'types' => DiagnosisType::query()->whereNot('key', DiagnosisType::MAIN)->orWhereNull('key')->orderBy('name')->get(['id', 'name']),
             'rules' => MaterialStore::rules(),
             'mainDiagnoses' => $this->mainDiagnosisOptions(),
