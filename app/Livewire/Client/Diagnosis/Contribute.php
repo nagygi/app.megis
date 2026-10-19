@@ -3,6 +3,7 @@
 namespace App\Livewire\Client\Diagnosis;
 
 use App\Enums\MaterialContext;
+use App\Enums\MaterialStatus;
 use App\Exceptions\UnreadableMaterialException;
 use App\Livewire\Client\Diagnosis\Concerns\HandlesOccasionMaterials;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
@@ -13,6 +14,7 @@ use App\Models\OccasionExperience;
 use App\Models\Organization;
 use App\Services\Materials\MaterialStore;
 use App\Services\Processes\OccasionService;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -92,9 +94,16 @@ class Contribute extends Component
             ->get()
             ->keyBy('process_occasion_id');
 
+        // "Feldolgozás alatt" lists what is still open: placing and the
+        // experience can be finished later; finished ones are on T5·b (V11).
+        $openMaterials = $materials
+            ->map(fn (Material $material) => ['material' => $material, 'state' => $this->materialState($material, $experiences)])
+            ->reject(fn (array $entry) => $entry['state'] === 'done')
+            ->values();
+
         return view('livewire.client.diagnosis.contribute', [
             'materials' => $materials,
-            'experiences' => $experiences,
+            'openMaterials' => $openMaterials,
             'canContribute' => app(OccasionService::class)->canContribute($this->main(), $this->user()),
             'rules' => MaterialStore::rules(),
             'connection' => $this->isLeader()
@@ -107,5 +116,20 @@ class Contribute extends Component
             'backLabel' => __('diagnosis.home_back'),
             'color' => 'cream',
         ])->title(__('processes.occasions.contribute_title'));
+    }
+
+    /**
+     * @param  Collection<int, OccasionExperience>  $experiences
+     */
+    private function materialState(Material $material, Collection $experiences): string
+    {
+        return match (true) {
+            $material->status === MaterialStatus::Failed => 'failed',
+            $material->placed_at === null => 'unplaced',
+            $material->status->isWorking() => 'processing',
+            $material->isUnclassified() => 'unclassified',
+            $material->process_occasion_id !== null && ! $experiences->has($material->process_occasion_id) => 'experience_open',
+            default => 'done',
+        };
     }
 }

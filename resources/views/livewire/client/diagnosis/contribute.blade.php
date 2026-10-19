@@ -49,22 +49,11 @@
         <p class="rounded-card bg-grey-100 p-4 text-sm">{{ __('processes.occasions.closed') }}</p>
     @endif
 
-    @if ($materials->isNotEmpty())
+    @if ($openMaterials->isNotEmpty())
         <section class="flex flex-col gap-2" aria-labelledby="processing">
-            <h2 id="processing" class="font-semibold">{{ __('processes.occasions.processing_title') }}</h2>
+            <h2 id="processing" class="font-semibold">{{ __('processes.occasions.processing_title') }} · {{ $openMaterials->count() }}</h2>
             <ul class="flex flex-col gap-2">
-                @foreach ($materials as $material)
-                    @php
-                        $experience = $material->process_occasion_id ? $experiences->get($material->process_occasion_id) : null;
-                        $state = match (true) {
-                            $material->status === \App\Enums\MaterialStatus::Failed => 'failed',
-                            $material->placed_at === null => 'unplaced',
-                            $material->status->isWorking() => 'processing',
-                            $material->isUnclassified() => 'unclassified',
-                            $material->process_occasion_id !== null && $experience === null => 'experience_open',
-                            default => 'done',
-                        };
-                    @endphp
+                @foreach ($openMaterials as ['material' => $material, 'state' => $state])
                     <li wire:key="material-{{ $material->uuid }}" class="flex flex-wrap items-center justify-between gap-3 rounded-card bg-white px-4 py-3">
                         <span>
                             <span class="block font-semibold">{{ $material->is_situation ? __('processes.occasions.situation') : ($material->original_name ?? $material->source->label()) }}</span>
@@ -88,7 +77,10 @@
                     </li>
                 @endforeach
             </ul>
-            <a href="{{ route('client.diagnosis.situations', [$organization, $diagnosis]) }}" class="self-start text-sm font-semibold">{{ __('processes.occasions.situations_link') }}</a>
         </section>
+    @endif
+
+    @if ($materials->isNotEmpty())
+        <a href="{{ route('client.diagnosis.situations', [$organization, $diagnosis]) }}" class="self-start text-sm font-semibold">{{ __('processes.occasions.situations_link') }}</a>
     @endif
 </div>

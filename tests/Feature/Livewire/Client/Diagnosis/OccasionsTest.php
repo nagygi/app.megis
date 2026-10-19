@@ -3,6 +3,7 @@
 use App\Enums\InboxItemType;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\MaterialContext;
+use App\Enums\MaterialStatus;
 use App\Enums\ParticipantRole;
 use App\Enums\ProcessKind;
 use App\Jobs\AnalyzeMaterial;
@@ -83,6 +84,22 @@ it('takes an upload and asks where it belongs before processing it (V11)', funct
         ->and($material->user_id)->toBe($setup['leader']->id)
         ->and($material->placed_at)->toBeNull();
     Queue::assertNotPushed(AnalyzeMaterial::class);
+});
+
+it('lists only the unfinished materials under "Feldolgozás alatt" (V11)', function () {
+    [$setup, $main, $retro] = occasionDiagnosis();
+    $leader = $setup['leader'];
+    actingAsCustomer($leader);
+    situationMaterial($main, $leader);
+    $finished = situationMaterial($main, $leader, 'A tervezésen mindenki szólt.');
+    app(OccasionService::class)->place($finished, $retro, today()->subDay()->toDateString(), $leader, false);
+    $finished->refresh()->update(['status' => MaterialStatus::Processed]);
+    app(OccasionService::class)->experience($finished, $leader, null, null, null, skip: true);
+
+    Livewire::test(Contribute::class, occasionParams($setup, $main))
+        ->assertSee('Feldolgozás alatt · 1')
+        ->assertSee('nincs besorolva')
+        ->assertSee('A helyzeteid');
 });
 
 it('rejects an unsupported file type', function () {
