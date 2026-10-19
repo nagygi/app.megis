@@ -103,7 +103,7 @@
                                 <span aria-hidden="true">‹</span> {{ $backLabel ?? __('ui.back') }}
                             </a>
                         @else
-                            <x-megis.logo :variant="in_array($color, ['charcoal', 'green'], true) ? 'white' : 'red-dark'" class="h-7" />
+                            <x-megis.logo :variant="in_array($color, ['charcoal', 'green'], true) ? 'white' : 'red-dark'" class="h-7 desktop:hidden" />
                         @endif
 
                         <span class="min-w-0 flex-1 truncate text-right text-xs font-semibold tracking-wider uppercase tabular-nums">{{ $step ?? $label }}</span>
