@@ -152,6 +152,19 @@ class Value extends Model
     }
 
     /**
+     * What the engine may match to (06 · 6.4): an AI-detected value only once
+     * reviewed. Unreviewed, its meaning is the AI's own earlier reasoning, so
+     * a detection would match its own copy, a name match by another route.
+     *
+     * @param  Builder<Value>  $query
+     */
+    #[Scope]
+    protected function matchable(Builder $query): void
+    {
+        $query->where(fn (Builder $matchable) => $matchable->where('origin', '!=', ValueOrigin::Ai)->orWhereNotNull('reviewed_at'));
+    }
+
+    /**
      * Came from outside the admin form and nobody has reviewed it yet (03 · 3.7).
      *
      * @param  Builder<Value>  $query

@@ -2,6 +2,17 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.13 · {hash} · 2026-10-19
+
+Értéktükör: az illesztés csendben üres választ kapott (Értéktükör teszt 1).
+
+- **Gyökérok:** a Gemini a gondolkodási tokeneket is a `max_tokens`-be számolja. Az illesztés válasza a 4096-os plafonnál csonkolódott, a csonka JSON-t az SDK üres válaszként olvasta, a hívás mégis „sikeres” lett, így egyetlen detekció sem illeszkedett, és minden szabad név „AI által detektált” értékként került az Értéktárba.
+- **AI-réteg:** a tokenlimitnél csonkolt vagy nem olvasható strukturált válasz sikertelen hívás, a job újrapróbálja, végül riaszt. A napló a finish reasont is mutatja. Ez minden AI-feladatra érvényes.
+- **Tokenlimit:** az Értéktükör három lépése 16 384 tokenig mehet (eddig 4096). Ez plafon, a költség a ténylegesen generált tokeneken múlik.
+- **Illesztés:** nincs csendes kilépés. Üres katalógusnál figyelmeztetés és riasztás jön, a tükör illesztés nélkül fut le. Ismeretlen detekciókódnál vagy értékkódnál figyelmeztetés jön az AI-hívás azonosítójával, és az is naplózva van, ha egy batchben semmi sem éri el a küszöböt.
+- **Katalógus:** a felülvizsgálatlan „AI által detektált” értékek nem illesztési célpontok, különben egy szabad név a saját korábbi másolatára illeszkedne. Ha a szervezet az értékszettjébe vette, marad.
+- **Detektálás:** `ertektukor-detektalas` v2. A névpéldák kimaradtak, mert a modell átvette őket. A gyengén látszó értékeket és azt is felveszi, amit a beszélő fontosnak mond, de a tettei mást mutatnak (1–2). A mások szavaiként idézett értékeket nem veszi fel.
+
 ## 1.12 · 69156e5 · 2026-10-19
 
 Ügyféloldali fejléc és a vezető első belépése a prototípus szerint.

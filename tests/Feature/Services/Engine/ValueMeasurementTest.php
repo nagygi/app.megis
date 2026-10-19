@@ -9,6 +9,8 @@ use App\Enums\MaterialStatus;
 use App\Enums\MirrorStatus;
 use App\Enums\ScoreResultState;
 use App\Enums\ValueOrigin;
+use App\Exceptions\EmptyValueCatalogException;
+use App\Mail\ErrorAlert;
 use App\Models\AiCall;
 use App\Models\AnonymousValueStat;
 use App\Models\InboxItem;
@@ -20,6 +22,10 @@ use App\Services\Ai\AiGateway;
 use App\Services\Materials\MaterialStore;
 use App\Services\Mirror\MirrorService;
 use App\Services\Values\ValueService;
+use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Ai\Responses\Data\Meta;
 use Laravel\Ai\Responses\Data\TextUsage;
 use Laravel\Ai\Responses\StructuredTextResponse;
@@ -58,6 +64,29 @@ function engineScenario(int $score = 5): array
     return [$directness, $care];
 }
 
+/**
+ * Every log record written from here on, with its level, message and context.
+ *
+ * @return Collection<int, MessageLogged>
+ */
+function loggedMessages(): Collection
+{
+    $logged = collect();
+    Event::listen(MessageLogged::class, fn (MessageLogged $message) => $logged->push($message));
+
+    return $logged;
+}
+
+/**
+ * One detection of the text mirror, for scenarios that test step B only.
+ */
+function oneDetection(): StructuredTextResponse
+{
+    return aiAnswer(['detections' => [
+        ['speaker' => 'Beszélő 1', 'quote' => 'inkább most mondom, mint csütörtökön', 'free_name' => 'egyenes beszéd', 'reasoning' => 'Rögtön kimondja.', 'strength' => 5],
+    ]]);
+}
+
 function textMirror(?Organization $organization = null): MirrorSession
 {
     $material = app(MaterialStore::class)->fromText(
@@ -79,7 +108,7 @@ it('reads a mirror in three steps and keeps every result with its AI call', func
     expect($session->fresh()->status)->toBe(MirrorStatus::Ready)
         ->and($material->status)->toBe(MaterialStatus::Processed)
         ->and($material->detections()->count())->toBe(2)
-        ->and($material->detections()->first()->aiCall->prompt_version)->toBe(1)
+        ->and($material->detections()->first()->aiCall)->prompt->toBe('ertektukor-detektalas')->prompt_version->toBe(2)
         ->and($material->detections()->first()->matches()->pluck('value_id')->all())->toBe([$directness->id])
         ->and($material->scores()->sole())
         ->value_id->toBe($directness->id)
@@ -97,6 +126,88 @@ it('shows matched values by their Értéktár name and the rest by the free name
 
     expect($groups->pluck('name')->all())->toBe(['Egyenesség', 'Játékosság'])
         ->and($groups->first()->quotes)->toBe(['inkább most mondom, mint csütörtökön']);
+});
+
+it('shows two detections matched to the same value as one card under the Értéktár name', function () {
+    $directness = app(ValueService::class)->create(['name' => 'Egyenesség', 'meanings' => ['Kimondom.'], 'high_examples' => ['Azonnal szólok.'], 'low_examples' => ['Hallgatok.']]);
+    AiGateway::fake([
+        aiAnswer(['detections' => [
+            ['speaker' => 'Beszélő 1', 'quote' => 'inkább most mondom, mint csütörtökön', 'free_name' => 'Nyíltság', 'reasoning' => 'Rögtön kimondja.', 'strength' => 5],
+            ['speaker' => 'Beszélő 1', 'quote' => 'Múlt héten inkább most mondom', 'free_name' => 'Őszinteség', 'reasoning' => 'Nem halogatja.', 'strength' => 4],
+        ]]),
+        aiAnswer(['results' => [
+            ['detection' => 'D1', 'matches' => [['ref' => 'E1', 'confidence' => 0.9]]],
+            ['detection' => 'D2', 'matches' => [['ref' => 'E1', 'confidence' => 0.8]]],
+        ]]),
+        aiAnswer(['scores' => [
+            ['ref' => 'E1', 'state' => 'scored', 'score' => 6, 'reasoning' => 'Beépült.', 'detections' => ['D1', 'D2']],
+        ]]),
+    ]);
+
+    $session = textMirror();
+
+    expect(app(MirrorService::class)->groups($session->fresh())->sole())
+        ->name->toBe('Egyenesség')
+        ->valueId->toBe($directness->id)
+        ->quotes->toBe(['inkább most mondom, mint csütörtökön', 'Múlt héten inkább most mondom']);
+});
+
+it('runs a mirror without matching when the catalog is empty, with a warning and an alert', function () {
+    config(['megis.alerts.recipients' => ['dev@megis.hu']]);
+    Mail::fake();
+    $logged = loggedMessages();
+    // A matching call would find no fake answer and fail the mirror.
+    AiGateway::fake([oneDetection()]);
+
+    $session = textMirror();
+
+    expect($session->fresh()->status)->toBe(MirrorStatus::Ready)
+        ->and($session->material->fresh()->status)->toBe(MaterialStatus::Processed)
+        ->and(AiCall::query()->pluck('task')->all())->toBe(['mirror_detection'])
+        ->and($logged->firstWhere('message', 'Value matching skipped: the Értéktár catalog is empty.'))
+        ->level->toBe('warning')
+        ->context->toBe(['material_id' => $session->material_id, 'organization_id' => null]);
+    Mail::assertSent(ErrorAlert::class, fn (ErrorAlert $mail): bool => $mail->errorClass === EmptyValueCatalogException::class);
+});
+
+it('logs an answer that names an unknown detection or Értéktár value, and matches nothing', function () {
+    Value::factory()->create();
+    $logged = loggedMessages();
+    AiGateway::fake([
+        oneDetection(),
+        aiAnswer(['results' => [
+            ['detection' => 'D7', 'matches' => [['ref' => 'E1', 'confidence' => 0.9]]],
+            ['detection' => 'D1', 'matches' => [['ref' => 'E42', 'confidence' => 0.9]]],
+        ]]),
+    ]);
+
+    $material = textMirror()->material;
+    $matchingCallId = AiCall::query()->where('task', 'mirror_matching')->sole()->id;
+
+    expect($material->detections()->sole()->matches()->count())->toBe(0)
+        ->and($logged->where('level', 'warning')->map(fn (MessageLogged $message) => $message->context)->values()->all())->toBe([
+            ['detection' => 'D7', 'ai_call_id' => $matchingCallId],
+            ['ref' => 'E42', 'detection' => 'D1', 'ai_call_id' => $matchingCallId],
+        ]);
+});
+
+it('logs a batch in which nothing matches above the threshold', function () {
+    Value::factory()->create();
+    $logged = loggedMessages();
+    AiGateway::fake([
+        oneDetection(),
+        aiAnswer(['results' => [['detection' => 'D1', 'matches' => [['ref' => 'E1', 'confidence' => 0.3]]]]]),
+    ]);
+
+    $material = textMirror()->material;
+
+    expect($logged->firstWhere('message', 'Value matching: no match above the threshold in this batch.'))
+        ->level->toBe('info')
+        ->context->toBe([
+            'material_id' => $material->id,
+            'detections' => 1,
+            'ai_call_id' => AiCall::query()->where('task', 'mirror_matching')->sole()->id,
+        ]);
 });
 
 it('writes nothing to the Értéktár before the account is confirmed', function () {

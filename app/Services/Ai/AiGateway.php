@@ -13,11 +13,14 @@ use Closure;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\JsonSchemaTypeFactory;
 use Illuminate\Support\Facades\Log;
+use Laravel\Ai\Exceptions\AiException;
 use Laravel\Ai\Files\Audio;
 use Laravel\Ai\Files\LocalAudio;
 use Laravel\Ai\Files\StoredAudio;
 use Laravel\Ai\Gateway\FakeTextGateway;
 use Laravel\Ai\PendingResponses\PendingTranscriptionGeneration;
+use Laravel\Ai\Responses\AgentResponse;
+use Laravel\Ai\Responses\Data\FinishReason;
 use Laravel\Ai\Responses\StructuredAgentResponse;
 use Laravel\Ai\Responses\TranscriptionResponse;
 use Laravel\Ai\Transcription;
@@ -79,12 +82,19 @@ class AiGateway
             throw $exception;
         }
 
+        $finishReason = $response->steps->last()?->finishReason;
+        $unusable = $this->unusableAnswer($response, $finishReason, $config);
+
         $call = $this->log($task->key(), $context, $config, $prompt, $startedAt, usage: [
             'input_tokens' => $response->usage->inputTokens,
             'output_tokens' => $response->usage->outputTokens,
             'cache_read_tokens' => $response->usage->cacheReadInputTokens ?? 0,
             'cache_write_tokens' => $response->usage->cacheWriteInputTokens ?? 0,
-        ], modelVersion: $response->meta->model);
+        ], modelVersion: $response->meta->model, error: $unusable, finishReason: $finishReason);
+
+        if ($unusable !== null) {
+            throw $unusable;
+        }
 
         return new AiResult(
             text: $response->text,
@@ -171,6 +181,28 @@ class AiGateway
     }
 
     /**
+     * The provider may answer "completed" with nothing usable: an answer cut
+     * off at max_tokens (thinking counts into it with Gemini), or a structured
+     * answer that is no valid JSON, which the SDK reads as []. Both fail the
+     * call, so the job retries it instead of going on with nothing. Every
+     * schema has required top-level keys, so [] is never a real answer.
+     *
+     * @param  array<string, mixed>  $config
+     */
+    private function unusableAnswer(AgentResponse $response, ?FinishReason $finishReason, array $config): ?AiException
+    {
+        if ($finishReason === FinishReason::Length) {
+            return new AiException('The answer reached max_tokens ('.($config['max_tokens'] ?? 'default').') and was cut off.');
+        }
+
+        if ($response instanceof StructuredAgentResponse && $response->structured === []) {
+            return new AiException('The structured answer could not be read.');
+        }
+
+        return null;
+    }
+
+    /**
      * @param  array<string, mixed>  $config
      */
     private function agentFor(AiTask $task, string $instructions, array $config): TaskAgent
@@ -200,6 +232,7 @@ class AiGateway
         ?string $modelVersion = null,
         ?Throwable $error = null,
         ?float $audioMinutes = null,
+        ?FinishReason $finishReason = null,
     ): AiCall {
         $usage ??= ['input_tokens' => 0, 'output_tokens' => 0, 'cache_read_tokens' => 0, 'cache_write_tokens' => 0];
 
@@ -235,6 +268,7 @@ class AiGateway
             'task' => $call->task,
             'model' => $call->model_version ?? $call->model,
             'status' => $call->status->value,
+            'finish_reason' => $finishReason?->value,
             'tokens' => $call->totalTokens(),
             'duration_ms' => $call->duration_ms,
         ]);

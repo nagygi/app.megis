@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ValueOrigin;
 use App\Models\Organization;
 use App\Models\Value;
 use App\Services\Engine\ValueCatalog;
@@ -33,6 +34,28 @@ it('leaves ordinary words that look like a value name alone', function () {
     Value::factory()->create(['name_en' => 'Clean', 'examples' => ['clean desk policy', 'Cleanliness drive', 'Clean (SE)']]);
 
     expect(ValueCatalog::forOrganization(null)->forPrompt())->toContain('Példák: clean desk policy | Cleanliness drive | [E1] (SE)');
+});
+
+it('leaves the organization’s unreviewed AI-detected values out of the catalog', function () {
+    $organization = Organization::factory()->create();
+    $regular = Value::factory()->create();
+    Value::factory()->from(ValueOrigin::Ai, $organization)->create(['name' => 'Egyenesség']);
+    $reviewedDetected = Value::factory()->from(ValueOrigin::Ai, $organization)->create(['reviewed_at' => now()]);
+    $ownValue = Value::factory()->from(ValueOrigin::User, $organization)->create();
+
+    $catalog = ValueCatalog::forOrganization($organization);
+
+    expect(array_map(fn (string $ref) => $catalog->resolve($ref)?->id, ['E1', 'E2', 'E3', 'E4']))
+        ->toBe([$regular->id, $reviewedDetected->id, $ownValue->id, null]);
+});
+
+it('keeps an unreviewed AI-detected value the organization put in its value set', function () {
+    $organization = Organization::factory()->create();
+    $detected = Value::factory()->from(ValueOrigin::Ai, $organization)->create();
+
+    $catalog = ValueCatalog::forDiagnosis($organization, ['values' => [['value_id' => $detected->id, 'meaning' => 'Nálunk ezt jelenti.']]]);
+
+    expect($catalog->refFor($detected->id))->toBe('E1');
 });
 
 it('puts the organization’s own words in place of the definition, with the boundaries', function () {

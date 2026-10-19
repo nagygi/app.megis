@@ -7,11 +7,14 @@ use App\Ai\Tasks\DetectValuesTask;
 use App\Ai\Tasks\MatchValuesTask;
 use App\Ai\Tasks\ScoreValuesTask;
 use App\Enums\ScoreResultState;
+use App\Exceptions\EmptyValueCatalogException;
 use App\Models\Material;
 use App\Models\RawDetection;
 use App\Services\Ai\AiGateway;
+use App\Services\Alerting\ErrorAlerter;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * The value measurement in three steps (06 · 6.4): A free detection,
@@ -24,6 +27,7 @@ class ValueMeasurementEngine
     public function __construct(
         private AiGateway $ai,
         private TranscriptChunker $chunker,
+        private ErrorAlerter $alerter,
     ) {}
 
     /**
@@ -96,13 +100,24 @@ class ValueMeasurementEngine
     }
 
     /**
-     * Step B: match the detections in batches to the nameless catalog.
+     * Step B: match the detections in batches to the nameless catalog. Nothing
+     * is skipped silently: a misconfigured Értéktár would otherwise give
+     * "successful" mirrors without a single match. The log carries codes and
+     * ids only, never quotes or names (docs/uzemeltetes.md · 4).
      */
     public function match(Material $material, ValueCatalog $catalog, AiContext $context): void
     {
         if ($catalog->isEmpty()) {
+            Log::channel('ai')->warning('Value matching skipped: the Értéktár catalog is empty.', [
+                'material_id' => $material->id,
+                'organization_id' => $material->organization_id,
+            ]);
+            $this->alerter->reportException(new EmptyValueCatalogException('The Értéktár catalog is empty: material '.$material->id.' was processed without matching.'), null);
+
             return;
         }
+
+        $threshold = (float) config('megis.engine.match_threshold');
 
         foreach ($material->detections()->orderBy('id')->get()->chunk((int) config('megis.engine.matching_batch')) as $batch) {
             $byCode = $batch->values()->mapWithKeys(fn (RawDetection $detection, int $index) => ['D'.($index + 1) => $detection]);
@@ -117,18 +132,33 @@ class ValueMeasurementEngine
                 ])->values()->all(),
             ), $context);
 
+            $matchedAboveThreshold = 0;
+
             foreach ($result->structured['results'] ?? [] as $row) {
-                $detection = $byCode->get(strtoupper(trim((string) ($row['detection'] ?? ''))));
+                $detectionCode = (string) ($row['detection'] ?? '');
+                $detection = $byCode->get(strtoupper(trim($detectionCode)));
 
                 if ($detection === null) {
+                    Log::channel('ai')->warning('Value matching: the answer names an unknown detection.', [
+                        'detection' => $detectionCode,
+                        'ai_call_id' => $result->call->id,
+                    ]);
+
                     continue;
                 }
 
                 foreach ($row['matches'] ?? [] as $match) {
-                    $value = $catalog->resolve((string) ($match['ref'] ?? ''));
+                    $ref = (string) ($match['ref'] ?? '');
+                    $value = $catalog->resolve($ref);
                     $confidence = max(0.0, min(1.0, (float) ($match['confidence'] ?? 0)));
 
                     if ($value === null) {
+                        Log::channel('ai')->warning('Value matching: the answer names an unknown Értéktár value.', [
+                            'ref' => $ref,
+                            'detection' => $detectionCode,
+                            'ai_call_id' => $result->call->id,
+                        ]);
+
                         continue;
                     }
 
@@ -137,7 +167,19 @@ class ValueMeasurementEngine
                         'confidence' => $confidence,
                         'ai_call_id' => $result->call->id,
                     ]);
+
+                    if ($confidence >= $threshold) {
+                        $matchedAboveThreshold++;
+                    }
                 }
+            }
+
+            if ($matchedAboveThreshold === 0) {
+                Log::channel('ai')->info('Value matching: no match above the threshold in this batch.', [
+                    'material_id' => $material->id,
+                    'detections' => $batch->count(),
+                    'ai_call_id' => $result->call->id,
+                ]);
             }
         }
     }

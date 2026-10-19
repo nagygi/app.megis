@@ -40,17 +40,19 @@ final class ValueCatalog
     }
 
     /**
-     * The values selectable in the organization; reviewed ones only without one (03 · 3.7).
+     * The values selectable in the organization; reviewed ones only without one
+     * (03 · 3.7). Unreviewed AI-detected values are left out (Value::matchable).
      */
     public static function forOrganization(?Organization $organization): self
     {
-        return new self(Value::query()->availableTo($organization)->with('latestVersion')->orderBy('id')->get());
+        return new self(Value::query()->availableTo($organization)->matchable()->with('latestVersion')->orderBy('id')->get());
     }
 
     /**
      * For the materials of a main diagnosis (13 · 13.2, 18 · 18.4): the
      * organization's values in its own words from the recorded value set
-     * version, next to the rest of the Értéktár.
+     * version, next to the rest of the Értéktár. A value the organization put
+     * in its value set stays, even an unreviewed AI-detected one.
      *
      * @param  array<string, mixed>  $valueSetSnapshot
      */
@@ -69,7 +71,7 @@ final class ValueCatalog
         }
 
         $values = Value::query()
-            ->where(fn ($query) => $query->availableTo($organization)->orWhereIn('id', array_keys($definitions)))
+            ->where(fn ($query) => $query->where(fn ($available) => $available->availableTo($organization)->matchable())->orWhereIn('id', array_keys($definitions)))
             ->with('latestVersion')
             ->orderBy('id')
             ->get();

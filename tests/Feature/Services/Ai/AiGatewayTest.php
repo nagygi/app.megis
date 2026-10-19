@@ -10,7 +10,9 @@ use App\Models\Organization;
 use App\Models\Value;
 use App\Services\Ai\AiGateway;
 use App\Services\Ai\PromptRepository;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Ai\Exceptions\AiException;
 use Laravel\Ai\Prompts\TranscriptionPrompt;
 use Laravel\Ai\Responses\Data\Meta;
 use Laravel\Ai\Responses\Data\TextUsage;
@@ -86,6 +88,40 @@ it('logs a failed call and lets the job retry it', function () {
         ->error->toBe('RuntimeException: Provider timeout')
         ->public_mirror->toBeTrue()
         ->and(AiCall::query()->sole()->contextLabel())->toBe('Nyilvános Értéktükör');
+});
+
+it('fails a call whose answer was cut off at max_tokens, though the provider completed it', function () {
+    // Gemini counts its thinking into max_tokens; the cut JSON reads as [] (Értéktükör teszt 1).
+    config([
+        'ai.tasks.test_task.provider' => 'gemini',
+        'ai.tasks.test_task.model' => 'gemini-test',
+        'ai.providers.gemini.key' => 'test-key',
+    ]);
+    Http::fake(['*interactions*' => Http::response([
+        'status' => 'incomplete',
+        'steps' => [['type' => 'model_output', 'content' => [['type' => 'text', 'text' => '{"values": ["Bátor']]]],
+        'usage' => ['total_input_tokens' => 900, 'total_output_tokens' => 15, 'total_thought_tokens' => 970],
+    ])]);
+
+    expect(fn () => app(AiGateway::class)->run(new TestTask(structured: true)))
+        ->toThrow(AiException::class, 'The answer reached max_tokens (1000) and was cut off.');
+
+    expect(AiCall::query()->sole())
+        ->status->toBe(AiCallStatus::Failed)
+        ->error->toBe('AiException: The answer reached max_tokens (1000) and was cut off.')
+        ->input_tokens->toBe(900)
+        ->output_tokens->toBe(985);
+});
+
+it('fails a structured call whose answer cannot be read', function () {
+    AiGateway::fake([
+        new StructuredTextResponse([], 'Sajnos nem tudok segíteni.', new TextUsage(10, 5), new Meta('anthropic', 'claude-test')),
+    ]);
+
+    expect(fn () => app(AiGateway::class)->run(new TestTask(structured: true)))
+        ->toThrow(AiException::class, 'The structured answer could not be read.');
+
+    expect(AiCall::query()->sole()->status)->toBe(AiCallStatus::Failed);
 });
 
 it('saves no cost for a model without a price', function () {

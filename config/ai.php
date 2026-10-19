@@ -73,22 +73,23 @@ return [
     /*
     | Tasks of the MVP (16 · 16.1). A task without a prompt version cannot run
     | yet; its ticket adds the prompt. The models are decided with the 12.7 PoC
-    | (16, open question 1).
+    | (16, open question 1). max_tokens is a ceiling, not a cost: Gemini counts
+    | its thinking into it, and an answer cut off there fails the call.
     */
     'tasks' => [
         'mirror_detection' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
             'model' => env('AI_DEFAULT_MODEL', 'claude-sonnet-5-5'),
-            'max_tokens' => 4096,
+            'max_tokens' => 16384,
             'temperature' => 0.2,
             'timeout' => 120,
             'prompt' => 'ertektukor-detektalas',
-            'prompt_version' => 1,
+            'prompt_version' => 2,
         ],
         'mirror_matching' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
             'model' => env('AI_DEFAULT_MODEL', 'claude-sonnet-5-5'),
-            'max_tokens' => 4096,
+            'max_tokens' => 16384,
             'temperature' => 0.0,
             'timeout' => 120,
             'prompt' => 'ertektukor-illesztes',
@@ -97,7 +98,7 @@ return [
         'mirror_scoring' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
             'model' => env('AI_DEFAULT_MODEL', 'claude-sonnet-5-5'),
-            'max_tokens' => 4096,
+            'max_tokens' => 16384,
             'temperature' => 0.0,
             'timeout' => 120,
             'prompt' => 'ertektukor-pontozas',
