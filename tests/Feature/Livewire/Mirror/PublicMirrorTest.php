@@ -64,6 +64,14 @@ it('opens with the manifesto and the two ways in', function () {
         ->assertSee('Van fiókom');
 });
 
+it('keeps the support address off the home page', function () {
+    config(['megis.support_email' => 'support@megis.hu']);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertDontSee('support@megis.hu');
+});
+
 it('reads a written situation and shows the values with quotes in the same browser only', function () {
     $session = submitTextMirror();
 
