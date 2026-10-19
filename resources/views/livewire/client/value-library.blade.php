@@ -26,24 +26,27 @@
                 @foreach ($valueSet->items as $item)
                     @php($isOpen = $openItemKey === $item->key)
                     <li wire:key="item-{{ $item->key }}" class="flex flex-col gap-2 rounded-card bg-white p-5">
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="flex flex-col gap-1">
+                        {{-- On a phone the text takes the full width, the score and "Részletek" go below it. --}}
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div class="flex min-w-0 flex-col gap-1 break-words">
                                 <h3 class="text-lg font-semibold">{{ $item->name }}</h3>
                                 @if ($item->meaning)
                                     <p>{{ $item->meaning }}</p>
                                 @endif
                                 <p class="text-sm text-grey-700">{{ __('client.value_library.low') }}: {{ $item->low_example }} {{ __('client.value_library.high') }}: {{ $item->high_example }}</p>
                             </div>
-                            @php($score = $scores->get(mb_strtolower(trim($item->name))))
-                            @if ($score && $report)
-                                <a href="{{ route('client.report.item', [$organization, $report->diagnosis, 'ertekek', $score['id']]) }}" class="shrink-0 text-right text-charcoal no-underline">
-                                    <span class="block text-2xl font-extrabold tabular-nums">{{ \App\Services\Report\ReportText::score($score) }} ›</span>
-                                    <span class="block text-xs text-grey-600">{{ __('client.value_library.score_from', ['date' => $report->published_at?->format('m.d.')]) }}</span>
-                                </a>
-                            @endif
-                            <button type="button" wire:click="toggleItem('{{ $item->key }}')" class="shrink-0 text-sm font-semibold underline" aria-expanded="{{ $isOpen ? 'true' : 'false' }}">
-                                {{ $isOpen ? __('client.value_library.hide') : __('client.value_library.show') }}
-                            </button>
+                            <div class="flex shrink-0 items-start justify-between gap-3">
+                                @php($score = $scores->get(mb_strtolower(trim($item->name))))
+                                @if ($score && $report)
+                                    <a href="{{ route('client.report.item', [$organization, $report->diagnosis, 'ertekek', $score['id']]) }}" class="text-charcoal no-underline sm:text-right">
+                                        <span class="block text-2xl font-extrabold tabular-nums">{{ \App\Services\Report\ReportText::score($score) }} ›</span>
+                                        <span class="block text-xs text-grey-600">{{ __('client.value_library.score_from', ['date' => $report->published_at?->format('m.d.')]) }}</span>
+                                    </a>
+                                @endif
+                                <button type="button" wire:click="toggleItem('{{ $item->key }}')" class="text-sm font-semibold underline" aria-expanded="{{ $isOpen ? 'true' : 'false' }}">
+                                    {{ $isOpen ? __('client.value_library.hide') : __('client.value_library.show') }}
+                                </button>
+                            </div>
                         </div>
                         @if ($isOpen)
                             <dl class="grid gap-2 border-t border-grey-200 pt-3 text-sm sm:grid-cols-[12rem_1fr]">

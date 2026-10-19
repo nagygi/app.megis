@@ -10,6 +10,19 @@ beforeEach(function () {
     Mail::fake();
 });
 
+it('shows the Értéktár with the report scores without scrolling sideways on a phone', function () {
+    [$setup] = publishedReport();
+    // A long word next to the score and "Részletek" pushed the card wider than the screen.
+    $setup['organization']->valueSet->items()->first()->update(['meaning' => 'Megbízhatóság-központúság a mindennapokban']);
+
+    $page = loginInBrowser($setup['leader']);
+    $page->resize(390, 844);
+    $page->navigate(route('client.values', $setup['organization'], false));
+
+    $page->assertSee('Részletek')->assertNoJavaScriptErrors();
+    expect($page->script('() => document.documentElement.scrollWidth <= document.documentElement.clientWidth'))->toBeTrue();
+});
+
 it('walks the leader through the published report, R0 to the Melléklet (27, 28)', function () {
     [$setup, $main] = publishedReport();
     $params = [$setup['organization'], $main->diagnosis];
