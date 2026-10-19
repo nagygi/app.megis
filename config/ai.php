@@ -165,7 +165,7 @@ return [
             'temperature' => 0.4,
             'timeout' => 180,
             'prompt' => 'olvasat-szovegek',
-            'prompt_version' => 1,
+            'prompt_version' => 2,
         ],
     ],
 
