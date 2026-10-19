@@ -99,8 +99,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('diagnozisok/uj', Admin\Diagnoses\Form::class)->name('diagnoses.create');
         Route::livewire('diagnozisok/inditas', Admin\MainDiagnoses\Form::class)->name('main-diagnoses.create');
         Route::livewire('diagnozisok/feltoltes', Admin\Diagnoses\Upload::class)->name('diagnoses.upload');
-        Route::livewire('anyagok/{material}', Admin\Materials\Show::class)->name('materials.show');
-        Route::get('anyagok/{material}/hang', MaterialAudioController::class)->name('materials.audio');
+        Route::livewire('anyagok/{material}', Admin\Materials\Show::class)->whereUuid('material')->name('materials.show');
+        Route::get('anyagok/{material}/hang', MaterialAudioController::class)->whereUuid('material')->name('materials.audio');
         Route::livewire('tamogato-kerdesek', Admin\SupportQuestions\Index::class)->name('support-questions.index');
         Route::livewire('diagnozisok/{diagnosis}', Admin\Diagnoses\Show::class)->name('diagnoses.show');
         Route::livewire('diagnozisok/{diagnosis}/adatok', Admin\Diagnoses\Form::class)->name('diagnoses.edit');
@@ -248,8 +248,8 @@ Route::middleware('customer')->name('client.')->group(function () {
                 Route::livewire('diagnozis/{diagnosis}/hozzateszek', Client\Diagnosis\Contribute::class)->name('diagnosis.contribute');
                 Route::livewire('diagnozis/{diagnosis}/helyzet', Client\Diagnosis\Situation::class)->name('diagnosis.situation');
                 Route::livewire('diagnozis/{diagnosis}/helyzeteim', Client\Diagnosis\Situations::class)->name('diagnosis.situations');
-                Route::livewire('diagnozis/{diagnosis}/anyag/{material}/hova', Client\Diagnosis\PlaceMaterial::class)->name('diagnosis.place');
-                Route::livewire('diagnozis/{diagnosis}/anyag/{material}/megeles', Client\Diagnosis\OccasionExperienceForm::class)->name('diagnosis.occasion-experience');
+                Route::livewire('diagnozis/{diagnosis}/anyag/{material}/hova', Client\Diagnosis\PlaceMaterial::class)->whereUuid('material')->name('diagnosis.place');
+                Route::livewire('diagnozis/{diagnosis}/anyag/{material}/megeles', Client\Diagnosis\OccasionExperienceForm::class)->whereUuid('material')->name('diagnosis.occasion-experience');
             });
     });
 });
