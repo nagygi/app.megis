@@ -189,7 +189,7 @@
                     </fieldset>
                 @endif
 
-                <x-form.input name="name" wire:model="name" :label="__('admin.main_diagnoses.name')" :help="__('admin.main_diagnoses.name_help')" />
+                <x-form.input name="name" wire:model="name" :label="__('admin.main_diagnoses.name')" :help="__($subjectEnum === \App\Enums\MainDiagnosisSubject::Team ? 'admin.main_diagnoses.name_help' : 'admin.main_diagnoses.name_help_person')" />
 
                 @if ($blockers !== [] && $isDraft)
                     <ul class="flex flex-col gap-1 rounded-xl bg-coral-light p-4 text-sm text-black" role="status">

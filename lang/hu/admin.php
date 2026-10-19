@@ -1013,6 +1013,7 @@ return [
         'show_peer_quotes_help' => 'Szereppel és dátummal, név nélkül. Kikapcsolva a vezető nem látja a társak idézeteit.',
         'name' => 'Név',
         'name_help' => 'Ha üresen hagyod: „Csapat · Termék · a kezdés napja”.',
+        'name_help_person' => 'Ha üresen hagyod: „Név · Termék · a kezdés napja”.',
         'send_invitation' => 'Meghívó küldése',
         'save_draft' => 'Mentés vázlatként',
         'saved_draft' => 'A diagnózist vázlatként mentettük. E-mail nem ment ki.',

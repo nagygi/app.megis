@@ -42,6 +42,18 @@ it('starts a team diagnosis on A1 and sends the leader invitation', function () 
     Mail::assertQueued(DiagnosisLeaderInvitationMail::class);
 });
 
+it('names the default diagnosis name after the subject on A1 (17 · 17.1)', function () {
+    $setup = diagnosisTeam(peers: 1);
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Form::class)
+        ->set('organization_id', $setup['organization']->id)
+        ->assertSee('„Csapat · Termék · a kezdés napja”')
+        ->set('subject', 'person')
+        ->assertSee('„Név · Termék · a kezdés napja”')
+        ->assertDontSee('„Csapat · Termék · a kezdés napja”');
+});
+
 it('saves a draft without sending anything', function () {
     Mail::fake();
     $setup = diagnosisTeam();
