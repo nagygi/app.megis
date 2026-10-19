@@ -82,6 +82,12 @@ return [
                 'driver' => 'local',
                 'root' => storage_path('app/private/materials'),
                 'visibility' => 'private',
+                // Group access, so the deploy user (in the web server's group)
+                // can read what php-fpm / the queue worker wrote, and vice versa.
+                'permissions' => [
+                    'file' => ['public' => 0664, 'private' => 0660],
+                    'dir' => ['public' => 0775, 'private' => 0770],
+                ],
                 'serve' => false,
                 'throw' => true,
                 'report' => true,
