@@ -4,11 +4,11 @@ namespace App\Livewire\Mirror;
 
 use App\Enums\LegalDocumentType;
 use App\Enums\MirrorStatus;
+use App\Livewire\Concerns\ChecksTurnstile;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\Value;
-use App\Rules\Turnstile;
 use App\Services\Auth\CustomerAuthenticator;
 use App\Services\Auth\LandingResolver;
 use App\Services\Auth\LoginCodeService;
@@ -28,6 +28,8 @@ use Livewire\Component;
  */
 class Result extends Component
 {
+    use ChecksTurnstile;
+
     public MirrorSession $session;
 
     public ?Organization $organization = null;
@@ -40,8 +42,6 @@ class Result extends Component
 
     /** @var list<string> */
     public array $curiosity = [];
-
-    public string $turnstileToken = '';
 
     public string $loginMode = 'password';
 
@@ -118,9 +118,8 @@ class Result extends Component
             'consent' => ['accepted'],
             'curiosity' => ['array'],
             'curiosity.*' => [Rule::in(MirrorSession::CURIOSITY)],
-            'turnstileToken' => [new Turnstile],
         ], ['consent.accepted' => __('mirror.consent_required')], ['email' => __('mirror.email')]);
-        $this->turnstileToken = '';
+        $this->checkTurnstile();
 
         $result = $mirrors->requestAccount($this->session, $this->email, $this->curiosity, $booking);
 
@@ -132,8 +131,8 @@ class Result extends Component
      */
     public function loginWithPassword(CustomerAuthenticator $authenticator, MirrorService $mirrors, LandingResolver $landing): void
     {
-        $this->validate(['password' => ['required', 'string'], 'turnstileToken' => [new Turnstile]], attributes: ['password' => __('mirror.password')]);
-        $this->turnstileToken = '';
+        $this->validate(['password' => ['required', 'string']], attributes: ['password' => __('mirror.password')]);
+        $this->checkTurnstile();
         $this->throttleLogin();
 
         [$outcome, $user] = $authenticator->attemptPassword($this->session->email ?? $this->email, $this->password);
@@ -147,8 +146,7 @@ class Result extends Component
 
     public function sendCode(LoginCodeService $codes): void
     {
-        $this->validate(['turnstileToken' => [new Turnstile]]);
-        $this->turnstileToken = '';
+        $this->checkTurnstile();
         $this->throttleLogin();
 
         $codes->send($this->session->email ?? $this->email);

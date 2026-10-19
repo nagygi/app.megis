@@ -38,5 +38,6 @@ it('walks the public Értéktükör from the opening to the full picture', funct
     $page->press('A teljes kép');
     $page->assertSee('Kíváncsi vagy?')
         ->assertSee('Létrehozom a fiókot')
+        ->assertScript("document.querySelector('script[src^=\"https://challenges.cloudflare.com/turnstile/\"]') !== null")
         ->assertNoAccessibilityIssues();
 });

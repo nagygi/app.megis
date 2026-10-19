@@ -101,6 +101,42 @@ it('requires Turnstile and limits public submissions per IP', function () {
     expect(MirrorSession::query()->count())->toBe(0);
 });
 
+it('asks the widget for a new token once a token has been checked', function () {
+    fakeTurnstile(false);
+
+    Livewire::test(Record::class)
+        ->call('setMode', 'text')
+        ->set('text', str_repeat('Egy helyzet a hétről. ', 5))
+        ->call('submitText')
+        ->assertHasErrors(['turnstileToken'])
+        ->assertNotDispatched('turnstile-reset')
+        ->set('turnstileToken', 'token')
+        ->call('submitText')
+        ->assertHasErrors(['turnstileToken'])
+        ->assertSet('turnstileToken', '')
+        ->assertDispatched('turnstile-reset');
+});
+
+it('keeps the Turnstile token while the account form has a mistake', function () {
+    Mail::fake();
+    $session = submitTextMirror();
+
+    Livewire::test(Result::class, ['session' => $session])
+        ->call('showFull')
+        ->set('email', 'anna@example.com')
+        ->set('turnstileToken', 'token')
+        ->call('createAccount', false)
+        ->assertHasErrors(['consent' => 'accepted'])
+        ->assertSet('turnstileToken', 'token')
+        ->assertNotDispatched('turnstile-reset')
+        ->set('consent', true)
+        ->call('createAccount', false)
+        ->assertHasNoErrors()
+        ->assertDispatched('turnstile-reset');
+
+    Mail::assertQueued(MirrorConfirmationMail::class);
+});
+
 it('asks for at least a few sentences when typing', function () {
     fakeTurnstile();
 

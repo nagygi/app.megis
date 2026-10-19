@@ -2,7 +2,8 @@
     Cloudflare Turnstile widget (NFR · 5).
     In a plain form Cloudflare adds the hidden "cf-turnstile-response" field.
     With "model" (a Livewire property) the widget is rendered explicitly and
-    hands its token to that property, also after Livewire re-renders the page.
+    hands its token to that property, also after Livewire re-renders the page
+    (resources/js/turnstile.js).
 --}}
 @props(['model' => null])
 
@@ -10,19 +11,8 @@
     @if ($model)
         <div
             wire:ignore
-            x-data
-            x-init="
-                const render = () => window.turnstile
-                    ? turnstile.render($refs.widget, {
-                        sitekey: @js(config('services.turnstile.site_key')),
-                        language: 'hu',
-                        theme: 'light',
-                        callback: (token) => $wire.set(@js($model), token, false),
-                        'expired-callback': () => $wire.set(@js($model), '', false),
-                    })
-                    : setTimeout(render, 200);
-                render();
-            "
+            x-data="turnstileWidget({ sitekey: @js(config('services.turnstile.site_key')), model: @js($model) })"
+            x-on:turnstile-reset.window="reset()"
         >
             <div x-ref="widget"></div>
         </div>

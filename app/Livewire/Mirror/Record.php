@@ -5,12 +5,12 @@ namespace App\Livewire\Mirror;
 use App\Enums\MaterialContext;
 use App\Enums\MaterialSource;
 use App\Exceptions\UnreadableMaterialException;
+use App\Livewire\Concerns\ChecksTurnstile;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\Organization;
 use App\Models\SupportQuestion;
 use App\Models\User;
-use App\Rules\Turnstile;
 use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\Materials\MaterialStore;
 use App\Services\Mirror\MirrorService;
@@ -30,6 +30,7 @@ use Livewire\WithFileUploads;
  */
 class Record extends Component
 {
+    use ChecksTurnstile;
     use WithFileUploads;
 
     public ?Organization $organization = null;
@@ -43,8 +44,6 @@ class Record extends Component
 
     /** @var TemporaryUploadedFile|null */
     public $file = null;
-
-    public string $turnstileToken = '';
 
     /**
      * The main diagnosis the mirror belongs to (17 · 17.4, 17.6).
@@ -146,8 +145,7 @@ class Record extends Component
             return;
         }
 
-        $this->validate(['turnstileToken' => [new Turnstile]]);
-        $this->turnstileToken = '';
+        $this->checkTurnstile();
 
         $key = 'mirror-submit:'.request()->ip();
 
