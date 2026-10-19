@@ -21,6 +21,37 @@ A három blokkoló közül kettő ugyanarra a gyökérokra vezethető vissza: **
 - **Ügyfél-belépés:** jelszóval. A meghívó-, belépőlink- és megerősítő tokenek `HMAC(APP_KEY)`-jel tárolódnak, a levelek pedig csak a staging logjába mennek (`MAIL_MAILER=log`). Ezért a regisztrációt a DB-ben szimuláltam (név + jelszó + `activated_at`, tagság `active`), a `/meghivo/{token}` oldalt pedig érvényes token nélkül nem tudtam végigvinni.
 - **AI:** valódi Gemini-hívások a stagingen (14 db: Értéktükör, helyzetek, beszélgetés-kinyerés, olvasat-vázlatok).
 
+## Javítások állapota (1.14, 2026-10-20)
+
+A stagingen deploy után (`./update.sh`, a nézetek miatt `npm run build` is) érvényesek.
+
+| Lelet | Állapot | Commit |
+|---|---|---|
+| B1 · V4 márka | javítva, böngészőteszttel | `5e09c2f` |
+| B2 · feltöltés | javítva, arch-teszttel; deploy után a jogi dokumentumokat fel kell tölteni | `97c5c84` |
+| B3 · küszöb-zsákutca | javítva; a diag 56 deploy után a Futás fülön felülírható | `a2960ce` |
+| S1 · beszélgetés | javítva | `5351e4a` (és `5e09c2f`) |
+| S2 · Profil név | javítva, böngészőteszttel | `5e09c2f` |
+| K1 · más szervezet értékneve | **nyitott kérdés** | – |
+| K2 · társ és rutin | **nyitott kérdés** | – |
+| K3 · 419 válaszvesztés | enyhítve: a válaszok már kilépéskor mentődnek; a 419 oka nem derült ki | `5e09c2f` |
+| K4 · mobil Értéktár | javítva, böngészőteszttel | `b740251` |
+| K5 · AI-hallucináció | javítva (prompt v2) | `b77f39e` |
+| K6 · magánszemély szövegezése | A1 névsúgó javítva; a V4 többes száma **nyitott kérdés** | `b0eca1b` |
+| A1 · `$persist` | javítva, böngészőteszttel | `cd4afc7` |
+| A2 · material 500 | javítva | `39f3c31` |
+| A3 · státusztörténet | javítva | `290767c` |
+| A4 · rés küszöb alatt | javítva (admin választó); a riport rés-kártyája **nyitott kérdés** | `3be7c33` |
+| A5 · mérőpont-szám | **nyitott kérdés** | – |
+| A6 · dupla logó | javítva | `4a32862` |
+| A7 · azonos nevű szervezetek | javítva | `77f1f13` |
+| A8 · „Feldolgozás alatt” | javítva | `e70259a` |
+| A9 · újrapublikálás szövege | javítva | `703dd60` |
+| A10 · „a mégis átnézte” | javítva | `8304a9e` |
+| A11 · hiányzó `h1` | javítva, minden admin oldalra teszttel | `8d1e461` |
+| A12 · demó-seeder | javítva; a stagingen már meglévő három „Demó ·” érték globális marad | `4c551e1` |
+| Kérdések 1–3 | **nyitott kérdés** | – |
+
 ## Blokkoló hibák
 
 ### B1 · V4 „A márkád alapja”: a „Tovább” sosem aktiválódik, a diagnózis nem indítható
