@@ -61,6 +61,6 @@
     @endif
 
     @if ($isPublic)
-        <x-turnstile model="turnstileToken" />
+        <x-turnstile model="turnstileToken" class="items-center" />
     @endif
 </div>
