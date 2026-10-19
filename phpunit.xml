@@ -35,6 +35,13 @@
         <env name="MEGIS_ALERT_RECIPIENTS" value=""/>
         <env name="MEGIS_MAIL_ALLOWLIST" value=""/>
         <env name="MEGIS_HEALTH_TOKEN" value=""/>
+        <!-- The config defaults, whatever the local .env uses (e.g. Gemini, WeasyPrint). -->
+        <env name="AI_DEFAULT_PROVIDER" value="anthropic"/>
+        <env name="AI_DEFAULT_MODEL" value="claude-sonnet-5-5"/>
+        <env name="AI_SMALL_MODEL" value="claude-haiku-5-5"/>
+        <env name="AI_TRANSCRIPTION_PROVIDER" value="openai"/>
+        <env name="AI_TRANSCRIPTION_MODEL" value="(null)"/>
+        <env name="LARAVEL_PDF_DRIVER" value="gotenberg"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
