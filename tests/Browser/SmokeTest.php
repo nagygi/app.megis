@@ -23,7 +23,8 @@ it('logs an admin in to the organizations list', function () {
     User::factory()->admin()->create(['email' => 'admin@megis.hu', 'password' => Hash::make('a-long-enough-password')]);
 
     $page = visit('/admin/belepes');
-    $page->assertNoAccessibilityIssues()
+    $page->assertNoJavaScriptErrors()
+        ->assertNoAccessibilityIssues()
         ->fill('email', 'admin@megis.hu')
         ->fill('password', 'a-long-enough-password');
     passTurnstile($page);

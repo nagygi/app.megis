@@ -10,6 +10,7 @@
     <title>{{ $title }} · {{ __('admin.title') }}</title>
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
     @stack('head')
 </head>
 <body class="min-h-dvh bg-charcoal text-charcoal">
@@ -21,5 +22,6 @@
             {{ $slot }}
         </div>
     </main>
+    @livewireScriptConfig
 </body>
 </html>
