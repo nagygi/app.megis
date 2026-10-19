@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.14 · {hash} · 2026-10-20
+## 1.14 · ea800c1 · 2026-10-20
 
 A staging-teszt (`docs/staging-teszt-2026-10-19.md`) javításai.
 
