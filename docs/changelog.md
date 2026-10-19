@@ -2,6 +2,14 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.11 · {hash} · 2026-10-19
+
+PDF WeasyPrinttel is, Docker nélküli környezetekre (staging).
+
+- **PDF-motor:** `LARAVEL_PDF_DRIVER=weasyprint` mellett a riport és az Útravaló PDF-je a szerver WeasyPrint-binárisával készül (`pontedilana/php-weasyprint`, `LARAVEL_PDF_WEASYPRINT_BINARY`). A Geologica fontot rendszerfontként kell telepíteni. Élesben a Gotenberg marad az alap.
+- **Setup check:** a PDF-motor sora WeasyPrintnél lefuttatja a binárist (`--version`), és hibát jelez, ha nem fut. Más drivernél továbbra is csak figyelmeztet.
+- **PDF-layout:** a fejléc és a lábléc WeasyPrintnél is teljes szélességű, a tartalom széléhez igazodik, a dátum és az oldalszám jobbra kerül, a magassága pedig egyezik a Gotenbergével. Mindkét motornál: a dobozok és a táblázatsorok nem törnek ketté, a címek nem maradnak egyedül az oldal alján.
+
 ## 1.10 · ca1ac9c · 2026-10-18
 
 Az Értéktár a mégis 58 értékével (`docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx`).

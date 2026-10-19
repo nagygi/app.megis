@@ -14,20 +14,35 @@
         h1 { font-size: 20pt; margin: 0 0 6pt; text-transform: uppercase; font-weight: 800; }
         h2 { font-size: 14pt; margin: 18pt 0 6pt; }
         h3 { font-size: 11.5pt; margin: 12pt 0 4pt; }
+        h1, h2, h3 { break-after: avoid; }
         p { margin: 0 0 6pt; }
         .page { page-break-after: always; }
         .page:last-child { page-break-after: auto; }
         .muted { color: #6b6b6b; font-size: 9.5pt; }
-        .box { border-radius: 10pt; padding: 10pt 12pt; margin: 8pt 0; }
+        .box { border-radius: 10pt; padding: 10pt 12pt; margin: 8pt 0; break-inside: avoid; }
         .quote { background: #f1efe9; }
         .yellow { background: #fbe7a1; }
         .green { background: #2f6b4f; color: #fff; }
         .charcoal { background: #3a3a3a; color: #fff; }
         .coral { background: #f4876c; color: #000; }
         table { width: 100%; border-collapse: collapse; }
+        tr { break-inside: avoid; }
         td, th { text-align: left; padding: 4pt 0; border-bottom: 0.5pt solid #ddd; vertical-align: top; }
         td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
         .big { font-size: 28pt; font-weight: 800; }
+
+        /*
+         * WeasyPrint (hosts without Docker, deploy.md) runs the header and the
+         * footer in the page's margin boxes, which already sit inside the side
+         * margins: full width there, without the inset Chromium's templates
+         * need, and as close to the edge as Chromium puts them. Chromium never
+         * sees these wrappers, and the margin boxes stay empty there.
+         */
+        @page {
+            @top-left { width: 100%; vertical-align: top; padding-top: 0.4cm; }
+            @bottom-left { width: 100%; vertical-align: bottom; padding-bottom: 0.4cm; }
+        }
+        .pdf-header > div, .pdf-footer > div { padding: 0 !important; }
     </style>
 </head>
 <body>

@@ -7,10 +7,11 @@ use Spatie\LaravelPdf\Jobs\GeneratePdfJob;
 return [
     /*
      * The PDF engine (28 · 28.3, plan 15 · question 8): Gotenberg over HTTP, a
-     * Chromium in a container next to the app. Tests use Pdf::fake().
+     * Chromium in a container next to the app; on hosts without Docker the
+     * WeasyPrint binary (deploy.md). Tests use Pdf::fake().
      *
      * The default driver to use for PDF generation.
-     * Supported: "browsershot", "cloudflare", "dompdf", "gotenberg", "chrome"
+     * Supported: "browsershot", "cloudflare", "dompdf", "gotenberg", "weasyprint", "chrome"
      */
     'driver' => env('LARAVEL_PDF_DRIVER', 'gotenberg'),
 

@@ -121,8 +121,10 @@ return [
     'pdf' => [
         'label' => 'PDF-motor',
         'ok' => 'A Gotenberg elérhető: :url',
-        'other' => 'A PDF-motor: :driver. Élesben Gotenberg ajánlott (deploy.md).',
+        'other' => 'A PDF-motor: :driver. Élesben Gotenberg vagy WeasyPrint ajánlott (deploy.md).',
         'unreachable' => 'A Gotenberg nem érhető el: :url. A riport és az Útravaló PDF-je nem tölthető le.',
+        'weasyprint_ok' => 'A WeasyPrint futtatható (:binary): :version',
+        'weasyprint_missing' => 'A WeasyPrint nem futtatható: :binary (LARAVEL_PDF_WEASYPRINT_BINARY). A riport és az Útravaló PDF-je nem tölthető le.',
     ],
 
 ];
