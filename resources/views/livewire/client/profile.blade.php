@@ -13,8 +13,8 @@
         </div>
 
         <div class="grid gap-5 sm:grid-cols-2">
-            <x-form.input name="last_name" wire:model.blur="last_name" :label="__('auth_ui.registration.last_name')" autocomplete="family-name" required />
-            <x-form.input name="first_name" wire:model.blur="first_name" :label="__('auth_ui.registration.first_name')" autocomplete="given-name" required />
+            <x-form.input name="last_name" wire:model.live.blur="last_name" :label="__('auth_ui.registration.last_name')" autocomplete="family-name" required />
+            <x-form.input name="first_name" wire:model.live.blur="first_name" :label="__('auth_ui.registration.first_name')" autocomplete="given-name" required />
         </div>
         <p class="text-sm text-green" role="status" aria-live="polite">
             @if ($nameSaved) {{ __('ui.saved') }} @endif

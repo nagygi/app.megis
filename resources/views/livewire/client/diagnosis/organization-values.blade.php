@@ -43,7 +43,7 @@
                         <div class="flex flex-col gap-1.5">
                             <x-form.textarea
                                 :name="'items.'.$index.'.'.$field"
-                                wire:model.blur="items.{{ $index }}.{{ $field }}"
+                                wire:model.live.blur="items.{{ $index }}.{{ $field }}"
                                 :label="__('diagnosis.organization_values.fields.'.$field)"
                                 :required="in_array($field, ['low_example', 'high_example'], true)"
                                 rows="2"

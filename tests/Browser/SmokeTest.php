@@ -54,6 +54,18 @@ it('logs a customer in with an e-mailed code', function () {
         ->assertNoAccessibilityIssues();
 });
 
+it('saves the name on the profile as the customer leaves the field', function () {
+    $organization = Organization::factory()->create();
+    $customer = customerOf($organization);
+
+    $page = loginInBrowser($customer);
+    $page->navigate('/'.$organization->slug.'/profil');
+    $page->fill('first_name', 'Kornélia')->keys('#first_name', 'Tab');
+
+    $page->waitForText('Mentve')->assertNoJavaScriptErrors();
+    expect($customer->refresh()->first_name)->toBe('Kornélia');
+});
+
 it('opens the menu and the user menu on a phone, and logs the customer out', function () {
     $organization = Organization::factory()->create(['name' => 'Acme Kft.']);
     $customer = customerOf($organization);

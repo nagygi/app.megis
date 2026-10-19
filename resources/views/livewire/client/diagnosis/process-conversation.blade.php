@@ -16,7 +16,7 @@
                 </label>
                 <textarea
                     id="answer-{{ $question }}"
-                    wire:model.blur="answers.{{ $question }}"
+                    wire:model.live.blur="answers.{{ $question }}"
                     rows="3"
                     maxlength="3000"
                     @disabled(! $editable)

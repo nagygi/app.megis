@@ -53,7 +53,7 @@
                     <label for="brand-{{ $field }}" class="sr-only">{{ $element->label() }}</label>
                     <textarea
                         id="brand-{{ $field }}"
-                        wire:model.blur="{{ $field }}"
+                        wire:model.live.blur="{{ $field }}"
                         rows="3"
                         maxlength="500"
                         aria-describedby="brand-{{ $field }}-question"

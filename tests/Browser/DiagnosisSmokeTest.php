@@ -55,6 +55,27 @@ it('walks the leader from V1 to "Indul a diagnózis"', function () {
     $page->assertSee('Hol tartunk')->assertNoAccessibilityIssues();
 });
 
+it('saves an empty brand as the leader leaves each field and lets the leader go on (V4)', function () {
+    $setup = diagnosisTeam(peers: 1, withValues: false);
+    $set = organizationValues($setup['organization'], withBrand: false);
+    $main = startMainDiagnosis($setup);
+
+    $page = loginInBrowser($setup['leader']);
+    $page->navigate(route('client.diagnosis.markad-alapja', [$setup['organization'], $main->diagnosis]));
+    $page->assertSee('1 / 4 kész')->assertButtonDisabled('Tovább');
+
+    $page->fill('brand-purpose', 'Hogy a csapat kiszámítható legyen.')->keys('#brand-purpose', 'Tab');
+    $page->fill('brand-value_proposition', 'Gyors, őszinte visszajelzés.')->keys('#brand-value_proposition', 'Tab');
+    $page->fill('brand-impact', 'Kevesebb újramunka.')->keys('#brand-impact', 'Tab');
+
+    $page->waitForText('4 / 4 kész')->assertButtonEnabled('Tovább')->assertNoJavaScriptErrors();
+    expect($set->refresh()->only(['purpose', 'value_proposition', 'impact']))->toBe([
+        'purpose' => 'Hogy a csapat kiszámítható legyen.',
+        'value_proposition' => 'Gyors, őszinte visszajelzés.',
+        'impact' => 'Kevesebb újramunka.',
+    ]);
+});
+
 it('walks a peer from the consent to the experience', function () {
     $setup = diagnosisTeam(peers: 1);
     $main = startMainDiagnosis($setup);
