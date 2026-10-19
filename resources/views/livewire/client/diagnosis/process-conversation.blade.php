@@ -63,7 +63,7 @@
 
     @if ($editable)
         <div class="flex flex-wrap items-center gap-4">
-            <x-ui.button tone="coral" size="lg" wire:click="finish">{{ __('processes.conversation.finish') }}</x-ui.button>
+            <x-ui.button tone="coral" size="lg" wire:click="finish" wire:loading.attr="disabled" wire:target="finish">{{ __('processes.conversation.finish') }}</x-ui.button>
             <a href="{{ route('client.diagnosis.process-calendar', [$organization, $diagnosis]) }}" class="font-semibold">{{ __('processes.conversation.calendar_instead') }}</a>
             <x-diagnosis.saved />
         </div>

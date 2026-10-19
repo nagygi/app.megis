@@ -14,6 +14,7 @@ use App\Livewire\Client\Diagnosis\ProcessList;
 use App\Livewire\Client\Diagnosis\ProcessSummary;
 use App\Livewire\Client\ProcessLibrary;
 use App\Livewire\Client\ProcessSheet;
+use App\Models\AiCall;
 use App\Models\CalendarConnection;
 use App\Models\Process;
 use App\Models\ProcessConversation as Conversation;
@@ -232,6 +233,55 @@ it('extracts the processes from each answer of the conversation', function () {
     expect(Process::query()->where('name', 'Vezetői kör')->sole()->source)->toBe(ProcessSource::Conversation)
         ->and(Process::query()->where('name', 'döntés négyszemközt')->sole()->unclear)->toBeTrue()
         ->and($conversation->refresh()->completed_at)->not->toBeNull();
+});
+
+/**
+ * The AI's answer to the extract of one conversation answer.
+ */
+function extractedProcesses(string ...$names): StructuredTextResponse
+{
+    $data = ['processes' => array_map(fn (string $name) => ['name' => $name, 'kind' => 'process', 'rhythm' => 'weekly', 'rhythm_label' => null, 'headcount' => null], $names)];
+
+    return new StructuredTextResponse($data, json_encode($data), new TextUsage(10, 5), new Meta('anthropic', 'claude-test'));
+}
+
+it('extracts the answer still waiting for its queued extract when the conversation is finished', function () {
+    $setup = diagnosisTeam();
+    $main = startMainDiagnosis($setup);
+    actingAsCustomer($setup['leader']);
+    Queue::fake();
+    AiGateway::fake([extractedProcesses('Vezetői kör')]);
+
+    Livewire::test(ProcessConversation::class, processParams($setup, $main))
+        ->set('answers.1', 'A keddi Vezetői kör, négyen.')
+        ->call('finish')
+        ->assertRedirect(route('client.diagnosis.process-list', processParams($setup, $main)));
+
+    expect(Process::query()->sole()->name)->toBe('Vezetői kör');
+});
+
+it('turns an extract that arrives after the conversation is finished into a process', function () {
+    $setup = diagnosisTeam();
+    $main = startMainDiagnosis($setup);
+    $conversation = app(ConversationService::class)->forUser($setup['organization'], $setup['leader'], $main);
+    $conversation->update(['answers' => [1 => 'Kéthetente retró.'], 'completed_at' => now()]);
+    AiGateway::fake([extractedProcesses('Retró')]);
+
+    app(ConversationService::class)->extract($conversation->refresh(), 1);
+
+    expect(Process::query()->sole()->name)->toBe('Retró');
+});
+
+it('does not ask the AI again for an answer that is already extracted', function () {
+    $setup = diagnosisTeam();
+    $main = startMainDiagnosis($setup);
+    $conversation = app(ConversationService::class)->forUser($setup['organization'], $setup['leader'], $main);
+    $conversation->update(['answers' => [1 => 'Kéthetente retró.'], 'extracted_answers' => [1 => 'Kéthetente retró.']]);
+    AiGateway::fake();
+
+    app(ConversationService::class)->extract($conversation->refresh(), 1);
+
+    expect(AiCall::query()->count())->toBe(0);
 });
 
 it('marks a process named in the fourth answer as a breakpoint candidate', function () {

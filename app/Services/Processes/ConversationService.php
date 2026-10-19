@@ -16,6 +16,7 @@ use App\Models\ProcessConversation;
 use App\Models\User;
 use App\Services\Ai\AiGateway;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * The conversation instead of the calendar (10): answers are saved, every
@@ -67,7 +68,8 @@ class ConversationService
     {
         $answer = $conversation->answer($question);
 
-        if ($answer === '') {
+        // Already extracted, e.g. on "Válasz és tovább" before the queued job ran.
+        if ($answer === '' || ! $conversation->isExtracting($question)) {
             return;
         }
 
@@ -103,6 +105,11 @@ class ConversationService
                 'extracts' => [...($fresh->extracts ?? []), $question => $chips],
                 'extracted_answers' => [...($fresh->extracted_answers ?? []), $question => $answer],
             ]);
+
+            // An extract that arrives after "Válasz és tovább" still becomes cards.
+            if ($fresh->completed_at !== null) {
+                $this->createProcesses($fresh, [$question]);
+            }
         });
     }
 
@@ -132,46 +139,73 @@ class ConversationService
      * "Válasz és tovább": process chips become cards "beszélgetésből", the
      * unclear ones go to "Bizonytalan" (10 · 10.3). An existing process with
      * the same name is not duplicated.
+     *
+     * The last answer is usually still waiting for its queued extract: it is
+     * extracted here, so it is not left out. A failed call does not stop the
+     * user; the queued retry turns its chips into cards later.
      */
     public function finish(ProcessConversation $conversation): int
     {
-        return DB::transaction(function () use ($conversation): int {
-            $count = 0;
-
-            foreach (ProcessConversation::QUESTIONS as $question) {
-                foreach ($conversation->chips($question) as $chip) {
-                    $existing = Process::query()
-                        ->whereBelongsTo($conversation->organization)
-                        ->whereRaw('lower(name) = ?', [mb_strtolower($chip['name'])])
-                        ->first();
-
-                    if ($existing !== null) {
-                        if ($chip['breakpoint']) {
-                            $existing->update(['breakpoint_candidate' => true]);
-                        }
-
-                        continue;
-                    }
-
-                    Process::create([
-                        'organization_id' => $conversation->organization_id,
-                        'name' => $chip['name'],
-                        'rhythm' => $chip['rhythm'],
-                        'rhythm_label' => $chip['rhythm_label'],
-                        'headcount' => $chip['headcount'],
-                        'kind' => ProcessKind::Routine,
-                        'source' => ProcessSource::Conversation,
-                        'confidence' => ProcessConfidence::Conversation,
-                        'unclear' => $chip['unclear'],
-                        'breakpoint_candidate' => $chip['breakpoint'],
-                    ]);
-                    $count++;
-                }
+        foreach (ProcessConversation::QUESTIONS as $question) {
+            if (! $conversation->isExtracting($question)) {
+                continue;
             }
 
+            try {
+                $this->extract($conversation, $question);
+            } catch (Throwable $exception) {
+                report($exception);
+            }
+
+            $conversation->refresh();
+        }
+
+        return DB::transaction(function () use ($conversation): int {
+            $count = $this->createProcesses($conversation, ProcessConversation::QUESTIONS);
             $conversation->update(['completed_at' => now()]);
 
             return $count;
         });
+    }
+
+    /**
+     * @param  list<int>  $questions
+     */
+    private function createProcesses(ProcessConversation $conversation, array $questions): int
+    {
+        $count = 0;
+
+        foreach ($questions as $question) {
+            foreach ($conversation->chips($question) as $chip) {
+                $existing = Process::query()
+                    ->whereBelongsTo($conversation->organization)
+                    ->whereRaw('lower(name) = ?', [mb_strtolower($chip['name'])])
+                    ->first();
+
+                if ($existing !== null) {
+                    if ($chip['breakpoint']) {
+                        $existing->update(['breakpoint_candidate' => true]);
+                    }
+
+                    continue;
+                }
+
+                Process::create([
+                    'organization_id' => $conversation->organization_id,
+                    'name' => $chip['name'],
+                    'rhythm' => $chip['rhythm'],
+                    'rhythm_label' => $chip['rhythm_label'],
+                    'headcount' => $chip['headcount'],
+                    'kind' => ProcessKind::Routine,
+                    'source' => ProcessSource::Conversation,
+                    'confidence' => ProcessConfidence::Conversation,
+                    'unclear' => $chip['unclear'],
+                    'breakpoint_candidate' => $chip['breakpoint'],
+                ]);
+                $count++;
+            }
+        }
+
+        return $count;
     }
 }
