@@ -20,7 +20,8 @@
     @stack('head')
 </head>
 <body @class([
-    'min-h-dvh text-charcoal',
+    // Decorations may bleed past the content column; the viewport clips them.
+    'min-h-dvh overflow-x-clip text-charcoal',
     'bg-cream' => $tone === 'cream',
     'bg-coral' => $tone === 'coral',
 ])>

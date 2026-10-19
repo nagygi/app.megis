@@ -1,6 +1,6 @@
 {{-- ET1 · the opening of the Értéktükör, the public home (06 · 6.1). --}}
 <x-layouts::public tone="coral" :title="__('mirror.meta_title')" :description="__('mirror.meta_description')">
-    <section class="relative flex flex-col gap-8 overflow-hidden py-10 sm:py-16">
+    <section class="relative flex flex-col gap-8 py-10 sm:py-16">
         <x-megis.symbol name="fire" class="pointer-events-none absolute -right-16 -bottom-10 size-80 text-coral-dark opacity-60 sm:size-[28rem]" />
 
         <h1 class="relative text-5xl leading-[0.95] font-extrabold uppercase sm:text-7xl">
