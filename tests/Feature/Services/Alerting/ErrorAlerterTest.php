@@ -37,6 +37,17 @@ it('emails the alert list when a request ends in a server error', function () {
     });
 });
 
+it('names the page of a failing Livewire update, not the update endpoint', function () {
+    Mail::fake();
+    Route::post('/_test/failing-update', fn () => throw new RuntimeException('Update failed.'));
+
+    $this->withHeader('X-Livewire', '1')->post('/_test/failing-update', [
+        'components' => [['snapshot' => json_encode(['memo' => ['path' => 'admin/inbox']])]],
+    ]);
+
+    Mail::assertSent(ErrorAlert::class, fn (ErrorAlert $mail): bool => $mail->url === url('admin/inbox'));
+});
+
 it('sends the same error only once within fifteen minutes', function () {
     Mail::fake();
 

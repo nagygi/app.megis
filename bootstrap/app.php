@@ -18,6 +18,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Livewire\Livewire;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -60,11 +61,15 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Reported exceptions during an HTTP request end in a 500; queued jobs
         // alert only once their retries are exhausted (AppServiceProvider).
+        // A Livewire update names the page the component lives on: the update
+        // endpoint itself takes POST only, so its link would open a 405.
         $exceptions->report(function (Throwable $exception): void {
             $request = request();
 
             if ($request->attributes->has(AssignLogId::REQUEST_ATTRIBUTE)) {
-                app(ErrorAlerter::class)->reportException($exception, $request->url());
+                $url = Livewire::isLivewireRequest() ? Livewire::originalUrl() : $request->url();
+
+                app(ErrorAlerter::class)->reportException($exception, $url);
             }
         });
     })->create();

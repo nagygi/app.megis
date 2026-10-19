@@ -24,6 +24,12 @@ return [
         'message' => 'Várj egy kicsit, és próbáld újra.',
     ],
 
+    // Every other 4xx without a page of its own, e.g. a 405 from a stale link.
+    '4xx' => [
+        'title' => 'Ez a kérés nem teljesíthető',
+        'message' => 'Lehet, hogy egy régi vagy hibás hivatkozásról jöttél. Kezdd újra a kezdőlapról.',
+    ],
+
     '500' => [
         'title' => 'Valami elromlott',
         'message' => 'Hiba történt nálunk. Már tudunk róla. Próbáld újra egy kicsit később.',
