@@ -44,12 +44,12 @@ class LegalDocuments extends Component
         $this->resetValidation();
     }
 
-    public function cancelUpload(): void
+    public function closeUpload(): void
     {
         $this->reset(['uploadingType', 'file', 'effectiveFrom', 'requiresReacceptance']);
     }
 
-    public function upload(LegalDocumentService $legalDocuments): void
+    public function storeVersion(LegalDocumentService $legalDocuments): void
     {
         Gate::authorize('create', LegalDocumentVersion::class);
 
@@ -67,7 +67,7 @@ class LegalDocuments extends Component
             $validated['requiresReacceptance'],
         );
 
-        $this->cancelUpload();
+        $this->closeUpload();
         session()->flash('status', __('admin.legal.uploaded_ok'));
     }
 

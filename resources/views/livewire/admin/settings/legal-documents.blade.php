@@ -32,7 +32,7 @@
             </div>
 
             @if ($uploadingType === $type->value)
-                <form wire:submit="upload" class="mt-6 flex flex-col gap-5 border-t border-grey-200 pt-6">
+                <form wire:submit="storeVersion" class="mt-6 flex flex-col gap-5 border-t border-grey-200 pt-6">
                     <div class="flex flex-col gap-1.5">
                         <x-form.label for="legal-file" required>{{ __('admin.legal.file') }}</x-form.label>
                         <input id="legal-file" type="file" wire:model="file" accept="application/pdf" aria-describedby="legal-file-help" class="text-sm">
@@ -48,8 +48,8 @@
                     @endif
 
                     <div class="flex gap-3">
-                        <x-ui.button type="submit" wire:loading.attr="disabled" wire:target="file,upload">{{ __('admin.legal.upload') }}</x-ui.button>
-                        <x-ui.button tone="outline" wire:click="cancelUpload">{{ __('admin.common.cancel') }}</x-ui.button>
+                        <x-ui.button type="submit" wire:loading.attr="disabled" wire:target="file,storeVersion">{{ __('admin.legal.upload') }}</x-ui.button>
+                        <x-ui.button tone="outline" wire:click="closeUpload">{{ __('admin.common.cancel') }}</x-ui.button>
                     </div>
                 </form>
             @endif

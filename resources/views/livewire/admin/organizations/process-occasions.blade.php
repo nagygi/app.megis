@@ -55,7 +55,7 @@
     </section>
 
     @if ($main)
-        <form wire:submit="upload" class="flex max-w-2xl flex-col gap-4 rounded-card border border-grey-250 bg-white p-6">
+        <form wire:submit="storeOccasion" class="flex max-w-2xl flex-col gap-4 rounded-card border border-grey-250 bg-white p-6">
             <h2 class="text-lg font-semibold">{{ __('admin.occasions.add') }}</h2>
             <p class="text-sm text-grey-700">{{ __('admin.occasions.add_help', ['diagnosis' => $main->diagnosis->name]) }}</p>
             <div class="flex flex-col gap-1.5">
@@ -67,7 +67,7 @@
             </div>
             <x-form.input name="date" type="date" wire:model="date" :label="__('processes.occasions.when')" :max="today()->toDateString()" required />
             <x-form.checkbox name="consent" wire:model="consent" :label="__('processes.occasions.consent')" :help="__('processes.occasions.consent_help')" />
-            <x-ui.button type="submit" class="self-start" wire:loading.attr="disabled" wire:target="file,upload">{{ __('admin.upload.submit') }}</x-ui.button>
+            <x-ui.button type="submit" class="self-start" wire:loading.attr="disabled" wire:target="file,storeOccasion">{{ __('admin.upload.submit') }}</x-ui.button>
         </form>
     @else
         <p class="text-sm text-grey-600">{{ __('admin.occasions.no_diagnosis') }}</p>

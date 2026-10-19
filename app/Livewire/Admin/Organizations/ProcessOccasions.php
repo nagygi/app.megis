@@ -45,7 +45,7 @@ class ProcessOccasions extends Component
         $this->date = today()->toDateString();
     }
 
-    public function upload(OccasionService $occasions): void
+    public function storeOccasion(OccasionService $occasions): void
     {
         Gate::authorize('update', $this->organization);
         $main = $occasions->adminDiagnosisFor($this->process);

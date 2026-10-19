@@ -36,7 +36,7 @@ class Contribute extends Component
         abort_unless($this->ensurePeerStarted(), 403);
     }
 
-    public function upload(OccasionService $occasions): void
+    public function storeUpload(OccasionService $occasions): void
     {
         $this->authorizeContribution();
 

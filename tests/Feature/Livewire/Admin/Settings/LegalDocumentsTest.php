@@ -16,7 +16,7 @@ it('uploads a new version that comes into force today', function () {
         ->call('openUpload', LegalDocumentType::Terms->value)
         ->set('file', UploadedFile::fake()->create('aszf-2026.pdf', 200, 'application/pdf'))
         ->set('requiresReacceptance', true)
-        ->call('upload')
+        ->call('storeVersion')
         ->assertHasNoErrors();
 
     $version = LegalDocumentVersion::query()->sole();
@@ -38,7 +38,7 @@ it('keeps the old version in force until a future date', function () {
         ->call('openUpload', LegalDocumentType::PrivacyPolicy->value)
         ->set('file', UploadedFile::fake()->create('adatkezeles.pdf', 100, 'application/pdf'))
         ->set('effectiveFrom', today()->addWeek()->toDateString())
-        ->call('upload')
+        ->call('storeVersion')
         ->assertHasNoErrors();
 
     expect(app(LegalDocumentService::class)->current(LegalDocumentType::PrivacyPolicy)->is($current))->toBeTrue();
@@ -51,7 +51,7 @@ it('accepts only PDF files up to 10 MB', function (UploadedFile $file) {
     Livewire::test(LegalDocuments::class)
         ->call('openUpload', LegalDocumentType::Terms->value)
         ->set('file', $file)
-        ->call('upload')
+        ->call('storeVersion')
         ->assertHasErrors('file');
 
     expect(LegalDocumentVersion::query()->count())->toBe(0);
@@ -68,7 +68,7 @@ it('never asks for the cookie policy to be accepted again', function () {
         ->call('openUpload', LegalDocumentType::CookiePolicy->value)
         ->set('file', UploadedFile::fake()->create('cookie.pdf', 100, 'application/pdf'))
         ->set('requiresReacceptance', true)
-        ->call('upload');
+        ->call('storeVersion');
 
     expect(LegalDocumentVersion::query()->sole()->requires_reacceptance)->toBeFalse();
 });

@@ -72,7 +72,7 @@ it('takes an upload and asks where it belongs before processing it (V11)', funct
     $component = Livewire::test(Contribute::class, occasionParams($setup, $main))
         ->assertSee('Mérés indítása')
         ->set('file', UploadedFile::fake()->createWithContent('retro.txt', str_repeat('Megbeszéltük a hetet, és mindenki elmondta a véleményét. ', 5)))
-        ->call('upload')
+        ->call('storeUpload')
         ->assertHasNoErrors();
 
     $material = Material::query()->sole();
@@ -91,7 +91,7 @@ it('rejects an unsupported file type', function () {
 
     Livewire::test(Contribute::class, occasionParams($setup, $main))
         ->set('file', UploadedFile::fake()->create('slides.pptx', 10))
-        ->call('upload')
+        ->call('storeUpload')
         ->assertHasErrors(['file']);
 
     expect(Material::query()->count())->toBe(0);
@@ -310,10 +310,10 @@ it('lets the admin add a material to a process and lists its occasions (12 · 12
         ->assertSee($setup['leader']->name)
         ->set('file', UploadedFile::fake()->createWithContent('jegyzet.txt', str_repeat('Az admin jegyzete a retróról. ', 6)))
         ->set('date', today()->toDateString())
-        ->call('upload')
+        ->call('storeOccasion')
         ->assertHasErrors(['consent'])
         ->set('consent', true)
-        ->call('upload')
+        ->call('storeOccasion')
         ->assertHasNoErrors()
         ->assertSee('jegyzet.txt');
 

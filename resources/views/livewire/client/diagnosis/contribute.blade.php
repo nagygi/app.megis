@@ -23,7 +23,7 @@
             @endif
         </section>
 
-        <form wire:submit="upload" class="flex flex-col gap-3 rounded-card bg-white p-5">
+        <form wire:submit="storeUpload" class="flex flex-col gap-3 rounded-card bg-white p-5">
             <h2 class="font-semibold">{{ __('processes.occasions.upload') }}</h2>
             <div class="flex flex-col gap-1.5">
                 <label for="occasion-file" class="text-sm font-medium">{{ __('processes.occasions.file') }}</label>
@@ -32,7 +32,7 @@
                 <div wire:loading wire:target="file" class="text-sm" role="status">{{ __('admin.upload.uploading') }}</div>
                 <x-form.error name="file" id="file" />
             </div>
-            <x-ui.button type="submit" tone="dark" size="sm" class="self-start" wire:loading.attr="disabled" wire:target="file,upload">{{ __('processes.occasions.upload_button') }}</x-ui.button>
+            <x-ui.button type="submit" tone="dark" size="sm" class="self-start" wire:loading.attr="disabled" wire:target="file,storeUpload">{{ __('processes.occasions.upload_button') }}</x-ui.button>
         </form>
 
         @if ($this->isLeader())
