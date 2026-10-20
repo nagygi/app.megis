@@ -4,6 +4,7 @@ use App\Livewire\Admin\System\AiConfiguration;
 use App\Livewire\Admin\System\AiPrompts;
 use App\Livewire\Admin\System\AiUsage;
 use App\Models\AiCall;
+use App\Models\AiModelPrice;
 use App\Models\Organization;
 use App\Models\User;
 use Livewire\Livewire;
@@ -57,6 +58,22 @@ it('shows each task with its model, prompt and price status', function () {
         ->assertSee('még nincs prompt')
         ->assertSee('nincs ár')
         ->assertSee('bemenet $1,00 · kimenet $5,00');
+});
+
+it('shows the synced price of a model whose name has dots', function () {
+    actingAsAdmin(User::factory()->superadmin()->create());
+    config(['ai.tasks.calendar_naming.model' => 'gemini-3.5-flash-lite']);
+    AiModelPrice::factory()->create([
+        'model' => 'gemini-3.5-flash-lite',
+        'provider' => 'gemini',
+        'input' => 0.3,
+        'output' => 2.5,
+        'synced_at' => '2026-10-20 03:45:00',
+    ]);
+
+    Livewire::test(AiConfiguration::class)
+        ->assertSee('bemenet $0,30 · kimenet $2,50')
+        ->assertSee('Utolsó frissítés: 2026.10.20. 03:45.');
 });
 
 it('shows the versions of a prompt and the text of one', function () {

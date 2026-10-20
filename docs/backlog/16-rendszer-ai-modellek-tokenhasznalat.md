@@ -55,8 +55,10 @@ A Rendszer menüben (01 · 1.4) a szuperadmin látja a konfigurációt és a has
   - átírásnál a hang hosszát percben;
   - a szervezetet, ha van. A nyilvános Értéktükör külön sor: „Nyilvános Értéktükör”;
   - a költséget USD-ben.
-- **Egységárak:** a konfigurációban, modellenként (bemenet és kimenet 1 millió tokenre, hang percenként).
-- A költség a hívás pillanatában számolódik ki, és mentődik. Ha később változik az ár, a régi sorok nem változnak.
+- **Egységárak:** modellenként (bemenet és kimenet 1 millió tokenre, hang percenként).
+  - A `megis:prices:sync` naponta frissíti a használt modellek árát a LiteLLM nyilvános árlistájából, az `ai_model_prices` táblába.
+  - A `config/ai.php` `prices` kulcsában megadott ár felülírja ezt, például olyan modellnél, amely nincs az árlistában.
+- A költség a hívás pillanatában számolódik ki, és mentődik. Ha később változik az ár, a régi sorok nem változnak. Az ár nélkül naplózott hívást a `--backfill` utólag beárazza, amikor a modelljének már van ára.
 
 ### 16.5 Rendszer → AI (admin, csak szuperadmin)
 

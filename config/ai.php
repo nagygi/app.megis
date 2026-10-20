@@ -175,10 +175,16 @@ return [
     | later price changes do not touch old calls. A model without a price is
     | flagged on Rendszer → AI and by the setup check.
     |
+    | megis:prices:sync refreshes the prices of the models in use daily from
+    | the LiteLLM price list into the ai_model_prices table. A price here
+    | overrides that one, e.g. for a model the list does not know.
+    |
     | 'model-id' => ['input' => 0.0, 'output' => 0.0, 'cache_read' => 0.0, 'cache_write' => 0.0, 'audio_minute' => 0.0],
     */
     'prices' => [
         //
     ],
+
+    'price_source' => env('AI_PRICE_SOURCE_URL') ?: 'https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json',
 
 ];

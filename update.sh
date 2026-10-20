@@ -171,6 +171,13 @@ main() {
 
   # --- Innentől az oldal ÉL: ami itt fut, az már nem állásidő. ---
 
+  # Az új modellek ára rögtön, ne csak a 03:45-ös ütemezett futáskor (16 · 16.4).
+  # A setup check előtt fut, hogy ne jelezzen hiányzó árat; hiba esetén a deploy megy tovább.
+  log "AI-egységárak frissítése"
+  if ! "$PHP" artisan megis:prices:sync --backfill; then
+    warn "Az AI-árak frissítése nem sikerült, a régi árak maradnak. Később: php artisan megis:prices:sync --backfill"
+  fi
+
   if [ "${SKIP_CHECKS:-0}" != "1" ]; then
     log "Ellenőrzés: setup check"
     if ! "$PHP" artisan megis:setup:check; then

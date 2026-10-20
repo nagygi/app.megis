@@ -2,15 +2,35 @@
 
 namespace App\Services\Ai;
 
+use App\Models\AiModelPrice;
+
 /**
- * USD cost of a call from the unit prices in config/ai.php (16 · 16.4).
+ * USD cost of a call from the unit prices (16 · 16.4): a price in
+ * config/ai.php first, then the one megis:prices:sync keeps up to date.
  * Cached input tokens are priced apart when the model has such a price.
  */
 class CostCalculator
 {
     public function hasPrice(string $model): bool
     {
-        return is_array(config('ai.prices.'.$model));
+        return $this->price($model) !== null;
+    }
+
+    /**
+     * The model name is a plain array key: config('ai.prices.'.$model) would
+     * split "gemini-3.8-flash" at its dots.
+     *
+     * @return array{input?: float, output?: float, cache_read?: float, cache_write?: float, audio_minute?: float}|null
+     */
+    public function price(string $model): ?array
+    {
+        $configured = (config('ai.prices') ?? [])[$model] ?? null;
+
+        if (is_array($configured)) {
+            return $configured;
+        }
+
+        return AiModelPrice::query()->where('model', $model)->first()?->toPriceArray();
     }
 
     /**
@@ -24,9 +44,9 @@ class CostCalculator
         int $cacheWriteTokens = 0,
         ?float $audioMinutes = null,
     ): ?float {
-        $prices = config('ai.prices.'.$model);
+        $prices = $this->price($model);
 
-        if (! is_array($prices)) {
+        if ($prices === null) {
             return null;
         }
 

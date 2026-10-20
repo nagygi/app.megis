@@ -1,7 +1,12 @@
 <div class="flex flex-col gap-4">
     <x-admin.page-header :title="__('admin.ai.configuration_title')" />
 
-    <p class="max-w-3xl text-sm text-grey-700">{{ __('admin.ai.configuration_help') }}</p>
+    <p class="max-w-3xl text-sm text-grey-700">
+        {{ __('admin.ai.configuration_help') }}
+        {{ $pricesSyncedAt
+            ? __('admin.ai.prices_synced', ['date' => \Illuminate\Support\Carbon::parse($pricesSyncedAt)->format('Y.m.d. H:i')])
+            : __('admin.ai.prices_never_synced') }}
+    </p>
 
     <x-admin.table>
         <x-slot:head>
@@ -28,7 +33,7 @@
                     @endif
                 </td>
                 <td class="px-3 py-2">
-                    @if ($task['has_price'])
+                    @if ($task['price'] !== null)
                         {{ __('admin.ai.price_text', [
                             'input' => number_format((float) ($task['price']['input'] ?? 0), 2, ',', ''),
                             'output' => number_format((float) ($task['price']['output'] ?? 0), 2, ',', ''),

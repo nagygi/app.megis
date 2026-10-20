@@ -44,6 +44,13 @@ Schedule::command('megis:calendar:prune')
     ->name('prune:calendar-metadata')
     ->onOneServer();
 
+// AI unit prices from the LiteLLM price list; calls logged without a price get one (16 · 16.4).
+Schedule::command('megis:prices:sync --backfill')
+    ->dailyAt('03:45')
+    ->name('sync:ai-prices')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // The Beérkező's daily scan, then the 8:00 summary to the contacts (22 · 22.2, question 2).
 Schedule::command('megis:inbox:scan')
     ->dailyAt('07:30')

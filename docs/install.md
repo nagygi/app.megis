@@ -168,6 +168,7 @@ $env:NODE_EXTRA_CA_CERTS = "C:\út\windows-roots.pem" # npm run build (Bunny-fon
 | `php artisan megis:admin:create [--role=superadmin\|admin] [--invite]` | Admin létrehozása vagy meghívása (01 · 1.1) |
 | `php artisan megis:values:import {file} [--dry-run]` | Az Értéktár értékeinek betöltése és frissítése táblázatból (03 · 3.6) |
 | `php artisan megis:mirror:prune` | A 24 óránál régebbi, fiókhoz nem kötött Értéktükrök törlése (06 · 6.1) |
+| `php artisan megis:prices:sync [--model=szolgáltató:modell] [--backfill]` | Az AI-modellek egységárainak frissítése a LiteLLM árlistájából; `--backfill`: az ár nélkül naplózott hívások utólagos beárazása (16 · 16.4) |
 | `php artisan megis:transcription:compare {file} --model=…` | Átíró szolgáltatók összevetése egy felvételen (12 · 12.7) |
 | `php artisan megis:calendar:sync` | Az összekötött naptárak frissítése, új alkalmak az elfogadott folyamatokhoz, szétkötés az időablak végén (09 · 9.4, 9.5) |
 | `php artisan megis:calendar:prune` | A 90 napnál régebbi naptár-metaadat törlése (09 · 9.5) |

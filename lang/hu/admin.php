@@ -788,6 +788,8 @@ return [
         'configuration_title' => 'AI konfiguráció',
         'prompts_title' => 'Promptok',
         'configuration_help' => 'Csak olvasható. Modellt és promptverziót a config/ai.php-ban lehet cserélni, deployjal. Az egységár 1 millió tokenre értendő, USD-ben.',
+        'prices_synced' => 'Az egységárakat a LiteLLM árlistájából a megis:prices:sync frissíti naponta. Utolsó frissítés: :date.',
+        'prices_never_synced' => 'Az egységárakat a LiteLLM árlistájából a megis:prices:sync frissíti naponta. Még nem futott.',
         'prompts_help' => 'Csak olvasható. A promptot fejlesztő módosítja kódreview után; új verzió mindig új fájl, a régiek megmaradnak.',
         'export' => 'CSV export',
         'period' => 'Időszak',

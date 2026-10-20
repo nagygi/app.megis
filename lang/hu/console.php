@@ -39,6 +39,15 @@ return [
         'columns' => ['Szolgáltató:modell', 'Idő (s)', 'Beszélők', 'Szavak', 'Perc', 'Költség', 'Átirat / hiba'],
     ],
 
+    'prices_sync' => [
+        'invalid_model' => 'Hibás modell: :option (szolgáltató:modell kell).',
+        'failed' => 'Az árlista nem tölthető le, az árak nem változtak: :message',
+        'columns' => ['Modell', 'Forrás', 'Bemenet / 1M', 'Kimenet / 1M', 'Cache / 1M', 'Hang / perc'],
+        'missing' => 'Nincs ár az árlistában: :model (a korábbi ára, ha volt, megmarad).',
+        'done' => ':count modell ára frissítve.',
+        'backfilled' => ':count korábbi hívás utólag beárazva.',
+    ],
+
     'values_import' => [
         'invalid_file' => 'Nem található xlsx vagy csv fájl: :path',
         'missing_name_column' => 'Hiányzik a „Név” oszlop az első sorból.',

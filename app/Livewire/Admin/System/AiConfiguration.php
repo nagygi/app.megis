@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\System;
 
 use App\Enums\AiCallStatus;
 use App\Models\AiCall;
+use App\Models\AiModelPrice;
 use App\Services\Ai\CostCalculator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -34,12 +35,14 @@ class AiConfiguration extends Component
             'model' => $task['model'],
             'prompt' => $task['prompt'],
             'prompt_version' => $task['prompt_version'],
-            'price' => $task['model'] !== null ? config('ai.prices.'.$task['model']) : null,
-            'has_price' => $task['model'] !== null && $costs->hasPrice($task['model']),
+            'price' => $task['model'] !== null ? $costs->price($task['model']) : null,
             'last_success' => $lastSuccess->get($key),
         ])->values();
 
-        return view('livewire.admin.system.ai-configuration', ['tasks' => $tasks])
+        return view('livewire.admin.system.ai-configuration', [
+            'tasks' => $tasks,
+            'pricesSyncedAt' => AiModelPrice::query()->max('synced_at'),
+        ])
             ->layout('layouts::admin')
             ->title(__('admin.ai.configuration_title'));
     }
