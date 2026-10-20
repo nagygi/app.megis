@@ -284,6 +284,21 @@ it('does not ask the AI again for an answer that is already extracted', function
     expect(AiCall::query()->count())->toBe(0);
 });
 
+it('does not ask the AI again when the answer was extracted while it waited', function () {
+    $setup = diagnosisTeam();
+    $main = startMainDiagnosis($setup);
+    $conversation = app(ConversationService::class)->forUser($setup['organization'], $setup['leader'], $main);
+    $conversation->update(['answers' => [1 => 'Kéthetente retró.']]);
+    $waiting = $conversation->fresh();
+    // Meanwhile the other caller (the queued job or "Válasz és tovább") is done.
+    $conversation->update(['extracted_answers' => [1 => 'Kéthetente retró.'], 'extracts' => [1 => []]]);
+    AiGateway::fake();
+
+    app(ConversationService::class)->extract($waiting, 1);
+
+    expect(AiCall::query()->count())->toBe(0);
+});
+
 it('marks a process named in the fourth answer as a breakpoint candidate', function () {
     $setup = diagnosisTeam();
     $main = startMainDiagnosis($setup);

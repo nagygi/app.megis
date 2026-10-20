@@ -15,6 +15,7 @@ use App\Models\Process;
 use App\Models\ProcessConversation;
 use App\Models\User;
 use App\Services\Ai\AiGateway;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -24,6 +25,16 @@ use Throwable;
  */
 class ConversationService
 {
+    /**
+     * Longer than the extract's AI call, so the lock does not lapse under it.
+     */
+    private const EXTRACT_LOCK_SECONDS = 120;
+
+    /**
+     * How long the second caller waits for the first one's extract.
+     */
+    private const EXTRACT_WAIT_SECONDS = 90;
+
     public function __construct(private AiGateway $ai) {}
 
     public function forUser(Organization $organization, User $user, ?MainDiagnosis $main): ProcessConversation
@@ -63,15 +74,31 @@ class ConversationService
 
     /**
      * The model and prompt version are logged with the call (NFR · 11).
+     *
+     * The queued job and "Válasz és tovább" may extract the same answer at
+     * once: one waits for the other and then finds it done, so the AI is
+     * asked once per answer.
      */
     public function extract(ProcessConversation $conversation, int $question): void
     {
-        $answer = $conversation->answer($question);
-
         // Already extracted, e.g. on "Válasz és tovább" before the queued job ran.
-        if ($answer === '' || ! $conversation->isExtracting($question)) {
+        if ($conversation->answer($question) === '' || ! $conversation->isExtracting($question)) {
             return;
         }
+
+        Cache::lock('process-conversation:'.$conversation->id.':'.$question, self::EXTRACT_LOCK_SECONDS)
+            ->block(self::EXTRACT_WAIT_SECONDS, function () use ($conversation, $question): void {
+                $fresh = ProcessConversation::query()->findOrFail($conversation->id);
+
+                if ($fresh->answer($question) !== '' && $fresh->isExtracting($question)) {
+                    $this->extractAnswer($fresh, $question);
+                }
+            });
+    }
+
+    private function extractAnswer(ProcessConversation $conversation, int $question): void
+    {
+        $answer = $conversation->answer($question);
 
         $result = $this->ai->run(
             new ExtractProcessesTask(__('processes.conversation.questions.'.$question), $answer),
