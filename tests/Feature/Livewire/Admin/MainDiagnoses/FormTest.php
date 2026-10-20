@@ -68,6 +68,23 @@ it('tells organizations of the same name apart by their address on A1', function
         ->assertDontSee('Béta Bt. · /beta');
 });
 
+it('warns on A1 that below three peers there will be no team average and gap', function (int $peers, bool $warns) {
+    $setup = diagnosisTeam(peers: $peers);
+    actingAsAdmin($setup['admin']);
+
+    $component = Livewire::test(Form::class)
+        ->set('organization_id', $setup['organization']->id)
+        ->set('team_id', $setup['team']->id)
+        ->set('leader_id', $setup['leader']->id);
+
+    $warns
+        ? $component->assertSee('Három társ alatt nem lesz csapat-átlag és rés')
+        : $component->assertDontSee('Három társ alatt nem lesz csapat-átlag és rés');
+})->with([
+    'two peers' => [2, true],
+    'three peers' => [3, false],
+]);
+
 it('saves a draft without sending anything', function () {
     Mail::fake();
     $setup = diagnosisTeam();

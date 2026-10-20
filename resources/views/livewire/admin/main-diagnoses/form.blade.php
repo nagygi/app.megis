@@ -164,6 +164,9 @@
                         @empty
                             <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.peers_empty') }}</p>
                         @endforelse
+                        @if ($peerCandidates->filter(fn ($candidate) => $peers[$candidate->id] ?? false)->count() < \App\Services\Diagnoses\ThresholdPolicy::PEERS)
+                            <p class="text-sm font-semibold text-coral-ink" role="status">{{ __('admin.main_diagnoses.peers_below_threshold') }}</p>
+                        @endif
                     </fieldset>
                 @endif
 
@@ -243,6 +246,9 @@
                 @if ($hasPeers)
                     @php($peerCount = $peerCandidates->filter(fn ($candidate) => $peers[$candidate->id] ?? false)->count())
                     <p class="text-sm opacity-90">{{ trans_choice('admin.main_diagnoses.preview_peers', $peerCount, ['count' => $peerCount]) }}</p>
+                    @if ($peerCount < \App\Services\Diagnoses\ThresholdPolicy::PEERS)
+                        <p class="text-sm">{{ __('admin.main_diagnoses.peers_below_threshold') }}</p>
+                    @endif
                 @endif
             @endif
         </aside>

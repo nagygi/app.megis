@@ -1002,6 +1002,7 @@ return [
         'peers' => 'Társak',
         'peers_help' => 'A csapat felhasználói a vezetőn kívül, címkétől függetlenül. Akit nem akarsz társnak, vedd ki. Aki az olvasat indításáig a csapatba kerül, automatikusan társ lesz.',
         'peers_empty' => 'A csapatban még nincs más felhasználó. Társat úgy adhatsz hozzá, hogy a csapathoz rendeled.',
+        'peers_below_threshold' => 'Három társ alatt nem lesz csapat-átlag és rés: a riport csak a PHI-t mutatja, a rés helyén szürke szöveg áll. Indítani így is lehet.',
         'window' => 'Időablak',
         'starts_on' => 'A kezdés napja',
         'starts_on_help' => 'A vezető kitöltési határideje. Ha üres, a vezető „egyeztetés alatt” feliratot lát.',
