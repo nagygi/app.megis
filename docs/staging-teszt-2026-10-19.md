@@ -43,7 +43,7 @@ A stagingen deploy után (`./update.sh`, a nézetek miatt `npm run build` is) é
 | A3 · státusztörténet | javítva | `290767c` |
 | A4 · rés küszöb alatt | javítva: admin választó; a riport küszöb alatt nem nevez meg sort | `3be7c33`, `e982f0d` |
 | A5 · mérőpont-szám | javítva: a V10 olvasattól a pontozottakat számolja | `d3a0c46` |
-| A6 · dupla logó | javítva | `4a32862` |
+| A6 · dupla logó | az első javítás nem hatott (újrateszt), újra javítva böngészőteszttel; **deploy kell** | `4a32862`, `823162c` |
 | A7 · azonos nevű szervezetek | javítva | `77f1f13` |
 | A8 · „Feldolgozás alatt” | javítva | `e70259a` |
 | A9 · újrapublikálás szövege | javítva | `703dd60` |
@@ -53,6 +53,37 @@ A stagingen deploy után (`./update.sh`, a nézetek miatt `npm run build` is) é
 | Kérdés 1 · V1 első belépés | javítva: a V1 marad, amíg a vezető maga nem lépett | `65f1dfc` |
 | Kérdés 2 · A1 kevés társ | javítva: figyelmeztetés | `7246eb3` |
 | Kérdés 3 · Útravaló számozása | marad (döntés) | – |
+
+## Újrateszt a stagingen (1.15, deploy 2026-10-20 11:13, `6f6ad85`)
+
+Ugyanúgy böngészőben, a meglévő `e2e-` adatokon. Új tesztadat: `e2e-vezeto3@example.com` (Viktor, „Egy ember” diagnózis, diag 80) és az „E2E Demó 2 Kft.” (`e2e-demo2`, diag 82, olvasatban) az AI-vázlatok ellenőrzéséhez.
+
+| Lelet | Eredmény a stagingen |
+|---|---|
+| B1 · V4 márka | ✅ Márk (diag 64): 3 mező → 3 kérés, „4 / 4 kész”, „Tovább” aktív, újratöltés után megmarad. Ilona (magánszemély): a saját értékek után 4/4. |
+| B2 · feltöltés | ✅ Jogi dokumentum: a „Mégse” bezár, az ÁSZF feltölthető, a láblécben és az ET5 elfogadásánál link lett, `/aszf` PDF-et ad. Ügyfél V11 feltöltés → besorolás lap. Admin folyamat-alkalom feltöltés → anyag létrejön. |
+| B3 · küszöb | ✅ Diag 56 olvasatban: „A küszöb nem teljesült.” + „Csapat-szám nélkül megy” → lista kész → publikálva. Küszöb alatti „Olvasat indítása” (diag 64): „A küszöbhöz még 3 társ kell… Publikálni csak csapat-szám nélkül lehet majd.” |
+| S1 · beszélgetés | ✅ Két begépelt válasz, azonnal „Válasz és tovább” (9 mp) → 3 folyamat, az utolsó válaszé is. Megjegyzés: 2 válaszra 4 AI-hívás ment, mert a háttérjob és a lezárás ugyanazt a választ közel egyszerre dolgozta fel (helyes eredmény, kétszeres költség). |
+| S2 · Profil név | ✅ „Klára-Teszt” blurra mentve („Mentve”), újratöltés után is. |
+| K1 · értéknév | ✅ Márk „kimondott igazság” értéke Vera át nem nézett értékéhez kötődött, hiba és duplikátum nélkül. (Az eredeti ütköző 179-es érték közben megszűnt.) |
+| K4 · mobil Értéktár | ✅ 390 px, nincs vízszintes görgetés, a pontszám és a „Részletek” a szöveg alatt. |
+| K5 · olvasat-szövegek | ✅ v2 prompt (diag 82): a nyom nélküli blokkokra „Ebben a blokkban még kevés a nyom.”, a márka-olvasat kimondja, hogy a megélés önkép. |
+| A1 · `$persist` | ✅ Az admin belépésen nincs JS-hiba. |
+| A2 · material | ✅ `/admin/anyagok/31` → 404. |
+| A3 · státusztörténet | ✅ „Vázlat → Meghívva”, „Fut → Olvasat (Draft → Jóváhagyásra vár)”. |
+| A4 · rés-választó | ✅ Küszöb alatt csak sornevek, a súgó megmondja, miért. |
+| A5 · mérőpont | ✅ Diag 56 olvasatban: V10 „10 mérőpont” (eddig 16). |
+| A6 · dupla logó | ❌ Még két logó 1280 px-en. Ok: a `.megis-logo` `display` szabálya rétegen kívüli CSS, erősebb a `desktop:hidden`-nél. Javítva (`823162c`), deploy kell. |
+| A7 · azonos nevű szervezetek | – Nincs most két azonos nevű szervezet; feature-teszt fedi. |
+| A8 · „Feldolgozás alatt” | ✅ „Feldolgozás alatt · 1” a besorolatlan fájllal; feldolgozás után a szakasz eltűnik, a „Helyzeteid” link marad. |
+| A9 · újrapublikálás | ✅ „Újrapublikálás: e-mail nem megy ki…”. |
+| A10 · vázlat-állítás | ✅ „vázlat · jóváhagyás után kerül a riportba”. |
+| A11 · `h1` | ✅ „Adatok”, „Értékek”. 63 admin oldal 200. |
+| Rés-kártya (döntés) | ✅ Diag 56 küszöb alatt: V12 és összefoglaló „Még 1 társ hangja kellett volna…”, sornév nélkül; nincs „legnagyobb rés” jelölés; PDF 200. |
+| V1 (döntés) | ✅ Viktor második látogatáskor is „Mi vár rád / Kezdjük”, a kész szervezeti értékek és márka pipával. |
+| A1 kevés társ (döntés) | ✅ A figyelmeztetés a társaknál és az előnézetben; „Egy ember” alanynál a névsúgó „Név · Termék · …”. |
+| Magánszemély V4 (döntés) | ✅ „Mit mond rólad a fa?”, „Miért csinálod?”, „Mi marad utánad?”. |
+| Regresszió | ✅ Vera 21 riport- és menüoldala 200, a társ Útravalója 200, a publikus Értéktükör (60 mp, 5 érték) működik. |
 
 ## Blokkoló hibák
 
