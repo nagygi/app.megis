@@ -182,6 +182,12 @@ return [
         'send_invitation' => 'Meghívó küldése',
         'resend_invitation' => 'Meghívó újraküldése',
         'impersonate' => 'Belépés a nevében',
+        'impersonation_unavailable' => [
+            'user_inactive' => 'A felhasználó fiókja inaktív.',
+            'membership_inactive' => 'A felhasználó ebben a szervezetben inaktív.',
+            'not_registered' => 'A felhasználó még nem regisztrált.',
+            'membership_pending' => 'A felhasználó tagsága ebben a szervezetben még nem aktív. A meghívó elküldésével azonnal aktív lesz.',
+        ],
         'added' => 'A felhasználó felvéve.',
         'invitation_sent' => 'Meghívót küldtünk ide: :email.',
         'already_member' => 'Ez a felhasználó már tagja a szervezetnek.',

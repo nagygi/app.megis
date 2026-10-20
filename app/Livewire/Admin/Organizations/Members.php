@@ -9,7 +9,6 @@ use App\Livewire\Admin\Concerns\WithDataTable;
 use App\Models\Membership;
 use App\Models\Organization;
 use App\Models\Team;
-use App\Models\User;
 use App\Models\UserToken;
 use App\Services\Organizations\MembershipService;
 use Illuminate\Database\Eloquent\Builder;
@@ -141,9 +140,24 @@ class Members extends Component
         return ['name', 'asc'];
     }
 
-    public function canImpersonate(User $user): bool
+    /**
+     * Why "Belépés a nevében" is greyed out in the row, or null when it works:
+     * the customer has to reach this organization on the customer side (14 · 14.6).
+     */
+    public function impersonationUnavailableReason(Membership $membership): ?string
     {
-        return Gate::allows('impersonate', $user);
+        $user = $membership->user;
+
+        if ($membership->status === MembershipStatus::Active && Gate::allows('impersonate', $user)) {
+            return null;
+        }
+
+        return match (true) {
+            ! $user->isActive() => __('admin.members.impersonation_unavailable.user_inactive'),
+            $membership->status === MembershipStatus::Inactive => __('admin.members.impersonation_unavailable.membership_inactive'),
+            ! $user->isActivated() => __('admin.members.impersonation_unavailable.not_registered'),
+            default => __('admin.members.impersonation_unavailable.membership_pending'),
+        };
     }
 
     private function findMembership(int $membershipId): Membership

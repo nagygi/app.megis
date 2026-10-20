@@ -80,6 +80,43 @@ it('reactivates a member only while there is a free seat', function () {
     expect($inactive->fresh()->status)->toBe(MembershipStatus::Inactive);
 });
 
+it('offers "Belépés a nevében" for an active member', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $membership = Membership::factory()->for($organization)->create();
+
+    $component = Livewire::test(Members::class, ['organization' => $organization]);
+
+    $component->assertSee(route('admin.impersonate', $membership->user));
+});
+
+it('greys out "Belépés a nevében" with the reason', function (Closure $membershipFactory, string $reason) {
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $membership = $membershipFactory()->for($organization)->create();
+
+    $component = Livewire::test(Members::class, ['organization' => $organization]);
+
+    $component->assertSee('Belépés a nevében')
+        ->assertSee($reason)
+        ->assertDontSee(route('admin.impersonate', $membership->user));
+})->with([
+    'deactivated account' => [fn () => Membership::factory()->state(['user_id' => User::factory()->deactivated()]), 'A felhasználó fiókja inaktív.'],
+    'inactive in the organization' => [fn () => Membership::factory()->inactive(), 'A felhasználó ebben a szervezetben inaktív.'],
+    'not registered yet' => [fn () => Membership::factory()->invited()->state(['user_id' => User::factory()->invited()]), 'A felhasználó még nem regisztrált.'],
+    'registered, invitation still open' => [fn () => Membership::factory()->invited(), 'A felhasználó tagsága ebben a szervezetben még nem aktív. A meghívó elküldésével azonnal aktív lesz.'],
+]);
+
+it('shows no "Belépés a nevében" for an admin account', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+    Membership::factory()->for($organization)->create(['user_id' => User::factory()->admin()]);
+
+    $component = Livewire::test(Members::class, ['organization' => $organization]);
+
+    $component->assertDontSee('Belépés a nevében');
+});
+
 it('filters members by tag', function () {
     actingAsAdmin();
     $organization = Organization::factory()->create();

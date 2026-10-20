@@ -76,12 +76,18 @@
                         @else
                             <x-admin.row-action wire:click="deactivate({{ $membership->id }})" wire:confirm="{{ __('admin.members.confirm_deactivate') }}">{{ __('admin.common.deactivate') }}</x-admin.row-action>
                         @endif
-                        @if ($membership->status === \App\Enums\MembershipStatus::Active && $this->canImpersonate($member))
-                            <form method="POST" action="{{ route('admin.impersonate', $member) }}" target="_blank">
-                                @csrf
-                                <x-admin.row-action type="submit">{{ __('admin.members.impersonate') }}</x-admin.row-action>
-                            </form>
-                        @endif
+                        {{-- Admin accounts get no such item at all (14 · 14.6). --}}
+                        @unless ($member->isAdmin())
+                            @php($impersonationUnavailableReason = $this->impersonationUnavailableReason($membership))
+                            @if ($impersonationUnavailableReason)
+                                <x-admin.row-action :disabled-reason="$impersonationUnavailableReason">{{ __('admin.members.impersonate') }}</x-admin.row-action>
+                            @else
+                                <form method="POST" action="{{ route('admin.impersonate', $member) }}" target="_blank">
+                                    @csrf
+                                    <x-admin.row-action type="submit">{{ __('admin.members.impersonate') }}</x-admin.row-action>
+                                </form>
+                            @endif
+                        @endunless
                     </x-admin.row-actions>
                 </td>
             </tr>
