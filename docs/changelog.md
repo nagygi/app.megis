@@ -2,6 +2,18 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.15 · {hash} · 2026-10-20
+
+A staging-teszt után eldöntött kérdések.
+
+- **Értéknév (K1):** ha a beírt név egy nem választható Értéktár-értéké (pl. egy másik szervezet még át nem nézett AI-értéke), a saját vagy szervezeti érték arra az értékre mutat, a felhasználó saját szövegeivel; abból az értékből semmi nem látszik. Eddig „Ilyen nevű érték már van az Értéktárban, de nem választható.” állt, kiút nélkül.
+- **Legnagyobb rés küszöb alatt:** 3 kitöltő alatt a V12, az összefoglaló és a PDF nem nevez meg sort, a kártyán csak a szürke „Még N társ hangja kellett volna…” áll; egy sor sem kap „legnagyobb rés” jelet.
+- **Mérőpont (A5):** a V10 futás közben a mérendő pontokat, olvasattól a pontozottakat számolja, mint a Kert és az R0.
+- **V1:** a „Kezdjük” nézet marad, amíg a vezető maga nem végzett el egy lépést; az admin által kitöltött szervezeti értékek és márka egyedül nem váltják V1·b-re.
+- **A1:** 3-nál kevesebb társnál jelzés a társaknál és az előnézetben: nem lesz csapat-átlag és rés. Indítani így is lehet.
+- **Magánszemély V4:** egyes számú kérdések és példák („Mit mond rólad a fa?”, „Miért csinálod?”).
+- Marad: a társ csak a rutinokat látja, amelyekben résztvevő (K2); az Útravaló kártyáinak számozása.
+
 ## 1.14 · ea800c1 · 2026-10-20
 
 A staging-teszt (`docs/staging-teszt-2026-10-19.md`) javításai.
