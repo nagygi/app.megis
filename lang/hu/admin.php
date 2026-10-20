@@ -8,7 +8,7 @@ return [
 
     'nav' => [
         'organizations' => 'Szervezetek',
-        'clients' => 'Ügyfelek',
+        'clients' => 'Felhasználók',
         'products' => 'Termékek',
         'admins' => 'Admin felhasználók',
         'settings' => 'Beállítások',
@@ -199,7 +199,7 @@ return [
     ],
 
     'clients' => [
-        'title' => 'Ügyfelek',
+        'title' => 'Felhasználók',
         'organizations' => 'Szervezet(ek)',
         'status' => 'Állapot',
         'last_login' => 'Utolsó belépés',
