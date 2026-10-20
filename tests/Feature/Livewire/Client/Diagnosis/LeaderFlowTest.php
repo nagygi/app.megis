@@ -177,6 +177,46 @@ it('lets a non-leader of the organization only read the organization values', fu
     Livewire::test(OrganizationValues::class, leaderParams($setup, $main))->call('remove', 'x')->assertForbidden();
 });
 
+it('ties an own value to an Értéktár value of the same name the user may not choose', function () {
+    $setup = diagnosisTeam();
+    $main = startMainDiagnosis($setup);
+    $taken = app(ValueService::class)->createElsewhere('Egyenesség', ValueOrigin::Ai, Organization::factory()->create(), ['meanings' => ['Egy másik szervezet AI-szövege.']]);
+    actingAsCustomer($setup['leader']);
+
+    Livewire::test(OwnValues::class, leaderParams($setup, $main))
+        ->call('show', 'add')
+        ->set('draft.name', 'egyenesség')
+        ->set('draft.meaning', 'Kimondom, amit gondolok.')
+        ->call('addDraft')
+        ->assertHasNoErrors()
+        ->assertSee('Kimondom, amit gondolok.')
+        ->assertDontSee('Egy másik szervezet AI-szövege.');
+
+    $item = PersonalValueSet::query()->where('user_id', $setup['leader']->id)->sole()->items()->sole();
+    expect($item->value_id)->toBe($taken->id)
+        ->and($item->name)->toBe('Egyenesség')
+        ->and($item->meaning)->toBe('Kimondom, amit gondolok.')
+        ->and(Value::query()->where('name', 'Egyenesség')->count())->toBe(1);
+});
+
+it('ties a new organization value to an Értéktár value of the same name not choosable here', function () {
+    $setup = diagnosisTeam(withValues: false);
+    $main = startMainDiagnosis($setup, invite: false);
+    $main->update(['stage' => MainDiagnosisStage::Invited]);
+    $taken = app(ValueService::class)->createElsewhere('Egyenesség', ValueOrigin::Ai, Organization::factory()->create(), ['meanings' => ['Egy másik szervezet AI-szövege.']]);
+    actingAsCustomer($setup['leader']);
+
+    Livewire::test(OrganizationValues::class, leaderParams($setup, $main))
+        ->set('newValueName', 'Egyenesség')
+        ->call('addNew')
+        ->assertHasNoErrors()
+        ->assertSet('items.0.value_id', $taken->id)
+        ->assertSet('items.0.meaning', '')
+        ->set('newValueName', 'egyenesség')
+        ->call('addNew')
+        ->assertHasErrors(['newValueName']);
+});
+
 it('edits the organization values with 3–5 values and records the version on "Tovább"', function () {
     $setup = diagnosisTeam(withValues: false);
     $main = startMainDiagnosis($setup, invite: false);

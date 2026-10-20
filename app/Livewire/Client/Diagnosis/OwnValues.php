@@ -162,13 +162,14 @@ class OwnValues extends Component
             $existing = $values->findByName((string) $draft['name']);
 
             if ($existing !== null) {
-                if (! Value::query()->availableToUser($this->user(), $this->organization)->whereKey($existing->id)->exists()) {
-                    throw ValidationException::withMessages(['draft.name' => __('diagnosis.own_values.name_taken')]);
-                }
+                // A name taken by a value the user may not choose (e.g. another
+                // organization's, not reviewed yet) is tied to it with the user's
+                // own words; nothing of that value is shown.
+                $available = Value::query()->availableToUser($this->user(), $this->organization)->whereKey($existing->id)->exists();
 
                 $draft['value_id'] = $existing->id;
-                $draft['source_version_id'] = $existing->latestVersion?->id;
-                $draft['source'] = PersonalValueSetItem::SOURCE_LIBRARY;
+                $draft['source_version_id'] = $available ? $existing->latestVersion?->id : null;
+                $draft['source'] = $available ? PersonalValueSetItem::SOURCE_LIBRARY : PersonalValueSetItem::SOURCE_NEW;
             }
         }
 

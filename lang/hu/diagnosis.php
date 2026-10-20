@@ -198,7 +198,6 @@ return [
         ],
         'too_many' => 'Legfeljebb :max saját érték lehet.',
         'too_few' => 'Legalább :min érték kell.',
-        'name_taken' => 'Ilyen nevű érték már van az Értéktárban, de nem választható.',
         'duplicate' => 'Ez az érték már a listádon van.',
     ],
 
@@ -215,7 +214,7 @@ return [
         'library_select' => 'Válassz értéket',
         'new_value' => 'Új érték',
         'add' => 'Hozzáadom',
-        'name_taken' => 'Ilyen nevű érték már van az Értéktárban vagy a listán.',
+        'name_taken' => 'Ilyen nevű érték már van a listán.',
         'too_few' => 'Legalább :min érték kell.',
         'too_many' => 'Legfeljebb :max érték lehet.',
         'values' => 'A szervezet értékei',

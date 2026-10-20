@@ -99,17 +99,19 @@ class OrganizationValues extends Component
             return;
         }
 
-        if ($existing !== null || collect($this->items)->contains(fn (array $item) => mb_strtolower($item['name']) === mb_strtolower($name))) {
+        if (collect($this->items)->contains(fn (array $item) => mb_strtolower($item['name']) === mb_strtolower($name))) {
             throw ValidationException::withMessages(['newValueName' => __('diagnosis.organization_values.name_taken')]);
         }
 
         // Saved with the value set, it goes to the Értéktár as "Szervezet által felvett" (08 · 8.1).
+        // A name taken by a value not choosable here (e.g. another organization's,
+        // not reviewed yet) is tied to it with the organization's own words.
         $key = (string) Str::uuid();
         $this->items[] = [
             'key' => $key,
-            'value_id' => null,
+            'value_id' => $existing?->id,
             'source_version_id' => null,
-            'name' => $name,
+            'name' => $existing?->name ?? $name,
             ...array_fill_keys(OrganizationValueSetItem::TEXT_FIELDS, ''),
         ];
         $this->openKey = $key;
