@@ -3,6 +3,7 @@
 namespace App\Livewire\Client\Diagnosis;
 
 use App\Enums\DiagnosisStep;
+use App\Enums\MainDiagnosisSubject;
 use App\Enums\StepMark;
 use App\Enums\TreeElement;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
@@ -93,6 +94,8 @@ class Brand extends Component
             'doneCount' => ($names->count() >= OrganizationValueSet::MIN_VALUES ? 1 : 0)
                 + collect(OrganizationValueSet::BRAND_FIELDS)->filter(fn (string $field) => filled($this->{$field}))->count(),
             'givenBy' => $set->latestVersion?->creator?->name ?? $set->updater?->name,
+            // A private person is asked in the singular ("Mit mond rólad a fa?").
+            'texts' => $this->main()->subject === MainDiagnosisSubject::Individual ? 'diagnosis.brand_individual' : 'diagnosis.brand',
         ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Brand))->title(DiagnosisStep::Brand->label());
     }
 

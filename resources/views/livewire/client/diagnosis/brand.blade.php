@@ -3,7 +3,7 @@
     <x-ui.flash />
 
     <div class="flex flex-col gap-1">
-        <p class="text-xl font-semibold">{{ __('diagnosis.brand.question') }}</p>
+        <p class="text-xl font-semibold">{{ __($texts.'.question') }}</p>
         <p class="text-grey-700" aria-live="polite">{{ __('diagnosis.brand.count', ['done' => $doneCount]) }}</p>
     </div>
 
@@ -20,11 +20,11 @@
                 <x-megis.symbol :name="\App\Enums\TreeElement::Root->symbol()" class="size-8 text-charcoal" />
                 <h2 class="font-semibold">{{ \App\Enums\TreeElement::Root->label() }}</h2>
             </div>
-            <p class="text-sm text-grey-600">{{ __('diagnosis.brand.questions.root') }}</p>
+            <p class="text-sm text-grey-600">{{ __($texts.'.questions.root') }}</p>
             @if ($names->isNotEmpty())
                 <p>{{ $names->implode(' · ') }}</p>
             @else
-                <p class="text-grey-600 italic">{{ __('diagnosis.brand.root_empty') }}</p>
+                <p class="text-grey-600 italic">{{ __($texts.'.root_empty') }}</p>
             @endif
             @if ($names->count() >= \App\Models\OrganizationValueSet::MIN_VALUES)
                 <p class="inline-flex items-center gap-1 text-sm font-semibold text-green"><x-megis.icon name="check" class="size-4" /> {{ __('diagnosis.brand.done') }}</p>
@@ -47,7 +47,7 @@
                         <button type="button" wire:click="edit('{{ $field }}')" class="text-sm font-semibold underline">{{ __('diagnosis.edit') }}</button>
                     @endif
                 </div>
-                <p class="text-sm text-grey-600" id="brand-{{ $field }}-question">{{ __('diagnosis.brand.questions.'.$field) }}</p>
+                <p class="text-sm text-grey-600" id="brand-{{ $field }}-question">{{ __($texts.'.questions.'.$field) }}</p>
 
                 @if ($isEditing)
                     <label for="brand-{{ $field }}" class="sr-only">{{ $element->label() }}</label>
@@ -57,7 +57,7 @@
                         rows="3"
                         maxlength="500"
                         aria-describedby="brand-{{ $field }}-question"
-                        placeholder="{{ __('diagnosis.brand.placeholders.'.$field) }}"
+                        placeholder="{{ __($texts.'.placeholders.'.$field) }}"
                         class="w-full rounded-xl border border-grey-350 bg-white px-3.5 py-2.5 text-base placeholder:text-grey-600 placeholder:italic focus:border-charcoal"
                     ></textarea>
                     <x-form.error :name="$field" :id="'brand-'.$field" />
@@ -65,7 +65,7 @@
                 @elseif ($isDone)
                     <p>{{ $this->{$field} }}</p>
                 @else
-                    <p class="text-grey-600 italic">{{ __('diagnosis.brand.placeholders.'.$field) }}</p>
+                    <p class="text-grey-600 italic">{{ __($texts.'.placeholders.'.$field) }}</p>
                 @endif
 
                 @if ($isDone)

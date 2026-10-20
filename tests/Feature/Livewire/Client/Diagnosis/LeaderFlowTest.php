@@ -388,3 +388,19 @@ it('makes a private person\'s own values the organization values', function () {
 
     expect($organization->valueSet()->first()->items()->pluck('name')->all())->toBe(['Bátorság', 'Nyíltság', 'Felelősség']);
 });
+
+it('asks a private person about the brand base in the singular', function () {
+    $organization = Organization::factory()->individual()->create([
+        'product_id' => startingProduct(Product::SNAPSHOT_INTERNAL)->id,
+        'contact_admin_id' => User::factory()->admin()->create()->id,
+    ]);
+    $person = User::factory()->create();
+    Membership::factory()->for($organization)->for($person)->organizationLeader()->create();
+    $main = startMainDiagnosis(['organization' => $organization, 'team' => null, 'leader' => $person, 'admin' => User::factory()->admin()->create()], overrides: ['team_id' => null, 'leader_id' => null]);
+    actingAsCustomer($person);
+
+    Livewire::test(Brand::class, ['organization' => $organization, 'diagnosis' => $main->diagnosis])
+        ->assertSee('Mit mond rólad a fa?')
+        ->assertSee('Miért csinálod?')
+        ->assertDontSee('Mit mond rólatok a fa?');
+});

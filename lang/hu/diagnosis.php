@@ -247,6 +247,23 @@ return [
         'done' => 'kész',
     ],
 
+    // A private person's brand base, in the singular.
+    'brand_individual' => [
+        'question' => 'Mit mond rólad a fa?',
+        'questions' => [
+            'root' => 'Mik az értékeid?',
+            'purpose' => 'Miért csinálod?',
+            'value_proposition' => 'Mit kap tőled, aki veled dolgozik?',
+            'impact' => 'Mi marad utánad?',
+        ],
+        'placeholders' => [
+            'purpose' => 'pl. Mert akkor vagyok jó, amikor az emberek érzik, hogy ők mozgatják a dolgokat.',
+            'value_proposition' => 'pl. Valakit, aki nem esik szét, amikor a terv változik.',
+            'impact' => 'pl. Az ügyfelek maradnak, mert velem kiszámíthatóbb a változás.',
+        ],
+        'root_empty' => 'Az előző lépés értékei jelennek meg itt.',
+    ],
+
     'experience' => [
         'question' => 'Hogyan látjátok ma a márkát?',
         'count' => ':answered / :total megválaszolva',
