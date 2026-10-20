@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.19 · {hash} · 2026-10-21
+## 1.19 · 2d4a6ce · 2026-10-21
 
 UI-finomhangolás, 2. lépés: visszajelzés.
 
