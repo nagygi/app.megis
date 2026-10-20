@@ -3,6 +3,8 @@
 use App\Enums\DiagnosisRowKind;
 use App\Models\DiagnosisClaim;
 use App\Models\Membership;
+use App\Services\Report\PublishService;
+use App\Services\Report\ReportBuilder;
 use Illuminate\Support\Facades\Queue;
 
 beforeEach(fn () => Queue::fake());
@@ -43,6 +45,36 @@ it('keeps the report closed before publishing', function () {
     actingAsCustomer($setup['leader']);
 
     $this->get(route('client.report.show', [$setup['organization'], $main->diagnosis]))->assertForbidden();
+});
+
+it('names no row as the biggest gap below the threshold (Extra inputok 1)', function () {
+    [$setup, $main] = approvedReading();
+    $row = $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Value)->orderBy('position')->firstOrFail();
+    $main->update(['biggest_gap_row_id' => $row->id]);
+
+    $report = app(ReportBuilder::class)->build($main->refresh());
+
+    expect($report['meta']['shows_experience'])->toBeFalse()
+        ->and($report['biggest_gap'])->toBeNull()
+        ->and(collect($report['rows'])->where('is_biggest_gap', true))->toBeEmpty();
+
+    app(PublishService::class)->publish($main, $setup['admin']);
+    actingAsCustomer($setup['leader']);
+    $this->get(route('client.report.summary', [$setup['organization'], $main->diagnosis]))
+        ->assertOk()
+        ->assertSee('A legnagyobb rés')
+        ->assertSee('Még 2 társ hangja kellett volna');
+});
+
+it('names the biggest gap once three peers have answered', function () {
+    [, $main] = approvedReading();
+    $row = $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Value)->orderBy('position')->firstOrFail();
+    $main->update(['biggest_gap_row_id' => $row->id, 'calculation' => [...$main->calculation, 'peers_answered' => 3]]);
+
+    $report = app(ReportBuilder::class)->build($main->refresh());
+
+    expect($report['biggest_gap']['id'])->toBe($row->id)
+        ->and(collect($report['rows'])->where('is_biggest_gap', true)->pluck('id')->all())->toBe([$row->id]);
 });
 
 it('reads the frozen snapshot, not the live rows (21 · 21.3)', function () {

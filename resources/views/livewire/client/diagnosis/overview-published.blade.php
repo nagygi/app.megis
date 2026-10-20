@@ -29,6 +29,12 @@
             <span class="text-xs font-semibold uppercase tracking-wide text-coral-light">{{ __('report.breakpoint_marker') }}</span>
             <span>{{ $report['crack']['text'] }}</span>
         </a>
+    @elseif (! $report['meta']['shows_experience'])
+        {{-- Below the threshold there is no gap: no row is named (Extra inputok 1). --}}
+        <div class="flex flex-col gap-2 rounded-card bg-charcoal p-5 text-cream on-dark">
+            <span class="text-xs font-semibold uppercase tracking-wide text-coral-light">{{ __('report.biggest_gap') }}</span>
+            <span>{{ ReportText::missingPeers($report['meta']) }}</span>
+        </div>
     @endif
 
     {{-- Mélyítés, live (26 · 26.3) --}}

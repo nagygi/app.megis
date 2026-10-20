@@ -23,6 +23,8 @@
             <h2>{{ __('report.question.summary') }}</h2>
             @if ($report['biggest_gap'])
                 <div class="box charcoal">{{ __('report.biggest_gap_sentence', ['label' => $report['biggest_gap']['label'], 'sentence' => ReportText::gap($report['biggest_gap'], $meta) ?? '']) }}</div>
+            @elseif (! $meta['shows_experience'])
+                <div class="box charcoal">{{ __('report.biggest_gap') }}: {{ ReportText::missingPeers($meta) }}</div>
             @endif
             @foreach (['strength', 'crack'] as $kind)
                 @if ($report[$kind])

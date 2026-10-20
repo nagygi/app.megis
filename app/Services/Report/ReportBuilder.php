@@ -108,7 +108,8 @@ class ReportBuilder
             ],
             'chapters' => $chapters,
             'rows' => $rowData->all(),
-            'biggest_gap' => $gapRow === null ? null : collect($rowData)->firstWhere('id', $gapRow->id),
+            // Below the threshold there is no gap, so no row is named (Extra inputok 1).
+            'biggest_gap' => $gapRow === null || ! $showsExperience ? null : collect($rowData)->firstWhere('id', $gapRow->id),
             'strength' => $this->pick($rowData, 'strength'),
             'crack' => $this->pick($rowData, 'crack'),
             'texts' => [
@@ -198,7 +199,7 @@ class ReportBuilder
             'peer_count' => $stats['peer_count'] ?? 0,
             'situations' => $stats['situations'] ?? null,
             'n' => $stats['n'] ?? null,
-            'is_biggest_gap' => $gapRow?->id === $row->id,
+            'is_biggest_gap' => $showsExperience && $gapRow?->id === $row->id,
             'has_crack' => $claims->contains('kind', 'crack'),
             'definition' => $definition === null ? null : [
                 'meaning' => $definition['meaning'] ?? null,

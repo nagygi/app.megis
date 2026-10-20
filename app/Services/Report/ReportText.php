@@ -35,7 +35,7 @@ final class ReportText
         }
 
         if (! $meta['shows_experience']) {
-            return trans_choice($meta['threshold_overridden'] ? 'report.threshold_overridden' : 'report.threshold_missing', max(1, $meta['missing_peers']), ['count' => max(1, $meta['missing_peers'])]);
+            return self::missingPeers($meta);
         }
 
         if ($row['experience_whole'] === null || $row['gap_against_whole'] === null) {
@@ -46,6 +46,18 @@ final class ReportText
             'experience' => HungarianNumber::dative($row['experience_whole']),
             'score' => $meta['has_peers'] ? HungarianNumber::accusative($row['gap_against_whole']) : HungarianNumber::dative($row['gap_against_whole']),
         ]);
+    }
+
+    /**
+     * "Még 1 társ hangja kell(ett volna), hogy lássátok a rést." (Extra inputok 1).
+     *
+     * @param  array<string, mixed>  $meta
+     */
+    public static function missingPeers(array $meta): string
+    {
+        $count = max(1, $meta['missing_peers']);
+
+        return trans_choice($meta['threshold_overridden'] ? 'report.threshold_overridden' : 'report.threshold_missing', $count, ['count' => $count]);
     }
 
     public static function decimal(?float $number): string
