@@ -82,24 +82,26 @@ it('closes a row and shows who closed it under "Lezártak"', function () {
     expect($item->fresh())->closed_by->toBe($admin->id)->close_reason->toBe(InboxItem::CLOSED_MANUALLY);
 });
 
-it('counts the open rows in the menu', function () {
+it('has only the Értékmérések Beérkező in the menu, with its open rows counted', function () {
     actingAsAdmin();
     InboxItem::factory()->count(2)->create();
-    InboxItem::factory()->closed()->create();
+    InboxItem::factory()->count(3)->create(['type' => InboxItemType::MirrorBooking, 'is_measurement' => true]);
+    InboxItem::factory()->closed()->create(['type' => InboxItemType::MirrorBooking, 'is_measurement' => true]);
 
     $this->get(route('admin.organizations.index'))
         ->assertOk()
-        ->assertSeeInOrder(['Beérkező', '2']);
+        ->assertDontSee(route('admin.inbox.index'))
+        ->assertSeeInOrder(['Értékmérések', 'Beérkező', '3']);
 });
 
-it('counts the open Értékmérések rows under their own group in the menu', function () {
+it('reaches the Beérkező of the diagnoses from the garden', function () {
     actingAsAdmin();
-    InboxItem::factory()->create();
-    InboxItem::factory()->count(3)->create(['type' => InboxItemType::MirrorBooking, 'is_measurement' => true]);
+    InboxItem::factory()->count(2)->create();
 
-    $this->get(route('admin.organizations.index'))
+    $this->get(route('admin.diagnoses.index'))
         ->assertOk()
-        ->assertSeeInOrder(['Beérkező', '1', 'Értékmérések', 'Beérkező', '3']);
+        ->assertSee(route('admin.inbox.index'))
+        ->assertSee('Ma 2 dolog vár rád', false);
 });
 
 it('does not open the same question twice and closes it when the cause goes away', function () {

@@ -6,7 +6,6 @@
         [
             'label' => null,
             'items' => [
-                ['route' => 'admin.inbox.index', 'active' => 'admin.inbox.*', 'label' => __('admin.nav.inbox'), 'count' => $inbox->openCount()],
                 ['route' => 'admin.organizations.index', 'active' => 'admin.organizations.*', 'label' => __('admin.nav.organizations')],
                 ['route' => 'admin.clients.index', 'active' => 'admin.clients.*', 'label' => __('admin.nav.clients')],
                 ['route' => 'admin.products.index', 'active' => 'admin.products.*', 'label' => __('admin.nav.products')],
@@ -16,7 +15,8 @@
         [
             'label' => __('admin.nav.diagnoses'),
             'items' => [
-                ['route' => 'admin.diagnoses.index', 'active' => 'admin.diagnoses.*', 'label' => __('admin.nav.all_diagnoses')],
+                // The Beérkező of the diagnoses opens from the garden's "Ma {n} dolog vár rád" (19 · 19.2, 22 · 22.1).
+                ['route' => 'admin.diagnoses.index', 'active' => ['admin.diagnoses.*', 'admin.inbox.*'], 'label' => __('admin.nav.all_diagnoses')],
                 ['route' => 'admin.diagnosis-types.index', 'active' => 'admin.diagnosis-types.*', 'label' => __('admin.nav.diagnosis_types')],
                 ['route' => 'admin.support-questions.index', 'active' => 'admin.support-questions.*', 'label' => __('admin.nav.support_questions')],
             ],
