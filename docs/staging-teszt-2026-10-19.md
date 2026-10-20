@@ -53,6 +53,7 @@ A stagingen deploy után (`./update.sh`, a nézetek miatt `npm run build` is) é
 | Kérdés 1 · V1 első belépés | javítva: a V1 marad, amíg a vezető maga nem lépett | `65f1dfc` |
 | Kérdés 2 · A1 kevés társ | javítva: figyelmeztetés | `7246eb3` |
 | Kérdés 3 · Útravaló számozása | marad (döntés) | – |
+| Konfig · Gemini-ár (`cost_usd`) | javítva: `megis:prices:sync` (LiteLLM árlista, naponta 03:45 és deploykor), `--backfill` beárazza a 14 régi hívást; **deploy kell** | `6437227` |
 
 ## Újrateszt a stagingen (1.15, deploy 2026-10-20 11:13, `6f6ad85`)
 
