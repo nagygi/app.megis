@@ -205,8 +205,7 @@ Route::middleware('customer')->name('client.')->group(function () {
                 Route::livewire('ertektar', Client\ValueLibrary::class)->name('values');
                 Route::livewire('tarak/folyamatok', Client\ProcessLibrary::class)->name('processes');
                 Route::livewire('tarak/folyamatok/{process}', Client\ProcessSheet::class)->whereNumber('process')->name('processes.show');
-                // Not in the user's name: the recording is the user's own voice (14 · 14.6).
-                Route::livewire('ertektukor', Mirror\Record::class)->middleware('not-impersonating')->name('mirror.record');
+                Route::livewire('ertektukor', Mirror\Record::class)->name('mirror.record');
                 Route::livewire('ertektukor/{session}', Mirror\Result::class)->name('mirror.result');
 
                 // The filling of a main diagnosis: the leader's V1–V9, the peer's T1–T5 (23, 25).

@@ -45,6 +45,17 @@ it('needs no Turnstile and goes to the active organization from the own menu', f
         ->and($session->diagnosis->organization_id)->toBe($organization->id);
 });
 
+it('records in the user’s name as well', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $customer = customerOf($organization);
+    $this->post(route('admin.impersonate', $customer));
+
+    $this->get(route('client.mirror.record', $organization))->assertOk();
+
+    expect(signedInMirror($organization)->user_id)->toBe($customer->id);
+});
+
 it('shows no e-mail step and keeps the curiosity questions when finishing', function () {
     $organization = Organization::factory()->create();
     actingAsCustomer(customerOf($organization));
