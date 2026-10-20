@@ -30,7 +30,7 @@
                 <h3 id="snapshot-{{ $key }}" class="text-lg font-semibold">{{ __('report.chapters.'.$key) }} · {{ __('report.block_points', $report['chapters'][$key]['points']) }}</h3>
                 <ul class="flex flex-col gap-1">
                     @foreach ($report['chapters'][$key]['rows'] as $row)
-                        <li class="flex flex-col gap-0.5 rounded-lg bg-white px-4 py-2">
+                        <li class="flex flex-col gap-0.5 rounded-field bg-white px-4 py-2">
                             <span class="flex justify-between gap-3"><span>{{ $row['label'] }}</span><span class="font-semibold tabular-nums">{{ ReportText::score($row) }}</span></span>
                             @if ($sentence = ReportText::gap($row, $report['meta']))
                                 <span class="text-sm text-grey-700">{{ $sentence }}</span>

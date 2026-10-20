@@ -162,13 +162,13 @@
                                     <ul class="mt-3 flex flex-col gap-1 border-t border-grey-200 pt-3">
                                         @if ($currentOrganization)
                                             <li>
-                                                <a href="{{ route('client.profile', $currentOrganization) }}" class="block rounded-lg px-2 py-1.5 text-charcoal no-underline hover:bg-grey-100">{{ __('client.menu.profile') }}</a>
+                                                <a href="{{ route('client.profile', $currentOrganization) }}" class="block rounded-field px-2 py-1.5 text-charcoal no-underline hover:bg-grey-100">{{ __('client.menu.profile') }}</a>
                                             </li>
                                         @endif
                                         <li>
                                             <form method="POST" action="{{ route('client.logout') }}">
                                                 @csrf
-                                                <button type="submit" class="w-full rounded-lg px-2 py-1.5 text-left hover:bg-grey-100">{{ __('client.menu.logout') }}</button>
+                                                <button type="submit" class="w-full rounded-field px-2 py-1.5 text-left hover:bg-grey-100">{{ __('client.menu.logout') }}</button>
                                             </form>
                                         </li>
                                     </ul>

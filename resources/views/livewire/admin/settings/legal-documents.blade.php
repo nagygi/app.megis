@@ -27,7 +27,7 @@
                     <p class="text-sm text-grey-600">{{ __('admin.legal.uploaded', ['name' => $current->creator?->name ?? '–', 'date' => $current->created_at->format('Y.m.d. H:i')]) }}</p>
                     <a href="{{ route('admin.legal.version', $current) }}" target="_blank" class="text-sm font-semibold text-charcoal">{{ __('admin.legal.open') }}</a>
                 @else
-                    <p class="rounded-lg bg-yellow-pale px-3 py-2" role="alert">{{ __('admin.legal.missing') }}</p>
+                    <p class="rounded-field bg-yellow-pale px-3 py-2" role="alert">{{ __('admin.legal.missing') }}</p>
                 @endif
             </div>
 

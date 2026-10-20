@@ -25,7 +25,7 @@
             value="{{ $value }}"
             @if ($hasError) aria-invalid="true" @endif
             @if ($describedBy !== '') aria-describedby="{{ $describedBy }}" @endif
-            {{ $attributes->class(['mt-0.5 size-5 shrink-0 rounded border-grey-350 accent-charcoal']) }}
+            {{ $attributes->class(['mt-0.5 size-5 shrink-0 accent-charcoal']) }}
         >
         <label for="{{ $id }}" class="text-base text-charcoal">{{ $label ?? $slot }}</label>
     </div>

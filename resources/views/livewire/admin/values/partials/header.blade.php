@@ -31,11 +31,11 @@
     </div>
 
     @if ($value->isArchived())
-        <p class="rounded-lg bg-grey-100 px-3 py-2 text-sm">{{ __('admin.values.archived_notice') }}</p>
+        <p class="rounded-field bg-grey-100 px-3 py-2 text-sm">{{ __('admin.values.archived_notice') }}</p>
     @endif
 
     @unless ($value->isReviewed())
-        <p class="rounded-lg bg-yellow-pale px-3 py-2 text-sm">
+        <p class="rounded-field bg-yellow-pale px-3 py-2 text-sm">
             {{ $value->originOrganization
                 ? __('admin.values.review_notice', ['place' => $value->originOrganization->name])
                 : __('admin.values.review_notice_nowhere') }}
@@ -50,7 +50,7 @@
                     <a
                         href="{{ route($route, $value) }}"
                         @class([
-                            'block rounded-t-lg px-4 py-2 text-sm font-semibold no-underline',
+                            'block rounded-t-field px-4 py-2 text-sm font-semibold no-underline',
                             'bg-white text-charcoal border border-b-0 border-grey-250' => $isActive,
                             'text-grey-700 hover:bg-grey-100' => ! $isActive,
                         ])

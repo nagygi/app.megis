@@ -11,7 +11,7 @@
         @foreach (\App\Models\ProcessConversation::QUESTIONS as $question)
             <li wire:key="question-{{ $question }}" class="flex flex-col gap-2 rounded-card bg-white p-5">
                 <label for="answer-{{ $question }}" class="flex gap-3 font-semibold">
-                    <span class="grid size-7 shrink-0 place-items-center rounded-pill bg-coral text-xs font-bold text-black" aria-hidden="true">{{ $question }}</span>
+                    <span class="grid size-7 shrink-0 place-items-center rounded-pill bg-coral text-xs font-extrabold text-black" aria-hidden="true">{{ $question }}</span>
                     {{ __('processes.conversation.questions.'.$question) }}
                 </label>
                 <textarea
@@ -20,7 +20,7 @@
                     rows="3"
                     maxlength="3000"
                     @disabled(! $editable)
-                    class="w-full rounded-xl border border-grey-350 bg-white px-3.5 py-2.5 text-base focus:border-charcoal"
+                    class="w-full rounded-field border border-grey-350 bg-white px-3.5 py-2.5 text-base focus:border-charcoal"
                 ></textarea>
                 <x-form.error :name="'answers.'.$question" :id="'answer-'.$question" />
                 @if ($editable)

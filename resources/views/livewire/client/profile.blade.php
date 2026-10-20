@@ -3,7 +3,7 @@
 
     <section class="flex flex-col gap-5" aria-labelledby="profile-me">
         <div class="flex items-center gap-4">
-            <span class="grid size-14 place-items-center rounded-pill bg-charcoal text-lg font-bold text-cream" aria-hidden="true">{{ $user->initials }}</span>
+            <span class="grid size-14 place-items-center rounded-pill bg-charcoal text-lg font-extrabold text-cream" aria-hidden="true">{{ $user->initials }}</span>
             <div>
                 <h2 id="profile-me" class="text-lg font-semibold">{{ $user->name }}</h2>
                 @if ($roleLine !== '')

@@ -2,6 +2,26 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.21 · {hash} · 2026-10-21
+
+UI-finomhangolás, 4. lépés: a design tokenek lezárása.
+
+- **Csak a márka értékei:**
+  - A színek után a sarokívek, az árnyékok és a betűvastagságok is le vannak zárva a Tailwind témában.
+  - Sarokív: kártya (20 px), mező (12 px, új `rounded-field`: mezők, menüpontok, betétpanelek), pill és kör.
+  - Árnyék nincs.
+  - Betűvastagság a Geologica négy vágása: 400, 500, 600, 800.
+- **Cserék 46 nézetben:**
+  - `rounded-lg`/`rounded-xl`/sima `rounded` → `rounded-field`, illetve pill.
+  - `font-bold` → `font-extrabold`: a körbe írt számok és monogramok.
+  - A felvevő kártyájának és a Kert csempéinek árnyéka kikerült. A Kert csempéje hoverre 3 px-t emelkedik (a design system szabálya).
+- **Lapozó:**
+  - Az admin listák lapozója márkás: kerek oldalgombok, az aktuális kitöltve, chevron ikonok, magyar összegzés („1–25, összesen 30”).
+  - Eddig a Livewire gyári nézete nem létező színekre és árnyékra hivatkozott.
+- **Build:**
+  - A CSS már nem függ a lefordított nézetek gyorsítótárától: a `storage/framework/views` és a Laravel-lapozó `@source` sora kikerült.
+  - A konvenció-teszt árnyék-, sarokív- és betűvastagság-szabálya kivétel nélkül teljesül.
+
 ## 1.20 · 4dc52cd · 2026-10-21
 
 UI-finomhangolás, 3. lépés: navigáció és layoutok.

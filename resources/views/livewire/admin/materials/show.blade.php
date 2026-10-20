@@ -32,7 +32,7 @@
             <x-form.error name="assignments" id="assignments" />
 
             @foreach ($speakers as $index => $speaker)
-                <div wire:key="speaker-{{ $index }}" class="grid gap-3 rounded-xl bg-paper p-4 md:grid-cols-[1fr_16rem]">
+                <div wire:key="speaker-{{ $index }}" class="grid gap-3 rounded-field bg-paper p-4 md:grid-cols-[1fr_16rem]">
                     <div class="flex flex-col gap-1">
                         <p class="font-semibold">{{ $speaker['label'] }}</p>
                         <ul class="flex flex-col gap-1 text-sm text-grey-700">

@@ -108,7 +108,7 @@
                     @elseif ($main)
                         <p>{{ $main->leader->name }} · {{ $main->leader->email }}</p>
                         @if ($canEditSettings)
-                            <div class="flex flex-wrap items-end gap-3 rounded-xl bg-grey-100 p-4">
+                            <div class="flex flex-wrap items-end gap-3 rounded-field bg-grey-100 p-4">
                                 <div class="min-w-56 flex-1">
                                     <x-form.select name="replacementLeaderId" wire:model="replacementLeaderId" :label="__('admin.main_diagnoses.new_leader')" :help="__('admin.main_diagnoses.change_leader_help')">
                                         <option value="">{{ __('admin.diagnoses.user_select') }}</option>
@@ -187,7 +187,7 @@
                 <x-form.input name="name" wire:model="name" :label="__('admin.main_diagnoses.name')" :help="__($subjectEnum === \App\Enums\MainDiagnosisSubject::Team ? 'admin.main_diagnoses.name_help' : 'admin.main_diagnoses.name_help_person')" />
 
                 @if ($blockers !== [] && $isDraft)
-                    <ul class="flex flex-col gap-1 rounded-xl bg-coral-light p-4 text-sm text-black" role="status">
+                    <ul class="flex flex-col gap-1 rounded-field bg-coral-light p-4 text-sm text-black" role="status">
                         @foreach ($blockers as $blocker)
                             <li>{{ $blocker }}</li>
                         @endforeach
@@ -231,7 +231,7 @@
                 <ol class="flex flex-col gap-2">
                     @foreach ($preview as $index => $step)
                         <li class="flex items-center gap-3">
-                            <span class="grid size-6 shrink-0 place-items-center rounded-pill text-xs font-bold {{ $index === 0 ? 'bg-coral text-black' : 'bg-white/15' }}" aria-hidden="true">{{ $index + 1 }}</span>
+                            <span class="grid size-6 shrink-0 place-items-center rounded-pill text-xs font-extrabold {{ $index === 0 ? 'bg-coral text-black' : 'bg-white/15' }}" aria-hidden="true">{{ $index + 1 }}</span>
                             <span class="flex-1">{{ $step['label'] }}@if ($step['readonly']) <span class="text-sm opacity-80">· {{ __('diagnosis.readonly') }}</span>@endif</span>
                             <span class="text-sm opacity-80">{{ __('diagnosis.minutes', ['minutes' => $step['minutes']]) }}</span>
                         </li>

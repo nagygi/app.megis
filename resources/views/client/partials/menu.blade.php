@@ -44,7 +44,7 @@
                     <a
                         href="{{ route('client.home', $currentOrganization) }}"
                         @class([
-                            'block rounded-lg px-4 py-2 no-underline',
+                            'block rounded-field px-4 py-2 no-underline',
                             'bg-charcoal font-semibold text-cream' => $isHome,
                             'text-charcoal hover:bg-grey-100' => ! $isHome,
                         ])
@@ -57,20 +57,20 @@
                 <ul class="mb-4 flex flex-col gap-1">
                     @foreach ($reports as $reportMain)
                         <li>
-                            <a href="{{ route('client.report.show', [$currentOrganization, $reportMain->diagnosis]) }}" class="block rounded-lg px-4 py-2 text-charcoal no-underline hover:bg-grey-100">
+                            <a href="{{ route('client.report.show', [$currentOrganization, $reportMain->diagnosis]) }}" class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">
                                 {{ __('report.menu.report_row', ['product' => $reportMain->product_name, 'date' => $reportMain->published_at?->format('m.d.') ?? '–', 'percent' => $reportMain->calculation['ring'] ?? '–']) }}
                             </a>
                         </li>
                     @endforeach
                 </ul>
                 <ul class="mb-4 flex flex-col gap-1">
-                    <li><a href="{{ route('client.report.appendix', [$currentOrganization, $latestReport->diagnosis]) }}" class="block rounded-lg px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.appendix_link') }}</a></li>
+                    <li><a href="{{ route('client.report.appendix', [$currentOrganization, $latestReport->diagnosis]) }}" class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.appendix_link') }}</a></li>
                 </ul>
                 @unless ($latestReport->isSnapshot())
                     <p class="px-4 pb-1 text-xs font-semibold uppercase tracking-wide text-grey-600">{{ __('report.menu.chapters') }}</p>
                     <ul class="mb-4 flex flex-col gap-1">
-                        <li><a href="{{ route('client.report.internal', [$currentOrganization, $latestReport->diagnosis]) }}" class="block rounded-lg px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.menu.internal') }}</a></li>
-                        <li><a href="{{ route('client.report.chapter', [$currentOrganization, $latestReport->diagnosis, 'markad-alapja']) }}" class="block rounded-lg px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.menu.brand') }}</a></li>
+                        <li><a href="{{ route('client.report.internal', [$currentOrganization, $latestReport->diagnosis]) }}" class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.menu.internal') }}</a></li>
+                        <li><a href="{{ route('client.report.chapter', [$currentOrganization, $latestReport->diagnosis, 'markad-alapja']) }}" class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.menu.brand') }}</a></li>
                     </ul>
                 @endunless
             @endif
@@ -82,7 +82,7 @@
                         <a
                             href="{{ route($item['route'], $currentOrganization) }}"
                             @class([
-                                'block rounded-lg px-4 py-2 no-underline',
+                                'block rounded-field px-4 py-2 no-underline',
                                 'bg-charcoal font-semibold text-cream' => $isActive,
                                 'text-charcoal hover:bg-grey-100' => ! $isActive,
                             ])
@@ -117,7 +117,7 @@
                             <li>
                                 <a
                                     href="{{ route('client.home', $organization) }}"
-                                    class="block rounded-lg px-4 py-2 text-charcoal no-underline hover:bg-grey-100"
+                                    class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100"
                                     @if ($organization->is($currentOrganization)) aria-current="true" @endif
                                 >{{ $organization->name }}</a>
                             </li>
@@ -130,12 +130,12 @@
                 </div>
             @endif
 
-            <a href="{{ route('client.profile', $currentOrganization) }}" class="rounded-lg px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('client.menu.profile') }}</a>
+            <a href="{{ route('client.profile', $currentOrganization) }}" class="rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('client.menu.profile') }}</a>
         @endif
 
         <form method="POST" action="{{ route('client.logout') }}">
             @csrf
-            <button type="submit" class="w-full rounded-lg px-4 py-2 text-left hover:bg-grey-100">{{ __('client.menu.logout') }}</button>
+            <button type="submit" class="w-full rounded-field px-4 py-2 text-left hover:bg-grey-100">{{ __('client.menu.logout') }}</button>
         </form>
     </div>
 </div>

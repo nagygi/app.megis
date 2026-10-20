@@ -19,7 +19,7 @@
             <summary class="cursor-pointer font-semibold">{{ __('admin.materials.transcript') }}</summary>
             <div class="mt-3 flex max-h-96 flex-col gap-2 overflow-y-auto text-sm">
                 @foreach ($material->segments as $segment)
-                    <p @class(['rounded-lg px-2 py-1', 'bg-yellow-pale' => $highlightSpeaker !== null && $segment['speaker'] === $highlightSpeaker])>
+                    <p @class(['rounded-field px-2 py-1', 'bg-yellow-pale' => $highlightSpeaker !== null && $segment['speaker'] === $highlightSpeaker])>
                         <span class="font-semibold">{{ $segment['speaker'] }}:</span> {{ $segment['text'] }}
                     </p>
                 @endforeach

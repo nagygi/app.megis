@@ -49,7 +49,7 @@
                             aria-label="{{ __('admin.list_editor.item_label', ['label' => $label, 'number' => $index + 1]) }}"
                             @if ($errors->has($name.'.'.$index)) aria-invalid="true" aria-describedby="{{ $id }}-{{ $index }}-error" @endif
                             @class([
-                                'w-full rounded-xl border bg-white px-3.5 py-2 text-base text-charcoal',
+                                'w-full rounded-field border bg-white px-3.5 py-2 text-base text-charcoal',
                                 'border-coral-dark' => $errors->has($name.'.'.$index),
                                 'border-grey-350 focus:border-charcoal' => ! $errors->has($name.'.'.$index),
                             ])
@@ -58,9 +58,9 @@
                     </div>
 
                     <div class="flex shrink-0 items-center gap-1 pt-1" wire:sort:ignore>
-                        <button type="button" wire:click="moveListItem('{{ $name }}', {{ $index }}, -1)" @disabled($loop->first) class="rounded-lg px-2 py-1 text-sm hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.list_editor.up', ['number' => $index + 1]) }}">↑</button>
-                        <button type="button" wire:click="moveListItem('{{ $name }}', {{ $index }}, 1)" @disabled($loop->last) class="rounded-lg px-2 py-1 text-sm hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.list_editor.down', ['number' => $index + 1]) }}">↓</button>
-                        <button type="button" wire:click="removeListItem('{{ $name }}', {{ $index }})" class="rounded-lg px-2 py-1 text-sm hover:bg-grey-100" aria-label="{{ __('admin.list_editor.remove', ['number' => $index + 1]) }}">×</button>
+                        <button type="button" wire:click="moveListItem('{{ $name }}', {{ $index }}, -1)" @disabled($loop->first) class="rounded-field px-2 py-1 text-sm hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.list_editor.up', ['number' => $index + 1]) }}">↑</button>
+                        <button type="button" wire:click="moveListItem('{{ $name }}', {{ $index }}, 1)" @disabled($loop->last) class="rounded-field px-2 py-1 text-sm hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.list_editor.down', ['number' => $index + 1]) }}">↓</button>
+                        <button type="button" wire:click="removeListItem('{{ $name }}', {{ $index }})" class="rounded-field px-2 py-1 text-sm hover:bg-grey-100" aria-label="{{ __('admin.list_editor.remove', ['number' => $index + 1]) }}">×</button>
                     </div>
                 </li>
             @endforeach

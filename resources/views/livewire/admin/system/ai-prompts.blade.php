@@ -40,7 +40,7 @@
             @if ($opened)
                 <div class="flex flex-col gap-2 rounded-card border border-grey-250 bg-white p-5">
                     <h2 class="font-semibold">{{ $opened->name }} · v{{ $opened->version }}</h2>
-                    <pre class="max-h-[70vh] overflow-auto whitespace-pre-wrap rounded-xl bg-paper p-4 text-sm">{{ $opened->content }}</pre>
+                    <pre class="max-h-[70vh] overflow-auto whitespace-pre-wrap rounded-field bg-paper p-4 text-sm">{{ $opened->content }}</pre>
                 </div>
             @else
                 <p class="text-grey-600">{{ __('admin.ai.pick_prompt') }}</p>

@@ -17,7 +17,7 @@
             <p class="text-sm text-grey-600">{{ $viewed->created_at->format('Y.m.d. H:i') }} · {{ $viewed->creator?->name ?? __('admin.versions.system') }}</p>
 
             @foreach ($viewed->snapshot['values'] ?? [] as $item)
-                <div class="rounded-xl bg-paper p-4">
+                <div class="rounded-field bg-paper p-4">
                     <h3 class="font-semibold">{{ $item['name'] }}</h3>
                     <dl class="mt-2 grid gap-2 text-sm md:grid-cols-[14rem_1fr]">
                         @foreach (\App\Models\OrganizationValueSetItem::TEXT_FIELDS as $field)
@@ -37,11 +37,11 @@
         </section>
     @else
         @if ($hasVersion)
-            <p class="rounded-lg bg-yellow-pale px-3 py-2 text-sm" role="note">{{ __('admin.value_sets.change_warning') }}</p>
+            <p class="rounded-field bg-yellow-pale px-3 py-2 text-sm" role="note">{{ __('admin.value_sets.change_warning') }}</p>
         @endif
 
         @if ($organization->isIndividual())
-            <p class="rounded-lg bg-grey-100 px-3 py-2 text-sm">{{ __('admin.value_sets.individual_note') }}</p>
+            <p class="rounded-field bg-grey-100 px-3 py-2 text-sm">{{ __('admin.value_sets.individual_note') }}</p>
         @endif
 
         <form wire:submit="save" class="flex flex-col gap-6">
@@ -64,9 +64,9 @@
                                 <x-form.error :name="'items.'.$index.'.name'" :id="'items-'.$index.'-name'" />
                             </div>
                             <div class="flex items-center gap-1">
-                                <button type="button" wire:click="moveItem({{ $index }}, -1)" @disabled($loop->first) class="rounded-lg px-2 py-1 hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.value_sets.up', ['name' => $item['name']]) }}">↑</button>
-                                <button type="button" wire:click="moveItem({{ $index }}, 1)" @disabled($loop->last) class="rounded-lg px-2 py-1 hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.value_sets.down', ['name' => $item['name']]) }}">↓</button>
-                                <button type="button" wire:click="removeItem({{ $index }})" class="rounded-lg px-2 py-1 hover:bg-grey-100" aria-label="{{ __('admin.value_sets.remove', ['name' => $item['name']]) }}">×</button>
+                                <button type="button" wire:click="moveItem({{ $index }}, -1)" @disabled($loop->first) class="rounded-field px-2 py-1 hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.value_sets.up', ['name' => $item['name']]) }}">↑</button>
+                                <button type="button" wire:click="moveItem({{ $index }}, 1)" @disabled($loop->last) class="rounded-field px-2 py-1 hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.value_sets.down', ['name' => $item['name']]) }}">↓</button>
+                                <button type="button" wire:click="removeItem({{ $index }})" class="rounded-field px-2 py-1 hover:bg-grey-100" aria-label="{{ __('admin.value_sets.remove', ['name' => $item['name']]) }}">×</button>
                             </div>
                         </div>
 
@@ -88,7 +88,7 @@
                                         @if (in_array($field, $requiredFields, true)) required aria-required="true" @endif
                                         @if ($errors->has('items.'.$index.'.'.$field)) aria-invalid="true" aria-describedby="items-{{ $index }}-{{ $field }}-error" @endif
                                         @class([
-                                            'w-full rounded-xl border bg-white px-3.5 py-2 text-base text-charcoal',
+                                            'w-full rounded-field border bg-white px-3.5 py-2 text-base text-charcoal',
                                             'border-coral-dark' => $errors->has('items.'.$index.'.'.$field),
                                             'border-grey-350 focus:border-charcoal' => ! $errors->has('items.'.$index.'.'.$field),
                                         ])

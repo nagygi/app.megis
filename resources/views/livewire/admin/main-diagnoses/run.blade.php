@@ -41,14 +41,14 @@
     @endif
 
     @if ($main->threshold_overridden_at)
-        <p class="flex flex-wrap items-center gap-3 rounded-lg bg-grey-100 px-3 py-2 text-sm">
+        <p class="flex flex-wrap items-center gap-3 rounded-field bg-grey-100 px-3 py-2 text-sm">
             {{ __('admin.run.threshold.overridden', ['name' => $thresholdOverrider?->name ?? '–', 'date' => $main->threshold_overridden_at->format('Y.m.d. H:i')]) }}
             @if ($isOpen)
                 <x-ui.button tone="outline" size="sm" wire:click="revokeThresholdOverride" wire:confirm="{{ __('admin.run.threshold.confirm_revoke') }}">{{ __('admin.run.threshold.revoke') }}</x-ui.button>
             @endif
         </p>
     @elseif ($main->threshold_snoozed_until && $main->threshold_snoozed_until->isFuture())
-        <p class="rounded-lg bg-grey-100 px-3 py-2 text-sm">{{ __('admin.run.threshold.snoozed', ['date' => $main->threshold_snoozed_until->format('Y.m.d.')]) }}</p>
+        <p class="rounded-field bg-grey-100 px-3 py-2 text-sm">{{ __('admin.run.threshold.snoozed', ['date' => $main->threshold_snoozed_until->format('Y.m.d.')]) }}</p>
     @endif
 
     {{-- Időablak (19 · 19.3) --}}

@@ -1,5 +1,5 @@
 {{-- How the point of a process diagnosis was calculated, saved with it (13 · 13.5). --}}
-<dl class="grid gap-3 rounded-xl bg-paper p-4 text-sm md:grid-cols-[12rem_1fr]">
+<dl class="grid gap-3 rounded-field bg-paper p-4 text-sm md:grid-cols-[12rem_1fr]">
     <dt class="font-semibold">{{ __('admin.diagnoses.aggregation.source') }}</dt>
     <dd>
         {{ __('admin.diagnoses.process_aggregation.source', ['process' => $diagnosis->process?->name ?? '–', 'period' => $diagnosis->dateLabel(), 'count' => $description['occasions'] ?? 0]) }}

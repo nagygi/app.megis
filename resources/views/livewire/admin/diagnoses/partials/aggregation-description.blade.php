@@ -1,5 +1,5 @@
 {{-- How the aggregated data was (or will be) calculated, saved with the diagnosis (04 · 4.5). --}}
-<dl class="grid gap-3 rounded-xl bg-paper p-4 text-sm md:grid-cols-[12rem_1fr]">
+<dl class="grid gap-3 rounded-field bg-paper p-4 text-sm md:grid-cols-[12rem_1fr]">
     <dt class="font-semibold">{{ __('admin.diagnoses.aggregation.source') }}</dt>
     <dd>
         {{ __('admin.diagnoses.aggregation.source_text', [

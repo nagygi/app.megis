@@ -25,7 +25,7 @@
             <a
                 href="{{ route($tab['route'], $organization) }}"
                 @class([
-                    'block whitespace-nowrap rounded-t-lg px-4 py-2 text-sm font-semibold no-underline',
+                    'block whitespace-nowrap rounded-t-field px-4 py-2 text-sm font-semibold no-underline',
                     'bg-grey-100 text-charcoal' => $isActive,
                     'text-cream hover:bg-white/10' => ! $isActive,
                 ])

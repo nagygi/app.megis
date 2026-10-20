@@ -21,7 +21,7 @@
     <div class="flex flex-wrap items-end gap-3">
         <div class="flex flex-col gap-1.5">
             <label for="period" class="text-sm font-medium">{{ __('admin.ai.period') }}</label>
-            <select id="period" wire:model.live="period" class="rounded-xl border border-grey-350 bg-white px-3 py-2 text-base focus:border-charcoal">
+            <select id="period" wire:model.live="period" class="rounded-field border border-grey-350 bg-white px-3 py-2 text-base focus:border-charcoal">
                 @foreach (\App\Services\Ai\AiUsageQuery::PERIODS as $option)
                     <option value="{{ $option }}">{{ __('admin.ai.periods.'.$option) }}</option>
                 @endforeach
@@ -48,7 +48,7 @@
         @endforeach
     </div>
     @if ($summary['unpriced'] > 0)
-        <p class="rounded-lg bg-yellow-pale px-3 py-2 text-sm" role="note">{{ __('admin.ai.unpriced', ['count' => $summary['unpriced']]) }}</p>
+        <p class="rounded-field bg-yellow-pale px-3 py-2 text-sm" role="note">{{ __('admin.ai.unpriced', ['count' => $summary['unpriced']]) }}</p>
     @endif
 
     {{-- Breakdowns --}}

@@ -9,7 +9,7 @@
         <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" />
 
         <div class="flex items-center gap-3 rounded-card bg-grey-100 px-4 py-3 text-grey-700">
-            <span class="grid size-7 shrink-0 place-items-center rounded-pill bg-grey-300 text-xs font-bold" aria-hidden="true">+</span>
+            <span class="grid size-7 shrink-0 place-items-center rounded-pill bg-grey-300 text-xs font-extrabold" aria-hidden="true">+</span>
             <span class="flex-1">
                 <span class="block font-semibold">{{ __('diagnosis.peer_add') }}</span>
                 <span class="block text-sm">{{ __('diagnosis.peer_add_help') }}</span>

@@ -9,7 +9,7 @@
             type="search"
             wire:model.live.debounce.300ms="search"
             placeholder="{{ __('admin.common.search_placeholder') }}"
-            class="w-full rounded-xl border border-grey-350 bg-white px-3.5 py-2 text-base focus:border-charcoal"
+            class="w-full rounded-field border border-grey-350 bg-white px-3.5 py-2 text-base focus:border-charcoal"
         >
     </div>
     {{ $slot }}

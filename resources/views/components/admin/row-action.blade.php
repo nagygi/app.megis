@@ -3,7 +3,7 @@
 @props(['href' => null, 'type' => 'button', 'disabledReason' => null])
 
 @php
-    $classes = 'block w-full rounded-lg px-3 py-1.5 text-left no-underline';
+    $classes = 'block w-full rounded-field px-3 py-1.5 text-left no-underline';
 @endphp
 
 @if ($disabledReason)

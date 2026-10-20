@@ -12,7 +12,7 @@
                 </h2>
                 <ul class="flex flex-col gap-1">
                     @foreach ($rows as $row)
-                        <li class="flex items-center justify-between gap-3 rounded-lg bg-white px-4 py-2">
+                        <li class="flex items-center justify-between gap-3 rounded-field bg-white px-4 py-2">
                             <span>
                                 {{ $row['label'] }}
                                 @if ($row['is_biggest_gap'] ?? false)

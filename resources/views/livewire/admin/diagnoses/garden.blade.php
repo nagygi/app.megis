@@ -46,7 +46,7 @@
                         wire:key="card-{{ $main->id }}"
                         href="{{ route('admin.main-diagnoses.open', $main->diagnosis) }}"
                         @class([
-                            'flex flex-col gap-1 rounded-card bg-white p-3 text-charcoal no-underline hover:shadow-sm',
+                            'flex flex-col gap-1 rounded-card bg-white p-3 text-charcoal no-underline transition-[translate] duration-200 ease-standard hover:-translate-y-0.75',
                             'border-2 border-coral' => $card['attention'],
                             'border border-grey-250' => ! $card['attention'],
                         ])

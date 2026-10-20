@@ -39,7 +39,7 @@
             <p class="text-lg">{{ __('admin.capabilities.import.summary', ['created' => count($preview['created']), 'updated' => count($preview['updated']), 'unchanged' => count($preview['unchanged'])]) }}</p>
 
             @if ($preview['errors'] !== [])
-                <div class="flex flex-col gap-2 rounded-lg bg-coral-light p-4">
+                <div class="flex flex-col gap-2 rounded-field bg-coral-light p-4">
                     <h3 class="font-semibold">{{ __('admin.capabilities.import.errors_title') }}</h3>
                     <ul class="list-disc pl-5 text-sm">
                         @foreach ($preview['errors'] as $message)
@@ -50,7 +50,7 @@
             @endif
 
             @if ($preview['warnings'] !== [])
-                <div class="flex flex-col gap-2 rounded-lg bg-yellow-pale p-4">
+                <div class="flex flex-col gap-2 rounded-field bg-yellow-pale p-4">
                     <h3 class="font-semibold">{{ __('admin.capabilities.import.warnings_title') }}</h3>
                     <ul class="list-disc pl-5 text-sm">
                         @foreach ($preview['warnings'] as $message)

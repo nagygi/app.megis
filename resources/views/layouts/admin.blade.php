@@ -97,12 +97,12 @@
                                 </p>
                                 <ul class="mt-3 flex flex-col gap-1 border-t border-grey-200 pt-3">
                                     <li>
-                                        <a href="{{ route('admin.profile') }}" class="block rounded-lg px-2 py-1.5 text-charcoal no-underline hover:bg-grey-100">{{ __('admin.user_menu.profile') }}</a>
+                                        <a href="{{ route('admin.profile') }}" class="block rounded-field px-2 py-1.5 text-charcoal no-underline hover:bg-grey-100">{{ __('admin.user_menu.profile') }}</a>
                                     </li>
                                     <li>
                                         <form method="POST" action="{{ route('admin.logout') }}">
                                             @csrf
-                                            <button type="submit" class="w-full rounded-lg px-2 py-1.5 text-left hover:bg-grey-100">{{ __('admin.user_menu.logout') }}</button>
+                                            <button type="submit" class="w-full rounded-field px-2 py-1.5 text-left hover:bg-grey-100">{{ __('admin.user_menu.logout') }}</button>
                                         </form>
                                     </li>
                                 </ul>

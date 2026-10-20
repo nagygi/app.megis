@@ -28,12 +28,12 @@
     </div>
 
     @if ($capability->isArchived())
-        <p class="rounded-lg bg-grey-100 px-3 py-2 text-sm">{{ __('admin.capabilities.archived_notice') }}</p>
+        <p class="rounded-field bg-grey-100 px-3 py-2 text-sm">{{ __('admin.capabilities.archived_notice') }}</p>
     @endif
 
     @if ($capability->imported_at)
         {{-- The Sheet is the master (07, question 1) --}}
-        <p class="rounded-lg bg-yellow-pale px-3 py-2 text-sm">{{ __('admin.capabilities.sheet_master', ['date' => $capability->imported_at->format('Y.m.d.')]) }}</p>
+        <p class="rounded-field bg-yellow-pale px-3 py-2 text-sm">{{ __('admin.capabilities.sheet_master', ['date' => $capability->imported_at->format('Y.m.d.')]) }}</p>
     @endif
 
     <nav aria-label="{{ $capability->name }}">
@@ -44,7 +44,7 @@
                     <a
                         href="{{ route($route, $capability) }}"
                         @class([
-                            'block rounded-t-lg px-4 py-2 text-sm font-semibold no-underline',
+                            'block rounded-t-field px-4 py-2 text-sm font-semibold no-underline',
                             'bg-white text-charcoal border border-b-0 border-grey-250' => $isActive,
                             'text-grey-700 hover:bg-grey-100' => ! $isActive,
                         ])

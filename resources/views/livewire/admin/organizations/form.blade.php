@@ -42,7 +42,7 @@
                 @endif
             </div>
             @if ($slugChanged)
-                <p class="rounded-lg bg-yellow-pale px-3 py-2 text-sm" role="alert">{{ __('admin.organizations.slug_warning') }}</p>
+                <p class="rounded-field bg-yellow-pale px-3 py-2 text-sm" role="alert">{{ __('admin.organizations.slug_warning') }}</p>
             @endif
         </div>
 

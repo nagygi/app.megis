@@ -10,7 +10,7 @@
     <x-ui.flash />
 
     @unless ($isOpen)
-        <p class="rounded-lg bg-grey-100 px-3 py-2 text-sm">{{ __('admin.reading.not_started') }}</p>
+        <p class="rounded-field bg-grey-100 px-3 py-2 text-sm">{{ __('admin.reading.not_started') }}</p>
     @endunless
 
     @if ($feedback)
@@ -57,7 +57,7 @@
                                     type="button"
                                     wire:click="selectRow({{ $row->id }})"
                                     @class([
-                                        'flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm',
+                                        'flex w-full items-center justify-between gap-2 rounded-field px-3 py-2 text-left text-sm',
                                         'bg-charcoal text-cream' => $selected?->id === $row->id,
                                         'bg-white hover:bg-paper' => $selected?->id !== $row->id,
                                     ])
@@ -119,7 +119,7 @@
                 </div>
 
                 @if ($isOpen && $overriding)
-                    <form wire:submit="saveOverride" class="grid gap-3 rounded-lg bg-paper p-4 md:grid-cols-2">
+                    <form wire:submit="saveOverride" class="grid gap-3 rounded-field bg-paper p-4 md:grid-cols-2">
                         <x-form.input name="overrideScore" wire:model="overrideScore" :label="__('admin.diagnoses.score')" :help="__('admin.diagnoses.process_point_help')" required />
                         <x-form.textarea name="overrideReason" wire:model="overrideReason" :label="__('admin.diagnoses.override.reason')" :help="__('admin.reading.reason_visible')" rows="2" required />
                         <div class="flex gap-2 md:col-span-2">
@@ -130,7 +130,7 @@
                 @endif
 
                 @if ($isOpen && $byHand)
-                    <form wire:submit="saveHandScore" class="flex flex-wrap items-end gap-3 rounded-lg bg-paper p-4">
+                    <form wire:submit="saveHandScore" class="flex flex-wrap items-end gap-3 rounded-field bg-paper p-4">
                         <x-form.select name="handScore" wire:model="handScore" :label="__('admin.reading.hand_score')" :help="__('admin.reading.hand_score_help')">
                             <option value="">–</option>
                             @foreach (range(1, 6) as $number)
@@ -145,7 +145,7 @@
                 <div class="flex flex-col gap-2">
                     <h3 class="font-semibold">{{ __('admin.reading.traces.title', ['count' => $traces->whereNull('excluded_at')->count()]) }}</h3>
                     @forelse ($traces as $trace)
-                        <article wire:key="trace-{{ $trace->id }}" @class(['flex flex-col gap-1 rounded-lg border p-3 text-sm', 'border-grey-250 bg-grey-100 opacity-60' => $trace->excluded_at, 'border-yellow bg-yellow-pale' => $trace->highlighted_at, 'border-grey-250' => ! $trace->excluded_at && ! $trace->highlighted_at])>
+                        <article wire:key="trace-{{ $trace->id }}" @class(['flex flex-col gap-1 rounded-field border p-3 text-sm', 'border-grey-250 bg-grey-100 opacity-60' => $trace->excluded_at, 'border-yellow bg-yellow-pale' => $trace->highlighted_at, 'border-grey-250' => ! $trace->excluded_at && ! $trace->highlighted_at])>
                             <p>„{{ $trace->quote }}”</p>
                             <p class="text-xs text-grey-700">
                                 {{ __('admin.reading.traces.sources.'.$trace->source_type) }}
@@ -182,7 +182,7 @@
 
                 @if ($isOpen && $byHand)
                     {{-- Evidence for an area or a tree element, from the diagnosis' traces (20 · 20.2) --}}
-                    <div class="flex flex-col gap-2 rounded-lg bg-paper p-4">
+                    <div class="flex flex-col gap-2 rounded-field bg-paper p-4">
                         <h3 class="font-semibold">{{ __('admin.reading.traces.pick') }}</h3>
                         <div class="flex flex-wrap items-end gap-2">
                             <x-form.select name="traceFilter.block" wire:model.live="traceFilter.block" :label="__('admin.reading.traces.block')">
@@ -212,7 +212,7 @@
                 @endif
 
                 @if ($isOpen)
-                    <details class="rounded-lg border border-grey-250 p-3 text-sm">
+                    <details class="rounded-field border border-grey-250 p-3 text-sm">
                         <summary class="cursor-pointer font-semibold">{{ __('admin.reading.traces.add') }}</summary>
                         <form wire:submit="addTrace" class="mt-3 grid gap-3 md:grid-cols-2">
                             <div class="md:col-span-2">
@@ -259,7 +259,7 @@
                     @endif
                 @endif
                 @forelse ($rowClaims as $rowClaim)
-                    <div wire:key="leader-claim-{{ $rowClaim->id }}" class="flex flex-col gap-1 rounded-lg bg-white p-3 text-sm">
+                    <div wire:key="leader-claim-{{ $rowClaim->id }}" class="flex flex-col gap-1 rounded-field bg-white p-3 text-sm">
                         <x-ui.badge :tone="$rowClaim->isApproved() ? 'green' : 'muted'">{{ __('admin.reading.claims.kinds.'.($main->isSnapshot() && $rowClaim->kind === 'crack' ? 'breakpoint' : $rowClaim->kind)) }}</x-ui.badge>
                         <p>{{ $rowClaim->text }}</p>
                         <p class="text-xs text-grey-600">{{ $rowClaim->isApproved() ? __('admin.reading.claims.marker') : __('admin.reading.claims.marker_draft') }}</p>
@@ -375,7 +375,7 @@
                 <div class="flex flex-col gap-1.5">
                     <label for="text-{{ $key }}" class="text-sm font-medium">{{ __('admin.reading.texts.keys.'.$key) }}</label>
                     <div wire:ignore x-data="markdownEditor({ max: {{ \App\Models\DiagnosisText::maxLength($key) }} })">
-                        <textarea id="text-{{ $key }}" x-ref="input" wire:model="texts.{{ $key }}" rows="3" aria-describedby="text-{{ $key }}-help" class="w-full rounded-xl border border-grey-350 bg-white px-3.5 py-2.5 text-base"></textarea>
+                        <textarea id="text-{{ $key }}" x-ref="input" wire:model="texts.{{ $key }}" rows="3" aria-describedby="text-{{ $key }}-help" class="w-full rounded-field border border-grey-350 bg-white px-3.5 py-2.5 text-base"></textarea>
                     </div>
                     <p id="text-{{ $key }}-help" class="text-sm text-grey-600">{{ __('admin.reading.max_length', ['max' => \App\Models\DiagnosisText::maxLength($key)]) }}</p>
                     <x-form.error :name="'texts.'.$key" :id="'texts-'.$key" />

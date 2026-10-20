@@ -1,12 +1,11 @@
 @import 'tailwindcss';
 @import './megis/assets.css';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-
 /*
- * mégis design tokens (prototype 3/_ds/tokens). Only the brand palette exists:
- * Tailwind's default colours are switched off so a raw colour cannot slip in.
+ * mégis design tokens (prototype 3/_ds/tokens). Only the brand's colours,
+ * radii, shadows (none) and weights exist: Tailwind's defaults are switched
+ * off, so a raw value cannot slip in (tests/Unit/ViewConventionsTest.php
+ * catches the class names, which Tailwind would drop without a word).
  */
 @theme {
     --font-sans: var(--font-geologica), ui-sans-serif, system-ui, sans-serif;
@@ -47,9 +46,24 @@
     --color-grey-150: #ededed;
     --color-grey-100: #f2f2f2;
 
-    /* The identity is pills and circles; cards follow the prototype's app radius. */
+    /*
+     * The identity is pills and circles; cards follow the prototype's app radius.
+     * Fields, menu items and inline panels take the one radius in between.
+     */
+    --radius-*: initial;
     --radius-card: 1.25rem;
+    --radius-field: 0.75rem;
     --radius-pill: 999px;
+
+    /* Flat: elevation comes from contrast, never from a shadow (_ds shape). */
+    --shadow-*: initial;
+
+    /* Geologica in the brand's four weights (_ds typography). */
+    --font-weight-*: initial;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-extrabold: 800;
 
     /* 15 · 15.6: mobile below 768px (Tailwind md), tablet 768–1199px, desktop from 1200px. */
     --breakpoint-desktop: 75rem;

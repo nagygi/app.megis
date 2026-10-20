@@ -32,7 +32,7 @@
     </div>
 
     @if ($main)
-        <p class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-yellow-pale px-3 py-2 text-sm">
+        <p class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-field bg-yellow-pale px-3 py-2 text-sm">
             <span class="font-semibold">{{ $diagnosis->organization->name }}</span>
             @if ($diagnosis->team)
                 <span>{{ $diagnosis->team->name }}</span>

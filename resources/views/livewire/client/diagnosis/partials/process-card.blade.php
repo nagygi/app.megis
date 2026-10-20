@@ -31,7 +31,7 @@
     </div>
 
     @if ($process->mergeCandidate && $editable)
-        <div class="flex flex-wrap items-center gap-3 rounded-lg bg-yellow-pale px-3 py-2 text-sm">
+        <div class="flex flex-wrap items-center gap-3 rounded-field bg-yellow-pale px-3 py-2 text-sm">
             <span>{{ __('processes.list.merge', ['name' => $process->mergeCandidate->name]) }}</span>
             <button type="button" wire:click="merge({{ $process->id }})" class="font-semibold underline">{{ __('processes.list.merge_accept') }}</button>
             <button type="button" wire:click="dismissMerge({{ $process->id }})" class="underline">{{ __('processes.list.merge_dismiss') }}</button>

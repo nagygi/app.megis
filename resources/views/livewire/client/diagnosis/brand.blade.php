@@ -58,7 +58,7 @@
                         maxlength="500"
                         aria-describedby="brand-{{ $field }}-question"
                         placeholder="{{ __($texts.'.placeholders.'.$field) }}"
-                        class="w-full rounded-xl border border-grey-350 bg-white px-3.5 py-2.5 text-base placeholder:text-grey-600 placeholder:italic focus:border-charcoal"
+                        class="w-full rounded-field border border-grey-350 bg-white px-3.5 py-2.5 text-base placeholder:text-grey-600 placeholder:italic focus:border-charcoal"
                     ></textarea>
                     <x-form.error :name="$field" :id="'brand-'.$field" />
                     <x-diagnosis.dictate :field="$field" :label="$element->label()" :pending="isset($dictations[$field])" />

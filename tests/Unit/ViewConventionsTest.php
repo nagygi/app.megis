@@ -63,70 +63,17 @@ function hasInlineCard(string $source): bool
 
 it('keeps shadows out of the views: the identity is flat', function () {
     expect(viewsBreaking(fn (string $source) => (bool) preg_match('/(?<![\w-])(?:[a-z-]+:)*shadow-(?:2xs|xs|sm|md|lg|xl|2xl)(?![\w-])/', $source)))
-        ->toEqual([
-            'components/recorder.blade.php',
-            'livewire/admin/diagnoses/garden.blade.php',
-        ]);
+        ->toBe([]);
 });
 
-it('uses only the brand radii: rounded-card, rounded-pill, rounded-full', function () {
+it('uses only the brand radii: rounded-card, rounded-field, rounded-pill, rounded-full', function () {
     expect(viewsBreaking(fn (string $source) => (bool) preg_match('/(?<![\w-])(?:[a-z-]+:)*rounded(?:-(?:t|r|b|l|tl|tr|br|bl|s|e|ss|se|es|ee))?(?:-(?:xs|sm|md|lg|xl|2xl|3xl|4xl))?(?![\w-])/', $source)))
-        ->toEqual([
-            'admin/partials/nav.blade.php',
-            'client/partials/menu.blade.php',
-            'client/report/internal.blade.php',
-            'client/report/snapshot.blade.php',
-            'components/admin/filter.blade.php',
-            'components/admin/list-editor.blade.php',
-            'components/admin/list-toolbar.blade.php',
-            'components/admin/main-diagnosis-tabs.blade.php',
-            'components/admin/organization-tabs.blade.php',
-            'components/admin/row-action.blade.php',
-            'components/form/checkbox.blade.php',
-            'components/form/input.blade.php',
-            'components/form/select.blade.php',
-            'components/form/textarea.blade.php',
-            'components/recorder.blade.php',
-            'layouts/admin.blade.php',
-            'layouts/client.blade.php',
-            'livewire/admin/capabilities/import.blade.php',
-            'livewire/admin/capabilities/partials/header.blade.php',
-            'livewire/admin/diagnoses/index.blade.php',
-            'livewire/admin/diagnoses/partials/aggregation-description.blade.php',
-            'livewire/admin/diagnoses/partials/process-aggregation.blade.php',
-            'livewire/admin/diagnoses/show.blade.php',
-            'livewire/admin/main-diagnoses/form.blade.php',
-            'livewire/admin/main-diagnoses/reading.blade.php',
-            'livewire/admin/main-diagnoses/run.blade.php',
-            'livewire/admin/materials/partials/source.blade.php',
-            'livewire/admin/materials/show.blade.php',
-            'livewire/admin/organizations/form.blade.php',
-            'livewire/admin/organizations/values.blade.php',
-            'livewire/admin/partials/version-history.blade.php',
-            'livewire/admin/settings/legal-documents.blade.php',
-            'livewire/admin/support-questions/index.blade.php',
-            'livewire/admin/system/ai-prompts.blade.php',
-            'livewire/admin/system/ai-usage.blade.php',
-            'livewire/admin/values/partials/header.blade.php',
-            'livewire/client/diagnosis/brand.blade.php',
-            'livewire/client/diagnosis/experience.blade.php',
-            'livewire/client/diagnosis/own-values.blade.php',
-            'livewire/client/diagnosis/partials/process-card.blade.php',
-            'livewire/client/diagnosis/process-conversation.blade.php',
-            'livewire/client/value-library.blade.php',
-        ]);
+        ->toBe([]);
 });
 
 it('uses only the brand weights: 400, 500, 600 and 800', function () {
     expect(viewsBreaking(fn (string $source) => (bool) preg_match('/(?<![\w-])(?:[a-z-]+:)*font-(?:thin|extralight|light|bold|black)(?![\w-])/', $source)))
-        ->toEqual([
-            'components/diagnosis/partials/step-row-content.blade.php',
-            'livewire/admin/main-diagnoses/form.blade.php',
-            'livewire/client/diagnosis/experience.blade.php',
-            'livewire/client/diagnosis/overview-peer.blade.php',
-            'livewire/client/diagnosis/process-conversation.blade.php',
-            'livewire/client/profile.blade.php',
-        ]);
+        ->toBe([]);
 });
 
 it('draws icons with x-megis.icon, not with Unicode signs', function () {

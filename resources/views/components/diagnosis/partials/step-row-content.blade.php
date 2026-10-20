@@ -1,5 +1,5 @@
 <span @class([
-    'grid size-7 shrink-0 place-items-center rounded-pill text-xs font-bold',
+    'grid size-7 shrink-0 place-items-center rounded-pill text-xs font-extrabold',
     'bg-coral text-black' => $current,
     'bg-green text-cream' => $state->done,
     'bg-grey-300 text-grey-700' => ! $state->done && ! $current,

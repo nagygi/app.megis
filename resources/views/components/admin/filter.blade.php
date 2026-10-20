@@ -9,7 +9,7 @@
     <select
         id="filter-{{ $name }}"
         wire:model.live="filters.{{ $name }}"
-        class="rounded-xl border border-grey-350 bg-white px-3 py-2 text-base focus:border-charcoal"
+        class="rounded-field border border-grey-350 bg-white px-3 py-2 text-base focus:border-charcoal"
     >
         <option value="">{{ $allLabel ?? __('admin.common.all') }}</option>
         @foreach ($options as $value => $optionLabel)

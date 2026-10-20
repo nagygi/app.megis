@@ -95,12 +95,12 @@
         <div class="flex flex-wrap items-end gap-3">
             <div class="flex min-w-56 flex-1 flex-col gap-1.5">
                 <label for="library-search" class="text-sm font-medium">{{ __('client.value_library.search') }}</label>
-                <input id="library-search" type="search" wire:model.live.debounce.300ms="search" class="rounded-xl border border-grey-350 bg-white px-3.5 py-2 text-base focus:border-charcoal">
+                <input id="library-search" type="search" wire:model.live.debounce.300ms="search" class="rounded-field border border-grey-350 bg-white px-3.5 py-2 text-base focus:border-charcoal">
             </div>
             @if ($categories->isNotEmpty())
                 <div class="flex flex-col gap-1.5">
                     <label for="library-category" class="text-sm font-medium">{{ __('client.value_library.category') }}</label>
-                    <select id="library-category" wire:model.live="category" class="rounded-xl border border-grey-350 bg-white px-3 py-2 text-base focus:border-charcoal">
+                    <select id="library-category" wire:model.live="category" class="rounded-field border border-grey-350 bg-white px-3 py-2 text-base focus:border-charcoal">
                         <option value="">{{ __('client.value_library.all_categories') }}</option>
                         @foreach ($categories as $categoryOption)
                             <option value="{{ $categoryOption->id }}">{{ $categoryOption->name }}</option>

@@ -130,6 +130,12 @@ it('tours the confirmation and the toast', function () {
     tourShot($page, 'feedback-02-toast');
 })->group('screenshots');
 
+it('tours the pager of an admin list', function () {
+    Organization::factory()->count(30)->create();
+    $page = adminLoginInBrowser(User::factory()->admin()->create());
+    tourShot($page, 'pager-01-organizations');
+})->group('screenshots');
+
 it('tours the admin', function () {
     [$setup, $main] = approvedReading();
     $diagnosis = $main->diagnosis;

@@ -78,7 +78,7 @@
             </div>
         </section>
     @elseif ($diagnosis->parent)
-        <p class="rounded-lg bg-grey-100 px-3 py-2 text-sm">
+        <p class="rounded-field bg-grey-100 px-3 py-2 text-sm">
             {{ __('admin.main_diagnoses.part_of') }}
             <a href="{{ route('admin.diagnoses.show', $diagnosis->parent) }}" class="font-semibold">{{ $diagnosis->parent->name }}</a>
             · {{ __('admin.main_diagnoses.status_follows') }}
@@ -89,7 +89,7 @@
     @endif
 
     @unless ($isEditable)
-        <p class="rounded-lg bg-grey-100 px-3 py-2 text-sm">{{ __('admin.diagnoses.published_readonly') }}</p>
+        <p class="rounded-field bg-grey-100 px-3 py-2 text-sm">{{ __('admin.diagnoses.published_readonly') }}</p>
     @endunless
 
     @if ($main && $main->calculation)

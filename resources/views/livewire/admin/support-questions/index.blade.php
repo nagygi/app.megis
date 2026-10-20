@@ -29,10 +29,10 @@
                     <x-ui.badge tone="muted">{{ __('admin.support_questions.inactive') }}</x-ui.badge>
                 @endunless
                 <div class="flex shrink-0 items-center gap-1" wire:sort:ignore>
-                    <button type="button" wire:click="move({{ $question->id }}, -1)" @disabled($loop->first) class="rounded-lg px-2 py-1 hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.support_questions.up', ['text' => $question->text]) }}">↑</button>
-                    <button type="button" wire:click="move({{ $question->id }}, 1)" @disabled($loop->last) class="rounded-lg px-2 py-1 hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.support_questions.down', ['text' => $question->text]) }}">↓</button>
-                    <button type="button" wire:click="toggleActive({{ $question->id }})" class="rounded-lg px-2 py-1 text-sm hover:bg-grey-100">{{ $question->is_active ? __('admin.common.deactivate') : __('admin.common.activate') }}</button>
-                    <button type="button" wire:click="edit({{ $question->id }})" class="rounded-lg px-2 py-1 text-sm hover:bg-grey-100">{{ __('admin.common.edit') }}</button>
+                    <button type="button" wire:click="move({{ $question->id }}, -1)" @disabled($loop->first) class="rounded-field px-2 py-1 hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.support_questions.up', ['text' => $question->text]) }}">↑</button>
+                    <button type="button" wire:click="move({{ $question->id }}, 1)" @disabled($loop->last) class="rounded-field px-2 py-1 hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.support_questions.down', ['text' => $question->text]) }}">↓</button>
+                    <button type="button" wire:click="toggleActive({{ $question->id }})" class="rounded-field px-2 py-1 text-sm hover:bg-grey-100">{{ $question->is_active ? __('admin.common.deactivate') : __('admin.common.activate') }}</button>
+                    <button type="button" wire:click="edit({{ $question->id }})" class="rounded-field px-2 py-1 text-sm hover:bg-grey-100">{{ __('admin.common.edit') }}</button>
                 </div>
             </li>
         @endforeach

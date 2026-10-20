@@ -10,8 +10,8 @@
             <div x-data="{ open: false }" @click.outside="open = false" @keydown.escape="open = false" class="relative">
                 <x-ui.button @click="open = ! open" ::aria-expanded="open" aria-controls="new-diagnosis-menu">{{ __('admin.diagnoses.create') }}</x-ui.button>
                 <ul id="new-diagnosis-menu" x-show="open" x-cloak class="absolute right-0 z-10 mt-2 flex w-72 flex-col gap-1 rounded-card border border-grey-250 bg-white p-2">
-                    <li><a href="{{ route('admin.main-diagnoses.create') }}" class="block rounded-lg px-3 py-2 text-charcoal no-underline hover:bg-grey-100"><span class="block font-semibold">{{ __('admin.main_diagnoses.start') }}</span><span class="block text-sm text-grey-600">{{ __('admin.main_diagnoses.start_help') }}</span></a></li>
-                    <li><a href="{{ route('admin.diagnoses.create') }}" class="block rounded-lg px-3 py-2 text-charcoal no-underline hover:bg-grey-100"><span class="block font-semibold">{{ __('admin.diagnoses.record_earlier') }}</span><span class="block text-sm text-grey-600">{{ __('admin.diagnoses.record_earlier_help') }}</span></a></li>
+                    <li><a href="{{ route('admin.main-diagnoses.create') }}" class="block rounded-field px-3 py-2 text-charcoal no-underline hover:bg-grey-100"><span class="block font-semibold">{{ __('admin.main_diagnoses.start') }}</span><span class="block text-sm text-grey-600">{{ __('admin.main_diagnoses.start_help') }}</span></a></li>
+                    <li><a href="{{ route('admin.diagnoses.create') }}" class="block rounded-field px-3 py-2 text-charcoal no-underline hover:bg-grey-100"><span class="block font-semibold">{{ __('admin.diagnoses.record_earlier') }}</span><span class="block text-sm text-grey-600">{{ __('admin.diagnoses.record_earlier_help') }}</span></a></li>
                 </ul>
             </div>
         </x-slot:actions>

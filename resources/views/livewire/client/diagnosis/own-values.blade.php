@@ -139,12 +139,12 @@
                 @if (($draft['value_id'] ?? null) === null)
                     <div class="flex flex-col gap-2">
                         <label for="library-search" class="font-semibold">{{ __('diagnosis.own_values.pick_library') }}</label>
-                        <input id="library-search" type="search" wire:model.live.debounce.300ms="librarySearch" class="rounded-xl border border-grey-350 bg-white px-3.5 py-2 text-base focus:border-charcoal" placeholder="{{ __('diagnosis.own_values.search_placeholder') }}">
+                        <input id="library-search" type="search" wire:model.live.debounce.300ms="librarySearch" class="rounded-field border border-grey-350 bg-white px-3.5 py-2 text-base focus:border-charcoal" placeholder="{{ __('diagnosis.own_values.search_placeholder') }}">
                         @if ($library->isNotEmpty())
                             <ul class="flex max-h-64 flex-col gap-1 overflow-y-auto">
                                 @foreach ($library as $value)
                                     <li wire:key="library-{{ $value->id }}">
-                                        <button type="button" wire:click="pickFromLibrary({{ $value->id }})" class="w-full rounded-lg px-3 py-2 text-left hover:bg-grey-100">
+                                        <button type="button" wire:click="pickFromLibrary({{ $value->id }})" class="w-full rounded-field px-3 py-2 text-left hover:bg-grey-100">
                                             <span class="block font-semibold">{{ $value->name }}</span>
                                             @if ($value->meanings !== [])
                                                 <span class="block text-sm text-grey-700">{{ $value->meanings[0] }}</span>

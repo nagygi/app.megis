@@ -24,7 +24,7 @@
     $circumference = 2 * M_PI * 54;
 @endphp
 
-    <section x-data="mirrorRecorder(@js($recorderConfig))" class="flex flex-col items-center gap-5 rounded-card bg-white p-6 shadow-sm" aria-live="polite">
+    <section x-data="mirrorRecorder(@js($recorderConfig))" class="flex flex-col items-center gap-5 rounded-card bg-white p-6" aria-live="polite">
         <template x-if="! supported">
             <p class="text-center">{{ __('mirror.unsupported') }}</p>
         </template>
@@ -49,7 +49,7 @@
             <p
                 x-show="state === 'recording' && question"
                 x-text="question"
-                class="rounded-xl bg-yellow-pale px-4 py-2 text-center transition-opacity duration-500"
+                class="rounded-field bg-yellow-pale px-4 py-2 text-center transition-opacity duration-500"
                 :class="speaking ? 'opacity-50' : 'opacity-100'"
             ></p>
 

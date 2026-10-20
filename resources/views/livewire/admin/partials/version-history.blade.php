@@ -47,13 +47,13 @@
         </div>
 
         <div class="flex flex-wrap gap-3 text-sm" aria-hidden="true">
-            <span class="rounded bg-green-soft px-2 py-0.5">+ {{ __('admin.versions.added') }}</span>
-            <span class="rounded bg-coral-light px-2 py-0.5 line-through">− {{ __('admin.versions.removed') }}</span>
-            <span class="rounded bg-yellow-pale px-2 py-0.5">↕ {{ __('admin.versions.moved') }}</span>
+            <span class="rounded-pill bg-green-soft px-2 py-0.5">+ {{ __('admin.versions.added') }}</span>
+            <span class="rounded-pill bg-coral-light px-2 py-0.5 line-through">− {{ __('admin.versions.removed') }}</span>
+            <span class="rounded-pill bg-yellow-pale px-2 py-0.5">↕ {{ __('admin.versions.moved') }}</span>
         </div>
 
         @foreach ($comparison as $row)
-            <section @class(['flex flex-col gap-2 rounded-xl p-3', 'bg-grey-100' => $row['changed']])>
+            <section @class(['flex flex-col gap-2 rounded-field p-3', 'bg-grey-100' => $row['changed']])>
                 <h3 class="flex items-center gap-2 text-sm font-semibold">
                     @isset($markers[$row['field']])<x-ui.badge :tone="$markers[$row['field']][1]" aria-hidden="true">{{ $markers[$row['field']][0] }}</x-ui.badge>@endisset
                     {{ $fieldLabel($row['field']) }}
@@ -69,7 +69,7 @@
                                     <ol class="flex flex-col gap-1">
                                         @foreach ($row[$side] as $item)
                                             <li @class([
-                                                'rounded px-2 py-0.5',
+                                                'rounded-field px-2 py-0.5',
                                                 'bg-green-soft' => $item['status'] === 'added',
                                                 'bg-coral-light line-through' => $item['status'] === 'removed',
                                                 'bg-yellow-pale' => $item['status'] === 'moved',
@@ -88,9 +88,9 @@
                                         @if ($segment['type'] === 'equal')
                                             {{ $segment['text'] }}
                                         @elseif ($segment['type'] === 'insert')
-                                            <ins class="rounded bg-green-soft no-underline"><span class="sr-only">{{ __('admin.versions.added') }}:</span>{{ $segment['text'] }}</ins>
+                                            <ins class="rounded-field bg-green-soft no-underline"><span class="sr-only">{{ __('admin.versions.added') }}:</span>{{ $segment['text'] }}</ins>
                                         @else
-                                            <del class="rounded bg-coral-light"><span class="sr-only">{{ __('admin.versions.removed') }}:</span>{{ $segment['text'] }}</del>
+                                            <del class="rounded-field bg-coral-light"><span class="sr-only">{{ __('admin.versions.removed') }}:</span>{{ $segment['text'] }}</del>
                                         @endif
                                     @empty
                                         <span class="text-grey-600">{{ __('admin.common.none') }}</span>
