@@ -2,6 +2,17 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.16 · {hash} · 2026-10-20
+
+Az 1.15 staging-újratesztje után.
+
+- **Beszélgetés-kinyerés:** a sorba állított job és a „Válasz és tovább” ugyanazt a választ egyszerre küldhette az AI-nak, így 2 válasz 4 hívásba került. A kinyerés most válaszonkénti zárral fut: a második hívó megvárja az elsőt, és már kinyertnek találja a választ.
+- **Logó (A6):** asztali nézetben valóban egy logó; az 1.14-es `desktop:hidden` a logó rétegen kívüli `display` szabálya alatt nem hatott. Böngészős teszttel.
+- **AI-egységárak:** a `megis:prices:sync` a LiteLLM árlistájából tölti az `ai_model_prices` táblát (naponta 03:45-kor és minden deploykor, `update.sh`); a `--backfill` beárazza az ár nélkül naplózott hívásokat. A `config/ai.php` ára továbbra is felülírja. A Rendszer → AI mutatja az utolsó frissítést. Új tábla: deploykor migráció kell.
+- **Beérkező:** a menü és a kert számlálója azt számolja, amit a lista alapból mutat (a saját és gazdátlan szervezetek tételeit).
+- **Tagok listája:** a „Belépés a nevében” mindig ott van az ügyfélfiókoknál; ha nem működhet, szürke, és a súgó megmondja, miért (deaktivált fiók, inaktív a szervezetben, még nem regisztrált, a tagság még nem aktív).
+- **Admin menü:** új Szervezetek csoport (Szervezetek, Felhasználók: az eddigi Ügyfelek lista); a Termékek és az Admin felhasználók a Beállítások alá kerültek.
+
 ## 1.15 · 693987b · 2026-10-20
 
 A staging-teszt után eldöntött kérdések.

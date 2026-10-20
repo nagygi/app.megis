@@ -30,7 +30,7 @@ A stagingen deploy után (`./update.sh`, a nézetek miatt `npm run build` is) é
 | B1 · V4 márka | javítva, böngészőteszttel | `5e09c2f` |
 | B2 · feltöltés | javítva, arch-teszttel; deploy után a jogi dokumentumokat fel kell tölteni | `97c5c84` |
 | B3 · küszöb-zsákutca | javítva; a diag 56 deploy után a Futás fülön felülírható | `a2960ce` |
-| S1 · beszélgetés | javítva | `5351e4a` (és `5e09c2f`) |
+| S1 · beszélgetés | javítva; az újrateszten látott dupla AI-hívás ellen válaszonkénti zár; **deploy kell** | `5351e4a` (és `5e09c2f`), `856015d` |
 | S2 · Profil név | javítva, böngészőteszttel | `5e09c2f` |
 | K1 · más szervezet értékneve | javítva (döntés: hozzákötés a meglévő értékhez) | `f4582b3` |
 | K2 · társ és rutin | marad (döntés: a spec szerint csak a résztvevő lát rutint) | – |
@@ -64,7 +64,7 @@ Ugyanúgy böngészőben, a meglévő `e2e-` adatokon. Új tesztadat: `e2e-vezet
 | B1 · V4 márka | ✅ Márk (diag 64): 3 mező → 3 kérés, „4 / 4 kész”, „Tovább” aktív, újratöltés után megmarad. Ilona (magánszemély): a saját értékek után 4/4. |
 | B2 · feltöltés | ✅ Jogi dokumentum: a „Mégse” bezár, az ÁSZF feltölthető, a láblécben és az ET5 elfogadásánál link lett, `/aszf` PDF-et ad. Ügyfél V11 feltöltés → besorolás lap. Admin folyamat-alkalom feltöltés → anyag létrejön. |
 | B3 · küszöb | ✅ Diag 56 olvasatban: „A küszöb nem teljesült.” + „Csapat-szám nélkül megy” → lista kész → publikálva. Küszöb alatti „Olvasat indítása” (diag 64): „A küszöbhöz még 3 társ kell… Publikálni csak csapat-szám nélkül lehet majd.” |
-| S1 · beszélgetés | ✅ Két begépelt válasz, azonnal „Válasz és tovább” (9 mp) → 3 folyamat, az utolsó válaszé is. Megjegyzés: 2 válaszra 4 AI-hívás ment, mert a háttérjob és a lezárás ugyanazt a választ közel egyszerre dolgozta fel (helyes eredmény, kétszeres költség). |
+| S1 · beszélgetés | ✅ Két begépelt válasz, azonnal „Válasz és tovább” (9 mp) → 3 folyamat, az utolsó válaszé is. Megjegyzés: 2 válaszra 4 AI-hívás ment, mert a háttérjob és a lezárás ugyanazt a választ közel egyszerre dolgozta fel (helyes eredmény, kétszeres költség). Javítva zárolással (`856015d`), deploy kell. |
 | S2 · Profil név | ✅ „Klára-Teszt” blurra mentve („Mentve”), újratöltés után is. |
 | K1 · értéknév | ✅ Márk „kimondott igazság” értéke Vera át nem nézett értékéhez kötődött, hiba és duplikátum nélkül. (Az eredeti ütköző 179-es érték közben megszűnt.) |
 | K4 · mobil Értéktár | ✅ 390 px, nincs vízszintes görgetés, a pontszám és a „Részletek” a szöveg alatt. |
