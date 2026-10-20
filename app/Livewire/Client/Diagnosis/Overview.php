@@ -257,7 +257,9 @@ class Overview extends Component
             'segments' => collect(range(1, $count))->map(fn (int $index) => $index < $current ? 'done' : ($index === $current ? 'now' : 'later'))->all(),
             'current' => $current,
             'count' => $count,
-            'measuringPoints' => $main->diagnosis->rows()->count(),
+            // While it runs: the points to be measured; from the reading on the measured
+            // ones, the same number as on the admin Kert and the report (R0).
+            'measuringPoints' => $reading ? (int) ($main->calculation['measuring_points'] ?? 0) : $main->diagnosis->rows()->count(),
             'onboarding' => ['done' => $steps->current() === null, 'date' => $main->running_at],
             'peers' => $main->hasPeers() ? [
                 'answered' => $threshold->peersAnswered($main),

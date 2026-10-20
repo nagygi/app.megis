@@ -116,6 +116,22 @@ it('shows the leader\'s home while it runs, with the coral plus, and without it 
         ->assertDontSeeHtml('href="'.route('client.diagnosis.contribute', $parameters).'"');
 });
 
+it('counts the points to be measured while it runs and the measured ones in the reading (V10)', function () {
+    Queue::fake();
+    [$setup, $main] = runningDiagnosis();
+    $parameters = ['organization' => $setup['organization'], 'diagnosis' => $main->diagnosis];
+    actingAsCustomer($setup['leader']);
+    $rows = $main->diagnosis->rows()->count();
+    expect($rows)->toBeGreaterThan(1);
+
+    $this->get(route('client.diagnosis.show', $parameters))->assertSee('Belső működés · '.$rows.' mérőpont');
+
+    app(StageMachine::class)->transition($main, MainDiagnosisStage::Reading, $setup['admin']);
+    $main->refresh()->update(['calculation' => [...($main->calculation ?? []), 'measuring_points' => 1]]);
+
+    $this->get(route('client.diagnosis.show', $parameters))->assertSee('Belső működés · 1 mérőpont');
+});
+
 it('lets the leader remind the peers from the home, without names (26, question 2)', function () {
     Mail::fake();
     Queue::fake();
