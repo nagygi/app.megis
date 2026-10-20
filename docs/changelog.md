@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.15 · {hash} · 2026-10-20
+## 1.15 · 693987b · 2026-10-20
 
 A staging-teszt után eldöntött kérdések.
 
