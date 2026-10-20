@@ -59,6 +59,13 @@
 }
 
 @layer base {
+    /* _ds motion: colour changes 200ms, transforms 120ms, anything entering 420ms. */
+    :root {
+        --duration-fast: 120ms;
+        --duration-base: 200ms;
+        --duration-slow: 420ms;
+    }
+
     html {
         background-color: var(--color-cream);
         color: var(--color-charcoal);
@@ -69,9 +76,29 @@
         -webkit-font-smoothing: antialiased;
     }
 
+    /*
+     * Text links are underlined with the brand coral (_ds: link coral, hover
+     * coral-light); Tailwind's preflight would leave them looking like text.
+     * Links shaped as buttons, rows or cards opt out with no-underline.
+     */
     a {
+        text-decoration-line: underline;
         text-decoration-thickness: 2px;
         text-underline-offset: 3px;
+        text-decoration-color: var(--color-coral);
+        transition: text-decoration-color var(--duration-base) var(--ease-standard);
+    }
+
+    a:hover {
+        text-decoration-color: var(--color-coral-light);
+    }
+
+    .on-dark a {
+        text-decoration-color: currentColor;
+    }
+
+    .on-dark a:hover {
+        text-decoration-color: var(--color-yellow);
     }
 
     ::selection {
@@ -92,15 +119,49 @@
     [x-cloak] {
         display: none !important;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        ::before,
+        ::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
 }
 
 @utility press {
     transition:
-        background-color 200ms var(--ease-standard),
-        color 200ms var(--ease-standard),
-        transform 120ms var(--ease-standard);
+        background-color var(--duration-base) var(--ease-standard),
+        border-color var(--duration-base) var(--ease-standard),
+        color var(--duration-base) var(--ease-standard),
+        opacity var(--duration-base) var(--ease-standard),
+        transform var(--duration-fast) var(--ease-standard);
 
     &:active {
         transform: scale(0.97);
     }
+}
+
+/* A button that reads as a link: the base link underline on any element. */
+@utility link {
+    text-decoration-line: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--color-coral);
+    transition: text-decoration-color var(--duration-base) var(--ease-standard);
+
+    &:hover {
+        text-decoration-color: var(--color-coral-light);
+    }
+}
+
+/*
+ * EasyMDE, the admin's md editor, loads its stock stylesheet after this one;
+ * its counter grey (#959694) stays under 4.5:1 on white (WCAG AA).
+ */
+.EasyMDEContainer .editor-statusbar {
+    color: var(--color-grey-600);
 }

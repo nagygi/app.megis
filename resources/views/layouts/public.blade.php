@@ -25,12 +25,12 @@
     'bg-cream' => $tone === 'cream',
     'bg-coral' => $tone === 'coral',
 ])>
-    <a href="#main" class="sr-only rounded-pill bg-charcoal px-4 py-2 text-cream focus:not-sr-only focus:absolute focus:top-3 focus:left-3">
+    <a href="#main" class="sr-only rounded-pill no-underline bg-charcoal px-4 py-2 text-cream focus:not-sr-only focus:absolute focus:top-3 focus:left-3">
         {{ __('ui.skip_to_content') }}
     </a>
 
     <header class="mx-auto flex max-w-5xl items-center px-4 py-5 sm:px-8">
-        <a href="{{ route('public.home') }}" class="inline-flex">
+        <a href="{{ route('public.home') }}" class="inline-flex no-underline">
             <x-megis.logo />
         </a>
     </header>

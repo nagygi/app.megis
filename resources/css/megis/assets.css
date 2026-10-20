@@ -86,6 +86,67 @@
     mask-image: url('../../images/megis/icons/share.svg');
 }
 
+/*
+ * Icons the design system lacks, drawn for the UI work (1.18) from the brand
+ * icons (mirrored or turned chevron and arrow, the bullet repeated) or in their
+ * hand. Temporary until the brand owner approves or replaces them.
+ */
+
+.megis-icon-arrow-down {
+    -webkit-mask-image: url('../../images/megis/icons/arrow-down.svg');
+    mask-image: url('../../images/megis/icons/arrow-down.svg');
+}
+
+.megis-icon-arrow-up {
+    -webkit-mask-image: url('../../images/megis/icons/arrow-up.svg');
+    mask-image: url('../../images/megis/icons/arrow-up.svg');
+}
+
+.megis-icon-chevron-down {
+    -webkit-mask-image: url('../../images/megis/icons/chevron-down.svg');
+    mask-image: url('../../images/megis/icons/chevron-down.svg');
+}
+
+.megis-icon-chevron-left {
+    -webkit-mask-image: url('../../images/megis/icons/chevron-left.svg');
+    mask-image: url('../../images/megis/icons/chevron-left.svg');
+}
+
+.megis-icon-chevron-up {
+    -webkit-mask-image: url('../../images/megis/icons/chevron-up.svg');
+    mask-image: url('../../images/megis/icons/chevron-up.svg');
+}
+
+.megis-icon-drag {
+    -webkit-mask-image: url('../../images/megis/icons/drag.svg');
+    mask-image: url('../../images/megis/icons/drag.svg');
+}
+
+.megis-icon-mic {
+    -webkit-mask-image: url('../../images/megis/icons/mic.svg');
+    mask-image: url('../../images/megis/icons/mic.svg');
+}
+
+.megis-icon-more {
+    -webkit-mask-image: url('../../images/megis/icons/more.svg');
+    mask-image: url('../../images/megis/icons/more.svg');
+}
+
+.megis-icon-search {
+    -webkit-mask-image: url('../../images/megis/icons/search.svg');
+    mask-image: url('../../images/megis/icons/search.svg');
+}
+
+.megis-icon-sort {
+    -webkit-mask-image: url('../../images/megis/icons/sort.svg');
+    mask-image: url('../../images/megis/icons/sort.svg');
+}
+
+.megis-icon-upload {
+    -webkit-mask-image: url('../../images/megis/icons/upload.svg');
+    mask-image: url('../../images/megis/icons/upload.svg');
+}
+
 .megis-symbol-circle {
     -webkit-mask-image: url('../../images/megis/symbols/circle.svg');
     mask-image: url('../../images/megis/symbols/circle.svg');

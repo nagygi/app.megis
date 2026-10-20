@@ -75,7 +75,7 @@
 @endphp
 
 <div class="flex min-h-full flex-col gap-6 p-4">
-    <a href="{{ route('admin.dashboard') }}" class="inline-flex px-3 pt-2">
+    <a href="{{ route('admin.dashboard') }}" class="inline-flex px-3 pt-2 no-underline">
         <x-megis.logo class="h-9" />
     </a>
 

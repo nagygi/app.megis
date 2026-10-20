@@ -2,6 +2,28 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.18 · {hash} · 2026-10-21
+
+UI-finomhangolás, 1. lépés: a megrendelő kérésére egységesebb, modernebb felület (terv: 9 lépés, ez az első kettő).
+
+- **Linkek:** a szöveges linkek coral aláhúzást kapnak (a design system szabálya), hoverre halványabbat. Eddig a Tailwind alapstílusa levette az aláhúzást, így ~100 link nem különbözött a szövegtől. A gombnak, sornak, kártyának formázott linkek aláhúzás nélkül maradnak.
+- **Gombok:**
+  - Új `danger` tónus a törlés jellegű műveletekhez és új `ghost` tónus a harmadlagos szöveggombokhoz.
+  - Ikon a felirat előtt vagy után (`icon`, `icon-right`).
+  - Hoverre világosodnak, nem sötétednek (design system): a szén zöldre, a coral és a sárga a világos árnyalatára vált.
+  - Legalább 40, illetve 44 px magasak, a mobilos érintéshez.
+- **Töltési állapot:**
+  - Amíg a Livewire a gomb kérését futtatja, a gomb halvány, nem kattintható, és pörgő jelet mutat.
+  - A sima űrlapok (belépés, kijelentkezés) ugyanígy jelzik a küldést, és nem küldhetők el kétszer.
+  - A letiltott link-gomb nem követhető.
+- **Mozgás:** a design system időtartamai (120/200/420 ms); a „csökkentett mozgás” beállításnál nincs animáció.
+- **Új ikonok:** chevron balra/fel/le, nyíl fel/le, továbbiak, fogd-és-vidd, rendezés, keresés, mikrofon, feltöltés. A meglévő ikonokból származtatva vagy azok stílusában rajzolva; ideiglenesek, a márkagazda jóváhagyására várnak.
+- **EasyMDE:** az admin md-szerkesztőjének karakterszámlálója AA-kontrasztú.
+- **Fejlesztői eszközök:**
+  - Képernyőkép-túra 42 fő oldalról (390 és 1280 px, `--group=screenshots`).
+  - Konvenció-teszt a nézetekre (`tests/Unit/ViewConventionsTest.php`): nincs árnyék, csak márka-sarokív és -betűvastagság, nincs Unicode-ikon, a fehér kártya `x-ui.card`. A kivétellista lépésenként fogy.
+- **Verzió:** az 1.17 a configban 1.16 maradt; most 1.18.
+
 ## 1.17 · 8c43184 · 2026-10-20
 
 Értéktükör: illesztés v3 (`ertektukor-illesztes` v3).

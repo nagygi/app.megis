@@ -65,7 +65,7 @@
     @stack('head')
 </head>
 <body class="min-h-dvh bg-cream text-charcoal">
-    <a href="#main" class="sr-only rounded-pill bg-charcoal px-4 py-2 text-cream focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50">
+    <a href="#main" class="sr-only rounded-pill no-underline bg-charcoal px-4 py-2 text-cream focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50">
         {{ __('ui.skip_to_content') }}
     </a>
 
