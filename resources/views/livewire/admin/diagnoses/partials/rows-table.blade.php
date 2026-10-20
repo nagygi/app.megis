@@ -82,7 +82,7 @@
                     <div class="flex justify-end gap-2">
                         <x-ui.button tone="outline" size="sm" wire:click="editRow({{ $row->id }})" aria-label="{{ __('admin.diagnoses.edit_row') }}: {{ $row->label() }}">{{ $row->automatic_score_state !== null ? __('admin.diagnoses.override.edit') : __('admin.diagnoses.edit_row') }}</x-ui.button>
                         @if ($row->overridden_at)
-                            <x-ui.button tone="outline" size="sm" wire:click="resetRow({{ $row->id }})" aria-label="{{ __('admin.diagnoses.override.reset') }}: {{ $row->label() }}">{{ __('admin.diagnoses.override.reset') }}</x-ui.button>
+                            <x-ui.button tone="outline" size="sm" wire:click="resetRow({{ $row->id }})" wire:confirm="{{ __('admin.diagnoses.override.confirm_reset') }}" aria-label="{{ __('admin.diagnoses.override.reset') }}: {{ $row->label() }}">{{ __('admin.diagnoses.override.reset') }}</x-ui.button>
                         @endif
                         @if ($removable && ! $isCalculated)
                             <x-ui.button tone="outline" size="sm" wire:click="removeRow({{ $row->id }})" wire:confirm="{{ __('admin.diagnoses.confirm_remove_row') }}" aria-label="{{ __('admin.diagnoses.remove_row') }}: {{ $row->label() }}">{{ __('admin.diagnoses.remove_row') }}</x-ui.button>

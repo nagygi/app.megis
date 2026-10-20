@@ -200,6 +200,9 @@
         </a>
     @endif
 
+    <x-ui.toasts />
+    <x-ui.confirm-dialog />
+
     @livewireScriptConfig
 </body>
 </html>

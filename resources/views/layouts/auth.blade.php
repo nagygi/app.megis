@@ -18,10 +18,13 @@
         <x-megis.logo variant="white" class="h-10 self-start" />
         <div class="rounded-card bg-cream p-6 sm:p-8">
             <h1 class="mb-6 text-2xl font-extrabold uppercase">{{ $title }}</h1>
-            <x-ui.flash class="mb-4" />
+            <x-ui.flash inline class="mb-4" />
             {{ $slot }}
         </div>
     </main>
+    <x-ui.toasts />
+    <x-ui.confirm-dialog />
+
     @livewireScriptConfig
 </body>
 </html>

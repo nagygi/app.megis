@@ -10,6 +10,8 @@ return [
     'save_failed' => 'Nem sikerült menteni. Próbáld újra.',
     'close' => 'Bezárás',
     'back' => 'Vissza',
+    'cancel' => 'Mégse',
+    'confirm' => 'Igen',
 
     'seo' => [
         'title_suffix' => 'mégis',

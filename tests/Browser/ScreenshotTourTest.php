@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\DiagnosisRowKind;
+use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 
@@ -114,6 +116,18 @@ it('tours the published report and the libraries', function () {
         'library-02-processes' => route('client.processes', $setup['organization'], false),
         'library-03-wisdom' => route('client.wisdom.index', $setup['organization'], false),
     ]);
+})->group('screenshots');
+
+it('tours the confirmation and the toast', function () {
+    Organization::factory()->create(['name' => 'Acme Kft.']);
+    $page = adminLoginInBrowser(User::factory()->admin()->create());
+
+    $page->click('[aria-label="Műveletek: Acme Kft."]')->click('Inaktiválás');
+    tourShot($page, 'feedback-01-confirm');
+
+    $page->press('Igen');
+    $page->assertVisible('[aria-live="polite"] [x-text="toast.message"]');
+    tourShot($page, 'feedback-02-toast');
 })->group('screenshots');
 
 it('tours the admin', function () {

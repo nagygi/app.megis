@@ -1,6 +1,6 @@
 {{-- B1 · Belépés (14 · 14.2) --}}
 <x-layouts::client :title="__('auth_ui.customer.login_title')" guest>
-    <x-ui.flash class="mb-6 max-w-md" />
+    <x-ui.flash inline class="mb-6 max-w-md" />
 
     <form
         method="POST"

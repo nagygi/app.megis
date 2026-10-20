@@ -70,7 +70,9 @@ it('saves the name on the profile as the customer leaves the field', function ()
 it('shows one logo on a desktop customer page, the menu\'s', function () {
     $organization = Organization::factory()->create();
     $page = loginInBrowser(customerOf($organization));
+    // Loaded again at the new size: counting right after the resize could still see the phone layout.
     $page->resize(1280, 800);
+    $page->navigate('/'.$organization->slug);
 
     $visibleLogos = $page->script('() => [...document.querySelectorAll(".megis-logo")].filter((logo) => logo.checkVisibility()).length');
 

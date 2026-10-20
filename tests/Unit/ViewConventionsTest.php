@@ -154,7 +154,8 @@ it('draws icons with x-megis.icon, not with Unicode signs', function () {
 });
 
 it('builds white cards with x-ui.card', function () {
-    expect(viewsBreaking(fn (string $source, string $path) => $path !== 'components/ui/card.blade.php' && hasInlineCard($source)))
+    // The design system's own surfaces (card, dialog, menus) live in components/ui.
+    expect(viewsBreaking(fn (string $source, string $path) => ! str_starts_with($path, 'components/ui/') && hasInlineCard($source)))
         ->toEqual([
             'client/home.blade.php',
             'client/legal-acceptance.blade.php',

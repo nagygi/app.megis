@@ -708,6 +708,7 @@ return [
             'reset' => 'Vissza az automatikusra',
             'saved' => 'Átírva. Az automatikus érték mellette marad.',
             'reset_done' => 'Visszaállítva az automatikus értékre.',
+            'confirm_reset' => 'Visszaállítod az automatikus értékre? A kézi érték és az oka elvész.',
         ],
         'process_aggregation' => [
             'source' => ':process · :period · :count felhasznált alkalom',
@@ -1343,6 +1344,7 @@ return [
             'snoozed' => 'A küszöb-jelzés :date-ig hallgat.',
             'overridden' => 'Csapat-szám nélkül megy · :name · :date',
             'revoke' => 'Visszavonom',
+            'confirm_revoke' => 'Visszavonod? A publikáláshoz újra teljesülnie kell a küszöbnek, vagy újra csapat-szám nélkül kell indítanod.',
             'below_title' => 'A küszöb nem teljesült.',
             'below_text' => 'A vezetőn kívül :answered társ töltötte ki a megélést, még :missing kell. Publikálni akkor lehet, ha a küszöb teljesül, vagy ha csapat-szám nélkül megy.',
         ],

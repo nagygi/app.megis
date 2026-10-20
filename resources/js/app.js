@@ -3,6 +3,8 @@ import mirrorRecorder from './recorder';
 import dictation from './dictation';
 import markdownEditor from './markdown-editor';
 import turnstileWidget from './turnstile';
+import megisConfirm from './confirm';
+import toasts from './toasts';
 
 // Livewire is bundled here instead of being auto-injected, so Alpine is present
 // on every page and app-wide Alpine components can be registered before start.
@@ -12,6 +14,25 @@ Alpine.data('mirrorRecorder', mirrorRecorder);
 Alpine.data('dictation', dictation);
 Alpine.data('markdownEditor', markdownEditor);
 Alpine.data('turnstileWidget', turnstileWidget);
+Alpine.store('toasts', toasts);
+
+// wire:confirm asks in the brand dialog instead of the browser's confirm().
+// Livewire's own handler runs first and sets __livewire_confirm, which its
+// click and submit handlers call with the action; this one replaces it.
+// data-confirm-tone="danger" paints the yes button as destructive and
+// data-confirm-label names it (e.g. "Törlöm").
+Livewire.hook('directive.init', ({ el, directive }) => {
+    if (directive.value !== 'confirm' || directive.modifiers.includes('prompt')) {
+        return;
+    }
+
+    const message = directive.expression.replaceAll('\\n', '\n');
+
+    el.__livewire_confirm = (action, instead) => {
+        megisConfirm({ message, tone: el.dataset.confirmTone, label: el.dataset.confirmLabel })
+            .then((confirmed) => (confirmed && el.isConnected ? action() : instead()));
+    };
+});
 
 Livewire.start();
 
@@ -21,7 +42,7 @@ Livewire.start();
 document.addEventListener('submit', (event) => {
     const form = event.target;
 
-    if (event.defaultPrevented || form.target === '_blank') {
+    if (event.defaultPrevented || form.target === '_blank' || form.method === 'dialog') {
         return;
     }
 

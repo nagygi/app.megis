@@ -219,7 +219,7 @@
                     @endif
                     <div class="flex gap-2">
                         @if ($hasPassword || $deletionCodeSent)
-                            <x-ui.button type="submit" tone="coral" size="sm">{{ __('client.deletion.confirm') }}</x-ui.button>
+                            <x-ui.button type="submit" tone="danger" size="sm">{{ __('client.deletion.confirm') }}</x-ui.button>
                         @endif
                         <x-ui.button tone="outline" size="sm" wire:click="$set('confirmingDeletion', false)">{{ __('client.deletion.cancel') }}</x-ui.button>
                     </div>

@@ -164,7 +164,7 @@
                     <div class="flex gap-2">
                         <x-ui.button tone="outline" size="sm" wire:click="editScore">{{ __('admin.diagnoses.override.edit') }}</x-ui.button>
                         @if ($diagnosis->score_overridden_at)
-                            <x-ui.button tone="outline" size="sm" wire:click="resetScore">{{ __('admin.diagnoses.override.reset') }}</x-ui.button>
+                            <x-ui.button tone="outline" size="sm" wire:click="resetScore" wire:confirm="{{ __('admin.diagnoses.override.confirm_reset') }}">{{ __('admin.diagnoses.override.reset') }}</x-ui.button>
                         @endif
                     </div>
                 @endif

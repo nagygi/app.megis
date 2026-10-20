@@ -6,7 +6,7 @@
     guest
 >
     <div class="flex max-w-md flex-col gap-6">
-        <x-ui.flash />
+        <x-ui.flash inline />
 
         <p>{{ __('auth_ui.customer.code_lead', ['email' => $email]) }}</p>
 

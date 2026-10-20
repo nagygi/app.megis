@@ -120,6 +120,11 @@
         display: none !important;
     }
 
+    /* The page behind a modal dialog (x-ui.confirm-dialog) does not scroll. */
+    html:has(dialog:modal) {
+        overflow: hidden;
+    }
+
     @media (prefers-reduced-motion: reduce) {
         *,
         ::before,

@@ -2,6 +2,27 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.19 · {hash} · 2026-10-21
+
+UI-finomhangolás, 2. lépés: visszajelzés.
+
+- **Megerősítés:**
+  - A böngésző saját „OK / Mégse” ablaka helyett márkás dialógus kérdez mind a 39 helyen; a hívások nem változtak.
+  - Az alapértelmezett gomb a „Mégse”; az Esc és a háttérre kattintás is nemet mond.
+  - A `data-confirm-tone="danger"` piros „Igen”-t ad, a `data-confirm-label` megnevezi a gombot (pl. „Törlöm”).
+- **Új megerősítések:**
+  - Kérdez a kézi átírás visszaállítása (sor és összpontszám) és a „csapat-szám nélkül megy” visszavonása; eddig kérdés nélkül futottak.
+  - Nem kérdez a szervezeti érték és a listaszerkesztő „×”-e, mert csak a mentetlen űrlapból vesz ki, és a „kevés adat” jelölés sem, mert visszanyitható.
+- **Toast:**
+  - A mentés, inaktiválás stb. visszajelzése alul jelenik meg (asztalon jobbra lent), nem a hosszú lap tetején, ahol a lap alján dolgozó felhasználó nem látta.
+  - A siker 6 mp után eltűnik, amíg rá nem mutatnak; a hiba bezárásig marad. Ugyanaz az üzenet újra is megjelenik.
+  - Livewire-ből: `$this->dispatch('toast', message: …, type: 'error')`.
+  - A belépő oldalak a helyükön, az űrlap mellett mutatják az üzenetet.
+- **Fióktörlés:** a „Véglegesen törlöm” gomb a törlés tónusát kapja; eddig ugyanolyan coral volt, mint a „Tovább”.
+- **Teszt:**
+  - Böngészős teszt a megerősítésre és a toastra.
+  - A desktop-logó teszt az átméretezés után újratölt, mert időzítéstől függően még a mobil elrendezést számolta.
+
 ## 1.18 · dedc812 · 2026-10-21
 
 UI-finomhangolás, 1. lépés: a megrendelő kérésére egységesebb, modernebb felület (terv: 9 lépés, ez az első kettő).
