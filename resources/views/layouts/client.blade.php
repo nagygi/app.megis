@@ -17,6 +17,8 @@
     'guest' => false,
     // "3 / 6" on the filling pages (23 · 23.3).
     'step' => null,
+    // [3, 6] draws the step bar under the title (prototype .prog).
+    'progress' => null,
     // The page label right of the logo when there is no step, e.g. "Első belépés".
     'label' => null,
     // The coral plus to V11, on the homes of a running diagnosis (15 · 15.5).
@@ -184,6 +186,26 @@
                             @endif
                         </div>
                     </div>
+
+                    @if ($progress)
+                        @php([$current, $total] = $progress)
+                        <div
+                            class="flex gap-1"
+                            role="progressbar"
+                            aria-valuemin="1"
+                            aria-valuemax="{{ $total }}"
+                            aria-valuenow="{{ $current }}"
+                            aria-label="{{ __('diagnosis.progress', ['current' => $current, 'total' => $total]) }}"
+                        >
+                            @for ($index = 1; $index <= $total; $index++)
+                                <span @class([
+                                    'h-1.5 flex-1 rounded-pill',
+                                    ($onDark ? 'bg-yellow' : 'bg-charcoal') => $index <= $current,
+                                    ($onDark ? 'bg-grey-700' : 'bg-grey-300') => $index > $current,
+                                ])></span>
+                            @endfor
+                        </div>
+                    @endif
                 </div>
             </header>
 

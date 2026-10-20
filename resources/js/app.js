@@ -34,6 +34,34 @@ Livewire.hook('directive.init', ({ el, directive }) => {
     };
 });
 
+// A step's "Tovább" (data-focus-errors) that fails validation hands the focus
+// to the first invalid field or error line, which may be far up the page.
+let focusErrorsAfterUpdate = false;
+
+document.addEventListener('click', (event) => {
+    if (event.target.closest('[data-focus-errors]')) {
+        focusErrorsAfterUpdate = true;
+    }
+}, true);
+
+Livewire.hook('commit', ({ succeed }) => {
+    succeed(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (!focusErrorsAfterUpdate) {
+            return;
+        }
+
+        focusErrorsAfterUpdate = false;
+        const error = document.querySelector('[aria-invalid="true"], main p[id$="-error"]');
+
+        if (error) {
+            error.matches('input, select, textarea, button') || error.setAttribute('tabindex', '-1');
+            error.focus({ preventScroll: true });
+            const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            error.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
+        }
+    })));
+});
+
 Livewire.start();
 
 // Plain forms (login, logout, legal acceptance) show the same busy button as

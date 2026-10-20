@@ -3,7 +3,7 @@
     <x-ui.flash />
 
     <div class="flex flex-col gap-1">
-        <p class="text-xl font-semibold">{{ $connection ? __('processes.list.lead_calendar') : __('processes.list.lead') }}</p>
+        <h2 class="text-xl font-semibold">{{ $connection ? __('processes.list.lead_calendar') : __('processes.list.lead') }}</h2>
         @if ($connection)
             <p class="text-grey-700">{{ __('processes.list.events', ['count' => $connection->event_count]) }}</p>
         @endif
@@ -17,7 +17,7 @@
     @foreach (['strong', 'uncertain', 'manual'] as $group)
         @if ($groups[$group]->isNotEmpty())
             <section class="flex flex-col gap-3" aria-labelledby="group-{{ $group }}">
-                <h2 id="group-{{ $group }}" class="font-semibold">{{ __('processes.list.groups.'.$group) }} · {{ $groups[$group]->count() }}</h2>
+                <h3 id="group-{{ $group }}" class="text-lg font-semibold">{{ __('processes.list.groups.'.$group) }} · {{ $groups[$group]->count() }}</h3>
                 <ul class="flex flex-col gap-3">
                     @foreach ($groups[$group] as $process)
                         @include('livewire.client.diagnosis.partials.process-card', ['process' => $process])
@@ -30,7 +30,7 @@
     @php($otherEvents = ($connection?->one_off_count ?? 0) + ($connection?->unlinked_count ?? 0))
     @if ($groups['other']->isNotEmpty() || $otherEvents > 0)
         <section class="flex flex-col gap-3" aria-labelledby="group-other">
-            <h2 id="group-other" class="font-semibold">{{ __('processes.list.groups.other') }}</h2>
+            <h3 id="group-other" class="text-lg font-semibold">{{ __('processes.list.groups.other') }}</h3>
             @if ($connection)
                 <p class="text-sm">{{ __('processes.list.other_events', ['count' => $connection->one_off_count]) }} · {{ __('processes.list.unlinked', ['count' => $connection->unlinked_count]) }}</p>
             @endif
@@ -44,12 +44,12 @@
     @endif
 
     @if (collect($groups)->flatten()->isEmpty())
-        <p class="rounded-card bg-white p-5">{{ __('processes.list.empty') }}</p>
+        <x-ui.empty-state symbol="spiral">{{ __('processes.list.empty') }}</x-ui.empty-state>
     @endif
 
     @if ($editable)
-        <form wire:submit="addManual" class="flex flex-col gap-4 rounded-card bg-white p-5">
-            <h2 class="font-semibold">{{ __('processes.list.add_title') }}</h2>
+        <x-ui.card as="form" wire:submit="addManual" class="flex flex-col gap-4">
+            <h3 class="text-lg font-semibold">{{ __('processes.list.add_title') }}</h3>
             <x-form.input name="name" wire:model="name" :label="__('processes.list.fields.name')" required />
             <div class="grid gap-4 sm:grid-cols-2">
                 <x-form.select name="rhythm" wire:model="rhythm" :label="__('processes.list.fields.rhythm')">
@@ -65,13 +65,13 @@
                     @endforeach
                 </x-form.select>
             </div>
-            <x-ui.button type="submit" tone="outline" size="sm" class="self-start">{{ __('processes.list.add') }}</x-ui.button>
-        </form>
+            <x-ui.button type="submit" tone="outline" icon="plus" class="self-start" data-focus-errors>{{ __('processes.list.add') }}</x-ui.button>
+        </x-ui.card>
     @endif
 
     @if ($goingOn->isNotEmpty())
-        <section class="flex flex-col gap-2 rounded-card border border-grey-250 p-5" aria-labelledby="going-on">
-            <h2 id="going-on" class="font-semibold">{{ __('processes.list.going_on') }}</h2>
+        <x-ui.card as="section" tone="cream" bordered class="flex flex-col gap-2" aria-labelledby="going-on">
+            <h3 id="going-on" class="font-semibold">{{ __('processes.list.going_on') }}</h3>
             <ul class="flex flex-col gap-1 text-sm">
                 @foreach ($goingOn as $process)
                     <li>
@@ -82,16 +82,16 @@
                     </li>
                 @endforeach
             </ul>
-        </section>
+        </x-ui.card>
     @endif
 
     @if ($editable)
         <div class="flex flex-wrap items-center gap-3">
+            <x-ui.button size="lg" icon-right="arrow-right" :href="route('client.diagnosis.process-summary', [$organization, $diagnosis])">{{ __('diagnosis.next') }}</x-ui.button>
             @if ($unaccepted > 0)
-                <x-ui.button tone="dark" wire:click="acceptAll">{{ trans_choice('processes.list.accept_all', $unaccepted, ['count' => $unaccepted]) }}</x-ui.button>
+                <x-ui.button tone="outline" wire:click="acceptAll">{{ trans_choice('processes.list.accept_all', $unaccepted, ['count' => $unaccepted]) }}</x-ui.button>
             @endif
-            <x-ui.button tone="coral" size="lg" :href="route('client.diagnosis.process-summary', [$organization, $diagnosis])">{{ __('diagnosis.next') }}</x-ui.button>
-            <a href="{{ route('client.diagnosis.show', [$organization, $diagnosis]) }}" class="font-semibold">{{ __('processes.list.later') }}</a>
+            <x-ui.button tone="ghost" :href="route('client.diagnosis.show', [$organization, $diagnosis])">{{ __('processes.list.later') }}</x-ui.button>
         </div>
     @endif
 </div>

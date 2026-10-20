@@ -7,11 +7,9 @@
         : $url('chapter', [\App\Services\Report\ReportService::SLUGS[$nextKey]]);
 @endphp
 
-<nav class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-grey-250 pt-4 text-sm" aria-label="{{ __('report.title') }}">
-    @if ($position !== null)
-        <span class="text-grey-700">{{ __('report.stepper', ['current' => $position + 1, 'total' => count($chapterKeys), 'chapter' => __('report.chapters.'.$current)]) }}</span>
-    @else
-        <span></span>
-    @endif
-    <a href="{{ $nextUrl }}" class="font-semibold">{{ $nextKey === null ? __('report.next', ['chapter' => __('report.closing.title')]) : __('report.next', ['chapter' => __('report.chapters.'.$nextKey)]) }}</a>
-</nav>
+<x-ui.page-nav
+    :label="__('report.title')"
+    :position="$position === null ? null : __('report.stepper', ['current' => $position + 1, 'total' => count($chapterKeys), 'chapter' => __('report.chapters.'.$current)])"
+    :next="$nextUrl"
+    :next-label="__('report.next', ['chapter' => $nextKey === null ? __('report.closing.title') : __('report.chapters.'.$nextKey)])"
+/>

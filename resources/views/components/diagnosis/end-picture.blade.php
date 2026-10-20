@@ -17,7 +17,7 @@
         <div class="flex items-center gap-4">
             <svg viewBox="0 0 64 64" class="size-16 shrink-0" aria-hidden="true">
                 <circle cx="32" cy="32" r="26" fill="none" stroke="currentColor" stroke-width="6" opacity="0.35" />
-                <text x="32" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="currentColor">?</text>
+                <text x="32" y="40" text-anchor="middle" font-size="24" font-weight="800" fill="currentColor">?</text>
             </svg>
             <p class="font-semibold">{{ __('diagnosis.end.ring') }}</p>
         </div>

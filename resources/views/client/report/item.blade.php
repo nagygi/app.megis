@@ -8,11 +8,11 @@
 @endphp
 <x-layouts::client :title="$item['label']" :color="$key === 'brand' ? 'light-yellow' : 'green'" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$chapterUrl" :back-label="__('report.back_to_chapter', ['chapter' => __('report.chapters.'.$key)])">
     <div class="flex max-w-2xl flex-col gap-6">
-        <h2 class="text-2xl font-semibold">{{ __('report.question.item', ['score' => ReportText::score($item), 'label' => $item['label']]) }}</h2>
+        <h2 class="text-xl font-semibold">{{ __('report.question.item', ['score' => ReportText::score($item), 'label' => $item['label']]) }}</h2>
 
         @include('client.report.partials.switch')
 
-        <section class="flex flex-col gap-2 rounded-card bg-white p-5" aria-label="PHI">
+        <x-ui.card as="section" class="flex flex-col gap-2" :aria-label="__('report.phi')">
             <p class="text-3xl font-extrabold tabular-nums">{{ ReportText::score($item) }}</p>
             <x-report.scale :value="$item['score']" />
             @if (in_array($key, ['values', 'brand'], true) || $key === 'processes')
@@ -22,13 +22,13 @@
                         : __('report.experience_self', ['leader' => ReportText::decimal($item['leader']), 'situations' => ReportText::decimal($item['situations'])]) }}</p>
                 @endif
                 @if ($sentence = ReportText::gap($item, $report['meta']))
-                    <p @class(['text-grey-600' => ! $report['meta']['shows_experience']])>{{ $sentence }}</p>
+                    <p @class(['text-grey-700' => ! $report['meta']['shows_experience']])>{{ $sentence }}</p>
                 @endif
             @endif
             @if ($item['occasions'])
                 <p class="text-sm text-grey-700">{{ __('report.occasions', ['count' => $item['occasions']['count'], 'yes' => $item['occasions']['yes'] ?? 0, 'partial' => $item['occasions']['partial'] ?? 0, 'no' => $item['occasions']['no'] ?? 0]) }}</p>
             @endif
-        </section>
+        </x-ui.card>
 
         @if ($item['definition'])
             <section class="flex flex-col gap-2" aria-labelledby="definition-title">
@@ -36,12 +36,12 @@
                 @if (filled($item['definition']['meaning']))
                     <p>{{ $item['definition']['meaning'] }}</p>
                 @endif
-                <dl class="grid gap-1 rounded-card bg-white p-4 text-sm sm:grid-cols-[6rem_1fr]">
+                <x-ui.card as="dl" padding="sm" class="grid gap-1 text-sm sm:grid-cols-[6rem_1fr]" :aria-label="__('report.definition')">
                     <dt class="font-semibold text-coral-ink">{{ __('report.definition_low') }}</dt>
                     <dd>{{ $item['definition']['low'] ?: '–' }}</dd>
                     <dt class="font-semibold text-green">{{ __('report.definition_high') }}</dt>
                     <dd>{{ $item['definition']['high'] ?: '–' }}</dd>
-                </dl>
+                </x-ui.card>
             </section>
         @endif
 
@@ -63,11 +63,12 @@
             @endforeach
         </section>
 
-        <nav class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-grey-250 pt-4 text-sm" aria-label="{{ __('report.chapters.'.$key) }}">
-            <a href="{{ $chapterUrl }}">{{ __('report.back_to_chapter', ['chapter' => __('report.chapters.'.$key)]) }}</a>
-            @if ($next)
-                <a href="{{ $url('item', [$slug, $next['id']]) }}" class="font-semibold">{{ __('report.next_item', ['label' => $next['label']]) }}</a>
-            @endif
-        </nav>
+        <x-ui.page-nav
+            :label="__('report.chapters.'.$key)"
+            :back="$chapterUrl"
+            :back-label="__('report.back_to_chapter', ['chapter' => __('report.chapters.'.$key)])"
+            :next="$next ? $url('item', [$slug, $next['id']]) : null"
+            :next-label="$next ? __('report.next_item', ['label' => $next['label']]) : null"
+        />
     </div>
 </x-layouts::client>

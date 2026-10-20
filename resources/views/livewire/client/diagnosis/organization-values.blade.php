@@ -3,16 +3,14 @@
     <x-ui.flash />
 
     <div class="flex flex-col gap-1">
-        <p class="text-xl font-semibold">{{ __('diagnosis.organization_values.question') }}</p>
+        <h2 class="text-xl font-semibold">{{ __('diagnosis.organization_values.question') }}</h2>
         <p class="text-grey-700">{{ trans_choice('diagnosis.organization_values.count', count($items), ['count' => count($items)]) }}</p>
     </div>
 
     @if (! $canEdit)
-        <p class="rounded-card bg-grey-100 p-4 text-sm">
-            {{ $givenBy ? __('diagnosis.organization_values.given_by', ['name' => $givenBy]) : __('diagnosis.organization_values.readonly') }}
-        </p>
+        <x-ui.notice>{{ $givenBy ? __('diagnosis.organization_values.given_by', ['name' => $givenBy]) : __('diagnosis.organization_values.readonly') }}</x-ui.notice>
     @elseif ($hasVersion)
-        <p class="rounded-card bg-yellow-pale p-4 text-sm">{{ __('diagnosis.organization_values.version_warning') }}</p>
+        <x-ui.notice tone="warning">{{ __('diagnosis.organization_values.version_warning') }}</x-ui.notice>
     @endif
 
     <x-form.error name="items" id="items" />
@@ -20,20 +18,25 @@
     <ul class="flex flex-col gap-3">
         @foreach ($items as $index => $item)
             @php($isOpen = $canEdit && $openKey === $item['key'])
-            <li wire:key="org-{{ $item['key'] }}" class="flex flex-col gap-3 rounded-card bg-white p-5">
+            <x-ui.card as="li" wire:key="org-{{ $item['key'] }}" class="flex flex-col gap-3">
                 <div class="flex items-start justify-between gap-3">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <h2 class="text-lg font-semibold">{{ $item['name'] }}</h2>
+                    <div class="flex flex-wrap items-center gap-2 pt-2">
+                        <h3 class="text-lg font-semibold">{{ $item['name'] }}</h3>
                         @if ($item['value_id'] !== null && in_array($item['value_id'], $ownValueIds, true))
                             <x-ui.badge tone="coral">{{ __('diagnosis.organization_values.yours_too') }}</x-ui.badge>
                         @endif
                     </div>
                     @if ($canEdit)
-                        <div class="flex items-center gap-2">
-                            <button type="button" wire:click="toggle('{{ $item['key'] }}')" class="text-sm font-semibold underline" aria-expanded="{{ $isOpen ? 'true' : 'false' }}">{{ $isOpen ? __('diagnosis.close') : __('diagnosis.edit') }}</button>
-                            <button type="button" wire:click="remove('{{ $item['key'] }}')" class="rounded-pill p-1 hover:bg-grey-100">
-                                <x-megis.icon name="close" class="size-4" :label="__('diagnosis.own_values.remove', ['name' => $item['name']])" />
-                            </button>
+                        <div class="-mt-1 -mr-2 flex items-center gap-1">
+                            <x-ui.button tone="ghost" size="sm" wire:click="toggle('{{ $item['key'] }}')" aria-expanded="{{ $isOpen ? 'true' : 'false' }}">{{ $isOpen ? __('diagnosis.close') : __('diagnosis.edit') }}</x-ui.button>
+                            <x-ui.icon-button
+                                icon="close"
+                                :label="__('diagnosis.own_values.remove', ['name' => $item['name']])"
+                                wire:click="remove('{{ $item['key'] }}')"
+                                wire:confirm="{{ __('diagnosis.organization_values.remove_confirm', ['name' => $item['name']]) }}"
+                                data-confirm-tone="danger"
+                                :data-confirm-label="__('diagnosis.own_values.remove_yes')"
+                            />
                         </div>
                     @endif
                 </div>
@@ -70,12 +73,12 @@
                     <x-form.error :name="'items.'.$index.'.low_example'" :id="'items-'.$index.'-low'" />
                     <x-form.error :name="'items.'.$index.'.high_example'" :id="'items-'.$index.'-high'" />
                 @endif
-            </li>
+            </x-ui.card>
         @endforeach
     </ul>
 
     @if ($canEdit && ! $isFull)
-        <div class="grid gap-4 rounded-card bg-white p-5 sm:grid-cols-2">
+        <x-ui.card class="grid gap-4 sm:grid-cols-2">
             <form wire:submit="addFromLibrary" class="flex flex-col gap-2">
                 <x-form.select name="pickedValueId" wire:model="pickedValueId" :label="__('diagnosis.organization_values.library')">
                     <option value="">{{ __('diagnosis.organization_values.library_select') }}</option>
@@ -83,17 +86,17 @@
                         <option value="{{ $value->id }}">{{ $value->name }}</option>
                     @endforeach
                 </x-form.select>
-                <x-ui.button type="submit" tone="outline" size="sm" class="self-start">{{ __('diagnosis.organization_values.add') }}</x-ui.button>
+                <x-ui.button type="submit" tone="outline" size="sm" icon="plus" class="self-start">{{ __('diagnosis.organization_values.add') }}</x-ui.button>
             </form>
             <form wire:submit="addNew" class="flex flex-col gap-2">
                 <x-form.input name="newValueName" wire:model="newValueName" :label="__('diagnosis.organization_values.new_value')" />
-                <x-ui.button type="submit" tone="outline" size="sm" class="self-start">{{ __('diagnosis.organization_values.add') }}</x-ui.button>
+                <x-ui.button type="submit" tone="outline" size="sm" icon="plus" class="self-start">{{ __('diagnosis.organization_values.add') }}</x-ui.button>
             </form>
-        </div>
+        </x-ui.card>
     @endif
 
-    <div class="flex flex-wrap items-center gap-4">
-        <x-ui.button tone="coral" size="lg" wire:click="next" :disabled="$canEdit && count($items) < \App\Models\OrganizationValueSet::MIN_VALUES">{{ __('diagnosis.next') }}</x-ui.button>
-        <x-diagnosis.saved />
-    </div>
+    <x-diagnosis.next
+        wire:click="next"
+        :disabled-reason="$canEdit && count($items) < \App\Models\OrganizationValueSet::MIN_VALUES ? __('diagnosis.organization_values.too_few', ['min' => \App\Models\OrganizationValueSet::MIN_VALUES]) : null"
+    />
 </div>

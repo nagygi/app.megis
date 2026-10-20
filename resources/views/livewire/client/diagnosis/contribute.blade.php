@@ -4,36 +4,19 @@
 
     @if ($canContribute)
         <section class="flex flex-col gap-3" aria-labelledby="start-measure">
-            <h2 id="start-measure" class="font-semibold">{{ __('processes.occasions.measure') }}</h2>
+            <h2 id="start-measure" class="text-lg font-semibold">{{ __('processes.occasions.measure') }}</h2>
             @if ($canRecordMirror)
-                <a href="{{ route('client.mirror.record', ['organization' => $organization, 'diagnozis' => $diagnosis->id]) }}" class="flex items-center justify-between gap-3 rounded-card bg-white px-5 py-4 text-charcoal no-underline hover:bg-paper">
-                    <span>
-                        <span class="block font-semibold">{{ __('client.menu.mirror') }}</span>
-                        <span class="block text-sm text-grey-700">{{ __('processes.occasions.mirror_help') }}</span>
-                    </span>
-                    <x-megis.icon name="chevron-right" class="size-4 shrink-0" />
-                </a>
-                <a href="{{ route('client.diagnosis.situation', [$organization, $diagnosis]) }}" class="flex items-center justify-between gap-3 rounded-card bg-white px-5 py-4 text-charcoal no-underline hover:bg-paper">
-                    <span>
-                        <span class="block font-semibold">{{ __('processes.occasions.situation') }}</span>
-                        <span class="block text-sm text-grey-700">{{ __('processes.occasions.situation_help') }}</span>
-                    </span>
-                    <x-megis.icon name="chevron-right" class="size-4 shrink-0" />
-                </a>
+                <x-ui.link-row :href="route('client.mirror.record', ['organization' => $organization, 'diagnozis' => $diagnosis->id])" :title="__('client.menu.mirror')" :meta="__('processes.occasions.mirror_help')" />
+                <x-ui.link-row :href="route('client.diagnosis.situation', [$organization, $diagnosis])" :title="__('processes.occasions.situation')" :meta="__('processes.occasions.situation_help')" />
             @endif
         </section>
 
-        <form wire:submit="storeUpload" class="flex flex-col gap-3 rounded-card bg-white p-5">
-            <h2 class="font-semibold">{{ __('processes.occasions.upload') }}</h2>
-            <div class="flex flex-col gap-1.5">
-                <label for="occasion-file" class="text-sm font-medium">{{ __('processes.occasions.file') }}</label>
-                <input id="occasion-file" type="file" wire:model="file" aria-describedby="occasion-file-help" class="text-base">
-                <p id="occasion-file-help" class="text-sm text-grey-600">{{ __('admin.upload.rules', $rules) }}</p>
-                <div wire:loading wire:target="file" class="text-sm" role="status">{{ __('admin.upload.uploading') }}</div>
-                <x-form.error name="file" id="file" />
-            </div>
-            <x-ui.button type="submit" tone="dark" size="sm" class="self-start" wire:loading.attr="disabled" wire:target="file,storeUpload">{{ __('processes.occasions.upload_button') }}</x-ui.button>
-        </form>
+        <x-ui.card as="form" wire:submit="storeUpload" class="flex flex-col gap-3">
+            <h2 class="text-lg font-semibold">{{ __('processes.occasions.upload') }}</h2>
+            <x-form.file name="file" id="occasion-file" wire:model="file" :label="__('processes.occasions.file')" :help="__('processes.occasions.upload_rules', $rules)" />
+            <div wire:loading wire:target="file" class="text-sm" role="status">{{ __('processes.occasions.uploading') }}</div>
+            <x-ui.button type="submit" size="sm" icon="upload" class="self-start" wire:loading.attr="disabled" wire:target="file">{{ __('processes.occasions.upload_button') }}</x-ui.button>
+        </x-ui.card>
 
         @if ($this->isLeader())
             <p class="text-sm text-grey-700">
@@ -46,15 +29,15 @@
             </p>
         @endif
     @else
-        <p class="rounded-card bg-grey-100 p-4 text-sm">{{ __('processes.occasions.closed') }}</p>
+        <x-ui.notice>{{ __('processes.occasions.closed') }}</x-ui.notice>
     @endif
 
     @if ($openMaterials->isNotEmpty())
         <section class="flex flex-col gap-2" aria-labelledby="processing">
-            <h2 id="processing" class="font-semibold">{{ __('processes.occasions.processing_title') }} · {{ $openMaterials->count() }}</h2>
+            <h2 id="processing" class="text-lg font-semibold">{{ __('processes.occasions.processing_title') }} · {{ $openMaterials->count() }}</h2>
             <ul class="flex flex-col gap-2">
                 @foreach ($openMaterials as ['material' => $material, 'state' => $state])
-                    <li wire:key="material-{{ $material->uuid }}" class="flex flex-wrap items-center justify-between gap-3 rounded-card bg-white px-4 py-3">
+                    <x-ui.card as="li" padding="sm" wire:key="material-{{ $material->uuid }}" class="flex flex-wrap items-center justify-between gap-3">
                         <span>
                             <span class="block font-semibold">{{ $material->is_situation ? __('processes.occasions.situation') : ($material->original_name ?? $material->source->label()) }}</span>
                             <span class="block text-sm text-grey-700">
@@ -65,22 +48,22 @@
                         @if ($canContribute)
                             <span class="flex flex-wrap gap-2">
                                 @if ($state === 'failed')
-                                    <x-ui.button size="sm" tone="outline" wire:click="retry('{{ $material->uuid }}')">{{ __('processes.occasions.retry') }}</x-ui.button>
-                                    <x-ui.button size="sm" tone="outline" wire:click="remove('{{ $material->uuid }}')" wire:confirm="{{ __('processes.occasions.confirm_remove') }}">{{ __('processes.occasions.remove') }}</x-ui.button>
+                                    <x-ui.button size="sm" tone="outline" icon="refresh" wire:click="retry('{{ $material->uuid }}')">{{ __('processes.occasions.retry') }}</x-ui.button>
+                                    <x-ui.button size="sm" tone="danger" wire:click="remove('{{ $material->uuid }}')" wire:confirm="{{ __('processes.occasions.confirm_remove') }}" data-confirm-tone="danger">{{ __('processes.occasions.remove') }}</x-ui.button>
                                 @elseif ($state === 'unplaced')
-                                    <x-ui.button size="sm" :href="route('client.diagnosis.place', [$organization, $diagnosis, $material])">{{ __('processes.occasions.place') }}</x-ui.button>
+                                    <x-ui.button size="sm" icon-right="chevron-right" :href="route('client.diagnosis.place', [$organization, $diagnosis, $material])">{{ __('processes.occasions.place') }}</x-ui.button>
                                 @elseif ($state === 'experience_open')
-                                    <x-ui.button size="sm" :href="route('client.diagnosis.occasion-experience', [$organization, $diagnosis, $material])">{{ __('processes.occasions.finish') }}</x-ui.button>
+                                    <x-ui.button size="sm" icon-right="chevron-right" :href="route('client.diagnosis.occasion-experience', [$organization, $diagnosis, $material])">{{ __('processes.occasions.finish') }}</x-ui.button>
                                 @endif
                             </span>
                         @endif
-                    </li>
+                    </x-ui.card>
                 @endforeach
             </ul>
         </section>
     @endif
 
     @if ($materials->isNotEmpty())
-        <a href="{{ route('client.diagnosis.situations', [$organization, $diagnosis]) }}" class="self-start text-sm font-semibold">{{ __('processes.occasions.situations_link') }}</a>
+        <x-ui.link-row :href="route('client.diagnosis.situations', [$organization, $diagnosis])" :title="__('processes.occasions.situations_link')" />
     @endif
 </div>

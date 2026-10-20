@@ -18,13 +18,10 @@
             @click="toggle()"
             :aria-pressed="recording"
             :disabled="uploading || {{ $pending ? 'true' : 'false' }}"
-            class="press inline-flex items-center gap-1.5 rounded-pill border border-charcoal px-3 py-1 font-semibold disabled:cursor-wait disabled:opacity-60"
-            :class="recording && 'bg-coral text-black border-coral'"
+            class="press inline-flex min-h-10 items-center gap-2 rounded-pill border-[1.5px] border-charcoal px-4 font-semibold hover:bg-yellow-pale disabled:cursor-wait disabled:border-grey-300 disabled:text-grey-600"
+            :class="recording && 'border-coral bg-coral text-black hover:bg-coral-light'"
         >
-            <svg viewBox="0 0 24 24" class="size-4" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="9" y="3" width="6" height="11" rx="3" />
-                <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
-            </svg>
+            <x-megis.icon name="mic" />
             <span x-text="recording ? @js(__('diagnosis.dictation.stop')) : @js(__('diagnosis.dictation.start'))"></span>
             <span class="sr-only">· {{ $label }}</span>
         </button>

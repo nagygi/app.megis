@@ -24,7 +24,7 @@
     $circumference = 2 * M_PI * 54;
 @endphp
 
-    <section x-data="mirrorRecorder(@js($recorderConfig))" class="flex flex-col items-center gap-5 rounded-card bg-white p-6" aria-live="polite">
+    <x-ui.card as="section" padding="lg" x-data="mirrorRecorder(@js($recorderConfig))" class="flex flex-col items-center gap-5" aria-live="polite">
         <template x-if="! supported">
             <p class="text-center">{{ __('mirror.unsupported') }}</p>
         </template>
@@ -58,7 +58,7 @@
             <p x-show="state === 'recorded' && isShort" class="text-center text-sm text-grey-700">{{ __('mirror.short') }}</p>
 
             <div class="flex flex-wrap justify-center gap-3">
-                <x-ui.button size="lg" x-show="state === 'idle'" x-on:click="start()">{{ __('mirror.record_start') }}</x-ui.button>
+                <x-ui.button size="lg" icon="mic" x-show="state === 'idle'" x-on:click="start()">{{ __('mirror.record_start') }}</x-ui.button>
                 <x-ui.button size="lg" x-show="state === 'recording'" x-on:click="stop()">{{ __('mirror.record_stop') }}</x-ui.button>
                 <x-ui.button size="lg" x-show="state === 'recorded'" x-on:click="submit()">{{ __('mirror.submit') }}</x-ui.button>
                 <x-ui.button size="lg" tone="outline" x-show="state === 'recorded'" x-on:click="restart()">{{ __('mirror.restart') }}</x-ui.button>
@@ -67,4 +67,4 @@
         </div>
 
         <x-form.error name="recording" id="recording" />
-    </section>
+    </x-ui.card>

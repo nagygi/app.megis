@@ -3,19 +3,21 @@
     <div class="flex max-w-md flex-col gap-5">
         <ul class="flex flex-col gap-3">
             @foreach ($versions as $version)
-                <li class="rounded-card border border-grey-250 bg-white p-4">
+                <x-ui.card as="li" padding="sm" bordered class="flex flex-col items-start gap-2">
                     <p class="font-semibold">{{ __('auth_ui.legal.changed', ['document' => $version->type->label()]) }}</p>
-                    <a href="{{ route('legal.show', $version->type->value) }}" target="_blank" class="font-semibold text-charcoal">{{ __('auth_ui.legal.open') }}</a>
-                </li>
+                    <x-ui.button tone="outline" size="sm" icon="document" :href="route('legal.show', $version->type->value)" target="_blank" rel="noopener">
+                        {{ __('auth_ui.legal.open') }}<span class="sr-only"> ({{ __('ui.new_tab') }})</span>
+                    </x-ui.button>
+                </x-ui.card>
             @endforeach
         </ul>
 
         @if ($isImpersonating)
-            <p class="rounded-card bg-yellow-pale p-4">{{ __('auth_ui.legal.impersonating') }}</p>
+            <x-ui.notice tone="warning">{{ __('auth_ui.legal.impersonating') }}</x-ui.notice>
         @else
             <form method="POST" action="{{ route('client.legal.store') }}">
                 @csrf
-                <x-ui.button type="submit" size="lg">{{ __('auth_ui.legal.accept') }}</x-ui.button>
+                <x-ui.button type="submit" size="lg" icon-right="arrow-right">{{ __('auth_ui.legal.accept') }}</x-ui.button>
             </form>
         @endif
 

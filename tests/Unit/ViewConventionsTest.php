@@ -79,8 +79,6 @@ it('uses only the brand weights: 400, 500, 600 and 800', function () {
 it('draws icons with x-megis.icon, not with Unicode signs', function () {
     expect(viewsBreaking(fn (string $source) => (bool) preg_match('/[‹›←→↑↓↕×▲▼⋮✓✔✕✖]/u', $source)))
         ->toEqual([
-            'client/partials/menu.blade.php',
-            'client/report/appendix.blade.php',
             'livewire/admin/clients/show.blade.php',
             'livewire/admin/diagnoses/show.blade.php',
             'livewire/admin/main-diagnoses/reading.blade.php',
@@ -88,9 +86,6 @@ it('draws icons with x-megis.icon, not with Unicode signs', function () {
             'livewire/admin/organizations/values.blade.php',
             'livewire/admin/partials/version-history.blade.php',
             'livewire/admin/support-questions/index.blade.php',
-            'livewire/client/diagnosis/overview-running.blade.php',
-            'livewire/client/value-library.blade.php',
-            'livewire/mirror/result.blade.php',
         ]);
 });
 
@@ -98,17 +93,6 @@ it('builds white cards with x-ui.card', function () {
     // The design system's own surfaces (card, dialog, menus) live in components/ui.
     expect(viewsBreaking(fn (string $source, string $path) => ! str_starts_with($path, 'components/ui/') && hasInlineCard($source)))
         ->toEqual([
-            'client/home.blade.php',
-            'client/legal-acceptance.blade.php',
-            'client/report/answer.blade.php',
-            'client/report/appendix.blade.php',
-            'client/report/chapter.blade.php',
-            'client/report/item.blade.php',
-            'client/report/snapshot.blade.php',
-            'client/report/takeaway.blade.php',
-            'client/wisdom/index.blade.php',
-            'client/wisdom/show.blade.php',
-            'components/recorder.blade.php',
             'livewire/admin/admin-users/form.blade.php',
             'livewire/admin/capabilities/form.blade.php',
             'livewire/admin/capabilities/import.blade.php',
@@ -144,30 +128,5 @@ it('builds white cards with x-ui.card', function () {
             'livewire/admin/system/overview.blade.php',
             'livewire/admin/value-categories/form.blade.php',
             'livewire/admin/values/form.blade.php',
-            'livewire/client/diagnosis/brand.blade.php',
-            'livewire/client/diagnosis/contribute.blade.php',
-            'livewire/client/diagnosis/experience.blade.php',
-            'livewire/client/diagnosis/invitation.blade.php',
-            'livewire/client/diagnosis/occasion-experience.blade.php',
-            'livewire/client/diagnosis/organization-values.blade.php',
-            'livewire/client/diagnosis/overview-peer.blade.php',
-            'livewire/client/diagnosis/overview-published.blade.php',
-            'livewire/client/diagnosis/overview-running.blade.php',
-            'livewire/client/diagnosis/own-values.blade.php',
-            'livewire/client/diagnosis/place-material.blade.php',
-            'livewire/client/diagnosis/process-calendar.blade.php',
-            'livewire/client/diagnosis/process-conversation.blade.php',
-            'livewire/client/diagnosis/process-list.blade.php',
-            'livewire/client/diagnosis/process-summary.blade.php',
-            'livewire/client/diagnosis/processes.blade.php',
-            'livewire/client/diagnosis/situations.blade.php',
-            'livewire/client/diagnosis/visibility.blade.php',
-            'livewire/client/process-library.blade.php',
-            'livewire/client/process-sheet.blade.php',
-            'livewire/client/profile.blade.php',
-            'livewire/client/report/feedback.blade.php',
-            'livewire/client/value-library.blade.php',
-            'livewire/mirror/record.blade.php',
-            'livewire/mirror/result.blade.php',
         ]);
 });

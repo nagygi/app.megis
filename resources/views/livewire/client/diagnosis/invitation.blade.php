@@ -8,21 +8,24 @@
     <p class="text-lg">{{ __('diagnosis.invitation.lead', ['leader' => $leaderName, 'subject' => $main->subjectName(), 'minutes' => config('diagnosis.peer_minutes')]) }}</p>
 
     @if (! $main->acceptsInput())
-        <p class="rounded-card bg-grey-100 p-4">{{ __('diagnosis.invitation.closed') }}</p>
+        <x-ui.notice>{{ __('diagnosis.invitation.closed') }}</x-ui.notice>
     @else
-        <form wire:submit="start" class="flex flex-col gap-5 rounded-card bg-white p-5">
-            <div class="flex flex-col gap-1">
-                <x-form.checkbox name="answersConsent" wire:model.live="answersConsent" :label="__('diagnosis.consent.answers', ['leader' => $leaderName])" :help="__('diagnosis.consent.answers_help')" />
-            </div>
+        <x-ui.card as="form" wire:submit="start" class="flex flex-col gap-5">
+            <x-form.checkbox name="answersConsent" wire:model.live="answersConsent" :label="__('diagnosis.consent.answers', ['leader' => $leaderName])" :help="__('diagnosis.consent.answers_help')" />
 
             @if ($main->show_peer_quotes)
                 <x-form.checkbox name="quotesConsent" wire:model="quotesConsent" :label="__('diagnosis.consent.quotes')" :help="__('diagnosis.consent.quotes_help')" />
             @endif
 
-            <div class="flex flex-wrap items-center gap-3">
-                <x-ui.button type="submit" tone="dark" size="lg" :disabled="! $answersConsent">{{ __('diagnosis.invitation.start') }}</x-ui.button>
-                <a href="{{ route('client.home', $main->diagnosis->organization) }}" class="font-semibold">{{ __('diagnosis.invitation.later') }}</a>
+            <div class="flex flex-col gap-2">
+                <div class="flex flex-wrap items-center gap-3">
+                    <x-ui.button type="submit" size="lg" icon-right="arrow-right" :disabled="! $answersConsent">{{ __('diagnosis.invitation.start') }}</x-ui.button>
+                    <x-ui.button tone="ghost" :href="route('client.home', $main->diagnosis->organization)">{{ __('diagnosis.invitation.later') }}</x-ui.button>
+                </div>
+                @unless ($answersConsent)
+                    <p class="text-sm text-grey-700">{{ __('diagnosis.invitation.consent_needed') }}</p>
+                @endunless
             </div>
-        </form>
+        </x-ui.card>
     @endif
 </div>

@@ -13,6 +13,7 @@
 @endphp
 <x-layouts::client :title="__('report.question.compare')" color="green" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$url('internal')" :back-label="__('report.question.internal')">
     <div class="flex max-w-2xl flex-col gap-6">
+        <x-ui.card padding="none" class="relative overflow-x-auto px-5 py-2">
         <table class="w-full text-left text-sm">
             <thead>
                 <tr class="border-b border-grey-250">
@@ -26,7 +27,7 @@
                 @foreach ($keys as $key)
                     @php($you = $mine->get($key)['score'] ?? null)
                     @php($teamScore = $team->get($key)['score'] ?? null)
-                    <tr class="border-b border-grey-200">
+                    <tr class="border-b border-grey-200 last:border-b-0">
                         <th scope="row" class="py-2 font-normal">{{ $team->get($key)['label'] }}</th>
                         <td class="py-2 text-right tabular-nums">{{ $whole($you) }}</td>
                         <td @class(['py-2 text-right tabular-nums', 'font-semibold text-coral-ink' => $you !== null && $teamScore !== null && abs($you - $teamScore) >= 2])>{{ $whole($teamScore) }}</td>
@@ -35,6 +36,7 @@
                 @endforeach
             </tbody>
         </table>
+        </x-ui.card>
 
         <p>
             {{ __('report.compare.sentence', [
@@ -47,6 +49,6 @@
             @endif
         </p>
 
-        <a href="{{ $url('internal') }}" class="self-start font-semibold">{{ __('report.back_to_chapter', ['chapter' => __('report.question.internal')]) }}</a>
+        <x-ui.page-nav :label="__('report.question.compare')" :back="$url('internal')" :back-label="__('report.back_to_chapter', ['chapter' => __('report.question.internal')])" />
     </div>
 </x-layouts::client>

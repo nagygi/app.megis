@@ -6,7 +6,7 @@
 @endphp
 <x-layouts::client :title="__('report.title')" color="light-yellow" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$homeUrl" :back-label="__('diagnosis.home_back')">
     <div class="flex max-w-2xl flex-col gap-6">
-        <h2 class="text-2xl font-semibold">{{ __('report.question.answer') }}</h2>
+        <h2 class="text-xl font-semibold">{{ __('report.question.answer') }}</h2>
 
         @if ($report['processes']['measured'] !== [])
             <p class="text-grey-700">
@@ -15,13 +15,13 @@
             </p>
         @endif
 
-        <section class="flex flex-col items-center gap-3 rounded-card bg-white p-6 text-center sm:flex-row sm:text-left" aria-label="{{ __('report.ring.label') }}">
+        <x-ui.card as="section" padding="lg" class="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left" aria-label="{{ __('report.ring.label') }}">
             <x-report.ring :percent="$ring['percent']" />
             <div class="flex flex-col gap-1">
                 <p class="text-lg font-semibold">{{ __('report.ring.label') }}</p>
                 <p class="text-grey-700">{{ __('report.ring.points', ['points' => $ring['points'], 'max' => $ring['max'], 'count' => $ring['measuring_points']]) }}</p>
             </div>
-        </section>
+        </x-ui.card>
         <x-report.scale :value="$ring['step']" />
 
         @foreach (['values', 'brand', 'processes'] as $key)
@@ -64,14 +64,17 @@
         @endif
 
         @if (isset($report['chapters']['brand']))
-            <a href="{{ $url('chapter', ['markad-alapja']) }}" class="font-semibold">{{ __('report.snapshot.brand_link') }}</a>
+            <x-ui.link-row tone="yellow" :href="$url('chapter', ['markad-alapja'])" :title="__('report.snapshot.brand_link')" />
         @endif
 
         @if (filled(config('megis.booking_url')))
-            <a href="{{ config('megis.booking_url') }}" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-card bg-white px-5 py-4 text-charcoal no-underline hover:bg-paper">
+            <x-ui.card class="flex flex-wrap items-center justify-between gap-3">
                 <span>{{ __('report.snapshot.deeper') }}</span>
-                <span class="font-semibold">{{ __('report.snapshot.deeper_action') }}</span>
-            </a>
+                <x-ui.button size="sm" icon-right="arrow-right" :href="config('megis.booking_url')" target="_blank" rel="noopener">
+                    {{ __('report.snapshot.deeper_action') }}
+                    <span class="sr-only">({{ __('ui.new_tab') }})</span>
+                </x-ui.button>
+            </x-ui.card>
         @endif
 
         @unless ($preview)

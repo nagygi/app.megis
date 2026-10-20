@@ -3,6 +3,6 @@
     <form method="POST" action="{{ route('client.login.link.store', $token) }}" class="flex max-w-md flex-col gap-5">
         @csrf
         <p>{{ __('auth_ui.customer.link_lead') }}</p>
-        <x-ui.button type="submit" size="lg" class="self-start">{{ __('auth_ui.customer.link_button') }}</x-ui.button>
+        <x-ui.button type="submit" size="lg" icon-right="arrow-right" class="self-start">{{ __('auth_ui.customer.link_button') }}</x-ui.button>
     </form>
 </x-layouts::client>

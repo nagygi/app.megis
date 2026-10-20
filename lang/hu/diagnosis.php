@@ -34,6 +34,8 @@ return [
     'overview_back' => 'Mi vár rád',
     'home_back' => 'Kezdőlap',
     'locked' => 'Ez a lépés már nem módosítható.',
+    'progress' => 'Lépés: :current / :total',
+    'unsaved' => 'A válaszaid még nincsenek elküldve. Biztosan elmész?',
     'peer_link' => 'A(z) :subject diagnózisában társ vagy',
     'peer_steps_lead' => 'Két lépés most, egy, amíg fut.',
     'peer_add' => 'Hozzáteszel',
@@ -63,6 +65,7 @@ return [
         'start' => 'Kezdem',
         'later' => 'Nem most',
         'closed' => 'A diagnózis kitöltése lezárult.',
+        'consent_needed' => 'A kezdéshez pipáld be a válaszaidhoz adott hozzájárulást.',
     ],
 
     // The texts agreed to are stored with the consent; a new wording needs a new version (25 · 25.2).
@@ -78,7 +81,8 @@ return [
     // V10, V10·b · the leader's home while it runs and is read (26 · 26.1, 26.2).
     'home' => [
         'title' => 'A ti diagnózisotok',
-        'subtitle' => ':product · :stage · :from → :to',
+        'subtitle' => ':product · :stage · :from – :to',
+        'conversations_title' => 'Beszélgetések a mégisszel',
         'ring' => 'Belső működés · :count mérőpont',
         'where' => 'Hol tartunk',
         'week_of' => ':current. hét / :count',
@@ -92,7 +96,7 @@ return [
         'onboarding_help' => 'értékek · folyamatok · a márkád alapja · :date',
         'peers' => 'Társak',
         'peers_count' => ':answered / :total kitöltötte',
-        'remind' => 'Emlékeztető',
+        'remind' => 'Emlékeztetem őket',
         'reminded' => 'Szóltunk azoknak, akik még nem töltötték ki.',
         'missing_peers' => '{1} Még :count társ hangja kell, hogy lássátok a rést.|[2,*] Még :count társ hangja kell, hogy lássátok a rést.',
         'conversations' => ':held megtartva',
@@ -110,6 +114,7 @@ return [
     'published_home' => [
         'subtitle' => ':product · publikálva :date',
         'points' => ':points / :max pont',
+        'pdf' => 'PDF',
         'internal' => 'Belső működés · értékek · folyamatok · területek',
         'snapshot' => 'Belső működés · értékek · folyamatok · a márkád alapja',
         'brand' => 'A márkád alapja · gyökér · törzs · korona · árnyék',
@@ -147,7 +152,7 @@ return [
         'megis_not' => 'a publikálásig olvas, utána csak a te kérésedre',
         'sees' => 'látja',
         'not' => 'nem látja',
-        'go_to_missing' => 'Ugrás a lépéshez',
+        'go_to_missing' => 'Megnyitom a lépést',
         'start' => 'Indul a diagnózis',
         'started' => 'Elindult a diagnózis.',
         'running' => 'A diagnózis már fut. Ez a lap a végéig érvényes.',
@@ -173,13 +178,15 @@ return [
             'none' => 'még nincs beépítve',
         ],
         'remove' => ':name kivétele',
+        'remove_confirm' => 'Kiveszed a(z) :name értéket a listádból? A leírásod is elvész.',
+        'remove_yes' => 'Kiveszem',
         'meaning_for_you' => 'Mit jelent neked',
         'meaning_missing' => 'Írd le, mit jelent neked.',
         'for_example' => 'Például',
         'source_mirror' => 'az Értéktükörből · :count / :total helyzetedben',
         'source_added_seen' => 'hozzáadva · :count / :total helyzetedben',
         'source_added' => 'hozzáadva · még nincs róla helyzet',
-        'new_value' => '+ Új érték',
+        'new_value' => 'Új érték',
         'where_from' => 'Honnan hozod?',
         'locked' => 'A diagnózis publikálva: a saját értékeid itt már csak olvashatók.',
         'add_title' => 'Érték hozzáadása',
@@ -217,6 +224,7 @@ return [
         'name_taken' => 'Ilyen nevű érték már van a listán.',
         'too_few' => 'Legalább :min érték kell.',
         'too_many' => 'Legfeljebb :max érték lehet.',
+        'remove_confirm' => 'Kiveszed a(z) :name értéket a szervezet értékei közül? A leírása is elvész.',
         'values' => 'A szervezet értékei',
         'fields' => [
             'name' => 'Érték',
@@ -231,6 +239,7 @@ return [
     'brand' => [
         'question' => 'Mit mond rólatok a fa?',
         'count' => ':done / 4 kész',
+        'next_hint' => 'A továbblépéshez mind a négy kérdésre válaszolj.',
         'given_by' => 'A márkád alapját :name adta meg.',
         'questions' => [
             'root' => 'Mik a szervezet értékei?',
@@ -280,7 +289,7 @@ return [
     'dictation' => [
         'label' => 'Felvétel',
         'start' => 'Elmondom',
-        'stop' => 'Kész',
+        'stop' => 'Leállítom',
         'uploading' => 'Feltöltés…',
         'transcribing' => 'Átírás…',
         'failed' => 'Nem sikerült átírni. Próbáld újra, vagy írd be.',

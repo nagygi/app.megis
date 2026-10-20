@@ -2,6 +2,54 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.23 · {hash} · 2026-10-21
+
+UI-finomhangolás, 6. lépés: az ügyfél képernyői az új komponenseken.
+
+- **Diagnózis-lépések:**
+  - Lépésjelző sáv a fejlécben a „3 / 6” alatt.
+  - A „Tovább” mindenhol ugyanaz: szén, nagy, nyíllal; mellette a „Mentve”. Eddig hét helyen coral, egy helyen szén volt.
+  - Ha még nem lehet továbblépni, a gomb alatt ott az ok („Még 2 sorra kell válasz.”); eddig csak szürke volt.
+  - A lépés kérdése címsor (h2), az alatta lévő blokkok h3-ak.
+  - Hibás küldés után a fókusz az első hibás mezőre ugrik, akár a lap tetején van.
+  - A megélés-skála elfér a telefonon: a hat pont egyenlő oszlopban, alattuk a „nem tudom”. Eddig 390 px-en átcsúszott.
+  - A saját és a szervezeti érték törlése megerősítést kér; eddig egy „×” azonnal törölt.
+  - Az alkalom-megélés figyelmeztet, ha beküldetlen válaszokkal hagynák el az oldalt. Autosave helyett: az adatmodellt nem érinti.
+- **Egységes elemek:**
+  - Kártyák, link-sorok (cím, alcím, chevron), értesítő dobozok, üres állapotok és lenyitható szakaszok chevronnal (eddig háromféle jelölés vagy semmi).
+  - Szegmentált kapcsolók hét helyen (felvétel/leírás, riport-nézet, folyamatfajta, visszajelzés, belépési mód); eddig ötféle kinézet.
+  - Választócsempék, fájlmezők, mező és gomb egy sorban.
+  - Minden eltávolító gomb 44 px-es ikon-gomb; eddig 24 és 12 px.
+- **Riport:**
+  - A szakaszcímek kisebbek a fejléc címénél.
+  - Egységes lapozó-lábléc: balra a hely vagy a vissza, jobbra a „Következő” gomb. Eddig négyféle volt.
+  - A csapat-nézet tiltva is megmondja, miért (eddig csak egérrel olvasható súgóban).
+  - A Markdown-szövegek formázva jelennek meg (felsorolás, címsor); eddig a stílus hiányzott.
+  - A „›” és „→” jelek helyén ikonok vannak.
+- **Értéktükör:**
+  - Az ügyfélfelületen nincs dupla h1.
+  - A gomb-másolatok helyén a közös gombok; a foglalás gombja a beleegyezésig valóban tiltott.
+  - A feldolgozás szimbóluma pulzál, nem forog (a design system nem forgatja a szimbólumokat).
+- **Belépés és regisztráció:**
+  - A jelszavas belépés kapcsolója a „Belépek” elé került.
+  - A kódmező csak számjegyet fogad; a beillesztett kódból kiszűri a szóközt.
+  - Az újraküldés visszaszámlálója nem szól másodpercenként a képernyőolvasóban.
+  - A „Másik e-mail” egyszer szerepel.
+  - A regisztrációnál a jelszó megismétlése csak jelszó után jelenik meg, és a tiltott gomb alatt ott az oka.
+  - Az új lapon nyíló linkek ezt kimondják.
+- **Profil:**
+  - A „Mentve” ugyanaz, mint a lépéseken.
+  - A kódmezők hat számjegyesek.
+  - A hozzájárulás visszavonása, a naptár lecsatolása és a hang törlése törlés-tónusú.
+- **Folyamat-adatlap:** egy visszaút; a „Kész” és a „Vissza a listához” ugyanoda vitt.
+- **Szövegek:**
+  - A gombok első személyű igék: „Összekötöm a naptárat”, „Mentem a jelszót”, „Elküldöm”, „Emlékeztetem őket”, „Elkezdem a felvételt”, „Rutint adok hozzá”, „Megnyitom”, „Átnevezem”, „Kijelentkezem”.
+  - A három jelentésű „Kész” helyett „Befejezem”, illetve „Leállítom”.
+  - A dátumtartományok kötőjellel jelennek meg.
+  - Az ügyfélnézetek saját nyelvi kulcsokat kaptak az admin kulcsok helyett; a „PHI” és a „PDF” fordítókulcsból jön.
+  - Egy fő nézete egyes számban szól („látod”), nem „látjátok”.
+- **Konvenció-teszt:** az ügyfél és a közös nézetek kivétel nélkül teljesítik a kártya- és ikonszabályt.
+
 ## 1.22 · 4530bdf · 2026-10-21
 
 UI-finomhangolás, 5. lépés: a közös komponenskészlet. A képernyők a 6–7. lépésben állnak át rá.

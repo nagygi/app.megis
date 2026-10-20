@@ -3,7 +3,7 @@
 <x-layouts::client :title="__('report.title')" color="light-yellow" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$url('show')" :back-label="__('report.ring.label')">
     <div class="flex max-w-2xl flex-col gap-6">
         <div class="flex flex-col gap-2">
-            <h2 class="text-2xl font-semibold">{{ __('report.closing.title') }}</h2>
+            <h2 class="text-xl font-semibold">{{ __('report.closing.title') }}</h2>
             <p class="text-grey-700">{{ __('report.closing.lead') }}</p>
         </div>
 
@@ -22,15 +22,18 @@
 
         @if (filled(config('megis.booking_url')))
             <div>
-                <x-ui.button tone="coral" size="lg" :href="config('megis.booking_url')" target="_blank" rel="noopener">{{ __('report.closing.book') }}</x-ui.button>
+                <x-ui.button size="lg" icon-right="arrow-right" :href="config('megis.booking_url')" target="_blank" rel="noopener">
+                    {{ __('report.closing.book') }}
+                    <span class="sr-only">({{ __('ui.new_tab') }})</span>
+                </x-ui.button>
             </div>
         @endif
 
-        <p class="flex gap-4 text-sm">
+        <div class="flex flex-wrap gap-2">
             @unless ($preview)
-                <a href="{{ $url('pdf') }}">{{ __('report.closing.pdf') }}</a>
+                <x-ui.button tone="outline" size="sm" icon="document" :href="$url('pdf')">{{ __('report.closing.pdf') }}</x-ui.button>
             @endunless
-            <a href="{{ $url('appendix') }}">{{ __('report.appendix_link') }}</a>
-        </p>
+            <x-ui.button tone="outline" size="sm" icon="document" :href="$url('appendix')">{{ __('report.appendix_link') }}</x-ui.button>
+        </div>
     </div>
 </x-layouts::client>

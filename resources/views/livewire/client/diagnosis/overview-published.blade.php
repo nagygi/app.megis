@@ -10,56 +10,51 @@
 <div class="flex max-w-2xl flex-col gap-6">
     <x-ui.flash />
 
-    <section class="flex flex-col items-center gap-3 rounded-card bg-white p-6 text-center sm:flex-row sm:text-left" aria-label="{{ __('report.ring.label') }}">
+    <x-ui.card as="section" padding="lg" class="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left" aria-label="{{ __('report.ring.label') }}">
         <x-report.ring :percent="$ring['percent']" />
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col items-center gap-1 sm:items-start">
             <p class="text-lg font-semibold">{{ __('report.ring.label') }}</p>
             <p class="text-grey-700">{{ __('diagnosis.published_home.points', ['points' => $ring['points'], 'max' => $ring['max']]) }}</p>
-            <a href="{{ route('client.wisdom.show', [$organization, 'szazalek-es-pontok']) }}" class="text-sm font-semibold">{{ __('report.ring.what') }}</a>
+            <x-ui.button tone="ghost" size="sm" :href="route('client.wisdom.show', [$organization, 'szazalek-es-pontok'])">{{ __('report.ring.what') }}</x-ui.button>
         </div>
-    </section>
+    </x-ui.card>
 
     @if ($gap)
-        <a href="{{ route('client.report.item', [$organization, $diagnosis, \App\Services\Report\ReportService::SLUGS[$gap['chapter']], $gap['id']]) }}" class="flex flex-col gap-2 rounded-card bg-charcoal p-5 text-cream no-underline on-dark">
-            <span class="text-xs font-semibold uppercase tracking-wide text-coral-light">{{ __('report.biggest_gap') }}</span>
-            <span>{{ __('report.biggest_gap_sentence', ['label' => $gap['label'], 'sentence' => ReportText::gap($gap, $report['meta']) ?? '']) }}</span>
+        <a href="{{ route('client.report.item', [$organization, $diagnosis, \App\Services\Report\ReportService::SLUGS[$gap['chapter']], $gap['id']]) }}" class="press on-dark flex items-start justify-between gap-3 rounded-card bg-charcoal p-5 text-cream no-underline hover:bg-grey-700">
+            <span class="flex flex-col gap-2">
+                <span class="text-xs font-semibold tracking-wide text-coral-light uppercase">{{ __('report.biggest_gap') }}</span>
+                <span>{{ __('report.biggest_gap_sentence', ['label' => $gap['label'], 'sentence' => ReportText::gap($gap, $report['meta']) ?? '']) }}</span>
+            </span>
+            <x-megis.icon name="chevron-right" class="mt-6 shrink-0" />
         </a>
     @elseif ($snapshot && $report['crack'])
-        <a href="{{ route('client.report.show', [$organization, $diagnosis]) }}" class="flex flex-col gap-2 rounded-card bg-charcoal p-5 text-cream no-underline on-dark">
-            <span class="text-xs font-semibold uppercase tracking-wide text-coral-light">{{ __('report.breakpoint_marker') }}</span>
-            <span>{{ $report['crack']['text'] }}</span>
+        <a href="{{ route('client.report.show', [$organization, $diagnosis]) }}" class="press on-dark flex items-start justify-between gap-3 rounded-card bg-charcoal p-5 text-cream no-underline hover:bg-grey-700">
+            <span class="flex flex-col gap-2">
+                <span class="text-xs font-semibold tracking-wide text-coral-light uppercase">{{ __('report.breakpoint_marker') }}</span>
+                <span>{{ $report['crack']['text'] }}</span>
+            </span>
+            <x-megis.icon name="chevron-right" class="mt-6 shrink-0" />
         </a>
     @elseif (! $report['meta']['shows_experience'])
         {{-- Below the threshold there is no gap: no row is named (Extra inputok 1). --}}
-        <div class="flex flex-col gap-2 rounded-card bg-charcoal p-5 text-cream on-dark">
-            <span class="text-xs font-semibold uppercase tracking-wide text-coral-light">{{ __('report.biggest_gap') }}</span>
+        <div class="on-dark flex flex-col gap-2 rounded-card bg-charcoal p-5 text-cream">
+            <span class="text-xs font-semibold tracking-wide text-coral-light uppercase">{{ __('report.biggest_gap') }}</span>
             <span>{{ ReportText::missingPeers($report['meta']) }}</span>
         </div>
     @endif
 
     {{-- Mélyítés, live (26 · 26.3) --}}
     <ul class="flex flex-col gap-2">
-        @unless ($snapshot)
-            <li>
-                <a href="{{ route('client.report.internal', [$organization, $diagnosis]) }}" class="flex items-center justify-between gap-3 rounded-card bg-green px-5 py-4 text-cream no-underline on-dark">
-                    <span>{{ __('diagnosis.published_home.internal') }}</span>
-                    <x-megis.icon name="chevron-right" class="size-4 shrink-0" />
-                </a>
-            </li>
-        @else
-            <li>
-                <a href="{{ route('client.report.show', [$organization, $diagnosis]) }}" class="flex items-center justify-between gap-3 rounded-card bg-green px-5 py-4 text-cream no-underline on-dark">
-                    <span>{{ __('diagnosis.published_home.snapshot') }}</span>
-                    <x-megis.icon name="chevron-right" class="size-4 shrink-0" />
-                </a>
-            </li>
-        @endunless
+        <li>
+            @unless ($snapshot)
+                <x-ui.link-row tone="green" :href="route('client.report.internal', [$organization, $diagnosis])" :title="__('diagnosis.published_home.internal')" />
+            @else
+                <x-ui.link-row tone="green" :href="route('client.report.show', [$organization, $diagnosis])" :title="__('diagnosis.published_home.snapshot')" />
+            @endunless
+        </li>
         @if (isset($report['chapters']['brand']))
             <li>
-                <a href="{{ route('client.report.chapter', [$organization, $diagnosis, 'markad-alapja']) }}" class="flex items-center justify-between gap-3 rounded-card bg-yellow px-5 py-4 text-charcoal no-underline">
-                    <span>{{ __('diagnosis.published_home.brand') }}</span>
-                    <x-megis.icon name="chevron-right" class="size-4 shrink-0" />
-                </a>
+                <x-ui.link-row tone="yellow" :href="route('client.report.chapter', [$organization, $diagnosis, 'markad-alapja'])" :title="__('diagnosis.published_home.brand')" />
             </li>
         @endif
     </ul>
@@ -69,31 +64,32 @@
         <h2 id="reports-title" class="text-lg font-semibold">{{ __('report.menu.reports') }}</h2>
         <ul class="flex flex-col gap-2">
             @foreach ($reports as $reportMain)
-                <li class="flex flex-wrap items-center justify-between gap-3 rounded-card bg-white px-5 py-3">
+                <x-ui.card as="li" padding="none" class="flex flex-wrap items-center justify-between gap-2 py-2 pr-2 pl-5">
                     <span>{{ $reportMain->product_name }} · {{ $reportMain->published_at?->format('Y.m.d.') }}</span>
-                    <span class="flex gap-3 text-sm font-semibold">
-                        <a href="{{ route('client.report.show', [$organization, $reportMain->diagnosis]) }}">{{ __('diagnosis.published_home.open') }}</a>
+                    <span class="flex flex-wrap gap-1">
+                        <x-ui.button tone="ghost" size="sm" icon-right="chevron-right" :href="route('client.report.show', [$organization, $reportMain->diagnosis])">{{ __('diagnosis.published_home.open') }}</x-ui.button>
                         @if (Route::has('client.report.pdf'))
-                            <a href="{{ route('client.report.pdf', [$organization, $reportMain->diagnosis]) }}">PDF</a>
+                            <x-ui.button tone="ghost" size="sm" icon="document" :href="route('client.report.pdf', [$organization, $reportMain->diagnosis])">{{ __('diagnosis.published_home.pdf') }}</x-ui.button>
                         @endif
                     </span>
-                </li>
+                </x-ui.card>
             @endforeach
         </ul>
     </section>
 
     {{-- Értékmérés-teaser (26, question 4) --}}
-    <section class="flex flex-col gap-3 rounded-card border border-grey-250 bg-white p-5" aria-labelledby="measure-title">
-        <h2 id="measure-title" class="font-semibold">{{ __('diagnosis.published_home.measure_title') }}</h2>
+    <x-ui.card as="section" class="flex flex-col gap-3" aria-labelledby="measure-title">
+        <h2 id="measure-title" class="text-lg font-semibold">{{ __('diagnosis.published_home.measure_title') }}</h2>
         <p class="text-grey-700">{{ __('diagnosis.published_home.measure_text') }}</p>
         @if (filled(config('megis.booking_url')))
-            <x-ui.button tone="outline" class="self-start" :href="config('megis.booking_url')" target="_blank" rel="noopener">{{ __('diagnosis.published_home.measure_action') }}</x-ui.button>
+            <x-ui.button tone="outline" class="self-start" :href="config('megis.booking_url')" target="_blank" rel="noopener">
+                {{ __('diagnosis.published_home.measure_action') }}
+                <span class="sr-only">({{ __('ui.new_tab') }})</span>
+            </x-ui.button>
         @endif
-    </section>
+    </x-ui.card>
 
     @foreach ($otherRoles as $peerMain)
-        <a href="{{ route('client.diagnosis.show', [$organization, $peerMain->diagnosis]) }}" class="text-sm font-semibold">
-            {{ __('diagnosis.peer_link', ['subject' => $peerMain->subjectName()]) }}
-        </a>
+        <x-ui.link-row :href="route('client.diagnosis.show', [$organization, $peerMain->diagnosis])" :title="__('diagnosis.peer_link', ['subject' => $peerMain->subjectName()])" />
     @endforeach
 </div>

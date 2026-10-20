@@ -41,7 +41,7 @@ return [
     ],
     'band' => '1 nincs · :step · 6 beépült',
     'block_points' => ':points / :max pont',
-    'summary_link' => 'összefoglaló ›',
+    'summary_link' => 'Összefoglaló',
     'no_trace' => '–',
     'no_trace_help' => 'nincs nyoma',
     'insufficient' => 'nincs elég adat',
@@ -54,7 +54,7 @@ return [
     'crack_marker' => 'repedés',
     'breakpoint_marker' => 'töréspont',
     'claim_marker' => 'a diagnózis állítása · a mégis átnézte',
-    'evidence_link' => 'bizonyítékok ›',
+    'evidence_link' => 'bizonyítékok',
     'claim_kinds' => [
         'strength' => 'Erősség',
         'crack' => 'Repedés',
@@ -80,13 +80,13 @@ return [
     'measured' => 'mért',
     'not_in_calendar' => 'nincs a naptárban',
     'not_measured' => 'Nem mért folyamatok',
-    'element_evidence' => 'Az elem összes bizonyítéka ›',
+    'element_evidence' => 'Az elem összes bizonyítéka',
     'what_is_tree' => 'Mi a küldetésfa?',
     'stepper' => ':current / :total · :chapter',
-    'next' => 'Következő: :chapter ›',
-    'next_item' => 'Következő: :label ›',
+    'next' => 'Következő: :chapter',
+    'next_item' => 'Következő: :label',
     'back_to_chapter' => 'Vissza: :chapter',
-    'compare_link' => 'összevetés ›',
+    'compare_link' => 'Összevetés',
     'views' => [
         'egyen' => 'Egyén',
         'csapat' => 'Csapat',
@@ -109,12 +109,12 @@ return [
         'quiet' => 'Belső működés :percent% · A legnagyobb rés: :label',
         'hour' => 'Egy óra a mégisszel: átnézzük, mit kezdjetek vele.',
         'book' => 'Időpontot foglalok',
-        'pdf' => 'PDF',
+        'pdf' => 'Letöltöm · PDF',
     ],
     'snapshot' => [
         'processes' => 'Mért folyamatok',
-        'window' => ':from → :to',
-        'brand_link' => 'A márkád alapjának belső oldala ›',
+        'window' => ':from – :to',
+        'brand_link' => 'A márkád alapjának belső oldala',
         'deeper' => 'A Teljes diagnózis · belül, társakkal, négy fejezetben',
         'deeper_action' => 'Beszéljünk róla',
     ],
@@ -126,7 +126,7 @@ return [
             'no' => 'Nem így látjuk',
         ],
         'what' => 'Miben nem?',
-        'send' => 'Küldés',
+        'send' => 'Elküldöm',
         'sent' => 'Elküldve a mégisnek · :date · „:answer” · a mégis beépíti az olvasatba.',
         'sent_yes' => 'Köszönjük · :date · „Igen”',
         'summary' => ':name · :chapter · :answer: :text',
@@ -138,6 +138,26 @@ return [
         'chapters' => 'Fejezetek',
         'internal' => 'Belső működés',
         'brand' => 'A márkád alapja',
+    ],
+
+    'phi' => 'PHI',
+
+    // Where a quote comes from, never whose (18 · 18.2).
+    'trace' => [
+        'sources' => [
+            'conversation' => 'beszélgetés',
+            'recording' => 'felvétel',
+            'note' => 'jegyzet',
+            'document' => 'dokumentum',
+            'mirror' => 'Értéktükör',
+            'calendar' => 'naptár',
+            'experience' => 'megélés',
+        ],
+        'roles' => [
+            'leader' => 'vezető',
+            'peer' => 'társ',
+            'external' => 'külsős',
+        ],
     ],
 
 ];

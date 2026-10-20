@@ -6,7 +6,7 @@
 @endphp
 <x-layouts::client :title="__('report.title')" color="light-yellow" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$url('show')" :back-label="__('report.ring.label')">
     <div class="flex max-w-2xl flex-col gap-4">
-        <h2 class="text-2xl font-semibold">{{ __('report.question.summary') }}</h2>
+        <h2 class="text-xl font-semibold">{{ __('report.question.summary') }}</h2>
 
         @if ($gap)
             <a href="{{ $url('item', [\App\Services\Report\ReportService::SLUGS[$gap['chapter']], $gap['id']]) }}" class="flex flex-col gap-2 rounded-card bg-charcoal p-5 text-cream no-underline on-dark">
@@ -30,7 +30,7 @@
                 @if (filled($report['texts']['summary_brand'] ?? null))
                     <span>{{ $report['texts']['summary_brand'] }}</span>
                 @endif
-                <span class="text-sm font-semibold">PHI {{ \App\Services\Report\ReportText::decimal($report['chapters']['brand']['average']) }}</span>
+                <span class="text-sm font-semibold">{{ __('report.phi') }} {{ \App\Services\Report\ReportText::decimal($report['chapters']['brand']['average']) }}</span>
             </a>
         @endif
 

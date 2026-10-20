@@ -2,7 +2,7 @@
 <div class="flex max-w-2xl flex-col gap-6">
     <x-ui.flash />
 
-    <p class="text-xl font-semibold">{{ __('diagnosis.visibility.lead') }}</p>
+    <h2 class="text-xl font-semibold">{{ __('diagnosis.visibility.lead') }}</h2>
 
     <dl class="flex flex-col gap-3">
         @php
@@ -21,31 +21,33 @@
         @endphp
 
         @foreach ($actors as $key => $lines)
-            <div class="flex flex-col gap-1 rounded-card bg-white p-4">
+            <x-ui.card padding="sm" class="flex flex-col gap-1">
                 <dt class="font-semibold">{{ __('diagnosis.visibility.actor.'.$key) }}</dt>
-                <dd class="flex items-start gap-2"><x-megis.icon name="check" class="mt-1 size-4 text-green" :label="__('diagnosis.visibility.sees')" /> {{ $lines['sees'] }}</dd>
-                <dd class="flex items-start gap-2 text-grey-700"><x-megis.icon name="close" class="mt-1 size-4" :label="__('diagnosis.visibility.not')" /> {{ $lines['not'] }}</dd>
-            </div>
+                <dd class="flex items-start gap-2"><x-megis.icon name="check" class="mt-1 text-green" :label="__('diagnosis.visibility.sees')" /> {{ $lines['sees'] }}</dd>
+                <dd class="flex items-start gap-2 text-grey-700"><x-megis.icon name="close" class="mt-1" :label="__('diagnosis.visibility.not')" /> {{ $lines['not'] }}</dd>
+            </x-ui.card>
         @endforeach
     </dl>
 
     @if ($main->stage->isBeforeRunning())
         <div class="flex flex-col gap-3">
             @if ($missing)
-                <p class="text-sm" role="status">
+                <x-ui.notice tone="warning">
                     {{ __('diagnosis.step_missing', ['step' => $missing->step->label()]) }}
-                    <a href="{{ $missingUrl }}" class="font-semibold">{{ __('diagnosis.visibility.go_to_missing') }}</a>
-                </p>
+                    <x-slot:action>
+                        <x-ui.button tone="outline" size="sm" :href="$missingUrl">{{ __('diagnosis.visibility.go_to_missing') }}</x-ui.button>
+                    </x-slot:action>
+                </x-ui.notice>
             @endif
             <div>
                 @if ($canStart)
-                    <x-ui.button tone="coral" size="lg" wire:click="startDiagnosis">{{ __('diagnosis.visibility.start') }}</x-ui.button>
+                    <x-ui.button size="lg" icon-right="arrow-right" wire:click="startDiagnosis">{{ __('diagnosis.visibility.start') }}</x-ui.button>
                 @else
-                    <x-ui.button tone="coral" size="lg" :href="$missingUrl" aria-disabled="true">{{ __('diagnosis.visibility.start') }}</x-ui.button>
+                    <x-ui.button size="lg" icon-right="arrow-right" :href="$missingUrl" aria-disabled="true">{{ __('diagnosis.visibility.start') }}</x-ui.button>
                 @endif
             </div>
         </div>
     @else
-        <p class="rounded-card bg-grey-100 p-4 text-sm">{{ __('diagnosis.visibility.running') }}</p>
+        <x-ui.notice>{{ __('diagnosis.visibility.running') }}</x-ui.notice>
     @endif
 </div>

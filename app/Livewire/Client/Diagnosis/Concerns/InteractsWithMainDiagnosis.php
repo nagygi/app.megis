@@ -114,6 +114,7 @@ trait InteractsWithMainDiagnosis
             'back' => $this->previousUrl($step),
             'backLabel' => $previous?->step->label() ?? __('diagnosis.overview_back'),
             'step' => $steps->position($step).' / '.$steps->count(),
+            'progress' => [$steps->position($step), $steps->count()],
             'color' => 'cream',
         ];
     }

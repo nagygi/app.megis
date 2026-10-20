@@ -3,7 +3,7 @@
     <x-ui.flash />
 
     @if ($materials->isEmpty())
-        <p class="text-grey-700">{{ __('processes.occasions.situations_empty') }}</p>
+        <x-ui.empty-state symbol="spiral">{{ __('processes.occasions.situations_empty') }}</x-ui.empty-state>
     @else
         <ul class="flex flex-col gap-2">
             @foreach ($materials as $material)
@@ -11,7 +11,7 @@
                     $experience = $material->process_occasion_id ? $experiences->get($material->process_occasion_id) : null;
                     $date = $material->occasion?->occurred_at ?? $material->placed_at;
                 @endphp
-                <li wire:key="situation-{{ $material->uuid }}" class="flex flex-wrap items-center justify-between gap-3 rounded-card bg-white px-4 py-3">
+                <x-ui.card as="li" padding="sm" wire:key="situation-{{ $material->uuid }}" class="flex flex-wrap items-center justify-between gap-3">
                     <span>
                         <span class="block font-semibold">{{ $material->occasion?->process?->name ?? __('processes.occasions.states.unclassified') }}</span>
                         <span class="block text-sm text-grey-700">
@@ -31,14 +31,15 @@
                     </span>
                     @if ($material->audio_path !== null && ! $isImpersonating)
                         <x-ui.button
-                            tone="outline"
+                            tone="danger"
                             size="sm"
                             wire:click="deleteAudio('{{ $material->uuid }}')"
                             wire:confirm="{{ __('client.recordings.confirm_delete') }}"
+                            data-confirm-tone="danger"
                             aria-label="{{ __('client.recordings.delete_label', ['date' => $date->format('Y.m.d.')]) }}"
                         >{{ __('client.recordings.delete') }}</x-ui.button>
                     @endif
-                </li>
+                </x-ui.card>
             @endforeach
         </ul>
     @endif

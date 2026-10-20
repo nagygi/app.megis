@@ -16,8 +16,11 @@
             <x-form.input name="last_name" wire:model.live.blur="last_name" :label="__('auth_ui.registration.last_name')" autocomplete="family-name" required />
             <x-form.input name="first_name" wire:model.live.blur="first_name" :label="__('auth_ui.registration.first_name')" autocomplete="given-name" required />
         </div>
-        <p class="text-sm text-green" role="status" aria-live="polite">
-            @if ($nameSaved) {{ __('ui.saved') }} @endif
+        {{-- The same "Mentve" as on the steps. --}}
+        <p class="-mt-2 min-h-6 text-sm" role="status" aria-live="polite">
+            @if ($nameSaved)
+                <span class="inline-flex items-center gap-1 font-semibold text-green"><x-megis.icon name="check" /> {{ __('ui.saved') }}</span>
+            @endif
         </p>
 
         <div class="flex flex-col gap-1">
@@ -44,12 +47,7 @@
             <h2 id="profile-awaiting" class="text-lg font-semibold">{{ __('client.profile.awaiting_title') }}</h2>
             <ul class="flex flex-col gap-2">
                 @foreach ($awaiting as $row)
-                    <li>
-                        <a href="{{ $row['url'] }}" class="flex items-center justify-between gap-3 rounded-card bg-white px-4 py-3 text-charcoal no-underline hover:bg-paper">
-                            <span>{{ $row['label'] }}</span>
-                            <x-megis.icon name="chevron-right" class="size-4 shrink-0" />
-                        </a>
-                    </li>
+                    <li><x-ui.link-row :href="$row['url']" :title="$row['label']" /></li>
                 @endforeach
             </ul>
         </section>
@@ -62,7 +60,7 @@
             <p>{{ __('client.profile.people_count', $people) }}</p>
             <p class="text-sm text-grey-700">{{ __('client.profile.people_rule') }}</p>
             @if ($people['can_remind'] && $people['answered'] < $people['total'] && ! $isImpersonating)
-                <x-ui.button tone="outline" size="sm" class="self-start" wire:click="remindPeers({{ $leaderMain->id }})">{{ __('client.profile.remind') }}</x-ui.button>
+                <x-ui.button tone="outline" size="sm" icon="mail" class="self-start" wire:click="remindPeers({{ $leaderMain->id }})">{{ __('client.profile.remind') }}</x-ui.button>
             @endif
         </section>
     @endif
@@ -71,10 +69,10 @@
         <h2 id="profile-password" class="text-lg font-semibold">{{ __('client.profile.password_title') }}</h2>
 
         @if ($isImpersonating)
-            <p class="rounded-card bg-yellow-pale p-4">{{ __('impersonation.forbidden') }}</p>
+            <x-ui.notice tone="warning">{{ __('impersonation.forbidden') }}</x-ui.notice>
         @else
             @if ($passwordSaved)
-                <p class="rounded-card bg-green-soft p-4 text-green" role="status">{{ __('client.profile.password_saved') }}</p>
+                <x-ui.notice tone="success">{{ __('client.profile.password_saved') }}</x-ui.notice>
             @endif
 
             <form wire:submit="savePassword" class="flex flex-col gap-5">
@@ -85,7 +83,7 @@
                     <p>{{ __('client.profile.password_lead_set') }}</p>
                     @if ($codeSent)
                         <p class="text-sm text-grey-700" role="status">{{ __('client.profile.code_sent', ['email' => $user->email]) }}</p>
-                        <x-form.input name="code" wire:model="code" :label="__('client.profile.code')" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required />
+                        <x-form.input name="code" wire:model="code" :label="__('client.profile.code')" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" class="max-w-48 tracking-[0.3em] tabular-nums" required />
                     @else
                         <x-ui.button tone="outline" class="self-start" wire:click="sendCode">{{ __('client.profile.send_code') }}</x-ui.button>
                     @endif
@@ -103,7 +101,7 @@
                     />
                     <x-form.input name="password_confirmation" type="password" wire:model="password_confirmation" :label="__('auth_ui.password_confirmation')" autocomplete="new-password" required />
 
-                    <x-ui.button type="submit" class="self-start">{{ __('client.profile.save_password') }}</x-ui.button>
+                    <x-ui.button type="submit" class="self-start" data-focus-errors>{{ __('client.profile.save_password') }}</x-ui.button>
                 @endif
             </form>
         @endif
@@ -114,7 +112,7 @@
         <section class="flex flex-col gap-3" aria-labelledby="calendar-title">
             <h2 id="calendar-title" class="text-lg font-semibold">{{ __('calendar.profile.title') }}</h2>
             @foreach ($calendars as $calendar)
-                <div wire:key="calendar-{{ $calendar->id }}" class="flex flex-wrap items-center justify-between gap-3 rounded-card bg-white px-4 py-3">
+                <x-ui.card padding="sm" wire:key="calendar-{{ $calendar->id }}" class="flex flex-wrap items-center justify-between gap-3">
                     <span>
                         <span class="block font-semibold">{{ $calendar->providerLabel() }} · {{ __('calendar.profile.connected', ['date' => $calendar->connected_at->format('m.d.')]) }}</span>
                         <span class="block text-sm text-grey-700">{{ __('calendar.profile.metadata_until', ['date' => $calendar->metadata_expires_at->format('m.d.')]) }}</span>
@@ -122,8 +120,8 @@
                             <span class="block text-sm font-semibold text-coral-ink" role="status">{{ __('calendar.profile.broken') }}</span>
                         @endif
                     </span>
-                    <x-ui.button tone="outline" size="sm" wire:click="disconnectCalendar({{ $calendar->id }})" wire:confirm="{{ __('calendar.profile.confirm_disconnect') }}">{{ __('calendar.profile.disconnect') }}</x-ui.button>
-                </div>
+                    <x-ui.button tone="danger" size="sm" wire:click="disconnectCalendar({{ $calendar->id }})" wire:confirm="{{ __('calendar.profile.confirm_disconnect') }}" data-confirm-tone="danger">{{ __('calendar.profile.disconnect') }}</x-ui.button>
+                </x-ui.card>
             @endforeach
         </section>
     @endif
@@ -142,7 +140,7 @@
 
         @foreach ($consents as $mainConsents)
             @php($consentMain = $mainConsents->first()->mainDiagnosis)
-            <div wire:key="consents-{{ $consentMain->id }}" class="flex flex-col gap-2 rounded-card bg-white px-4 py-3">
+            <x-ui.card padding="sm" wire:key="consents-{{ $consentMain->id }}" class="flex flex-col gap-2">
                 <p class="font-semibold">{{ __('client.consents.diagnosis', ['subject' => $consentMain->subjectName()]) }}</p>
                 <ul class="flex flex-col gap-2">
                     @foreach ($mainConsents->unique('kind') as $consent)
@@ -155,8 +153,9 @@
                             </span>
                             @if (! $isImpersonating && $consentService->canRevoke($consent))
                                 <x-ui.button
-                                    tone="outline"
+                                    tone="danger"
                                     size="sm"
+                                    data-confirm-tone="danger"
                                     wire:click="revokeConsent({{ $consent->id }})"
                                     wire:confirm="{{ $consent->kind === \App\Enums\ConsentKind::Answers ? __('client.consents.confirm_answers', ['subject' => $consentMain->subjectName()]) : __('client.consents.confirm_quotes') }}"
                                 >{{ __('client.consents.revoke') }}</x-ui.button>
@@ -164,7 +163,7 @@
                         </li>
                     @endforeach
                 </ul>
-            </div>
+            </x-ui.card>
         @endforeach
     </section>
 
@@ -173,25 +172,26 @@
         <h2 id="recordings-title" class="text-lg font-semibold">{{ __('client.recordings.title') }}</h2>
         <p class="text-sm text-grey-700">{{ __('client.recordings.lead') }}</p>
         @if ($recordings->isEmpty())
-            <p class="text-grey-600">{{ __('client.recordings.empty') }}</p>
+            <p class="text-grey-700">{{ __('client.recordings.empty') }}</p>
         @else
             <ul class="flex flex-col gap-2">
                 @foreach ($recordings as $recording)
-                    <li wire:key="recording-{{ $recording->uuid }}" class="flex flex-wrap items-center justify-between gap-3 rounded-card bg-white px-4 py-3">
+                    <x-ui.card as="li" padding="sm" wire:key="recording-{{ $recording->uuid }}" class="flex flex-wrap items-center justify-between gap-3">
                         <span>
                             <span class="block font-semibold">{{ $recording->context->label() }}</span>
                             <span class="block text-sm text-grey-700">{{ $recording->created_at->format('Y.m.d.') }}@if ($recording->durationLabel()) · {{ $recording->source->label() }} · {{ $recording->durationLabel() }}@endif</span>
                         </span>
                         @unless ($isImpersonating)
                             <x-ui.button
-                                tone="outline"
+                                tone="danger"
                                 size="sm"
+                                data-confirm-tone="danger"
                                 wire:click="deleteRecording('{{ $recording->uuid }}')"
                                 wire:confirm="{{ __('client.recordings.confirm_delete') }}"
                                 aria-label="{{ __('client.recordings.delete_label', ['date' => $recording->created_at->format('Y.m.d.')]) }}"
                             >{{ __('client.recordings.delete') }}</x-ui.button>
                         @endunless
-                    </li>
+                    </x-ui.card>
                 @endforeach
             </ul>
         @endif
@@ -202,24 +202,26 @@
         <section class="flex flex-col gap-3 border-t border-grey-250 pt-6" aria-labelledby="profile-deletion">
             <h2 id="profile-deletion" class="text-lg font-semibold">{{ __('client.deletion.title') }}</h2>
             @if ($confirmingDeletion)
-                <div class="flex flex-col gap-2 rounded-card bg-white p-4 text-sm">
-                    <p>{{ __('client.deletion.what_goes') }}</p>
-                    <p>{{ __('client.deletion.what_stays') }}</p>
-                    <p>{{ __('client.deletion.when') }}</p>
-                </div>
+                <x-ui.notice tone="warning" class="text-sm">
+                    <div class="flex flex-col gap-2">
+                        <p>{{ __('client.deletion.what_goes') }}</p>
+                        <p>{{ __('client.deletion.what_stays') }}</p>
+                        <p>{{ __('client.deletion.when') }}</p>
+                    </div>
+                </x-ui.notice>
                 <form wire:submit="deleteAccount" class="flex flex-col gap-3">
                     @if ($hasPassword)
                         <x-form.input name="deletionPassword" type="password" wire:model="deletionPassword" :label="__('client.profile.current_password')" autocomplete="current-password" required />
                     @else
                         @if ($deletionCodeSent)
-                            <x-form.input name="deletionCode" wire:model="deletionCode" :label="__('client.profile.code')" autocomplete="one-time-code" inputmode="numeric" required />
+                            <x-form.input name="deletionCode" wire:model="deletionCode" :label="__('client.profile.code')" autocomplete="one-time-code" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" class="max-w-48 tracking-[0.3em] tabular-nums" required />
                         @else
                             <x-ui.button tone="outline" size="sm" class="self-start" wire:click="sendDeletionCode">{{ __('client.profile.send_code') }}</x-ui.button>
                         @endif
                     @endif
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
                         @if ($hasPassword || $deletionCodeSent)
-                            <x-ui.button type="submit" tone="danger" size="sm">{{ __('client.deletion.confirm') }}</x-ui.button>
+                            <x-ui.button type="submit" tone="danger" size="sm" data-focus-errors>{{ __('client.deletion.confirm') }}</x-ui.button>
                         @endif
                         <x-ui.button tone="outline" size="sm" wire:click="$set('confirmingDeletion', false)">{{ __('client.deletion.cancel') }}</x-ui.button>
                     </div>

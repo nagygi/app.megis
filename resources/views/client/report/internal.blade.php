@@ -7,8 +7,8 @@
             @php($rows = $mode === 'csapat' ? collect($chapter['rows']) : ($mode === 'egyen' ? $individual : $organizationView)->where('kind', \App\Services\Report\ReportBuilder::CHAPTERS[$key]->value)->sortByDesc('score'))
             @continue($rows->isEmpty())
             <section class="flex flex-col gap-2" aria-labelledby="internal-{{ $key }}">
-                <h2 id="internal-{{ $key }}" class="flex items-center justify-between text-lg font-semibold">
-                    <a href="{{ $url('chapter', [\App\Services\Report\ReportService::SLUGS[$key]]) }}" class="text-charcoal no-underline">{{ __('report.chapters.'.$key) }}</a>
+                <h2 id="internal-{{ $key }}" class="text-lg font-semibold">
+                    <a href="{{ $url('chapter', [\App\Services\Report\ReportService::SLUGS[$key]]) }}" class="inline-flex items-center gap-1 text-charcoal no-underline hover:underline">{{ __('report.chapters.'.$key) }} <x-megis.icon name="chevron-right" /></a>
                 </h2>
                 <ul class="flex flex-col gap-1">
                     @foreach ($rows as $row)
@@ -16,9 +16,9 @@
                             <span>
                                 {{ $row['label'] }}
                                 @if ($row['is_biggest_gap'] ?? false)
-                                    <span class="ml-1 rounded-pill bg-coral px-2 py-0.5 text-xs font-semibold text-black">{{ __('report.biggest_gap') }}</span>
+                                    <x-ui.badge tone="coral" class="ml-1">{{ __('report.biggest_gap') }}</x-ui.badge>
                                 @elseif ($row['has_crack'] ?? false)
-                                    <span class="ml-1 rounded-pill bg-grey-200 px-2 py-0.5 text-xs font-semibold">{{ $report['meta']['snapshot'] ? __('report.breakpoint_marker') : __('report.crack_marker') }}</span>
+                                    <x-ui.badge class="ml-1">{{ $report['meta']['snapshot'] ? __('report.breakpoint_marker') : __('report.crack_marker') }}</x-ui.badge>
                                 @endif
                             </span>
                             <span class="font-semibold tabular-nums">{{ isset($row['score_whole']) ? \App\Services\Report\ReportText::score($row) : (($row['score'] ?? null) === null ? '–' : \App\Services\Report\ReportText::decimal($row['score'])) }}</span>
@@ -40,7 +40,7 @@
             @endif
         @endforeach
 
-        <a href="{{ $url('compare') }}" class="self-end font-semibold">{{ __('report.compare_link') }}</a>
+        <x-ui.button tone="outline" size="sm" icon-right="chevron-right" class="self-start" :href="$url('compare')">{{ __('report.compare_link') }}</x-ui.button>
 
         @include('client.report.partials.footer', ['current' => null])
     </div>

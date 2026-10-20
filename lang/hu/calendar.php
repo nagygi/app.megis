@@ -34,7 +34,7 @@ return [
         'stays' => 'A folyamat és az alkalmak dátuma megmarad.',
     ],
 
-    'connect' => 'Naptár összekötése',
+    'connect' => 'Összekötöm a naptárat',
     'talk' => 'Inkább beszélgetünk',
     'talk_instead' => 'Mondd el inkább a négy kérdésre válaszolva',
 

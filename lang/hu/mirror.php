@@ -23,9 +23,9 @@ return [
     'mode_record' => 'Elmondom',
     'mode_text' => 'Inkább leírom',
     'mode_file' => 'Fájlt töltök fel',
-    'record_start' => 'Felvétel indítása',
+    'record_start' => 'Elkezdem a felvételt',
     'record_stop' => 'Megállítom',
-    'restart' => 'Újra',
+    'restart' => 'Újraveszem',
     'recording' => 'Felvétel folyamatban',
     'motivation' => [
         'start' => 'Mesélj tovább…',
@@ -91,7 +91,8 @@ return [
     'create_account' => 'Létrehozom a fiókot',
     'book' => 'Időpontot foglalok',
     'book_help' => 'A foglalási naptár új ablakban nyílik meg.',
-    'finish' => 'Kész',
+    'consent_needed' => 'A folytatáshoz fogadd el az ÁSZF-et és az adatvédelmi szabályzatot.',
+    'finish' => 'Befejezem',
     'booking_saved' => 'Megnyitottuk a foglalási naptárat. A mégis látja, mire vagy kíváncsi.',
     'saved_to' => 'A tükröd a(z) :organization diagnózisai közé került. A mégis átnézi, mielőtt a platformon megjelenik.',
 

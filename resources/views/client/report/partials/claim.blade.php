@@ -10,10 +10,10 @@
     @if (($claim['traces'][0] ?? null) && ($withQuote ?? true))
         @include('client.report.partials.quote', ['trace' => $claim['traces'][0]])
     @endif
-    <p class="text-xs text-grey-600">
+    <p class="text-xs text-grey-700">
         {{ __('report.claim_marker') }}
         @isset($evidenceUrl)
-            · <a href="{{ $evidenceUrl }}">{{ __('report.evidence_link') }}</a>
+            · <a href="{{ $evidenceUrl }}" class="inline-flex items-center gap-0.5 font-semibold">{{ __('report.evidence_link') }} <x-megis.icon name="chevron-right" /></a>
         @endisset
     </p>
 </div>

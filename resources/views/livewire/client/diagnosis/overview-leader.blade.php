@@ -9,10 +9,10 @@
     @unless ($main->stage->isBeforeRunning())
         <div class="flex flex-col gap-1">
             @if ($main->acceptsInput())
-                <p class="text-xl font-semibold">{{ __('diagnosis.running_lead', ['date' => $main->publishes_on->format('m.d.')]) }}</p>
+                <h2 class="text-xl font-semibold">{{ __('diagnosis.running_lead', ['date' => $main->publishes_on->format('m.d.')]) }}</h2>
                 <p class="text-grey-700">{{ __('diagnosis.running_help', ['date' => $main->readingStartsOn()->format('m.d.')]) }}</p>
             @else
-                <p class="text-xl font-semibold">{{ __('diagnosis.reading_lead') }}</p>
+                <h2 class="text-xl font-semibold">{{ __('diagnosis.reading_lead') }}</h2>
                 <p class="text-grey-700">{{ __('diagnosis.reading_help') }}</p>
             @endif
         </div>
@@ -21,16 +21,15 @@
     <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" />
 
     @if (($current && $main->acceptsInput()) || $main->stage->isBeforeRunning())
-        <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
+        <div class="flex flex-wrap items-center gap-3">
             @if ($current && $main->acceptsInput())
-                <x-ui.button size="lg" :href="$stepUrl($current->step)">
+                <x-ui.button size="lg" icon-right="arrow-right" :href="$stepUrl($current->step)">
                     {{ $steps->hasOwnProgress() && ! $firstVisit ? __('diagnosis.continue') : __('diagnosis.start') }}
-                    <x-megis.icon name="arrow-right" class="size-4" />
                 </x-ui.button>
             @endif
 
             @if ($main->stage->isBeforeRunning())
-                <a href="{{ route('client.wisdom.show', [$main->diagnosis->organization, 'folyamat']) }}" class="text-sm font-semibold">{{ __('wisdom.more') }}</a>
+                <x-ui.button tone="ghost" :href="route('client.wisdom.show', [$main->diagnosis->organization, 'folyamat'])">{{ __('wisdom.more') }}</x-ui.button>
             @endif
         </div>
     @endif
@@ -40,8 +39,6 @@
     @endif
 
     @foreach ($otherRoles as $peerMain)
-        <a href="{{ route('client.diagnosis.show', [$main->diagnosis->organization, $peerMain->diagnosis]) }}" class="text-sm font-semibold">
-            {{ __('diagnosis.peer_link', ['subject' => $peerMain->subjectName()]) }}
-        </a>
+        <x-ui.link-row :href="route('client.diagnosis.show', [$main->diagnosis->organization, $peerMain->diagnosis])" :title="__('diagnosis.peer_link', ['subject' => $peerMain->subjectName()])" />
     @endforeach
 </div>

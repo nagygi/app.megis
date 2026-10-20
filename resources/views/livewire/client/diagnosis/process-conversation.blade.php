@@ -1,7 +1,7 @@
 {{-- V6·c · Beszélgetés (10). --}}
 <div class="flex max-w-2xl flex-col gap-6" @if ($extracting || $dictations !== []) wire:poll.2s="pollDictations" @endif>
     <div class="flex flex-col gap-1">
-        <p class="text-xl font-semibold">{{ __('processes.conversation.lead') }}</p>
+        <h2 class="text-xl font-semibold">{{ __('processes.conversation.lead') }}</h2>
         <p class="text-grey-700">{{ __('processes.conversation.duration') }}</p>
     </div>
 
@@ -9,39 +9,46 @@
 
     <ol class="flex flex-col gap-4">
         @foreach (\App\Models\ProcessConversation::QUESTIONS as $question)
-            <li wire:key="question-{{ $question }}" class="flex flex-col gap-2 rounded-card bg-white p-5">
+            @php($field = 'answers.'.$question)
+            <x-ui.card as="li" wire:key="question-{{ $question }}" class="flex flex-col gap-2" x-data="{ length: 0 }" x-init="length = $refs.answer.value.length">
                 <label for="answer-{{ $question }}" class="flex gap-3 font-semibold">
                     <span class="grid size-7 shrink-0 place-items-center rounded-pill bg-coral text-xs font-extrabold text-black" aria-hidden="true">{{ $question }}</span>
                     {{ __('processes.conversation.questions.'.$question) }}
                 </label>
                 <textarea
                     id="answer-{{ $question }}"
+                    x-ref="answer"
+                    x-on:input="length = $el.value.length"
                     wire:model.live.blur="answers.{{ $question }}"
                     rows="3"
                     maxlength="3000"
                     @disabled(! $editable)
-                    class="w-full rounded-field border border-grey-350 bg-white px-3.5 py-2.5 text-base focus:border-charcoal"
+                    @error($field) aria-invalid="true" aria-describedby="answer-{{ $question }}-error" @enderror
+                    class="field w-full"
                 ></textarea>
-                <x-form.error :name="'answers.'.$question" :id="'answer-'.$question" />
+                <p class="self-end text-sm text-grey-600 tabular-nums" x-cloak><span x-text="length"></span> / 3000</p>
+                <x-form.error :name="$field" :id="'answer-'.$question" />
                 @if ($editable)
-                    <x-diagnosis.dictate :field="'answers.'.$question" :label="__('processes.conversation.answer', ['number' => $question])" :pending="isset($dictations['answers.'.$question])" />
+                    <x-diagnosis.dictate :field="$field" :label="__('processes.conversation.answer', ['number' => $question])" :pending="isset($dictations[$field])" />
                 @endif
-            </li>
+            </x-ui.card>
         @endforeach
     </ol>
 
-    <section class="flex flex-col gap-3 rounded-card border border-grey-250 p-5" aria-labelledby="going-on" aria-live="polite">
-        <h2 id="going-on" class="font-semibold">
+    <x-ui.card as="section" tone="cream" bordered class="flex flex-col gap-3" aria-labelledby="going-on" aria-live="polite">
+        <h3 id="going-on" class="font-semibold">
             {{ __('processes.list.going_on') }}
             <span class="font-normal text-grey-700">· {{ __('processes.conversation.count', ['processes' => $processCount, 'unclear' => $unclearCount]) }}</span>
-        </h2>
+        </h3>
         @if ($extracting)
             <p class="text-sm text-grey-700" role="status">{{ __('processes.conversation.extracting') }}</p>
         @endif
         <ul class="flex flex-wrap gap-2">
             @foreach ($chips as $chip)
                 <li wire:key="chip-{{ $chip['question'] }}-{{ $chip['index'] }}" @class([
-                    'inline-flex items-center gap-2 rounded-pill px-3 py-1 text-sm',
+                    'inline-flex min-h-8 items-center gap-1 rounded-pill py-0.5 pl-3 text-sm',
+                    'pr-3' => ! $editable,
+                    'pr-0.5' => $editable,
                     'bg-charcoal font-semibold text-cream' => ! $chip['unclear'],
                     'border-2 border-dashed border-charcoal' => $chip['unclear'],
                 ])>
@@ -52,19 +59,26 @@
                         @endif
                     </span>
                     @if ($editable)
-                        <button type="button" wire:click="removeChip({{ $chip['question'] }}, {{ $chip['index'] }})" class="rounded-pill">
-                            <x-megis.icon name="close" class="size-3" :label="__('processes.conversation.remove_chip', ['name' => $chip['name']])" />
+                        {{-- 32px: inside a chip; the chip's text is the bigger target around it. --}}
+                        <button
+                            type="button"
+                            wire:click="removeChip({{ $chip['question'] }}, {{ $chip['index'] }})"
+                            @class(['press grid size-8 place-items-center rounded-pill', 'hover:bg-grey-700' => ! $chip['unclear'], 'hover:bg-yellow-pale' => $chip['unclear']])
+                            aria-label="{{ __('processes.conversation.remove_chip', ['name' => $chip['name']]) }}"
+                            title="{{ __('processes.conversation.remove_chip', ['name' => $chip['name']]) }}"
+                        >
+                            <x-megis.icon name="close" />
                         </button>
                     @endif
                 </li>
             @endforeach
         </ul>
-    </section>
+    </x-ui.card>
 
     @if ($editable)
-        <div class="flex flex-wrap items-center gap-4">
-            <x-ui.button tone="coral" size="lg" wire:click="finish" wire:loading.attr="disabled" wire:target="finish">{{ __('processes.conversation.finish') }}</x-ui.button>
-            <a href="{{ route('client.diagnosis.process-calendar', [$organization, $diagnosis]) }}" class="font-semibold">{{ __('processes.conversation.calendar_instead') }}</a>
+        <div class="flex flex-wrap items-center gap-3">
+            <x-ui.button size="lg" icon-right="arrow-right" data-focus-errors wire:click="finish" wire:target="finish">{{ __('processes.conversation.finish') }}</x-ui.button>
+            <x-ui.button tone="ghost" :href="route('client.diagnosis.process-calendar', [$organization, $diagnosis])">{{ __('processes.conversation.calendar_instead') }}</x-ui.button>
             <x-diagnosis.saved />
         </div>
     @endif

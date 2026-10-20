@@ -42,8 +42,8 @@
         </ol>
 
         {{-- The scale: grey circle at the start, charcoal dot in the situations, green mark the others --}}
-        <section class="flex flex-col gap-3 rounded-card bg-white p-5" aria-labelledby="takeaway-scale">
-            <h2 id="takeaway-scale" class="font-semibold">{{ __('takeaway.scale') }}</h2>
+        <x-ui.card as="section" class="flex flex-col gap-3" aria-labelledby="takeaway-scale">
+            <h2 id="takeaway-scale" class="text-lg font-semibold">{{ __('takeaway.scale') }}</h2>
             <p class="flex flex-wrap gap-4 text-xs text-grey-700" aria-hidden="true">
                 <span class="flex items-center gap-1"><span class="size-3 rounded-pill border-2 border-grey-350"></span>{{ __('takeaway.legend.start') }}</span>
                 <span class="flex items-center gap-1"><span class="size-3 rounded-pill bg-charcoal"></span>{{ __('takeaway.legend.situations') }}</span>
@@ -56,7 +56,7 @@
                             <span>{{ $row['name'] }}</span>
                             <span class="tabular-nums">{{ __('takeaway.row_numbers', ['start' => $whole($row['start']), 'situations' => $whole($row['situations']), 'others' => $whole($row['others'])]) }}</span>
                         </p>
-                        <div @class(['relative h-2 rounded-pill', 'bg-coral/40' => $row['lower'], 'bg-grey-100' => ! $row['lower']]) aria-hidden="true">
+                        <div @class(['relative h-2 rounded-pill', 'bg-coral-light' => $row['lower'], 'bg-grey-100' => ! $row['lower']]) aria-hidden="true">
                             @if ($row['start'] !== null)
                                 <span class="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-pill border-2 border-grey-350 bg-white" style="left: {{ $position($row['start']) }}%"></span>
                             @endif
@@ -70,26 +70,23 @@
                     </li>
                 @endforeach
             </ul>
-        </section>
+        </x-ui.card>
 
         @if ($recommendation)
             <section class="flex flex-col gap-1 rounded-card bg-yellow-pale p-5" aria-labelledby="takeaway-recommendation">
-                <h2 id="takeaway-recommendation" class="font-semibold">{{ __('takeaway.recommendation') }}</h2>
+                <h2 id="takeaway-recommendation" class="text-lg font-semibold">{{ __('takeaway.recommendation') }}</h2>
                 <p>{{ $recommendation['text'] }}</p>
             </section>
         @endif
 
         @unless ($preview)
-            <a href="{{ route('client.mirror.record', $organization) }}" class="flex items-center justify-between gap-3 rounded-card bg-white px-5 py-4 text-charcoal no-underline hover:bg-paper">
-                <span>{{ __('takeaway.mirror_again') }}</span>
-                <x-megis.icon name="chevron-right" class="size-4" />
-            </a>
-            <p class="flex gap-4 text-sm">
+            <x-ui.link-row :href="route('client.mirror.record', $organization)" :title="__('takeaway.mirror_again')" />
+            <div class="flex flex-wrap gap-2">
                 @if (Route::has('client.diagnosis.takeaway.pdf'))
-                    <a href="{{ route('client.diagnosis.takeaway.pdf', [$organization, $diagnosis]) }}">{{ __('takeaway.pdf') }}</a>
+                    <x-ui.button tone="outline" size="sm" icon="document" :href="route('client.diagnosis.takeaway.pdf', [$organization, $diagnosis])">{{ __('takeaway.pdf') }}</x-ui.button>
                 @endif
-                <a href="{{ route('client.values', $organization) }}">{{ __('client.menu.value_library') }}</a>
-            </p>
+                <x-ui.button tone="ghost" size="sm" icon-right="chevron-right" :href="route('client.values', $organization)">{{ __('client.menu.value_library') }}</x-ui.button>
+            </div>
         @endunless
     </div>
 </x-layouts::client>

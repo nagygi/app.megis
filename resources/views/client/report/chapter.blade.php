@@ -11,7 +11,7 @@
 <x-layouts::client :title="__('report.chapters.'.$key)" :color="$color" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$url($report['meta']['snapshot'] ? 'show' : 'internal')" :back-label="$report['meta']['snapshot'] ? __('report.title') : __('report.question.internal')">
     <div class="flex max-w-2xl flex-col gap-6">
         <div class="flex flex-col gap-2">
-            <h2 class="text-2xl font-semibold">{{ __('report.question.'.$key) }}</h2>
+            <h2 class="text-xl font-semibold">{{ __('report.question.'.$key) }}</h2>
             @include('client.report.partials.updated', ['chapterKey' => $key])
             @if (filled($report['texts']['summary_'.($key === 'brand' ? 'brand' : $key)] ?? null))
                 <p class="text-grey-700">{{ $report['texts']['summary_'.($key === 'brand' ? 'brand' : $key)] }}</p>
@@ -34,7 +34,7 @@
 
         @if ($key === 'brand')
             {{-- The tree with its four elements and the PHI of the tree (27 · 27.8) --}}
-            <section class="flex flex-col items-center gap-4 rounded-card bg-white p-6" aria-label="{{ __('report.chapters.brand') }}">
+            <x-ui.card as="section" padding="lg" class="flex flex-col items-center gap-4" aria-label="{{ __('report.chapters.brand') }}">
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     @foreach ($chapter['rows'] as $row)
                         <a href="#element-{{ $row['id'] }}" class="flex flex-col items-center gap-1 text-center text-charcoal no-underline">
@@ -46,13 +46,13 @@
                         </a>
                     @endforeach
                 </div>
-                <p class="font-semibold">PHI {{ ReportText::decimal($chapter['average']) }}</p>
-            </section>
+                <p class="font-semibold">{{ __('report.phi') }} {{ ReportText::decimal($chapter['average']) }}</p>
+            </x-ui.card>
 
             @if (filled($report['texts']['brand_reading'] ?? null))
                 <section class="flex flex-col gap-2 rounded-card bg-yellow-pale p-5" aria-labelledby="brand-reading">
                     <h3 id="brand-reading" class="font-semibold">{{ __('report.brand_reading') }}</h3>
-                    <div class="prose-sm">{!! \Illuminate\Support\Str::markdown($report['texts']['brand_reading'], ['html_input' => 'escape', 'allow_unsafe_links' => false]) !!}</div>
+                    <div class="prose-megis">{!! \Illuminate\Support\Str::markdown($report['texts']['brand_reading'], ['html_input' => 'escape', 'allow_unsafe_links' => false]) !!}</div>
                     <p class="text-xs text-grey-700">{{ __('report.brand_reading_marker') }}</p>
                 </section>
             @endif
@@ -61,23 +61,24 @@
         @if ($viewRows !== null)
             <ul class="flex flex-col gap-2">
                 @forelse ($viewRows as $row)
-                    <li class="flex flex-col gap-1 rounded-card bg-white px-5 py-4">
+                    <x-ui.card as="li" padding="none" class="flex flex-col gap-1 px-5 py-4">
                         <span class="flex items-center justify-between gap-3">
                             <span class="font-semibold">{{ $row['label'] }}</span>
                             <span class="text-lg font-semibold tabular-nums">{{ $row['score_state'] === 'insufficient_data' ? __('report.insufficient') : ($row['score'] === null ? '–' : (int) floor($row['score'] + 0.5)) }}</span>
                         </span>
                         @if ($row['gap'] !== null && $row['experience'] !== null && $row['score'] !== null)
-                            <span class="text-sm text-grey-700">{{ __('report.gap_sentence', ['experience' => \App\Services\Report\HungarianNumber::dative((int) floor($row['experience'] + 0.5)), 'score' => \App\Services\Report\HungarianNumber::accusative((int) floor($row['score'] + 0.5))]) }}</span>
+                            {{-- One person's view speaks to one person. --}}
+                            <span class="text-sm text-grey-700">{{ __($mode === 'egyen' || ! $report['meta']['has_peers'] ? 'report.gap_sentence_self' : 'report.gap_sentence', ['experience' => \App\Services\Report\HungarianNumber::dative((int) floor($row['experience'] + 0.5)), 'score' => \App\Services\Report\HungarianNumber::accusative((int) floor($row['score'] + 0.5))]) }}</span>
                         @endif
-                    </li>
+                    </x-ui.card>
                 @empty
-                    <li class="text-grey-700">{{ __('report.insufficient') }}</li>
+                    <li><x-ui.empty-state>{{ __('report.insufficient') }}</x-ui.empty-state></li>
                 @endforelse
             </ul>
         @else
             <ul class="flex flex-col gap-3">
                 @foreach ($chapter['rows'] as $row)
-                    <li id="element-{{ $row['id'] }}" class="flex flex-col gap-3 rounded-card bg-white p-5">
+                    <x-ui.card as="li" id="element-{{ $row['id'] }}" class="flex flex-col gap-3">
                         <a href="{{ $url('item', [$slug, $row['id']]) }}" class="flex items-start justify-between gap-3 text-charcoal no-underline">
                             <span>
                                 <span class="block text-lg font-semibold">{{ $row['label'] }}</span>
@@ -97,9 +98,9 @@
                             @include('client.report.partials.quote', ['trace' => $row['traces'][0]])
                         @endif
                         @if ($key === 'brand')
-                            <a href="{{ $url('item', [$slug, $row['id']]) }}" class="text-sm font-semibold">{{ __('report.element_evidence') }}</a>
+                            <x-ui.button tone="ghost" size="sm" icon-right="chevron-right" class="-ml-1.5 self-start" :href="$url('item', [$slug, $row['id']])">{{ __('report.element_evidence') }}</x-ui.button>
                         @endif
-                    </li>
+                    </x-ui.card>
                 @endforeach
             </ul>
         @endif
@@ -120,12 +121,12 @@
         @endif
 
         @if (! $preview && in_array($key, ['brand', 'areas'], true))
-            <a href="{{ route('client.wisdom.show', [$organization, $key === 'brand' ? 'kuldetesfa' : 'teruletek']) }}" class="self-start text-sm font-semibold">{{ $key === 'brand' ? __('report.what_is_tree') : __('wisdom.title').' · '.__('report.chapters.areas') }}</a>
+            <x-ui.button tone="ghost" size="sm" class="-ml-1.5 self-start" :href="route('client.wisdom.show', [$organization, $key === 'brand' ? 'kuldetesfa' : 'teruletek'])">{{ $key === 'brand' ? __('report.what_is_tree') : __('wisdom.title').' · '.__('report.chapters.areas') }}</x-ui.button>
         @endif
-        <a href="{{ $url('appendix') }}" class="self-start text-sm font-semibold">{{ __('report.appendix_link') }}</a>
+        <x-ui.button tone="ghost" size="sm" icon="document" class="-ml-1.5 self-start" :href="$url('appendix')">{{ __('report.appendix_link') }}</x-ui.button>
 
         @if ($report['meta']['snapshot'])
-            <a href="{{ $url('show') }}" class="font-semibold">{{ __('report.title') }}</a>
+            <x-ui.page-nav :label="__('report.title')" :back="$url('show')" :back-label="__('report.title')" />
         @else
             @include('client.report.partials.footer', ['current' => $key])
         @endif

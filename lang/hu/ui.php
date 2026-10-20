@@ -10,6 +10,7 @@ return [
     'save_failed' => 'Nem sikerült menteni. Próbáld újra.',
     'close' => 'Bezárás',
     'back' => 'Vissza',
+    'new_tab' => 'új lapon nyílik',
     'cancel' => 'Mégse',
     'confirm' => 'Igen',
 
