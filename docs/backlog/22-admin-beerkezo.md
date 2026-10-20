@@ -10,7 +10,7 @@ Szuperadmin és Admin egyaránt használhatja (01).
 
 ### 22.1 A lista
 
-- Bal oldali menüpont: *Beérkező*, mellette a nyitott sorok száma.
+- Bal oldali menüpont: *Beérkező*, mellette a nyitott sorok száma. A szám azokat a sorokat számolja, amelyeket a lista alapból mutat (kapcsolattartó: én), ugyanígy a Diagnózisok oldal „Ma {n} dolog vár rád” mondata és az *Értékmérések › Beérkező* száma.
 - **Soronként:** típus, diagnózis (szervezet · csapat), a tárgy egy mondatban, mióta, legfeljebb két gomb.
 - **Lezárás:**
   - a lezárt sor eltűnik a listából;

@@ -83,13 +83,16 @@ class InboxService
         ]);
     }
 
-    public function openCount(): int
+    /**
+     * The open rows the list shows the admin by default ("alapból: én", 22 · 22.1).
+     */
+    public function openCount(User $admin): int
     {
-        return InboxItem::query()->open()->withoutMeasurements()->count();
+        return InboxItem::query()->open()->withoutMeasurements()->forContact($admin)->count();
     }
 
-    public function openMeasurementCount(): int
+    public function openMeasurementCount(User $admin): int
     {
-        return InboxItem::query()->open()->measurements()->count();
+        return InboxItem::query()->open()->measurements()->forContact($admin)->count();
     }
 }

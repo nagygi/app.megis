@@ -92,6 +92,21 @@ it('counts the open rows in the menu', function () {
         ->assertSeeInOrder(['Beérkező', '2']);
 });
 
+it('counts only the rows the list shows by default, not a colleague’s', function () {
+    $admin = actingAsAdmin();
+    $theirs = Organization::factory()->create(['contact_admin_id' => User::factory()->admin()->create()->id]);
+    InboxItem::factory()->create(['organization_id' => $theirs->id]);
+    InboxItem::factory()->create(['organization_id' => $theirs->id, 'type' => InboxItemType::MirrorBooking, 'is_measurement' => true]);
+
+    expect(app(InboxService::class))
+        ->openCount($admin)->toBe(0)
+        ->openMeasurementCount($admin)->toBe(0);
+
+    $this->get(route('admin.diagnoses.index'))
+        ->assertOk()
+        ->assertSee('Ma 0 dolog vár rád.');
+});
+
 it('counts the open Értékmérések rows under their own group in the menu', function () {
     actingAsAdmin();
     InboxItem::factory()->create();

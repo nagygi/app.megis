@@ -151,7 +151,7 @@ class Index extends Component
                 'symbol' => $symbol,
                 'cards' => $cards->filter(fn (array $card) => $card['main']->stage->value === $stage)->values(),
             ]),
-            'openCount' => app(InboxService::class)->openCount(),
+            'openCount' => app(InboxService::class)->openCount(auth()->user()),
             'subjects' => collect(MainDiagnosisSubject::cases())->mapWithKeys(fn (MainDiagnosisSubject $subject) => [$subject->value => $subject->label()])->all(),
             'contacts' => User::query()->admins()->orderBy('last_name')->orderBy('first_name')->get(),
         ])->layout('layouts::admin')->title(__('admin.garden.title'));
