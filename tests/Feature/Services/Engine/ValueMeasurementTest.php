@@ -115,6 +115,7 @@ it('reads a mirror in three steps and keeps every result with its AI call', func
         ->state->toBe(ScoreResultState::Scored)
         ->score->toBe(5.0)
         ->and(AiCall::query()->pluck('task')->all())->toBe(['mirror_detection', 'mirror_matching', 'mirror_scoring'])
+        ->and(AiCall::query()->pluck('prompt_version', 'task')->all())->toBe(['mirror_detection' => 2, 'mirror_matching' => 3, 'mirror_scoring' => 2])
         ->and(AiCall::query()->first()->public_mirror)->toBeTrue();
 });
 

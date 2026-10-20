@@ -93,7 +93,7 @@ return [
             'temperature' => 0.0,
             'timeout' => 120,
             'prompt' => 'ertektukor-illesztes',
-            'prompt_version' => 2,
+            'prompt_version' => 3,
         ],
         'mirror_scoring' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),

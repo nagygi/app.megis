@@ -2,6 +2,13 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.17 · {hash} · 2026-10-20
+
+Értéktükör: illesztés v3 (`ertektukor-illesztes` v3).
+
+- **Illesztés, nem teljesülés:** az illesztés arról dönt, melyik értékről szól a szabad érték, nem arról, mennyire teljesül. A gyengén látszó vagy csak kimondott értékek is illeszkednek, a szintet a pontozás adja meg („2 · csak szavak”). A tesztszövegben az „Egészségtudatosság” háromból egyszer helyett háromból háromszor illeszkedett az Egészségre.
+- **Több érték egy idézetben:** ha egy idézet több értéket mutat, mindegyik illeszkedik, a legmagasabb konfidenciát az kapja, amelyikről elsősorban szól. A v2 eddig egyre szorított.
+
 ## 1.16 · b5a24a8 · 2026-10-20
 
 Az 1.15 staging-újratesztje után.
