@@ -103,7 +103,11 @@
                                 <span aria-hidden="true">‹</span> {{ $backLabel ?? __('ui.back') }}
                             </a>
                         @else
-                            <x-megis.logo :variant="in_array($color, ['charcoal', 'green'], true) ? 'white' : 'red-dark'" class="h-7 desktop:hidden" />
+                            {{-- From 1200px the menu shows the logo. The wrapper hides this one:
+                                 .megis-logo sets its display outside the utility layer. --}}
+                            <span class="flex desktop:hidden">
+                                <x-megis.logo :variant="in_array($color, ['charcoal', 'green'], true) ? 'white' : 'red-dark'" class="h-7" />
+                            </span>
                         @endif
 
                         <span class="min-w-0 flex-1 truncate text-right text-xs font-semibold tracking-wider uppercase tabular-nums">{{ $step ?? $label }}</span>

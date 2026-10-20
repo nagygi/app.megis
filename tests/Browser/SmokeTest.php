@@ -67,6 +67,17 @@ it('saves the name on the profile as the customer leaves the field', function ()
     expect($customer->refresh()->first_name)->toBe('Kornélia');
 });
 
+it('shows one logo on a desktop customer page, the menu\'s', function () {
+    $organization = Organization::factory()->create();
+    $page = loginInBrowser(customerOf($organization));
+    $page->resize(1280, 800);
+
+    $visibleLogos = $page->script('() => [...document.querySelectorAll(".megis-logo")].filter((logo) => logo.checkVisibility()).length');
+
+    expect($visibleLogos)->toBe(1);
+    $page->assertNoJavaScriptErrors();
+});
+
 it('opens the menu and the user menu on a phone, and logs the customer out', function () {
     $organization = Organization::factory()->create(['name' => 'Acme Kft.']);
     $customer = customerOf($organization);
