@@ -1,6 +1,9 @@
 @php
     [$sortField, $sortDirection] = $this->currentSort();
-    $statusTones = ['active' => 'green', 'pending' => 'yellow', 'inactive' => 'muted'];
+    // The same status tones on every user list: clients, members, admins.
+    $statusTones = ['active' => 'green', 'added' => 'neutral', 'invited' => 'yellow', 'pending' => 'yellow', 'invitation_expired' => 'coral', 'locked' => 'coral', 'inactive' => 'muted'];
+    // An empty list says "Nincs találat." only when a search or a filter hid the rows.
+    $filtering = filled($search) || collect($filters)->filter(fn ($filter) => filled($filter))->isNotEmpty();
 @endphp
 
 <div>
@@ -37,7 +40,8 @@
                 <td class="px-3 py-2 whitespace-nowrap">{{ $client->last_login_at?->format('Y.m.d. H:i') ?? __('admin.common.never') }}</td>
             </tr>
         @empty
-            <tr><td colspan="5" class="px-3 py-6 text-center text-grey-600">{{ __('admin.common.empty') }}</td></tr>
+            {{-- New users are added through an organization, so there is no "add" here. --}}
+            <x-admin.empty-row :colspan="5">{{ $filtering ? __('admin.common.empty') : __('admin.clients.empty') }}</x-admin.empty-row>
         @endforelse
     </x-admin.table>
 </div>

@@ -3,9 +3,8 @@
 /*
  * Keeps the views on the design system (UI finomhangolás, 1.18): no shadows,
  * no radius or weight outside the brand tokens, icons instead of Unicode signs,
- * and cards through x-ui.card. Each rule lists the views that still break it.
- * A list may only shrink: a new view breaking a rule fails, and so does a
- * listed view that no longer breaks it (take it off the list).
+ * and cards through x-ui.card. Every view keeps every rule: a view that
+ * breaks one fails here, with its path.
  */
 
 /**
@@ -78,55 +77,11 @@ it('uses only the brand weights: 400, 500, 600 and 800', function () {
 
 it('draws icons with x-megis.icon, not with Unicode signs', function () {
     expect(viewsBreaking(fn (string $source) => (bool) preg_match('/[‹›←→↑↓↕×▲▼⋮✓✔✕✖]/u', $source)))
-        ->toEqual([
-            'livewire/admin/clients/show.blade.php',
-            'livewire/admin/diagnoses/show.blade.php',
-            'livewire/admin/main-diagnoses/reading.blade.php',
-            'livewire/admin/organizations/process-occasions.blade.php',
-            'livewire/admin/organizations/values.blade.php',
-            'livewire/admin/partials/version-history.blade.php',
-            'livewire/admin/support-questions/index.blade.php',
-        ]);
+        ->toBe([]);
 });
 
 it('builds white cards with x-ui.card', function () {
     // The design system's own surfaces (card, dialog, menus) live in components/ui.
     expect(viewsBreaking(fn (string $source, string $path) => ! str_starts_with($path, 'components/ui/') && hasInlineCard($source)))
-        ->toEqual([
-            'livewire/admin/admin-users/form.blade.php',
-            'livewire/admin/capabilities/form.blade.php',
-            'livewire/admin/capabilities/import.blade.php',
-            'livewire/admin/capability-groups/form.blade.php',
-            'livewire/admin/clients/show.blade.php',
-            'livewire/admin/diagnoses/form.blade.php',
-            'livewire/admin/diagnoses/index.blade.php',
-            'livewire/admin/diagnoses/show.blade.php',
-            'livewire/admin/diagnoses/upload.blade.php',
-            'livewire/admin/diagnosis-types/form.blade.php',
-            'livewire/admin/inbox/index.blade.php',
-            'livewire/admin/main-diagnoses/form.blade.php',
-            'livewire/admin/main-diagnoses/publish.blade.php',
-            'livewire/admin/main-diagnoses/reading.blade.php',
-            'livewire/admin/main-diagnoses/run.blade.php',
-            'livewire/admin/materials/partials/source.blade.php',
-            'livewire/admin/materials/show.blade.php',
-            'livewire/admin/organizations/form.blade.php',
-            'livewire/admin/organizations/member-form.blade.php',
-            'livewire/admin/organizations/process-occasions.blade.php',
-            'livewire/admin/organizations/processes.blade.php',
-            'livewire/admin/organizations/teams.blade.php',
-            'livewire/admin/organizations/values.blade.php',
-            'livewire/admin/partials/version-history.blade.php',
-            'livewire/admin/products/form.blade.php',
-            'livewire/admin/profile.blade.php',
-            'livewire/admin/settings/areas.blade.php',
-            'livewire/admin/settings/legal-documents.blade.php',
-            'livewire/admin/support-questions/index.blade.php',
-            'livewire/admin/system/ai-prompts.blade.php',
-            'livewire/admin/system/ai-usage.blade.php',
-            'livewire/admin/system/health.blade.php',
-            'livewire/admin/system/overview.blade.php',
-            'livewire/admin/value-categories/form.blade.php',
-            'livewire/admin/values/form.blade.php',
-        ]);
+        ->toBe([]);
 });

@@ -9,6 +9,6 @@
 
         <x-ui.button type="submit" class="self-start">{{ __('auth_ui.admin.login_button') }}</x-ui.button>
 
-        <p class="text-sm text-grey-600">{{ __('auth_ui.admin.forgot_password') }}</p>
+        <p class="text-sm text-grey-700">{{ __('auth_ui.admin.forgot_password') }}</p>
     </form>
 </x-layouts::auth>

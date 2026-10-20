@@ -1,11 +1,15 @@
-@php([$sortField, $sortDirection] = $this->currentSort())
+@php
+    [$sortField, $sortDirection] = $this->currentSort();
+    // An empty list says "Nincs találat." only when a search or filter hid the rows.
+    $filtering = filled($search) || collect($filters)->filter(fn ($filter) => filled($filter))->isNotEmpty();
+@endphp
 
 <div>
     <x-ui.flash class="mb-6" />
 
     <x-admin.page-header :title="__('admin.values.title')">
         <x-slot:actions>
-            <x-ui.button :href="route('admin.values.create')">{{ __('admin.values.create') }}</x-ui.button>
+            <x-ui.button icon="plus" :href="route('admin.values.create')">{{ __('admin.values.create') }}</x-ui.button>
         </x-slot:actions>
     </x-admin.page-header>
 
@@ -70,13 +74,26 @@
                         @if ($value->isArchived())
                             <x-admin.row-action wire:click="restore({{ $value->id }})">{{ __('admin.values.restore') }}</x-admin.row-action>
                         @else
-                            <x-admin.row-action wire:click="archive({{ $value->id }})" wire:confirm="{{ __('admin.values.confirm_archive') }}">{{ __('admin.values.archive') }}</x-admin.row-action>
+                            <x-admin.row-action
+                                tone="danger"
+                                wire:click="archive({{ $value->id }})"
+                                wire:confirm="{{ __('admin.values.confirm_archive') }}"
+                                data-confirm-tone="danger"
+                                :data-confirm-label="__('admin.values.archive')"
+                            >{{ __('admin.values.archive') }}</x-admin.row-action>
                         @endif
                     </x-admin.row-actions>
                 </td>
             </tr>
         @empty
-            <tr><td colspan="7" class="px-3 py-6 text-center text-grey-600">{{ __('admin.common.empty') }}</td></tr>
+            <x-admin.empty-row :colspan="7">
+                {{ $filtering ? __('admin.common.empty') : __('admin.values.empty') }}
+                @unless ($filtering)
+                    <x-slot:action>
+                        <x-ui.button tone="outline" icon="plus" :href="route('admin.values.create')">{{ __('admin.values.create') }}</x-ui.button>
+                    </x-slot:action>
+                @endunless
+            </x-admin.empty-row>
         @endforelse
     </x-admin.table>
 </div>

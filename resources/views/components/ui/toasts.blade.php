@@ -19,7 +19,8 @@
                     @mouseleave="$store.toasts.resume(toast)"
                     @class([
                         'on-dark pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-card py-2 pr-2 pl-4 text-cream',
-                        'transition-[opacity,translate] duration-[420ms] ease-brand-out starting:translate-y-2 starting:opacity-0',
+                        // Arriving, it moves up a little; it never fades, so its text is readable from the first frame.
+                        'transition-[translate] duration-[420ms] ease-brand-out starting:translate-y-2',
                         'bg-green' => $type === 'success',
                         'bg-charcoal' => $type === 'error',
                     ])

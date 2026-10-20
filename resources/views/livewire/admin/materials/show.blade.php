@@ -1,34 +1,38 @@
-@php($status = $material->status)
+@php
+    $status = $material->status;
+    $meta = collect([
+        $material->context->label(),
+        $material->source->label(),
+        $material->organization?->name,
+        $material->created_at->format('Y.m.d. H:i'),
+        $material->durationLabel(),
+    ])->filter()->implode(' · ');
+@endphp
 
-<div class="flex max-w-4xl flex-col gap-6" @if ($status->isWorking()) wire:poll.5s @endif>
+<div class="flex max-w-5xl flex-col gap-6" @if ($status->isWorking()) wire:poll.5s @endif>
     <x-ui.flash />
 
-    <div class="flex flex-col gap-2">
-        <h1 class="text-2xl font-semibold">{{ $material->original_name ?? $material->context->label() }}</h1>
-        <p class="text-grey-700">
-            {{ $material->context->label() }} · {{ $material->source->label() }}
-            @if ($material->organization) · {{ $material->organization->name }}@endif
-            · {{ $material->created_at->format('Y.m.d. H:i') }}
-            @if ($material->durationLabel()) · {{ $material->durationLabel() }}@endif
-        </p>
-        <div><x-ui.badge :tone="$status === \App\Enums\MaterialStatus::Failed ? 'coral' : ($status === \App\Enums\MaterialStatus::Processed ? 'green' : 'yellow')">{{ $status->label() }}</x-ui.badge></div>
-    </div>
+    <x-admin.page-header :title="$material->original_name ?? $material->context->label()" :description="$meta" :spaced="false">
+        <x-slot:badges>
+            <x-ui.badge :tone="$status === \App\Enums\MaterialStatus::Failed ? 'coral' : ($status === \App\Enums\MaterialStatus::Processed ? 'green' : 'yellow')">{{ $status->label() }}</x-ui.badge>
+        </x-slot:badges>
+    </x-admin.page-header>
 
     @if ($status === \App\Enums\MaterialStatus::Failed)
-        <div class="flex flex-col items-start gap-3 rounded-card border border-grey-250 bg-white p-5" role="alert">
-            <p class="font-semibold">{{ __('admin.materials.failed') }}</p>
+        <x-ui.notice tone="error" :title="__('admin.materials.failed')">
             @if ($material->error)
-                <p class="text-sm text-grey-700 break-words">{{ $material->error }}</p>
+                <p class="text-sm break-words">{{ $material->error }}</p>
             @endif
-            <x-ui.button size="sm" wire:click="retry">{{ __('admin.materials.retry') }}</x-ui.button>
-        </div>
+            <x-slot:action>
+                <x-ui.button size="sm" wire:click="retry">{{ __('admin.materials.retry') }}</x-ui.button>
+            </x-slot:action>
+        </x-ui.notice>
     @endif
 
     @if ($status === \App\Enums\MaterialStatus::AwaitingSpeakers)
         {{-- 06 · 6.3: each speaker to a user of the organization, or skipped --}}
-        <form wire:submit="assign" class="flex flex-col gap-4 rounded-card border border-grey-250 bg-white p-5">
-            <h2 class="text-lg font-semibold">{{ __('admin.materials.speakers') }}</h2>
-            <p class="text-sm text-grey-700">{{ __('admin.materials.speakers_help') }}</p>
+        <x-ui.card as="form" bordered wire:submit="assign" class="flex flex-col gap-4">
+            <x-ui.section-header :title="__('admin.materials.speakers')" :description="__('admin.materials.speakers_help')" />
             <x-form.error name="assignments" id="assignments" />
 
             @foreach ($speakers as $index => $speaker)
@@ -50,8 +54,8 @@
                 </div>
             @endforeach
 
-            <div><x-ui.button type="submit">{{ __('admin.materials.start_analysis') }}</x-ui.button></div>
-        </form>
+            <x-ui.button type="submit" class="self-start">{{ __('admin.materials.start_analysis') }}</x-ui.button>
+        </x-ui.card>
     @endif
 
     @if ($diagnoses->isNotEmpty())

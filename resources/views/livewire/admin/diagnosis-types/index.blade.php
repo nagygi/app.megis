@@ -1,11 +1,15 @@
-@php([$sortField, $sortDirection] = $this->currentSort())
+@php
+    [$sortField, $sortDirection] = $this->currentSort();
+    // An empty list says "Nincs találat." only when the search hid the rows.
+    $filtering = filled($search) || collect($filters)->filter(fn ($filter) => filled($filter))->isNotEmpty();
+@endphp
 
 <div>
     <x-ui.flash class="mb-6" />
 
     <x-admin.page-header :title="__('admin.diagnosis_types.title')">
         <x-slot:actions>
-            <x-ui.button :href="route('admin.diagnosis-types.create')">{{ __('admin.diagnosis_types.create') }}</x-ui.button>
+            <x-ui.button icon="plus" :href="route('admin.diagnosis-types.create')">{{ __('admin.diagnosis_types.create') }}</x-ui.button>
         </x-slot:actions>
     </x-admin.page-header>
 
@@ -28,13 +32,20 @@
                     <x-admin.row-actions :label="__('admin.common.row_actions', ['name' => $type->name])">
                         <x-admin.row-action :href="route('admin.diagnosis-types.edit', $type)">{{ __('admin.common.edit') }}</x-admin.row-action>
                         @if (! $type->isSystemType() && $type->diagnoses_count === 0)
-                            <x-admin.row-action wire:click="delete({{ $type->id }})" wire:confirm="{{ __('admin.diagnosis_types.confirm_delete') }}">{{ __('admin.common.delete') }}</x-admin.row-action>
+                            <x-admin.row-action tone="danger" wire:click="delete({{ $type->id }})" wire:confirm="{{ __('admin.diagnosis_types.confirm_delete') }}" data-confirm-tone="danger">{{ __('admin.common.delete') }}</x-admin.row-action>
                         @endif
                     </x-admin.row-actions>
                 </td>
             </tr>
         @empty
-            <tr><td colspan="4" class="px-3 py-6 text-center text-grey-600">{{ __('admin.common.empty') }}</td></tr>
+            <x-admin.empty-row :colspan="4">
+                {{ $filtering ? __('admin.common.empty') : __('admin.diagnosis_types.empty') }}
+                @unless ($filtering)
+                    <x-slot:action>
+                        <x-ui.button tone="outline" icon="plus" :href="route('admin.diagnosis-types.create')">{{ __('admin.diagnosis_types.create') }}</x-ui.button>
+                    </x-slot:action>
+                @endunless
+            </x-admin.empty-row>
         @endforelse
     </x-admin.table>
 </div>

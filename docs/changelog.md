@@ -2,6 +2,43 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.24 · {hash} · 2026-10-21
+
+UI-finomhangolás, 7. lépés: az admin képernyői az új komponenseken.
+
+- **Egy művelet, egy kinézet:**
+  - A mentés szén, a hozzáadás plusz ikont kap, a mégse mindenhol „Mégse” (három űrlapon „Vissza” volt).
+  - A törlés, archiválás, inaktiválás és visszavonás törlés-tónusú, piros „Igen”-nel kér megerősítést; eddig a szerkesztéssel azonos menüpont vagy coral gomb volt.
+  - Az emlékeztetés és a meghívás levél ikont kap; soronként egy meghívógomb (a tagoknál kettő volt).
+- **Sorműveletek:**
+  - A sor fő művelete (szerkesztés, emlékeztetés, megnyitás) gomb marad; a többi és a lezárás a „⋯” menüben van.
+  - Négy különböző minta helyett egy.
+- **Táblák:**
+  - Az üres lista megmondja, mi hiányzik, és felajánlja az első hozzáadását; „Nincs találat.” csak keresésnél vagy szűrésnél áll.
+  - A „Lezártak” üres listája is üzen; eddig csak a fejléc látszott.
+  - Minden fejléccella rendezhető kinézetű, ahol rendezhető.
+- **Oldalak:**
+  - Egységes fejléc: vissza link, badge-ek, leírás, műveletek; a kézzel írt h1-ek megszűntek.
+  - Űrlap 3xl, adatlap 5xl szélesség. Az Értéktár és a Képességtár szerkesztő és verziók füle azonos szélességű, nem ugrik.
+  - A hosszú képesség-űrlap szakaszokra bomlik.
+- **Űrlapok:**
+  - Rádiócsoportok csempeként, fájlmezők pill-gombbal, a kis checkboxok a közös komponenssel.
+  - A mező és gomb sorok a közös elrendezéssel; a 9 kézi igazítás megszűnt.
+- **Olvasat:**
+  - A három hasáb 1200 px-től; 1024 px-en a középső kb. 96 px széles volt.
+  - Egy szakaszcím-méret; a kicsi aláhúzott műveletek gombok.
+  - Az md-szerkesztő márkás: magyar tooltipek, látható gombok (B, I, felsorolás, link, előnézet); eddig az ikonok üresek voltak, és az állapotsoron „characters:” állt.
+- **Futás és publikálás:**
+  - Az „Olvasat indítása” és a „Publikálom” a lap fő gombja (szén, nagy).
+  - A küszöb-figyelmeztetés és a jegyzetek értesítő dobozok.
+- **Beérkező:** a besorolás, az emlékeztetés, az újrapróbálás és a megnyitás a sorban marad; a lezárás felirata és képernyőolvasós neve egyezik.
+- **Menü:** nagyobb célterületek a csoportfejléceken és a menüpontokon.
+- **Megerősítő ablak:** egyszerre egy „Igen” gomb van az oldalon; eddig a rejtett párja is ott volt.
+- **Mozgás:** a menük, a toast és a dialógus csak rövid mozgással érkezik, áttűnés nélkül, így a szövegük az első pillanattól olvasható. A menü záráskor azonnal eltűnik.
+- **Szövegek:** a gombok első személyű igék („Mentem”, „Szerkesztem”, „Törlöm”, „Inaktiválom”, „Archiválom”, „Elküldöm a meghívót”, „Belépek a nevében”…). A „+ ” előtagok helyett plusz ikon. A „→” jelek helyett ikon, képernyőolvasós felirattal.
+- **Konvenció-teszt:** minden nézet minden szabályt teljesít; a kivétellisták kiürültek.
+- **Teszt:** böngészős teszt a fő ügyfél- és admin-oldalakra: 390 px-en egyik sem szélesebb a képernyőnél.
+
 ## 1.23 · 82ce429 · 2026-10-21
 
 UI-finomhangolás, 6. lépés: az ügyfél képernyői az új komponenseken.

@@ -1,26 +1,48 @@
-@php([$sortField, $sortDirection] = $this->currentSort())
+@php
+    [$sortField, $sortDirection] = $this->currentSort();
+    // An empty list says "Nincs találat." only when a search or filter hid the rows.
+    $filtering = filled($search) || collect($filters)->filter(fn ($filter) => filled($filter))->isNotEmpty();
+@endphp
 
 <div>
     <x-ui.flash class="mb-6" />
 
     <x-admin.page-header :title="__('admin.diagnoses.title')">
         <x-slot:actions>
-            <x-ui.button tone="outline" :href="route('admin.diagnoses.upload')">{{ __('admin.upload.create') }}</x-ui.button>
+            <x-ui.button tone="outline" icon="upload" :href="route('admin.diagnoses.upload')">{{ __('admin.upload.create') }}</x-ui.button>
             {{-- Two ways in: start a diagnosis (A1) or record an earlier one (17 · 17.2, 04 · 4.3) --}}
-            <div x-data="{ open: false }" @click.outside="open = false" @keydown.escape="open = false" class="relative">
-                <x-ui.button @click="open = ! open" ::aria-expanded="open" aria-controls="new-diagnosis-menu">{{ __('admin.diagnoses.create') }}</x-ui.button>
-                <ul id="new-diagnosis-menu" x-show="open" x-cloak class="absolute right-0 z-10 mt-2 flex w-72 flex-col gap-1 rounded-card border border-grey-250 bg-white p-2">
-                    <li><a href="{{ route('admin.main-diagnoses.create') }}" class="block rounded-field px-3 py-2 text-charcoal no-underline hover:bg-grey-100"><span class="block font-semibold">{{ __('admin.main_diagnoses.start') }}</span><span class="block text-sm text-grey-600">{{ __('admin.main_diagnoses.start_help') }}</span></a></li>
-                    <li><a href="{{ route('admin.diagnoses.create') }}" class="block rounded-field px-3 py-2 text-charcoal no-underline hover:bg-grey-100"><span class="block font-semibold">{{ __('admin.diagnoses.record_earlier') }}</span><span class="block text-sm text-grey-600">{{ __('admin.diagnoses.record_earlier_help') }}</span></a></li>
-                </ul>
-            </div>
+            <x-ui.dropdown
+                id="new-diagnosis-menu"
+                :label="__('admin.diagnoses.create')"
+                :width="288"
+                trigger-class="press inline-flex min-h-11 items-center gap-2 rounded-pill bg-charcoal px-5 text-cream font-semibold hover:bg-green"
+            >
+                <x-slot:trigger>
+                    <x-megis.icon name="plus" />
+                    {{-- The name comes from the dropdown's label, so it is not read twice. --}}
+                    <span aria-hidden="true">{{ __('admin.diagnoses.create') }}</span>
+                </x-slot:trigger>
+
+                <x-ui.dropdown-item :href="route('admin.main-diagnoses.create')">
+                    <span class="flex flex-col">
+                        <span class="font-semibold">{{ __('admin.main_diagnoses.start') }}</span>
+                        <span class="text-sm text-grey-700">{{ __('admin.main_diagnoses.start_help') }}</span>
+                    </span>
+                </x-ui.dropdown-item>
+                <x-ui.dropdown-item :href="route('admin.diagnoses.create')">
+                    <span class="flex flex-col">
+                        <span class="font-semibold">{{ __('admin.diagnoses.record_earlier') }}</span>
+                        <span class="text-sm text-grey-700">{{ __('admin.diagnoses.record_earlier_help') }}</span>
+                    </span>
+                </x-ui.dropdown-item>
+            </x-ui.dropdown>
         </x-slot:actions>
     </x-admin.page-header>
 
-    <div class="mb-4 flex gap-2 text-sm" role="group" aria-label="{{ __('admin.garden.title') }}">
-        <a href="{{ route('admin.diagnoses.index') }}" class="rounded-pill border border-charcoal px-3 py-1 font-semibold text-charcoal no-underline">{{ __('admin.garden.view_garden') }}</a>
-        <span class="rounded-pill bg-charcoal px-3 py-1 font-semibold text-cream" aria-current="page">{{ __('admin.garden.view_list') }}</span>
-    </div>
+    <x-ui.segmented :label="__('admin.garden.title')" class="mb-4">
+        <x-ui.segment :href="route('admin.diagnoses.index')">{{ __('admin.garden.view_garden') }}</x-ui.segment>
+        <x-ui.segment selected :href="route('admin.diagnoses.index', ['nezet' => 'lista'])">{{ __('admin.garden.view_list') }}</x-ui.segment>
+    </x-ui.segmented>
 
     <x-admin.list-toolbar>
         <x-admin.filter name="organization" :label="__('admin.diagnoses.organization')" :options="$organizations" />
@@ -53,14 +75,21 @@
                 <td class="px-3 py-2">
                     {{ $diagnosis->creator_kind->label() }}
                     @if ($diagnosis->creator)
-                        <span class="block text-sm text-grey-600">{{ $diagnosis->creator->name }}</span>
+                        <span class="block text-sm text-grey-700">{{ $diagnosis->creator->name }}</span>
                     @endif
                 </td>
                 <td class="px-3 py-2"><x-admin.diagnosis-status :status="$diagnosis->status" /></td>
                 <td class="px-3 py-2">{{ $diagnosis->main?->stage->label() ?? '–' }}</td>
             </tr>
         @empty
-            <tr><td colspan="8" class="px-3 py-6 text-center text-grey-600">{{ __('admin.common.empty') }}</td></tr>
+            <x-admin.empty-row :colspan="8">
+                {{ $filtering ? __('admin.common.empty') : __('admin.diagnoses.empty') }}
+                @unless ($filtering)
+                    <x-slot:action>
+                        <x-ui.button tone="outline" icon="plus" :href="route('admin.main-diagnoses.create')">{{ __('admin.diagnoses.create') }}</x-ui.button>
+                    </x-slot:action>
+                @endunless
+            </x-admin.empty-row>
         @endforelse
     </x-admin.table>
 </div>

@@ -1,4 +1,8 @@
-@php([$sortField, $sortDirection] = $this->currentSort())
+@php
+    [$sortField, $sortDirection] = $this->currentSort();
+    // An empty list says "Nincs találat." only when a search or filter hid the rows.
+    $filtering = filled($search) || collect($filters)->filter(fn ($filter) => filled($filter))->isNotEmpty();
+@endphp
 
 <div>
     <x-ui.flash class="mb-6" />
@@ -6,7 +10,7 @@
     <x-admin.page-header :title="__('admin.capabilities.title')">
         <x-slot:actions>
             <x-ui.button tone="outline" :href="route('admin.capabilities.import')">{{ __('admin.capabilities.import.title') }}</x-ui.button>
-            <x-ui.button :href="route('admin.capabilities.create')">{{ __('admin.capabilities.create') }}</x-ui.button>
+            <x-ui.button icon="plus" :href="route('admin.capabilities.create')">{{ __('admin.capabilities.create') }}</x-ui.button>
         </x-slot:actions>
     </x-admin.page-header>
 
@@ -37,7 +41,7 @@
                 <td class="px-3 py-2">
                     <a href="{{ route('admin.capabilities.edit', $capability) }}" class="font-semibold text-charcoal">{{ $capability->name }}</a>
                     @if ($capability->name_en)
-                        <span class="block text-sm text-grey-600">{{ $capability->name_en }}</span>
+                        <span class="block text-sm text-grey-700">{{ $capability->name_en }}</span>
                     @endif
                 </td>
                 <td class="px-3 py-2 text-grey-700">{{ $capability->group->name }}</td>
@@ -66,13 +70,26 @@
                         @if ($capability->isArchived())
                             <x-admin.row-action wire:click="restore({{ $capability->id }})">{{ __('admin.capabilities.restore') }}</x-admin.row-action>
                         @else
-                            <x-admin.row-action wire:click="archive({{ $capability->id }})" wire:confirm="{{ __('admin.capabilities.confirm_archive') }}">{{ __('admin.capabilities.archive') }}</x-admin.row-action>
+                            <x-admin.row-action
+                                tone="danger"
+                                wire:click="archive({{ $capability->id }})"
+                                wire:confirm="{{ __('admin.capabilities.confirm_archive') }}"
+                                data-confirm-tone="danger"
+                                :data-confirm-label="__('admin.capabilities.archive')"
+                            >{{ __('admin.capabilities.archive') }}</x-admin.row-action>
                         @endif
                     </x-admin.row-actions>
                 </td>
             </tr>
         @empty
-            <tr><td colspan="9" class="px-3 py-6 text-center text-grey-600">{{ __('admin.common.empty') }}</td></tr>
+            <x-admin.empty-row :colspan="9">
+                {{ $filtering ? __('admin.common.empty') : __('admin.capabilities.empty') }}
+                @unless ($filtering)
+                    <x-slot:action>
+                        <x-ui.button tone="outline" icon="plus" :href="route('admin.capabilities.create')">{{ __('admin.capabilities.create') }}</x-ui.button>
+                    </x-slot:action>
+                @endunless
+            </x-admin.empty-row>
         @endforelse
     </x-admin.table>
 </div>

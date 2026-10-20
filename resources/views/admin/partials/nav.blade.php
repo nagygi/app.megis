@@ -70,8 +70,8 @@
     }
 
     $linkClasses = fn (bool $isActive): string => $isActive
-        ? 'flex items-center justify-between gap-2 rounded-field bg-charcoal px-3 py-2 font-semibold text-cream no-underline'
-        : 'flex items-center justify-between gap-2 rounded-field px-3 py-2 text-charcoal no-underline hover:bg-grey-100';
+        ? 'flex min-h-10 items-center justify-between gap-2 rounded-field bg-charcoal px-3 py-2 font-semibold text-cream no-underline'
+        : 'flex min-h-10 items-center justify-between gap-2 rounded-field px-3 py-2 text-charcoal no-underline hover:bg-grey-100';
 @endphp
 
 <div class="flex min-h-full flex-col gap-6 p-4">
@@ -105,7 +105,7 @@
                 @if ($group['label'])
                     <button
                         type="button"
-                        class="flex w-full items-center justify-between gap-2 rounded-field px-3 pb-1 text-left text-xs font-semibold uppercase tracking-wide text-grey-600"
+                        class="flex min-h-9 w-full items-center justify-between gap-2 rounded-field px-3 text-left text-xs font-semibold tracking-wide text-grey-700 uppercase hover:bg-grey-100"
                         aria-controls="admin-nav-group-{{ $loop->index }}"
                         :aria-expanded="open"
                         @click="toggle()"

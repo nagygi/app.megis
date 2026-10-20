@@ -8,6 +8,8 @@
         'day' => \Illuminate\Support\Carbon::parse($key)->format('Y.m.d.'),
         default => $key,
     };
+    // The calls list says "Nincs találat." only when a filter hid the rows.
+    $filtering = collect($filters)->filter(fn ($filter) => filled($filter))->isNotEmpty();
 @endphp
 
 <div class="flex flex-col gap-6">
@@ -19,19 +21,17 @@
 
     {{-- Period (16 · 16.5) --}}
     <div class="flex flex-wrap items-end gap-3">
-        <div class="flex flex-col gap-1.5">
-            <label for="period" class="text-sm font-medium">{{ __('admin.ai.period') }}</label>
-            <select id="period" wire:model.live="period" class="rounded-field border border-grey-350 bg-white px-3 py-2 text-base focus:border-charcoal">
-                @foreach (\App\Services\Ai\AiUsageQuery::PERIODS as $option)
-                    <option value="{{ $option }}">{{ __('admin.ai.periods.'.$option) }}</option>
-                @endforeach
-            </select>
-        </div>
+        <x-form.select name="period" wire:model.live="period" :label="__('admin.ai.period')">
+            @foreach (\App\Services\Ai\AiUsageQuery::PERIODS as $option)
+                <option value="{{ $option }}">{{ __('admin.ai.periods.'.$option) }}</option>
+            @endforeach
+        </x-form.select>
         @if ($period === 'custom')
             <x-form.input name="from" type="date" wire:model.live="from" :label="__('admin.ai.from')" />
             <x-form.input name="until" type="date" wire:model.live="until" :label="__('admin.ai.until')" />
         @endif
-        <p class="pb-2 text-sm text-grey-600">{{ $start->format('Y.m.d.') }} – {{ $end->format('Y.m.d.') }}</p>
+        {{-- As tall as the fields, so the range sits on their middle line. --}}
+        <p class="flex min-h-11 items-center text-sm text-grey-700">{{ $start->format('Y.m.d.') }} – {{ $end->format('Y.m.d.') }}</p>
     </div>
 
     {{-- Totals --}}
@@ -41,21 +41,21 @@
             ['label' => __('admin.ai.tokens'), 'value' => $count($summary['tokens'])],
             ['label' => __('admin.ai.cost'), 'value' => $usd($summary['cost'])],
         ] as $tile)
-            <div class="rounded-card border border-grey-250 bg-white p-5">
-                <p class="text-sm text-grey-600">{{ $tile['label'] }}</p>
+            <x-ui.card bordered>
+                <p class="text-sm text-grey-700">{{ $tile['label'] }}</p>
                 <p class="text-2xl font-semibold">{{ $tile['value'] }}</p>
-            </div>
+            </x-ui.card>
         @endforeach
     </div>
     @if ($summary['unpriced'] > 0)
-        <p class="rounded-field bg-yellow-pale px-3 py-2 text-sm" role="note">{{ __('admin.ai.unpriced', ['count' => $summary['unpriced']]) }}</p>
+        <x-ui.notice tone="warning" role="note">{{ __('admin.ai.unpriced', ['count' => $summary['unpriced']]) }}</x-ui.notice>
     @endif
 
     {{-- Breakdowns --}}
     <div class="grid gap-4 lg:grid-cols-2">
         @foreach ($breakdowns as $by => $rows)
             <section class="flex flex-col gap-2" aria-labelledby="breakdown-{{ $by }}">
-                <h2 id="breakdown-{{ $by }}" class="font-semibold">{{ __('admin.ai.by.'.$by) }}</h2>
+                <h2 id="breakdown-{{ $by }}" class="text-lg font-semibold">{{ __('admin.ai.by.'.$by) }}</h2>
                 <x-admin.table>
                     <x-slot:head>
                         <x-admin.th>{{ __('admin.ai.by_columns.'.$by) }}</x-admin.th>
@@ -71,7 +71,7 @@
                             <td class="px-3 py-2">{{ $usd($row['cost']) }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" class="px-3 py-4 text-center text-grey-600">{{ __('admin.ai.no_calls') }}</td></tr>
+                        <x-admin.empty-row :colspan="4">{{ __('admin.ai.no_calls') }}</x-admin.empty-row>
                     @endforelse
                 </x-admin.table>
             </section>
@@ -104,9 +104,9 @@
             @forelse ($calls as $call)
                 <tr wire:key="call-{{ $call->id }}">
                     <td class="px-3 py-2 whitespace-nowrap">
-                        <button type="button" wire:click="toggleCall({{ $call->id }})" class="font-semibold text-charcoal underline" aria-expanded="{{ $openCallId === $call->id ? 'true' : 'false' }}">
+                        <x-ui.button tone="ghost" size="sm" class="-ml-1.5" wire:click="toggleCall({{ $call->id }})" :aria-expanded="$openCallId === $call->id ? 'true' : 'false'">
                             {{ $call->created_at->format('Y.m.d. H:i:s') }}
-                        </button>
+                        </x-ui.button>
                     </td>
                     <td class="px-3 py-2">{{ __('admin.ai.tasks.'.$call->task) }}</td>
                     <td class="px-3 py-2">{{ $call->model_version ?? $call->model }}</td>
@@ -147,7 +147,7 @@
                     </tr>
                 @endif
             @empty
-                <tr><td colspan="8" class="px-3 py-6 text-center text-grey-600">{{ __('admin.ai.no_calls') }}</td></tr>
+                <x-admin.empty-row :colspan="8">{{ $filtering ? __('admin.common.empty') : __('admin.ai.no_calls') }}</x-admin.empty-row>
             @endforelse
         </x-admin.table>
     </section>

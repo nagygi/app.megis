@@ -5,7 +5,8 @@
     $decimalLabel = fn (?float $number) => $number === null ? '–' : number_format($number, 1, ',', '');
 @endphp
 
-<div class="flex max-w-7xl flex-col gap-6">
+{{-- A main diagnosis' tab pages keep the wide frame; any other diagnosis is a detail page. --}}
+<div @class(['flex flex-col gap-6', 'max-w-7xl' => $main, 'max-w-5xl' => ! $main])>
     <x-ui.flash />
 
     {{-- A main diagnosis starts with its title and tabs, like its other tab pages (17). --}}
@@ -14,104 +15,109 @@
     @endif
 
     {{-- Header: the basic data and the status steps (04 · 4.3) --}}
-    <div class="flex flex-wrap items-start justify-between gap-4">
-        <div class="flex flex-col gap-2">
-            @unless ($main)
-                <h1 class="text-2xl font-semibold text-charcoal">{{ $diagnosis->name }}</h1>
-            @endunless
-            <p class="text-grey-700">
-                {{ $diagnosis->organization->name }} · {{ $diagnosis->subjectLabel() }} · {{ $diagnosis->type->name }} · {{ $diagnosis->dateLabel() }}
-            </p>
-            <div class="flex flex-wrap items-center gap-2 text-sm">
+    <div class="flex flex-col gap-2">
+        @unless ($main)
+            <x-admin.page-header :title="$diagnosis->name" :spaced="false">
+                <x-slot:badges>
+                    <x-admin.diagnosis-status :status="$diagnosis->status" />
+                </x-slot:badges>
+                <x-slot:actions>
+                    @if ($isEditable && $canChangeStatus)
+                        <x-ui.button tone="outline" size="sm" :href="route('admin.diagnoses.edit', $diagnosis)">{{ __('admin.diagnoses.edit_data') }}</x-ui.button>
+                    @endif
+                    @foreach ($canChangeStatus ? $diagnosis->status->nextStatuses() : [] as $next)
+                        @php
+                            [$label, $tone] = match (true) {
+                                $next === \App\Enums\DiagnosisStatus::PendingApproval => [__('admin.diagnoses.to_pending'), 'dark'],
+                                $next === \App\Enums\DiagnosisStatus::Published => [__('admin.diagnoses.to_published'), 'dark'],
+                                $diagnosis->status === \App\Enums\DiagnosisStatus::Published => [__('admin.diagnoses.withdraw'), 'danger'],
+                                default => [__('admin.diagnoses.to_draft'), 'outline'],
+                            };
+                        @endphp
+                        @if ($diagnosis->status === \App\Enums\DiagnosisStatus::Published)
+                            {{-- Withdrawing hides it from the users until it is published again. --}}
+                            <x-ui.button :tone="$tone" size="sm" wire:click="changeStatus('{{ $next->value }}')" wire:confirm="{{ __('admin.diagnoses.confirm_withdraw') }}" data-confirm-tone="danger" :data-confirm-label="$label">{{ $label }}</x-ui.button>
+                        @else
+                            <x-ui.button :tone="$tone" size="sm" wire:click="changeStatus('{{ $next->value }}')">{{ $label }}</x-ui.button>
+                        @endif
+                    @endforeach
+                </x-slot:actions>
+            </x-admin.page-header>
+        @endunless
+        <p class="text-grey-700">
+            {{ $diagnosis->organization->name }} · {{ $diagnosis->subjectLabel() }} · {{ $diagnosis->type->name }} · {{ $diagnosis->dateLabel() }}
+        </p>
+        <div class="flex flex-wrap items-center gap-2 text-sm">
+            @if ($main)
                 <x-admin.diagnosis-status :status="$diagnosis->status" />
-                <span class="text-grey-700">{{ __('admin.diagnoses.creator') }}: {{ $diagnosis->creator_kind->label() }}@if ($diagnosis->creator) · {{ $diagnosis->creator->name }}@endif</span>
-            </div>
-            @if ($diagnosis->description)
-                <p class="max-w-3xl whitespace-pre-line text-grey-700">{{ $diagnosis->description }}</p>
             @endif
+            <span class="text-grey-700">{{ __('admin.diagnoses.creator') }}: {{ $diagnosis->creator_kind->label() }}@if ($diagnosis->creator) · {{ $diagnosis->creator->name }}@endif</span>
         </div>
-
-        <div class="flex flex-wrap gap-2">
-            @if ($isEditable && $canChangeStatus)
-                <x-ui.button tone="outline" size="sm" :href="route('admin.diagnoses.edit', $diagnosis)">{{ __('admin.diagnoses.edit_data') }}</x-ui.button>
-            @endif
-            @foreach ($canChangeStatus ? $diagnosis->status->nextStatuses() : [] as $next)
-                @php
-                    [$label, $tone] = match (true) {
-                        $next === \App\Enums\DiagnosisStatus::PendingApproval => [__('admin.diagnoses.to_pending'), 'dark'],
-                        $next === \App\Enums\DiagnosisStatus::Published => [__('admin.diagnoses.to_published'), 'dark'],
-                        $diagnosis->status === \App\Enums\DiagnosisStatus::Published => [__('admin.diagnoses.withdraw'), 'outline'],
-                        default => [__('admin.diagnoses.to_draft'), 'outline'],
-                    };
-                @endphp
-                @if ($diagnosis->status === \App\Enums\DiagnosisStatus::Published)
-                    <x-ui.button :tone="$tone" size="sm" wire:click="changeStatus('{{ $next->value }}')" wire:confirm="{{ __('admin.diagnoses.confirm_withdraw') }}">{{ $label }}</x-ui.button>
-                @else
-                    <x-ui.button :tone="$tone" size="sm" wire:click="changeStatus('{{ $next->value }}')">{{ $label }}</x-ui.button>
-                @endif
-            @endforeach
-        </div>
+        @if ($diagnosis->description)
+            <p class="max-w-3xl whitespace-pre-line text-grey-700">{{ $diagnosis->description }}</p>
+        @endif
     </div>
 
     @if ($main)
         {{-- The main diagnosis: stage, leader, time window (17) --}}
-        <section class="grid gap-4 rounded-card border border-grey-250 bg-white p-6 sm:grid-cols-2 lg:grid-cols-4" aria-label="{{ __('admin.main_diagnoses.summary') }}">
+        <x-ui.card as="section" bordered padding="lg" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="{{ __('admin.main_diagnoses.summary') }}">
             <div>
-                <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.stage') }}</p>
+                <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.stage') }}</p>
                 <p class="font-semibold">{{ $main->stage->label() }}</p>
             </div>
             <div>
-                <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.product') }}</p>
+                <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.product') }}</p>
                 <p class="font-semibold">{{ $main->product_name }} · {{ $main->subject->label() }}</p>
             </div>
             <div>
-                <p class="text-sm text-grey-600">{{ $main->subject === \App\Enums\MainDiagnosisSubject::Person ? __('admin.main_diagnoses.person') : __('admin.main_diagnoses.leader') }}</p>
+                <p class="text-sm text-grey-700">{{ $main->subject === \App\Enums\MainDiagnosisSubject::Person ? __('admin.main_diagnoses.person') : __('admin.main_diagnoses.leader') }}</p>
                 <p class="font-semibold">{{ $main->leader->name }}</p>
                 @if ($main->hasPeers())
                     <p class="text-sm text-grey-700">{{ trans_choice('admin.main_diagnoses.preview_peers', $main->participants->where('role', \App\Enums\ParticipantRole::Peer)->whereNull('excluded_at')->count(), ['count' => $main->participants->where('role', \App\Enums\ParticipantRole::Peer)->whereNull('excluded_at')->count()]) }}</p>
                 @endif
             </div>
             <div>
-                <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.window') }}</p>
-                <p class="font-semibold">{{ $main->starts_on?->format('Y.m.d.') ?? __('diagnosis.date_open') }} → {{ $main->publishes_on->format('Y.m.d.') }}</p>
+                <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.window') }}</p>
+                {{-- A date range, written like the run's time window (admin.run.window_label). --}}
+                <p class="font-semibold">{{ $main->starts_on?->format('Y.m.d.') ?? __('diagnosis.date_open') }} – {{ $main->publishes_on->format('Y.m.d.') }}</p>
                 <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.reading_short', ['date' => $main->readingStartsOn()->format('Y.m.d.')]) }}</p>
             </div>
-        </section>
+        </x-ui.card>
     @elseif ($diagnosis->parent)
-        <p class="rounded-field bg-grey-100 px-3 py-2 text-sm">
+        <x-ui.notice>
             {{ __('admin.main_diagnoses.part_of') }}
             <a href="{{ route('admin.diagnoses.show', $diagnosis->parent) }}" class="font-semibold">{{ $diagnosis->parent->name }}</a>
             · {{ __('admin.main_diagnoses.status_follows') }}
             @if ($diagnosis->excluded_at)
                 · <strong>{{ __('admin.main_diagnoses.excluded') }}</strong>
             @endif
-        </p>
+        </x-ui.notice>
     @endif
 
     @unless ($isEditable)
-        <p class="rounded-field bg-grey-100 px-3 py-2 text-sm">{{ __('admin.diagnoses.published_readonly') }}</p>
+        <x-ui.notice>{{ __('admin.diagnoses.published_readonly') }}</x-ui.notice>
     @endunless
 
     @if ($main && $main->calculation)
         {{-- The ring, the step, the points and the biggest gap (18 · 18.3, 18.4) --}}
         @php($calculation = $main->calculation)
-        <section class="grid gap-4 rounded-card border border-grey-250 bg-white p-6 sm:grid-cols-2 lg:grid-cols-5" aria-labelledby="calculation-title">
+        <x-ui.card as="section" bordered padding="lg" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5" aria-labelledby="calculation-title">
             <h2 id="calculation-title" class="sr-only">{{ __('admin.diagnoses.calculation.title') }}</h2>
             <div>
-                <p class="text-sm text-grey-600">{{ __('admin.diagnoses.calculation.ring') }}</p>
+                <p class="text-sm text-grey-700">{{ __('admin.diagnoses.calculation.ring') }}</p>
                 <p class="text-2xl font-semibold">{{ $calculation['ring'] === null ? '–' : $calculation['ring'].'%' }}</p>
             </div>
             <div>
-                <p class="text-sm text-grey-600">{{ __('admin.diagnoses.calculation.step') }}</p>
+                <p class="text-sm text-grey-700">{{ __('admin.diagnoses.calculation.step') }}</p>
                 <p class="font-semibold">{{ $calculation['step'] === null ? '–' : __('admin.diagnoses.calculation.steps.'.$calculation['step']) }}</p>
             </div>
             <div>
-                <p class="text-sm text-grey-600">{{ __('admin.diagnoses.calculation.points') }}</p>
+                <p class="text-sm text-grey-700">{{ __('admin.diagnoses.calculation.points') }}</p>
                 <p class="font-semibold">{{ $calculation['points'] ?? 0 }} / {{ $calculation['max'] ?? 0 }}</p>
                 <p class="text-sm text-grey-700">{{ __('admin.diagnoses.calculation.measuring_points', ['count' => $calculation['measuring_points'] ?? 0]) }}</p>
             </div>
             <div>
-                <p class="text-sm text-grey-600">{{ __('admin.diagnoses.calculation.biggest_gap') }}</p>
+                <p class="text-sm text-grey-700">{{ __('admin.diagnoses.calculation.biggest_gap') }}</p>
                 <p class="font-semibold">
                     @if ($calculation['biggest_gap'])
                         {{ $calculation['biggest_gap']['label'] }} · {{ __('admin.diagnoses.calculation.gap_text', ['experience' => number_format((float) $calculation['biggest_gap']['experience'], 1, ',', ''), 'score' => number_format((float) $calculation['biggest_gap']['score'], 1, ',', '')]) }}
@@ -121,20 +127,20 @@
                 </p>
             </div>
             <div>
-                <p class="text-sm text-grey-600">{{ __('admin.diagnoses.calculation.threshold') }}</p>
+                <p class="text-sm text-grey-700">{{ __('admin.diagnoses.calculation.threshold') }}</p>
                 <p class="font-semibold">{{ $calculation['threshold_met'] ? __('admin.diagnoses.calculation.threshold_met') : __('admin.diagnoses.calculation.threshold_open', ['count' => $calculation['peers_answered']]) }}</p>
                 <p class="text-sm text-grey-700">{{ __('admin.diagnoses.calculation.calculated_at', ['date' => $main->calculated_at->format('Y.m.d. H:i')]) }}</p>
             </div>
-        </section>
+        </x-ui.card>
     @endif
 
     @if ($diagnosis->level === \App\Enums\DiagnosisLevel::Process)
         {{-- The point of the process and how it was calculated (13 · 13.1, 13.3, 13.5) --}}
         @php($processAggregation = $diagnosis->aggregation ?? [])
-        <section class="flex flex-col gap-4 rounded-card border border-grey-250 bg-white p-6" aria-labelledby="process-point-title">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4" aria-labelledby="process-point-title">
             <div class="flex flex-wrap items-start justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h2 id="process-point-title" class="text-sm text-grey-600">{{ __('admin.diagnoses.process_point') }} · {{ $diagnosis->process?->name }}</h2>
+                    <h2 id="process-point-title" class="text-lg font-semibold">{{ __('admin.diagnoses.process_point') }} · {{ $diagnosis->process?->name }}</h2>
                     <p class="text-3xl font-semibold">{{ $diagnosis->scoreLabel() ?: '–' }}</p>
                     <p class="flex flex-wrap gap-1">
                         @if ($diagnosis->score_state === \App\Enums\ScoreState::InsufficientData)
@@ -166,10 +172,11 @@
                     @endif
                 </div>
                 @if ($isEditable && $isCalculated && ! $editingScore)
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
                         <x-ui.button tone="outline" size="sm" wire:click="editScore">{{ __('admin.diagnoses.override.edit') }}</x-ui.button>
                         @if ($diagnosis->score_overridden_at)
-                            <x-ui.button tone="outline" size="sm" wire:click="resetScore" wire:confirm="{{ __('admin.diagnoses.override.confirm_reset') }}">{{ __('admin.diagnoses.override.reset') }}</x-ui.button>
+                            {{-- The manual value and its reason are lost. --}}
+                            <x-ui.button tone="danger" size="sm" wire:click="resetScore" wire:confirm="{{ __('admin.diagnoses.override.confirm_reset') }}" data-confirm-tone="danger" :data-confirm-label="__('admin.diagnoses.override.reset')">{{ __('admin.diagnoses.override.reset') }}</x-ui.button>
                         @endif
                     </div>
                 @endif
@@ -179,7 +186,7 @@
                 <form wire:submit="saveScore" class="grid gap-4 md:grid-cols-2">
                     <x-form.input name="scoreInput" wire:model="scoreInput" :label="__('admin.diagnoses.process_point')" :help="__('admin.diagnoses.process_point_help')" required />
                     <x-form.textarea name="scoreReason" wire:model="scoreReason" :label="__('admin.diagnoses.override.reason')" :help="__('admin.diagnoses.override.reason_help')" rows="2" required />
-                    <div class="flex gap-3 md:col-span-2">
+                    <div class="flex flex-wrap gap-3 md:col-span-2">
                         <x-ui.button type="submit" size="sm">{{ __('admin.common.save') }}</x-ui.button>
                         <x-ui.button tone="outline" size="sm" wire:click="$set('editingScore', false)">{{ __('admin.common.cancel') }}</x-ui.button>
                     </div>
@@ -189,18 +196,19 @@
             @if ($processAggregation !== [])
                 @include('livewire.admin.diagnoses.partials.process-aggregation', ['description' => $processAggregation])
             @endif
-        </section>
+        </x-ui.card>
     @endif
 
     {{-- Aggregated data (04 · 4.5) --}}
     @if ($isAggregatable)
-        <section class="flex flex-col gap-4 rounded-card border border-grey-250 bg-white p-6" aria-labelledby="aggregation-title">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-                <h2 id="aggregation-title" class="text-lg font-semibold">{{ __('admin.diagnoses.aggregation.title') }}</h2>
-                @if ($isEditable && ! $preview)
-                    <x-ui.button tone="outline" size="sm" wire:click="previewAggregation">{{ __('admin.diagnoses.aggregation.load') }}</x-ui.button>
-                @endif
-            </div>
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4" aria-labelledby="aggregation-title">
+            <x-ui.section-header :title="__('admin.diagnoses.aggregation.title')" id="aggregation-title">
+                <x-slot:actions>
+                    @if ($isEditable && ! $preview)
+                        <x-ui.button tone="outline" size="sm" wire:click="previewAggregation">{{ __('admin.diagnoses.aggregation.load') }}</x-ui.button>
+                    @endif
+                </x-slot:actions>
+            </x-ui.section-header>
 
             @if ($preview)
                 @include('livewire.admin.diagnoses.partials.aggregation-description', ['description' => $preview])
@@ -210,7 +218,8 @@
 
                 <div class="flex flex-wrap gap-3">
                     @if ($valueRows->isNotEmpty() || $aggregation)
-                        <x-ui.button wire:click="loadAggregation" wire:confirm="{{ __('admin.diagnoses.aggregation.confirm_reload') }}">{{ __('admin.diagnoses.aggregation.confirm') }}</x-ui.button>
+                        {{-- Reloading writes over every row, the manual changes too. --}}
+                        <x-ui.button wire:click="loadAggregation" wire:confirm="{{ __('admin.diagnoses.aggregation.confirm_reload') }}" data-confirm-tone="danger" :data-confirm-label="__('admin.diagnoses.aggregation.confirm')">{{ __('admin.diagnoses.aggregation.confirm') }}</x-ui.button>
                     @else
                         <x-ui.button wire:click="loadAggregation">{{ __('admin.diagnoses.aggregation.confirm') }}</x-ui.button>
                     @endif
@@ -219,9 +228,9 @@
             @elseif ($aggregation)
                 @include('livewire.admin.diagnoses.partials.aggregation-description', ['description' => $aggregation])
             @else
-                <p class="text-sm text-grey-600">{{ __('admin.diagnoses.aggregation.help') }}</p>
+                <p class="text-sm text-grey-700">{{ __('admin.diagnoses.aggregation.help') }}</p>
             @endif
-        </section>
+        </x-ui.card>
     @endif
 
     {{-- Values (04 · 4.4) --}}
@@ -231,8 +240,8 @@
         @include('livewire.admin.diagnoses.partials.rows-table', ['rows' => $valueRows, 'removable' => true])
 
         @if ($isEditable && ! $isCalculated)
-            <form wire:submit="addValue" class="flex flex-wrap items-end gap-3 rounded-card border border-grey-250 bg-white p-4">
-                <div class="min-w-64 flex-1">
+            <x-ui.card as="form" bordered padding="sm" wire:submit="addValue">
+                <x-form.inline>
                     <x-form.input
                         name="newValueName"
                         wire:model="newValueName"
@@ -246,9 +255,11 @@
                             <option value="{{ $valueName }}"></option>
                         @endforeach
                     </datalist>
-                </div>
-                <x-ui.button type="submit" class="mb-7">{{ __('admin.diagnoses.add_value_button') }}</x-ui.button>
-            </form>
+                    <x-slot:actions>
+                        <x-ui.button type="submit" tone="outline" icon="plus">{{ __('admin.diagnoses.add_value_button') }}</x-ui.button>
+                    </x-slot:actions>
+                </x-form.inline>
+            </x-ui.card>
         @endif
     </section>
 
@@ -259,7 +270,7 @@
             <ul class="flex flex-col gap-2">
                 @foreach ($otherDetected as $detections)
                     @php($detectedValue = $detections->first()->unmatchedValue)
-                    <li class="rounded-card border border-grey-250 bg-white p-4">
+                    <x-ui.card as="li" bordered padding="sm">
                         <a href="{{ route('admin.values.edit', $detectedValue) }}" class="font-semibold text-charcoal">{{ $detectedValue->name }}</a>
                         <x-ui.badge class="ml-2">{{ $detectedValue->origin->label() }}</x-ui.badge>
                         <ul class="mt-2 flex flex-col gap-1 text-sm text-grey-700">
@@ -267,7 +278,7 @@
                                 <li>„{{ $detection->quote }}”</li>
                             @endforeach
                         </ul>
-                    </li>
+                    </x-ui.card>
                 @endforeach
             </ul>
         </section>
@@ -282,10 +293,10 @@
         <section class="flex flex-col gap-3" aria-labelledby="processes-title">
             <h2 id="processes-title" class="text-lg font-semibold">{{ __('admin.diagnoses.processes_block') }}</h2>
             @include('livewire.admin.diagnoses.partials.rows-table', ['rows' => $processRows, 'removable' => false, 'title' => __('admin.diagnoses.processes_block')])
-            <ul class="flex flex-wrap gap-3 text-sm">
+            <ul class="-ml-1.5 flex flex-wrap gap-x-3">
                 @foreach ($processRows as $processRow)
                     @isset($processRow->aggregation_stats['process_diagnosis_id'])
-                        <li><a href="{{ route('admin.diagnoses.show', $processRow->aggregation_stats['process_diagnosis_id']) }}" class="font-semibold">{{ __('admin.diagnoses.open_process', ['name' => $processRow->label()]) }}</a></li>
+                        <li><x-ui.button tone="ghost" size="sm" :href="route('admin.diagnoses.show', $processRow->aggregation_stats['process_diagnosis_id'])">{{ __('admin.diagnoses.open_process', ['name' => $processRow->label()]) }}</x-ui.button></li>
                     @endisset
                 @endforeach
             </ul>
@@ -319,7 +330,7 @@
                         <td class="px-3 py-2">
                             <span class="font-semibold">{{ $entry['occasion']->occurred_at->format('Y.m.d.') }}</span>
                             @if ($entry['occasion']->process_id !== $diagnosis->process_id)
-                                <span class="block text-xs text-grey-600">{{ $entry['occasion']->process->name }}</span>
+                                <span class="block text-xs text-grey-700">{{ $entry['occasion']->process->name }}</span>
                             @endif
                         </td>
                         <td class="px-3 py-2">
@@ -367,12 +378,12 @@
                     {{ $transition->created_at->format('Y.m.d. H:i') }} ·
                     @if ($transition->from_stage && $transition->to_stage && $transition->from_stage !== $transition->to_stage)
                         {{-- A main diagnosis moves in stages; its status changes only with some of them (17 · 17.5). --}}
-                        {{ $transition->from_stage->label() }} → {{ $transition->to_stage->label() }}
+                        {{ $transition->from_stage->label() }} <x-megis.icon name="arrow-right" class="align-middle" :label="__('admin.diagnoses.changed_to')" /> {{ $transition->to_stage->label() }}
                         @if ($transition->from_status !== $transition->to_status)
-                            ({{ $transition->from_status?->label() }} → {{ $transition->to_status->label() }})
+                            ({{ $transition->from_status?->label() }} <x-megis.icon name="arrow-right" class="align-middle" :label="__('admin.diagnoses.changed_to')" /> {{ $transition->to_status->label() }})
                         @endif
                     @elseif ($transition->from_status)
-                        {{ $transition->from_status->label() }} → {{ $transition->to_status->label() }}
+                        {{ $transition->from_status->label() }} <x-megis.icon name="arrow-right" class="align-middle" :label="__('admin.diagnoses.changed_to')" /> {{ $transition->to_status->label() }}
                     @else
                         {{ __('admin.diagnoses.created_status', ['status' => $transition->to_status->label()]) }}
                     @endif

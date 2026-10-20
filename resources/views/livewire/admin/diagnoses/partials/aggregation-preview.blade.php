@@ -29,6 +29,6 @@
             </td>
         </tr>
     @empty
-        <tr><td colspan="6" class="px-3 py-6 text-center text-grey-600">{{ __('admin.diagnoses.aggregation.nothing') }}</td></tr>
+        <x-admin.empty-row :colspan="6">{{ __('admin.diagnoses.aggregation.nothing') }}</x-admin.empty-row>
     @endforelse
 </x-admin.table>

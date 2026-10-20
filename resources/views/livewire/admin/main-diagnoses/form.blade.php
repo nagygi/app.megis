@@ -10,8 +10,9 @@
         <x-admin.page-header :title="$title" />
     @endif
 
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <form wire:submit="saveDraft" class="flex flex-col gap-6 rounded-card border border-grey-250 bg-white p-6">
+    {{-- Side by side only from the desktop width: next to the admin's sidebar a 1024px screen leaves the form narrower than the preview. --}}
+    <div class="grid gap-6 desktop:grid-cols-[minmax(0,1fr)_22rem]">
+        <x-ui.card as="form" bordered padding="lg" wire:submit="saveDraft" class="flex flex-col gap-6">
             {{-- Ügyfél --}}
             <fieldset class="flex flex-col gap-4">
                 <legend class="mb-2 text-lg font-semibold">{{ __('admin.main_diagnoses.section_client') }}</legend>
@@ -20,7 +21,7 @@
                     <div class="flex flex-col gap-1">
                         <span class="text-sm font-medium">{{ __('admin.main_diagnoses.organization') }}</span>
                         <span>{{ $organization->name }}</span>
-                        <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.organization_fixed') }}</p>
+                        <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.organization_fixed') }}</p>
                     </div>
                 @else
                     <x-form.select name="organization_id" wire:model.live="organization_id" :label="__('admin.main_diagnoses.organization')" required>
@@ -44,7 +45,7 @@
                             · <a href="{{ route('admin.organizations.edit', $organization) }}">{{ __('admin.main_diagnoses.edit_organization') }}</a>
                         </span>
                         @if (! $hasFlow)
-                            <p class="text-sm font-semibold text-coral-ink" role="alert">{{ __('admin.main_diagnoses.no_flow') }}</p>
+                            <x-ui.notice tone="error" class="mt-1">{{ __('admin.main_diagnoses.no_flow') }}</x-ui.notice>
                         @endif
                     </div>
                 @endif
@@ -52,33 +53,35 @@
 
             @if ($organization && $hasFlow)
                 {{-- Kit diagnosztizálunk? --}}
-                <fieldset class="flex flex-col gap-3">
-                    <legend class="mb-2 text-lg font-semibold">{{ __('admin.main_diagnoses.subject') }}</legend>
+                @if ($organization->isIndividual() || $main)
+                    <fieldset class="flex flex-col gap-3">
+                        <legend class="mb-2 text-lg font-semibold">{{ __('admin.main_diagnoses.subject') }}</legend>
 
-                    @if ($organization->isIndividual())
-                        <p>{{ __('enums.main_diagnosis_subject.individual') }} · <span class="text-grey-600">{{ __('admin.main_diagnoses.subject_individual_help') }}</span></p>
-                    @elseif ($main)
-                        <p>{{ $subjectEnum?->label() }}</p>
-                    @else
-                        @foreach ([\App\Enums\MainDiagnosisSubject::Team, \App\Enums\MainDiagnosisSubject::Person] as $option)
-                            <label class="flex items-start gap-2">
-                                <input type="radio" name="subject" value="{{ $option->value }}" wire:model.live="subject" class="mt-1 size-4 accent-charcoal">
-                                <span>
-                                    <span class="font-medium">{{ $option->label() }}</span>
-                                    <span class="block text-sm text-grey-600">{{ __('admin.main_diagnoses.subject_help.'.$option->value) }}</span>
-                                </span>
-                            </label>
-                        @endforeach
-                        <x-form.error name="subject" id="subject" />
-                    @endif
-                </fieldset>
+                        @if ($organization->isIndividual())
+                            <p>{{ __('enums.main_diagnosis_subject.individual') }} · <span class="text-grey-700">{{ __('admin.main_diagnoses.subject_individual_help') }}</span></p>
+                        @else
+                            <p>{{ $subjectEnum?->label() }}</p>
+                        @endif
+                    </fieldset>
+                @else
+                    {{-- The question is this section's title, so the group's legend takes the section-title size instead of a second legend above it. --}}
+                    <x-form.radio-group
+                        name="subject"
+                        :label="__('admin.main_diagnoses.subject')"
+                        :options="collect([\App\Enums\MainDiagnosisSubject::Team, \App\Enums\MainDiagnosisSubject::Person])
+                            ->mapWithKeys(fn ($option) => [$option->value => ['label' => $option->label(), 'help' => __('admin.main_diagnoses.subject_help.'.$option->value)]])
+                            ->all()"
+                        wire:model.live="subject"
+                        class="[&>legend]:mb-2 [&>legend]:text-lg [&>legend]:font-semibold"
+                    />
+                @endif
 
                 {{-- Csapat --}}
                 @if ($subjectEnum === \App\Enums\MainDiagnosisSubject::Team)
                     <fieldset class="flex flex-col gap-3">
                         <legend class="mb-2 text-lg font-semibold">{{ __('admin.main_diagnoses.team') }}</legend>
                         @if ($main)
-                            <p>{{ $main->diagnosis->team?->name }} <span class="text-sm text-grey-600">· {{ __('admin.main_diagnoses.team_fixed') }}</span></p>
+                            <p>{{ $main->diagnosis->team?->name }} <span class="text-sm text-grey-700">· {{ __('admin.main_diagnoses.team_fixed') }}</span></p>
                         @else
                             @if (! $newTeam)
                                 <x-form.select name="team_id" wire:model.live="team_id" :label="__('admin.main_diagnoses.team')" required>
@@ -90,9 +93,9 @@
                             @else
                                 <x-form.input name="new_team_name" wire:model="new_team_name" :label="__('admin.main_diagnoses.new_team')" required />
                             @endif
-                            <button type="button" wire:click="$toggle('newTeam')" class="self-start text-sm font-semibold underline">
+                            <x-ui.button tone="ghost" size="sm" :icon="$newTeam ? null : 'plus'" class="-ml-1.5 self-start" wire:click="$toggle('newTeam')">
                                 {{ $newTeam ? __('admin.main_diagnoses.pick_team') : __('admin.main_diagnoses.add_team') }}
-                            </button>
+                            </x-ui.button>
                         @endif
                     </fieldset>
                 @endif
@@ -108,18 +111,18 @@
                     @elseif ($main)
                         <p>{{ $main->leader->name }} · {{ $main->leader->email }}</p>
                         @if ($canEditSettings)
-                            <div class="flex flex-wrap items-end gap-3 rounded-field bg-grey-100 p-4">
-                                <div class="min-w-56 flex-1">
-                                    <x-form.select name="replacementLeaderId" wire:model="replacementLeaderId" :label="__('admin.main_diagnoses.new_leader')" :help="__('admin.main_diagnoses.change_leader_help')">
-                                        <option value="">{{ __('admin.diagnoses.user_select') }}</option>
-                                        @foreach ($leaderOptions as $option)
-                                            @continue($option->id === $main->leader_id)
-                                            <option value="{{ $option->id }}">{{ $option->name }} · {{ $option->email }}</option>
-                                        @endforeach
-                                    </x-form.select>
-                                </div>
-                                <x-ui.button tone="outline" wire:click="changeLeader" wire:confirm="{{ __('admin.main_diagnoses.change_leader_confirm') }}">{{ __('admin.main_diagnoses.change_leader') }}</x-ui.button>
-                            </div>
+                            <x-form.inline class="rounded-field bg-grey-100 p-4">
+                                <x-form.select name="replacementLeaderId" wire:model="replacementLeaderId" :label="__('admin.main_diagnoses.new_leader')" :help="__('admin.main_diagnoses.change_leader_help')">
+                                    <option value="">{{ __('admin.diagnoses.user_select') }}</option>
+                                    @foreach ($leaderOptions as $option)
+                                        @continue($option->id === $main->leader_id)
+                                        <option value="{{ $option->id }}">{{ $option->name }} · {{ $option->email }}</option>
+                                    @endforeach
+                                </x-form.select>
+                                <x-slot:actions>
+                                    <x-ui.button tone="outline" wire:click="changeLeader" wire:confirm="{{ __('admin.main_diagnoses.change_leader_confirm') }}">{{ __('admin.main_diagnoses.change_leader') }}</x-ui.button>
+                                </x-slot:actions>
+                            </x-form.inline>
                         @endif
                     @else
                         @if (! $newLeader || $subjectEnum !== \App\Enums\MainDiagnosisSubject::Team)
@@ -137,9 +140,9 @@
                             <x-form.input name="leader_email" type="email" wire:model="leader_email" :label="__('admin.members.email')" :help="__('admin.main_diagnoses.new_leader_help')" required />
                         @endif
                         @if ($subjectEnum === \App\Enums\MainDiagnosisSubject::Team)
-                            <button type="button" wire:click="$toggle('newLeader')" class="self-start text-sm font-semibold underline">
+                            <x-ui.button tone="ghost" size="sm" :icon="$newLeader ? null : 'plus'" class="-ml-1.5 self-start" wire:click="$toggle('newLeader')">
                                 {{ $newLeader ? __('admin.main_diagnoses.pick_leader') : __('admin.main_diagnoses.add_leader') }}
-                            </button>
+                            </x-ui.button>
                         @endif
                     @endif
                 </fieldset>
@@ -148,7 +151,7 @@
                 @if ($hasPeers)
                     <fieldset class="flex flex-col gap-3">
                         <legend class="mb-2 text-lg font-semibold">{{ __('admin.main_diagnoses.peers') }}</legend>
-                        <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.peers_help') }}</p>
+                        <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.peers_help') }}</p>
                         @forelse ($peerCandidates as $candidate)
                             <x-form.checkbox
                                 :name="'peers.'.$candidate->id"
@@ -156,10 +159,11 @@
                                 :label="$candidate->name.' · '.$candidate->email"
                             />
                         @empty
-                            <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.peers_empty') }}</p>
+                            <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.peers_empty') }}</p>
                         @endforelse
                         @if ($peerCandidates->filter(fn ($candidate) => $peers[$candidate->id] ?? false)->count() < \App\Services\Diagnoses\ThresholdPolicy::PEERS)
-                            <p class="text-sm font-semibold text-coral-ink" role="status">{{ __('admin.main_diagnoses.peers_below_threshold') }}</p>
+                            {{-- Starting is still allowed, so a warning; it changes with every tick, hence the polite status. --}}
+                            <x-ui.notice tone="warning" role="status">{{ __('admin.main_diagnoses.peers_below_threshold') }}</x-ui.notice>
                         @endif
                     </fieldset>
                 @endif
@@ -172,7 +176,7 @@
                         <x-form.input name="publishes_on" type="date" wire:model.live="publishes_on" :label="__('admin.main_diagnoses.publishes_on')" required />
                     </div>
                     @if ($readingStartsOn)
-                        <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.reading_info', ['date' => $readingStartsOn, 'days' => config('diagnosis.reading_offset_days')]) }}</p>
+                        <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.reading_info', ['date' => $readingStartsOn, 'days' => config('diagnosis.reading_offset_days')]) }}</p>
                     @endif
                 </fieldset>
 
@@ -187,16 +191,18 @@
                 <x-form.input name="name" wire:model="name" :label="__('admin.main_diagnoses.name')" :help="__($subjectEnum === \App\Enums\MainDiagnosisSubject::Team ? 'admin.main_diagnoses.name_help' : 'admin.main_diagnoses.name_help_person')" />
 
                 @if ($blockers !== [] && $isDraft)
-                    <ul class="flex flex-col gap-1 rounded-field bg-coral-light p-4 text-sm text-black" role="status">
-                        @foreach ($blockers as $blocker)
-                            <li>{{ $blocker }}</li>
-                        @endforeach
-                    </ul>
+                    <x-ui.notice tone="error">
+                        <ul class="flex flex-col gap-1">
+                            @foreach ($blockers as $blocker)
+                                <li>{{ $blocker }}</li>
+                            @endforeach
+                        </ul>
+                    </x-ui.notice>
                 @endif
 
                 <div class="flex flex-wrap gap-3">
                     @if ($isDraft)
-                        <x-ui.button type="button" wire:click="sendInvitation" :disabled="$blockers !== []">{{ __('admin.main_diagnoses.send_invitation') }}</x-ui.button>
+                        <x-ui.button type="button" icon="mail" wire:click="sendInvitation" :disabled="$blockers !== []">{{ __('admin.main_diagnoses.send_invitation') }}</x-ui.button>
                         <x-ui.button type="submit" tone="outline">{{ __('admin.main_diagnoses.save_draft') }}</x-ui.button>
                     @elseif ($canEditSettings)
                         <x-ui.button type="submit">{{ __('admin.common.save') }}</x-ui.button>
@@ -205,16 +211,23 @@
                 </div>
 
                 @if ($main && $main->stage !== \App\Enums\MainDiagnosisStage::Closed)
-                    <div class="border-t border-grey-200 pt-4">
-                        <x-ui.button tone="outline" size="sm" wire:click="close" wire:confirm="{{ __('admin.main_diagnoses.close_confirm') }}">{{ __('admin.main_diagnoses.close') }}</x-ui.button>
-                        <p class="mt-2 text-sm text-grey-600">{{ __('admin.main_diagnoses.close_help') }}</p>
+                    <div class="flex flex-col items-start gap-2 border-t border-grey-200 pt-4">
+                        <x-ui.button
+                            tone="danger"
+                            size="sm"
+                            wire:click="close"
+                            wire:confirm="{{ __('admin.main_diagnoses.close_confirm') }}"
+                            data-confirm-tone="danger"
+                            :data-confirm-label="__('admin.main_diagnoses.close')"
+                        >{{ __('admin.main_diagnoses.close') }}</x-ui.button>
+                        <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.close_help') }}</p>
                     </div>
                 @endif
             @endif
-        </form>
+        </x-ui.card>
 
         {{-- Amit a vezető lát (V1) --}}
-        <aside class="flex flex-col gap-4 self-start rounded-card bg-charcoal p-6 text-cream lg:sticky lg:top-6" aria-labelledby="preview-title">
+        <aside class="flex flex-col gap-4 self-start rounded-card bg-charcoal p-6 text-cream desktop:sticky desktop:top-6" aria-labelledby="preview-title">
             <p id="preview-title" class="text-sm opacity-90">{{ __('admin.main_diagnoses.preview_title') }}</p>
             @if ($preview === [])
                 <p class="opacity-90">{{ __('admin.main_diagnoses.preview_empty') }}</p>
@@ -225,7 +238,7 @@
                     <p class="text-sm opacity-90">
                         {{ $productName }} ·
                         {{ __('diagnosis.minutes_until', ['minutes' => array_sum(array_column($preview, 'minutes'))]) }}
-                        {{ filled($starts_on) ? rescue(fn () => today()->parse($starts_on)->format('m.d.').'-ig', '', false) : __('diagnosis.date_open') }}
+                        {{ filled($starts_on) ? rescue(fn () => __('diagnosis.until', ['date' => today()->parse($starts_on)->format('m.d.')]), '', false) : __('diagnosis.date_open') }}
                     </p>
                 </div>
                 <ol class="flex flex-col gap-2">

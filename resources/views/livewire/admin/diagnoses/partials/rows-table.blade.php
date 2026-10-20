@@ -71,7 +71,7 @@
                 {{ $row->scoreLabel() }}
                 @if (array_key_exists('n', $stats))
                     @php($deviation = $stats['score_deviation'] ?? $stats['deviation'] ?? null)
-                    <span class="block text-xs font-normal text-grey-600">n = {{ $stats['n'] }}@if (array_key_exists('score_deviation', $stats) || array_key_exists('deviation', $stats)) · {{ __('admin.diagnoses.aggregation.deviation') }}: {{ $deviation === null ? '–' : number_format($deviation, 2, ',', '') }}@endif</span>
+                    <span class="block text-xs font-normal text-grey-700">n ={{ $stats['n'] }}@if (array_key_exists('score_deviation', $stats) || array_key_exists('deviation', $stats)) · {{ __('admin.diagnoses.aggregation.deviation') }}: {{ $deviation === null ? '–' : number_format($deviation, 2, ',', '') }}@endif</span>
                 @endif
             </td>
             <td class="px-3 py-2">{{ $row->experienceLabel() }}</td>
@@ -79,13 +79,36 @@
             <td class="max-w-xs px-3 py-2 text-grey-700">{{ \Illuminate\Support\Str::limit((string) $row->reasoning, 80) }}</td>
             <td class="px-3 py-2 text-right">
                 @if ($isEditable && $editingRowId !== $row->id)
-                    <div class="flex justify-end gap-2">
-                        <x-ui.button tone="outline" size="sm" wire:click="editRow({{ $row->id }})" aria-label="{{ __('admin.diagnoses.edit_row') }}: {{ $row->label() }}">{{ $row->automatic_score_state !== null ? __('admin.diagnoses.override.edit') : __('admin.diagnoses.edit_row') }}</x-ui.button>
-                        @if ($row->overridden_at)
-                            <x-ui.button tone="outline" size="sm" wire:click="resetRow({{ $row->id }})" wire:confirm="{{ __('admin.diagnoses.override.confirm_reset') }}" aria-label="{{ __('admin.diagnoses.override.reset') }}: {{ $row->label() }}">{{ __('admin.diagnoses.override.reset') }}</x-ui.button>
-                        @endif
-                        @if ($removable && ! $isCalculated)
-                            <x-ui.button tone="outline" size="sm" wire:click="removeRow({{ $row->id }})" wire:confirm="{{ __('admin.diagnoses.confirm_remove_row') }}" aria-label="{{ __('admin.diagnoses.remove_row') }}: {{ $row->label() }}">{{ __('admin.diagnoses.remove_row') }}</x-ui.button>
+                    {{-- A calculated row is written over, the others edited; the accessible name starts with the visible label. --}}
+                    @php($editLabel = $row->automatic_score_state !== null ? __('admin.diagnoses.override.edit') : __('admin.diagnoses.edit_row'))
+                    @php($rowRemovable = $removable && ! $isCalculated)
+                    {{-- Editing, the row's main action, stays a button; resetting and removing wait in the menu. --}}
+                    <div class="flex items-center justify-end gap-1">
+                        <x-ui.button tone="outline" size="sm" wire:click="editRow({{ $row->id }})" aria-label="{{ $editLabel }}: {{ $row->label() }}">{{ $editLabel }}</x-ui.button>
+                        @if ($row->overridden_at || $rowRemovable)
+                            <x-admin.row-actions :label="__('admin.common.row_actions', ['name' => $row->label()])">
+                                @if ($row->overridden_at)
+                                    {{-- The manual value and its reason are lost. --}}
+                                    <x-admin.row-action
+                                        tone="danger"
+                                        wire:click="resetRow({{ $row->id }})"
+                                        wire:confirm="{{ __('admin.diagnoses.override.confirm_reset') }}"
+                                        data-confirm-tone="danger"
+                                        :data-confirm-label="__('admin.diagnoses.override.reset')"
+                                        aria-label="{{ __('admin.diagnoses.override.reset') }}: {{ $row->label() }}"
+                                    >{{ __('admin.diagnoses.override.reset') }}</x-admin.row-action>
+                                @endif
+                                @if ($rowRemovable)
+                                    <x-admin.row-action
+                                        tone="danger"
+                                        wire:click="removeRow({{ $row->id }})"
+                                        wire:confirm="{{ __('admin.diagnoses.confirm_remove_row') }}"
+                                        data-confirm-tone="danger"
+                                        :data-confirm-label="__('admin.diagnoses.remove_row')"
+                                        aria-label="{{ __('admin.diagnoses.remove_row') }}: {{ $row->label() }}"
+                                    >{{ __('admin.diagnoses.remove_row') }}</x-admin.row-action>
+                                @endif
+                            </x-admin.row-actions>
                         @endif
                     </div>
                 @endif
@@ -142,6 +165,6 @@
             </tr>
         @endif
     @empty
-        <tr><td colspan="6" class="px-3 py-6 text-center text-grey-600">{{ __('admin.diagnoses.no_values') }}</td></tr>
+        <x-admin.empty-row :colspan="6">{{ __('admin.diagnoses.no_values') }}</x-admin.empty-row>
     @endforelse
 </x-admin.table>

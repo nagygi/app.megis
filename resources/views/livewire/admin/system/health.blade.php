@@ -1,15 +1,15 @@
 @php($tones = ['ok' => 'green', 'warning' => 'yellow', 'error' => 'coral'])
 
-<div class="max-w-4xl" wire:poll.60s>
+<div class="max-w-5xl" wire:poll.60s>
     <x-admin.page-header :title="__('admin.system.health_title')" />
 
-    <dl class="mb-6 grid gap-4 rounded-card border border-grey-250 bg-white p-6 sm:grid-cols-3">
-        <div><dt class="text-sm text-grey-600">{{ __('admin.system.version') }}</dt><dd class="font-semibold">{{ $version }}</dd></div>
-        <div><dt class="text-sm text-grey-600">{{ __('admin.system.environment') }}</dt><dd class="font-semibold">{{ $environment }}</dd></div>
-        <div><dt class="text-sm text-grey-600">{{ __('admin.system.deployed_at') }}</dt><dd class="font-semibold">{{ $deployedAt ?? __('admin.system.unknown') }}</dd></div>
-        <div><dt class="text-sm text-grey-600">{{ __('admin.system.queue_size') }}</dt><dd class="font-semibold">{{ $queueSize ?? __('admin.system.unknown') }}</dd></div>
-        <div><dt class="text-sm text-grey-600">{{ __('admin.system.failed_jobs') }}</dt><dd class="font-semibold">{{ $failedJobs }}</dd></div>
-    </dl>
+    <x-ui.card as="dl" bordered padding="lg" class="mb-6 grid gap-4 sm:grid-cols-3">
+        <div><dt class="text-sm text-grey-700">{{ __('admin.system.version') }}</dt><dd class="font-semibold">{{ $version }}</dd></div>
+        <div><dt class="text-sm text-grey-700">{{ __('admin.system.environment') }}</dt><dd class="font-semibold">{{ $environment }}</dd></div>
+        <div><dt class="text-sm text-grey-700">{{ __('admin.system.deployed_at') }}</dt><dd class="font-semibold">{{ $deployedAt ?? __('admin.system.unknown') }}</dd></div>
+        <div><dt class="text-sm text-grey-700">{{ __('admin.system.queue_size') }}</dt><dd class="font-semibold">{{ $queueSize ?? __('admin.system.unknown') }}</dd></div>
+        <div><dt class="text-sm text-grey-700">{{ __('admin.system.failed_jobs') }}</dt><dd class="font-semibold">{{ $failedJobs }}</dd></div>
+    </x-ui.card>
 
     <h2 class="mb-3 text-lg font-semibold">{{ __('admin.system.checks') }}</h2>
     <x-admin.table>

@@ -1,6 +1,7 @@
 @php
     [$sortField, $sortDirection] = $this->currentSort();
-    $statusTones = ['active' => 'green', 'invited' => 'yellow', 'invitation_expired' => 'coral', 'locked' => 'coral', 'inactive' => 'muted'];
+    // The same status tones on every user list: clients, members, admins.
+    $statusTones = ['active' => 'green', 'added' => 'neutral', 'invited' => 'yellow', 'pending' => 'yellow', 'invitation_expired' => 'coral', 'locked' => 'coral', 'inactive' => 'muted'];
 @endphp
 
 <div>
@@ -8,17 +9,17 @@
 
     <x-admin.page-header :title="__('admin.admins.title')">
         <x-slot:actions>
-            <x-ui.button :href="route('admin.admins.create')">{{ __('admin.admins.invite') }}</x-ui.button>
+            <x-ui.button icon="plus" :href="route('admin.admins.create')">{{ __('admin.admins.invite') }}</x-ui.button>
         </x-slot:actions>
     </x-admin.page-header>
 
     <x-admin.list-toolbar>
         <x-admin.filter name="role" :label="__('admin.admins.role')" :options="collect($roles)->mapWithKeys(fn ($role) => [$role->value => $role->label()])" />
         <x-admin.filter name="status" :label="__('admin.admins.status')" :options="collect($statuses)->mapWithKeys(fn ($status) => [$status->value => $status->label()])" />
-        <label class="inline-flex items-center gap-2 pb-2 text-sm">
-            <input type="checkbox" wire:model.live="showInactive" class="size-4 accent-charcoal">
-            {{ __('admin.common.show_inactive') }}
-        </label>
+        {{-- Lined up with the 44px fields beside it. --}}
+        <div class="flex min-h-11 items-center">
+            <x-form.checkbox name="showInactive" wire:model.live="showInactive" :label="__('admin.common.show_inactive')" />
+        </div>
     </x-admin.list-toolbar>
 
     <x-admin.table :paginator="$users">
@@ -58,7 +59,7 @@
                                 <x-admin.row-action wire:click="resetPassword({{ $user->id }})" wire:confirm="{{ __('admin.admins.confirm_reset') }}">{{ __('admin.admins.reset_password') }}</x-admin.row-action>
                             @endcan
                             @can('deactivate', $user)
-                                <x-admin.row-action wire:click="deactivate({{ $user->id }})" wire:confirm="{{ __('admin.admins.confirm_deactivate') }}">{{ __('admin.common.deactivate') }}</x-admin.row-action>
+                                <x-admin.row-action tone="danger" wire:click="deactivate({{ $user->id }})" wire:confirm="{{ __('admin.admins.confirm_deactivate') }}" data-confirm-tone="danger">{{ __('admin.common.deactivate') }}</x-admin.row-action>
                             @endcan
                             @can('activate', $user)
                                 <x-admin.row-action wire:click="activate({{ $user->id }})" wire:confirm="{{ __('admin.admins.confirm_activate') }}">{{ __('admin.common.activate') }}</x-admin.row-action>
@@ -68,7 +69,8 @@
                 </td>
             </tr>
         @empty
-            <tr><td colspan="6" class="px-3 py-6 text-center text-grey-600">{{ __('admin.common.empty') }}</td></tr>
+            {{-- The signed-in admin is always on the list, so it is empty only under a search or a filter. --}}
+            <x-admin.empty-row :colspan="6">{{ __('admin.common.empty') }}</x-admin.empty-row>
         @endforelse
     </x-admin.table>
 </div>

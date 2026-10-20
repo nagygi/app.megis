@@ -122,7 +122,7 @@ it('tours the confirmation and the toast', function () {
     Organization::factory()->create(['name' => 'Acme Kft.']);
     $page = adminLoginInBrowser(User::factory()->admin()->create());
 
-    $page->click('[aria-label="Műveletek: Acme Kft."]')->click('Inaktiválás');
+    $page->click('[aria-label="Műveletek: Acme Kft."]')->click('Inaktiválom');
     tourShot($page, 'feedback-01-confirm');
 
     $page->press('Igen');

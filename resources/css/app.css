@@ -178,11 +178,68 @@
 }
 
 /*
- * EasyMDE, the admin's md editor, loads its stock stylesheet after this one;
- * its counter grey (#959694) stays under 4.5:1 on white (WCAG AA).
+ * EasyMDE, the admin's md editor, in the brand: it loads its stock stylesheet
+ * after this one, so every rule here is one class more specific. Its counter
+ * grey (#959694) stayed under 4.5:1 on white (WCAG AA).
  */
+.EasyMDEContainer .editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    border-color: var(--color-grey-350);
+    border-radius: var(--radius-field) var(--radius-field) 0 0;
+    background-color: var(--color-white);
+    padding: 0.25rem;
+    opacity: 1;
+}
+
+.EasyMDEContainer .editor-toolbar button {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    margin: 0;
+    padding: 0 0.625rem;
+    border: 0;
+    border-radius: var(--radius-field);
+    color: var(--color-charcoal);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+}
+
+.EasyMDEContainer .editor-toolbar button:hover,
+.EasyMDEContainer .editor-toolbar button.active {
+    background-color: var(--color-grey-100);
+}
+
+.EasyMDEContainer .editor-toolbar i.separator {
+    border-left-color: var(--color-grey-250);
+    border-right: 0;
+}
+
+.EasyMDEContainer .CodeMirror {
+    border-color: var(--color-grey-350);
+    border-radius: 0 0 var(--radius-field) var(--radius-field);
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+}
+
+.EasyMDEContainer .CodeMirror-focused {
+    border-color: var(--color-charcoal);
+}
+
+.EasyMDEContainer .editor-preview {
+    background-color: var(--color-paper);
+}
+
 .EasyMDEContainer .editor-statusbar {
     color: var(--color-grey-600);
+}
+
+/* The counter is ours ("25 / 160"); EasyMDE would prefix it with an English "characters:". */
+.EasyMDEContainer .editor-statusbar .characters::before {
+    content: none;
 }
 
 /*

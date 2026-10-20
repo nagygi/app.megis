@@ -1,9 +1,9 @@
-<div class="max-w-2xl">
+<div class="max-w-3xl">
     <x-ui.flash class="mb-6" />
 
     <x-admin.page-header :title="$title" />
 
-    <form wire:submit="save" class="flex flex-col gap-5 rounded-card border border-grey-250 bg-white p-6">
+    <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-5">
         <x-form.input name="name" wire:model="name" :label="__('admin.diagnoses.name')" required />
         <x-form.textarea name="description" wire:model="description" :label="__('admin.diagnoses.description')" />
 
@@ -11,7 +11,7 @@
             <div class="flex flex-col gap-1.5">
                 <span class="text-sm font-medium">{{ __('admin.diagnoses.organization') }}</span>
                 <span>{{ $diagnosis->organization->name }}</span>
-                <p class="text-sm text-grey-600">{{ __('admin.diagnoses.organization_fixed') }}</p>
+                <p class="text-sm text-grey-700">{{ __('admin.diagnoses.organization_fixed') }}</p>
             </div>
         @else
             <x-form.select name="organization_id" wire:model.live="organization_id" :label="__('admin.diagnoses.organization')" required>
@@ -20,19 +20,15 @@
             </x-form.select>
         @endif
 
-        <fieldset class="flex flex-col gap-2">
-            <legend class="mb-1 text-sm font-medium">{{ __('admin.diagnoses.level') }} <span class="font-normal text-grey-600">· {{ __('ui.required') }}</span></legend>
-            @foreach ($levels as $levelOption)
-                <label class="inline-flex items-center gap-2">
-                    <input type="radio" name="level" value="{{ $levelOption->value }}" wire:model.live="level" class="size-4 accent-charcoal">
-                    {{ $levelOption->label() }}
-                </label>
-            @endforeach
-            @if ($organization?->isIndividual())
-                <p class="text-sm text-grey-600">{{ __('admin.diagnoses.level_team_individual') }}</p>
-            @endif
-            <x-form.error name="level" id="level" />
-        </fieldset>
+        <x-form.radio-group
+            name="level"
+            wire:model.live="level"
+            :label="__('admin.diagnoses.level')"
+            :options="$levels->mapWithKeys(fn ($levelOption) => [$levelOption->value => $levelOption->label()])->all()"
+            :help="$organization?->isIndividual() ? __('admin.diagnoses.level_team_individual') : null"
+            required
+            inline
+        />
 
         @if ($level === \App\Enums\DiagnosisLevel::Team->value)
             <x-form.select name="team_id" wire:model="team_id" :label="__('admin.diagnoses.team')" required>
@@ -90,5 +86,5 @@
             <x-ui.button type="submit">{{ __('admin.common.save') }}</x-ui.button>
             <x-ui.button tone="outline" :href="$diagnosis ? route('admin.diagnoses.show', $diagnosis) : route('admin.diagnoses.index')">{{ __('admin.common.cancel') }}</x-ui.button>
         </div>
-    </form>
+    </x-ui.card>
 </div>

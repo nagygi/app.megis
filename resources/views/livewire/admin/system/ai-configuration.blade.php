@@ -1,12 +1,11 @@
-<div class="flex flex-col gap-4">
-    <x-admin.page-header :title="__('admin.ai.configuration_title')" />
-
-    <p class="max-w-3xl text-sm text-grey-700">
-        {{ __('admin.ai.configuration_help') }}
-        {{ $pricesSyncedAt
+<div class="flex flex-col gap-6">
+    <x-admin.page-header
+        :title="__('admin.ai.configuration_title')"
+        :description="__('admin.ai.configuration_help').' '.($pricesSyncedAt
             ? __('admin.ai.prices_synced', ['date' => \Illuminate\Support\Carbon::parse($pricesSyncedAt)->format('Y.m.d. H:i')])
-            : __('admin.ai.prices_never_synced') }}
-    </p>
+            : __('admin.ai.prices_never_synced'))"
+        :spaced="false"
+    />
 
     <x-admin.table>
         <x-slot:head>
@@ -27,7 +26,7 @@
                     @if ($task['prompt'] && $task['prompt_version'])
                         <a href="{{ route('admin.system.ai.prompts', ['prompt' => $task['prompt'], 'verzio' => $task['prompt_version']]) }}" class="text-charcoal">{{ $task['prompt'] }} · v{{ $task['prompt_version'] }}</a>
                     @elseif ($task['prompt'])
-                        <span class="text-grey-600">{{ $task['prompt'] }} · {{ __('admin.ai.no_prompt_yet') }}</span>
+                        <span class="text-grey-700">{{ $task['prompt'] }} · {{ __('admin.ai.no_prompt_yet') }}</span>
                     @else
                         {{ __('admin.common.none') }}
                     @endif

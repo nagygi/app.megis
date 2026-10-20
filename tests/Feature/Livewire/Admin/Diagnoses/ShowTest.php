@@ -158,8 +158,8 @@ it('logs the stage change of a main diagnosis, not the unchanged status (17 · 1
     $main = startMainDiagnosis($setup);
 
     Livewire::test(Show::class, ['diagnosis' => $main->diagnosis])
-        ->assertSee('Vázlat → Meghívva')
-        ->assertDontSee('Draft → Draft');
+        ->assertSeeInOrder(['Vázlat', 'erre váltott:', 'Meghívva'])
+        ->assertDontSee('(Draft');
 });
 
 it('does not skip from draft to published', function () {

@@ -5,12 +5,13 @@
 --}}
 @if ($viewed)
     {{-- Read-only view of one version --}}
-    <div class="flex flex-col gap-4 rounded-card border border-grey-250 bg-white p-6">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-            <h2 class="text-lg font-semibold">{{ __('admin.versions.readonly', ['version' => $viewed->label()]) }}</h2>
-            <x-ui.button tone="outline" size="sm" wire:click="backToList">{{ __('admin.versions.back_to_list') }}</x-ui.button>
-        </div>
-        <p class="text-sm text-grey-600">{{ $viewed->created_at->format('Y.m.d. H:i') }} · {{ $viewed->creator?->name ?? __('admin.versions.system') }}@if ($viewed->note) · {{ $viewed->note }}@endif</p>
+    <x-ui.card bordered padding="lg" class="flex flex-col gap-4">
+        <x-ui.section-header :title="__('admin.versions.readonly', ['version' => $viewed->label()])">
+            <x-slot:actions>
+                <x-ui.button tone="outline" size="sm" icon="chevron-left" wire:click="backToList">{{ __('admin.versions.back_to_list') }}</x-ui.button>
+            </x-slot:actions>
+        </x-ui.section-header>
+        <p class="text-sm text-grey-700">{{ $viewed->created_at->format('Y.m.d. H:i') }} · {{ $viewed->creator?->name ?? __('admin.versions.system') }}@if ($viewed->note) · {{ $viewed->note }}@endif</p>
 
         <dl class="flex flex-col gap-4">
             @foreach ($fields as $field => $type)
@@ -22,7 +23,7 @@
                     <dd>
                         @if ($type === \App\Services\Versioning\SnapshotComparison::LIST)
                             @if (($viewedSnapshot[$field] ?? []) === [])
-                                <span class="text-grey-600">{{ __('admin.versions.empty_list') }}</span>
+                                <span class="text-grey-700">{{ __('admin.versions.empty_list') }}</span>
                             @else
                                 <ol class="list-decimal pl-5">
                                     @foreach ($viewedSnapshot[$field] as $item)
@@ -37,19 +38,21 @@
                 </div>
             @endforeach
         </dl>
-    </div>
+    </x-ui.card>
 @elseif ($comparison)
     {{-- Side by side comparison --}}
-    <div class="flex flex-col gap-4 rounded-card border border-grey-250 bg-white p-6">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-            <h2 class="text-lg font-semibold">{{ __('admin.versions.comparing', ['left' => 'v'.$left, 'right' => 'v'.$right]) }}</h2>
-            <x-ui.button tone="outline" size="sm" wire:click="backToList">{{ __('admin.versions.back_to_list') }}</x-ui.button>
-        </div>
+    <x-ui.card bordered padding="lg" class="flex flex-col gap-4">
+        <x-ui.section-header :title="__('admin.versions.comparing', ['left' => 'v'.$left, 'right' => 'v'.$right])">
+            <x-slot:actions>
+                <x-ui.button tone="outline" size="sm" icon="chevron-left" wire:click="backToList">{{ __('admin.versions.back_to_list') }}</x-ui.button>
+            </x-slot:actions>
+        </x-ui.section-header>
 
-        <div class="flex flex-wrap gap-3 text-sm" aria-hidden="true">
-            <span class="rounded-pill bg-green-soft px-2 py-0.5">+ {{ __('admin.versions.added') }}</span>
-            <span class="rounded-pill bg-coral-light px-2 py-0.5 line-through">− {{ __('admin.versions.removed') }}</span>
-            <span class="rounded-pill bg-yellow-pale px-2 py-0.5">↕ {{ __('admin.versions.moved') }}</span>
+        {{-- The legend in the colours of the highlights below; the moved sign is the sort icon. --}}
+        <div class="flex flex-wrap gap-2" aria-hidden="true">
+            <x-ui.badge tone="green">+ {{ __('admin.versions.added') }}</x-ui.badge>
+            <x-ui.badge tone="coral" class="line-through">− {{ __('admin.versions.removed') }}</x-ui.badge>
+            <x-ui.badge tone="yellow" class="gap-1"><x-megis.icon name="sort" />{{ __('admin.versions.moved') }}</x-ui.badge>
         </div>
 
         @foreach ($comparison as $row)
@@ -61,10 +64,10 @@
                 <div class="grid gap-4 md:grid-cols-2">
                     @foreach (['old' => 'v'.$left, 'new' => 'v'.$right] as $side => $sideLabel)
                         <div class="flex flex-col gap-1">
-                            <span class="text-xs font-semibold uppercase text-grey-600">{{ $sideLabel }}</span>
+                            <span class="text-xs font-semibold uppercase text-grey-700">{{ $sideLabel }}</span>
                             @if ($row['type'] === \App\Services\Versioning\SnapshotComparison::LIST)
                                 @if ($row[$side] === [])
-                                    <span class="text-grey-600">{{ __('admin.versions.empty_list') }}</span>
+                                    <span class="text-grey-700">{{ __('admin.versions.empty_list') }}</span>
                                 @else
                                     <ol class="flex flex-col gap-1">
                                         @foreach ($row[$side] as $item)
@@ -93,7 +96,7 @@
                                             <del class="rounded-field bg-coral-light"><span class="sr-only">{{ __('admin.versions.removed') }}:</span>{{ $segment['text'] }}</del>
                                         @endif
                                     @empty
-                                        <span class="text-grey-600">{{ __('admin.common.none') }}</span>
+                                        <span class="text-grey-700">{{ __('admin.common.none') }}</span>
                                     @endforelse
                                 </p>
                             @endif
@@ -102,25 +105,31 @@
                 </div>
             </section>
         @endforeach
-    </div>
+    </x-ui.card>
 @else
     {{-- Version list and events --}}
     @if ($versions->count() > 1)
-        <form wire:submit="compare" class="mb-4 flex flex-wrap items-end gap-3 rounded-card border border-grey-250 bg-white p-4">
-            <x-form.select name="left" wire:model="left" :label="__('admin.versions.compare_left')">
-                <option value="">–</option>
-                @foreach ($versions as $version)
-                    <option value="{{ $version->number }}">{{ $version->label() }}</option>
-                @endforeach
-            </x-form.select>
-            <x-form.select name="right" wire:model="right" :label="__('admin.versions.compare_right')">
-                <option value="">–</option>
-                @foreach ($versions as $version)
-                    <option value="{{ $version->number }}">{{ $version->label() }}</option>
-                @endforeach
-            </x-form.select>
-            <x-ui.button type="submit" tone="outline">{{ __('admin.versions.compare_button') }}</x-ui.button>
-        </form>
+        <x-ui.card bordered padding="sm" class="mb-4">
+            <x-form.inline as="form" wire:submit="compare">
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <x-form.select name="left" wire:model="left" :label="__('admin.versions.compare_left')">
+                        <option value="">–</option>
+                        @foreach ($versions as $version)
+                            <option value="{{ $version->number }}">{{ $version->label() }}</option>
+                        @endforeach
+                    </x-form.select>
+                    <x-form.select name="right" wire:model="right" :label="__('admin.versions.compare_right')">
+                        <option value="">–</option>
+                        @foreach ($versions as $version)
+                            <option value="{{ $version->number }}">{{ $version->label() }}</option>
+                        @endforeach
+                    </x-form.select>
+                </div>
+                <x-slot:actions>
+                    <x-ui.button type="submit" tone="outline">{{ __('admin.versions.compare_button') }}</x-ui.button>
+                </x-slot:actions>
+            </x-form.inline>
+        </x-ui.card>
     @endif
 
     <x-admin.table>

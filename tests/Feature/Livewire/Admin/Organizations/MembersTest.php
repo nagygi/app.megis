@@ -18,7 +18,7 @@ it('shows the headcount and the invite button while there is a free seat', funct
 
     $component = Livewire::test(Members::class, ['organization' => $organization]);
 
-    $component->assertSee('8 / 10 felhasználó')->assertSee('+ Felhasználó meghívása');
+    $component->assertSee('8 / 10 felhasználó')->assertSee('Felhasználót hívok meg');
 });
 
 it('greys out the invite button with the reason at the limit', function () {
@@ -38,7 +38,7 @@ it('sends the invitation of a recorded user from the list', function () {
     $membership = Membership::factory()->added()->for($organization)->create(['user_id' => User::factory()->invited()]);
 
     Livewire::test(Members::class, ['organization' => $organization])
-        ->assertSee('Meghívó küldése')
+        ->assertSee('Elküldöm a meghívót')
         ->call('sendInvitation', $membership->id);
 
     expect($membership->fresh()->status)->toBe(MembershipStatus::Invited);
@@ -80,7 +80,7 @@ it('reactivates a member only while there is a free seat', function () {
     expect($inactive->fresh()->status)->toBe(MembershipStatus::Inactive);
 });
 
-it('offers "Belépés a nevében" for an active member', function () {
+it('offers "Belépek a nevében" for an active member', function () {
     actingAsAdmin();
     $organization = Organization::factory()->create();
     $membership = Membership::factory()->for($organization)->create();
@@ -90,14 +90,14 @@ it('offers "Belépés a nevében" for an active member', function () {
     $component->assertSee(route('admin.impersonate', $membership->user));
 });
 
-it('greys out "Belépés a nevében" with the reason', function (Closure $membershipFactory, string $reason) {
+it('greys out "Belépek a nevében" with the reason', function (Closure $membershipFactory, string $reason) {
     actingAsAdmin();
     $organization = Organization::factory()->create();
     $membership = $membershipFactory()->for($organization)->create();
 
     $component = Livewire::test(Members::class, ['organization' => $organization]);
 
-    $component->assertSee('Belépés a nevében')
+    $component->assertSee('Belépek a nevében')
         ->assertSee($reason)
         ->assertDontSee(route('admin.impersonate', $membership->user));
 })->with([
@@ -107,14 +107,14 @@ it('greys out "Belépés a nevében" with the reason', function (Closure $member
     'registered, invitation still open' => [fn () => Membership::factory()->invited(), 'A felhasználó tagsága ebben a szervezetben még nem aktív. A meghívó elküldésével azonnal aktív lesz.'],
 ]);
 
-it('shows no "Belépés a nevében" for an admin account', function () {
+it('shows no "Belépek a nevében" for an admin account', function () {
     actingAsAdmin();
     $organization = Organization::factory()->create();
     Membership::factory()->for($organization)->create(['user_id' => User::factory()->admin()]);
 
     $component = Livewire::test(Members::class, ['organization' => $organization]);
 
-    $component->assertDontSee('Belépés a nevében');
+    $component->assertDontSee('Belépek a nevében');
 });
 
 it('filters members by tag', function () {

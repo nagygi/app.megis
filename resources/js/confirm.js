@@ -14,17 +14,14 @@ export default function megisConfirm({ message, tone, label }) {
         return Promise.resolve(window.confirm(message));
     }
 
-    const danger = tone === 'danger';
     dialog.querySelector('[data-confirm-message]').textContent = message;
 
-    dialog.querySelectorAll('[data-confirm-ok]').forEach((button) => {
-        const shown = (button.dataset.confirmOk === 'danger') === danger;
-        button.hidden = !shown;
-
-        if (shown) {
-            button.querySelector('[data-confirm-label]').textContent = label || button.dataset.defaultLabel;
-        }
-    });
+    // One yes button at a time, in the tone the action asks for.
+    const template = dialog.querySelector(`[data-confirm-template="${tone === 'danger' ? 'danger' : 'default'}"]`);
+    const slot = dialog.querySelector('[data-confirm-ok-slot]');
+    slot.replaceChildren(template.content.cloneNode(true));
+    const yes = slot.querySelector('button');
+    yes.querySelector('[data-confirm-label]').textContent = label || yes.dataset.defaultLabel;
 
     dialog.returnValue = '';
     dialog.showModal();

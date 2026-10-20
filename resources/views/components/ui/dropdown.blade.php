@@ -2,7 +2,7 @@
     A menu that opens from a button: the row menus of the admin lists, the
     avatar menus. Fixed to the viewport, so a scrolling table cannot clip it.
     It closes on Esc (the focus goes back to the button), on a click outside
-    or on an item, and when anything scrolls.
+    or on an item, and when anything scrolls; it slides in and is gone at once.
     - label: the button's accessible name; without a "trigger" slot the button
       shows the "more" icon;
     - width: the menu's width in px; align: the button's right (default) or
@@ -79,10 +79,8 @@
         id="{{ $menuId }}"
         x-show="open"
         x-cloak
-        x-transition:enter="transition-[opacity,translate] duration-200 ease-brand-out"
-        x-transition:enter-start="-translate-y-1 opacity-0"
-        x-transition:leave="transition-opacity duration-100"
-        x-transition:leave-end="opacity-0"
+        x-transition:enter="transition-[translate] duration-200 ease-brand-out"
+        x-transition:enter-start="-translate-y-1"
         @click="close()"
         :style="`top: ${top}px; left: ${left}px; width: {{ (int) $width }}px`"
         class="fixed z-40 flex flex-col gap-0.5 rounded-card border border-grey-250 bg-white p-2 text-charcoal"
