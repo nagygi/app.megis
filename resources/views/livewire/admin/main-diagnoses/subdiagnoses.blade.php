@@ -16,7 +16,7 @@
         </x-slot:head>
 
         @forelse ($subdiagnoses as $subdiagnosis)
-            <tr wire:key="sub-{{ $subdiagnosis->id }}" @class(['opacity-60' => $subdiagnosis->excluded_at])>
+            <tr wire:key="sub-{{ $subdiagnosis->id }}" @class(['bg-grey-100 text-grey-600' => $subdiagnosis->excluded_at])>
                 <td class="px-3 py-2">
                     <a href="{{ route('admin.diagnoses.show', $subdiagnosis) }}" class="font-semibold text-charcoal">{{ $subdiagnosis->name }}</a>
                     @if ($subdiagnosis->excluded_at)

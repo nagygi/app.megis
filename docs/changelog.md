@@ -2,6 +2,26 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.25 · {hash} · 2026-10-21
+
+UI-finomhangolás, 8. lépés: lezárás.
+
+- **Akadálymentesség:** a képernyőkép-túra minden oldalt ellenőriz is (`UI_A11Y=1`). Mind a 45 fő oldal (ügyfél, riport, tükör, admin, megerősítő ablak, toast, lapozó) hiba nélkül megy át 390 és 1280 px-en.
+- **Átlátszóság helyett tömör színek:**
+  - A fejlécek alcíme és jegyzete, a V1-előnézet és az inaktív sorok halványítása tömör színű lett; a design system nem használ átlátszóságot.
+  - Az ellenőrző az áttetsző szöveg mögött nem találta a hátteret a ragadós előnézetben.
+- **A teljes terv kész (1.18–1.25):**
+  1. alapok;
+  2. visszajelzés;
+  3. navigáció;
+  4. tokenek;
+  5. komponensek;
+  6. ügyfélfelület;
+  7. adminfelület;
+  8. lezárás.
+
+  Előtte–utána képek: 42 oldal, 390 és 1280 px.
+
 ## 1.24 · 06d0397 · 2026-10-21
 
 UI-finomhangolás, 7. lépés: az admin képernyői az új komponenseken.

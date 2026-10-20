@@ -55,7 +55,7 @@
                     <span>
                         {{ $chip['name'] }}@if ($chip['unclear'])?@endif
                         @if ($chip['rhythm_label'] || $chip['headcount'])
-                            <span class="font-normal opacity-80">· {{ collect([$chip['rhythm_label'], $chip['headcount'] ? __('processes.headcount', ['count' => $chip['headcount']]) : null])->filter()->implode(', ') }}</span>
+                            <span class="font-normal">· {{ collect([$chip['rhythm_label'], $chip['headcount'] ? __('processes.headcount', ['count' => $chip['headcount']]) : null])->filter()->implode(', ') }}</span>
                         @endif
                     </span>
                     @if ($editable)

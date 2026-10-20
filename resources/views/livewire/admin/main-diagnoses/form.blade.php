@@ -228,14 +228,14 @@
 
         {{-- Amit a vezető lát (V1) --}}
         <aside class="flex flex-col gap-4 self-start rounded-card bg-charcoal p-6 text-cream desktop:sticky desktop:top-6" aria-labelledby="preview-title">
-            <p id="preview-title" class="text-sm opacity-90">{{ __('admin.main_diagnoses.preview_title') }}</p>
+            <p id="preview-title" class="text-sm">{{ __('admin.main_diagnoses.preview_title') }}</p>
             @if ($preview === [])
-                <p class="opacity-90">{{ __('admin.main_diagnoses.preview_empty') }}</p>
+                <p>{{ __('admin.main_diagnoses.preview_empty') }}</p>
             @else
                 <div>
                     <p class="text-xl font-extrabold uppercase">{{ __('diagnosis.what_awaits') }}</p>
                     <p>{{ trans_choice('diagnosis.steps_lead', count($preview), ['count' => count($preview)]) }}</p>
-                    <p class="text-sm opacity-90">
+                    <p class="text-sm text-grey-350">
                         {{ $productName }} ·
                         {{ __('diagnosis.minutes_until', ['minutes' => array_sum(array_column($preview, 'minutes'))]) }}
                         {{ filled($starts_on) ? rescue(fn () => __('diagnosis.until', ['date' => today()->parse($starts_on)->format('m.d.')]), '', false) : __('diagnosis.date_open') }}
@@ -244,15 +244,15 @@
                 <ol class="flex flex-col gap-2">
                     @foreach ($preview as $index => $step)
                         <li class="flex items-center gap-3">
-                            <span class="grid size-6 shrink-0 place-items-center rounded-pill text-xs font-extrabold {{ $index === 0 ? 'bg-coral text-black' : 'bg-white/15' }}" aria-hidden="true">{{ $index + 1 }}</span>
-                            <span class="flex-1">{{ $step['label'] }}@if ($step['readonly']) <span class="text-sm opacity-80">· {{ __('diagnosis.readonly') }}</span>@endif</span>
-                            <span class="text-sm opacity-80">{{ __('diagnosis.minutes', ['minutes' => $step['minutes']]) }}</span>
+                            <span class="grid size-6 shrink-0 place-items-center rounded-pill text-xs font-extrabold {{ $index === 0 ? 'bg-coral text-black' : 'bg-grey-700' }}" aria-hidden="true">{{ $index + 1 }}</span>
+                            <span class="flex-1">{{ $step['label'] }}@if ($step['readonly']) <span class="text-sm text-grey-350">· {{ __('diagnosis.readonly') }}</span>@endif</span>
+                            <span class="text-sm text-grey-350">{{ __('diagnosis.minutes', ['minutes' => $step['minutes']]) }}</span>
                         </li>
                     @endforeach
                 </ol>
                 @if ($hasPeers)
                     @php($peerCount = $peerCandidates->filter(fn ($candidate) => $peers[$candidate->id] ?? false)->count())
-                    <p class="text-sm opacity-90">{{ trans_choice('admin.main_diagnoses.preview_peers', $peerCount, ['count' => $peerCount]) }}</p>
+                    <p class="text-sm text-grey-350">{{ trans_choice('admin.main_diagnoses.preview_peers', $peerCount, ['count' => $peerCount]) }}</p>
                     @if ($peerCount < \App\Services\Diagnoses\ThresholdPolicy::PEERS)
                         <p class="text-sm">{{ __('admin.main_diagnoses.peers_below_threshold') }}</p>
                     @endif

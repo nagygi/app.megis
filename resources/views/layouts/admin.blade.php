@@ -65,7 +65,7 @@
 
                     <div class="min-w-0 flex-1">
                         @if ($organization)
-                            <p class="text-sm opacity-90">{{ __('admin.nav.organizations') }}</p>
+                            <p class="text-sm">{{ __('admin.nav.organizations') }}</p>
                             <p class="truncate text-lg font-semibold">{{ $organization->name }}</p>
                         @else
                             <p class="truncate text-lg font-semibold">{{ $title }}</p>

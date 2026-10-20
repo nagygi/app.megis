@@ -68,7 +68,7 @@
     <x-ui.card as="section" bordered class="flex flex-col gap-3" aria-labelledby="window-title">
         <h2 id="window-title" class="text-lg font-semibold">{{ __('admin.run.window') }}</h2>
         <div class="relative h-3 rounded-pill bg-grey-100" role="img" aria-label="{{ __('admin.run.window_label', ['from' => $start->format('Y.m.d.'), 'to' => $main->publishes_on->format('Y.m.d.'), 'today' => today()->format('Y.m.d.')]) }}">
-            <div class="absolute inset-y-0 left-0 rounded-pill bg-green/60" style="width: {{ $position(today()) }}%"></div>
+            <div class="absolute inset-y-0 left-0 rounded-pill bg-green-muted" style="width: {{ $position(today()) }}%"></div>
             <div class="absolute inset-y-[-4px] w-0.5 bg-coral-dark" style="left: {{ $position($main->readingStartsOn()) }}%" title="{{ __('admin.main_diagnoses.reading_short', ['date' => $main->readingStartsOn()->format('Y.m.d.')]) }}"></div>
         </div>
         <p class="flex flex-wrap justify-between gap-2 text-sm text-grey-700">

@@ -179,10 +179,10 @@
                         <div>
                             <h1 class="text-2xl leading-tight font-extrabold uppercase [text-wrap:pretty]">{{ $title }}</h1>
                             @if ($subtitle)
-                                <p class="mt-1 text-sm opacity-90">{{ $subtitle }}</p>
+                                <p class="mt-1 text-sm">{{ $subtitle }}</p>
                             @endif
                             @if ($note)
-                                <p class="text-sm opacity-80">{{ $note }}</p>
+                                <p class="text-sm">{{ $note }}</p>
                             @endif
                         </div>
                     </div>

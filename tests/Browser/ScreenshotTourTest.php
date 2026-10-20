@@ -20,7 +20,8 @@ beforeEach(function () {
 });
 
 /**
- * Screenshots the current page at 390 and 1280px.
+ * Screenshots the current page at 390 and 1280px; with UI_A11Y=1 it checks
+ * every page for accessibility issues too.
  */
 function tourShot(mixed $page, string $name): void
 {
@@ -29,6 +30,10 @@ function tourShot(mixed $page, string $name): void
     foreach ([390 => 844, 1280 => 800] as $width => $height) {
         $page->resize($width, $height);
         $page->screenshot(true, "{$set}-{$name}-{$width}");
+
+        if (getenv('UI_A11Y')) {
+            $page->assertNoAccessibilityIssues();
+        }
     }
 }
 

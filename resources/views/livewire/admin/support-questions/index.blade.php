@@ -35,7 +35,7 @@
                     padding="none"
                     wire:key="question-{{ $question->id }}"
                     wire:sort:item="{{ $question->id }}"
-                    :class="'flex items-center gap-2 py-1 pr-2 pl-1'.($question->is_active ? '' : ' opacity-60')"
+                    :class="'flex items-center gap-2 py-1 pr-2 pl-1'.($question->is_active ? '' : ' text-grey-600')"
                 >
                     <span wire:sort:handle class="grid size-11 shrink-0 cursor-grab place-items-center text-grey-600" title="{{ __('admin.list_editor.drag') }}" aria-hidden="true">
                         <x-megis.icon name="drag" />

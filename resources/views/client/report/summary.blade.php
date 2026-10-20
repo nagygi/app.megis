@@ -39,7 +39,7 @@
             @foreach (['strength', 'crack'] as $kind)
                 @if ($report[$kind])
                     <span>
-                        <span class="block text-xs uppercase opacity-90">{{ \App\Services\Report\ReportText::claimKind($kind, $report['meta']) }} · {{ $report[$kind]['row'] }}</span>
+                        <span class="block text-xs uppercase">{{ \App\Services\Report\ReportText::claimKind($kind, $report['meta']) }} · {{ $report[$kind]['row'] }}</span>
                         <span class="block">{{ $report[$kind]['text'] }}</span>
                     </span>
                 @endif
