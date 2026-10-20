@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.16 · {hash} · 2026-10-20
+## 1.16 · b5a24a8 · 2026-10-20
 
 Az 1.15 staging-újratesztje után.
 
