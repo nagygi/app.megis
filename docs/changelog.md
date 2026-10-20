@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.20 · {hash} · 2026-10-21
+## 1.20 · 4dc52cd · 2026-10-21
 
 UI-finomhangolás, 3. lépés: navigáció és layoutok.
 
