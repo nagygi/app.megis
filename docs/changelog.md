@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.24 · {hash} · 2026-10-21
+## 1.24 · 06d0397 · 2026-10-21
 
 UI-finomhangolás, 7. lépés: az admin képernyői az új komponenseken.
 
