@@ -4,7 +4,7 @@
 @endphp
 
 <div class="flex max-w-4xl flex-col gap-6">
-    <x-admin.page-header :title="__('admin.organizations.tabs.values')" class="mb-0" />
+    <x-admin.page-header :title="__('admin.organizations.tabs.values')" :spaced="false" />
     <x-ui.flash />
 
     @if ($viewed)

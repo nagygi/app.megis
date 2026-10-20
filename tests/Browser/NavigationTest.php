@@ -33,7 +33,9 @@ it('leads home from the menu and the libraries', function () {
 
 it('closes the admin drawer with Esc and keeps it out of reach when closed', function () {
     $page = adminLoginInBrowser(User::factory()->admin()->create());
+    // Loaded again at the new size: measuring right after the resize could still see the desktop layout.
     $page->resize(390, 844);
+    $page->navigate('/admin/szervezetek');
     $navVisibility = '() => getComputedStyle(document.getElementById("admin-nav")).visibility';
 
     expect($page->script($navVisibility))->toBe('hidden');

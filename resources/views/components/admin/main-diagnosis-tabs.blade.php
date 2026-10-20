@@ -45,22 +45,8 @@
         </p>
     @endif
 
-    <nav class="border-b border-grey-250" aria-label="{{ $diagnosis->name }}">
-        <ul class="flex gap-1 overflow-x-auto">
-            @foreach ($tabs as $tab)
-                @php($isActive = request()->routeIs($tab['route']))
-                <li>
-                    <a
-                        href="{{ route($tab['route'], $diagnosis) }}"
-                        @class([
-                            'block whitespace-nowrap border-b-2 px-4 py-2 text-sm font-semibold no-underline',
-                            'border-charcoal text-charcoal' => $isActive,
-                            'border-transparent text-grey-700 hover:text-charcoal' => ! $isActive,
-                        ])
-                        @if ($isActive) aria-current="page" @endif
-                    >{{ $tab['label'] }}</a>
-                </li>
-            @endforeach
-        </ul>
-    </nav>
+    <x-ui.tabs
+        :label="$diagnosis->name"
+        :tabs="array_map(fn (array $tab) => ['href' => route($tab['route'], $diagnosis), 'label' => $tab['label'], 'active' => request()->routeIs($tab['route'])], $tabs)"
+    />
 </div>

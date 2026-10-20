@@ -184,3 +184,105 @@
 .EasyMDEContainer .editor-statusbar {
     color: var(--color-grey-600);
 }
+
+/*
+ * The one look of every form field (NFR: the same input tokens everywhere):
+ * x-form.input/select/textarea, the admin filters, search and list editor.
+ * aria-invalid paints the error; the width is the caller's.
+ */
+@utility field {
+    border: 1px solid var(--color-grey-350);
+    border-radius: var(--radius-field);
+    background-color: var(--color-white);
+    padding: 0.625rem 0.875rem;
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    color: var(--color-charcoal);
+    transition: border-color var(--duration-base) var(--ease-standard);
+
+    &::placeholder {
+        color: var(--color-grey-600);
+    }
+
+    &:hover {
+        border-color: var(--color-grey-500);
+    }
+
+    &:focus {
+        border-color: var(--color-charcoal);
+    }
+
+    &[aria-invalid='true'] {
+        border-color: var(--color-coral-dark);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        background-color: var(--color-grey-100);
+        color: var(--color-grey-700);
+    }
+}
+
+/*
+ * Markdown from the reading, the report and the Bölcsességtár, without the
+ * typography plugin: paragraphs, headings, lists with the brand bullet,
+ * quotes with the coral rule.
+ */
+@utility prose-megis {
+    & > * + * {
+        margin-top: 0.75em;
+    }
+
+    & h2,
+    & h3 {
+        margin-top: 1.25em;
+        font-weight: var(--font-weight-semibold);
+        line-height: 1.25;
+    }
+
+    & h2 {
+        font-size: var(--text-xl);
+    }
+
+    & h3 {
+        font-size: var(--text-lg);
+    }
+
+    & strong {
+        font-weight: var(--font-weight-semibold);
+    }
+
+    & ul,
+    & ol {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35em;
+    }
+
+    & ol {
+        list-style: decimal;
+        padding-left: 1.4em;
+    }
+
+    & ul > li {
+        position: relative;
+        padding-left: 1.4em;
+    }
+
+    & ul > li::before {
+        content: '';
+        position: absolute;
+        top: 0.5em;
+        left: 0.2em;
+        width: 0.55em;
+        height: 0.55em;
+        background-color: currentColor;
+        -webkit-mask: url('../images/megis/icons/bullet.svg') center / contain no-repeat;
+        mask: url('../images/megis/icons/bullet.svg') center / contain no-repeat;
+    }
+
+    & blockquote {
+        border-left: 4.5px solid var(--color-coral);
+        padding-left: 1em;
+    }
+}

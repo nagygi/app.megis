@@ -134,46 +134,26 @@
                         ])>{{ $step ?? $label }}</span>
 
                         @if ($user)
-                            <div x-data="{ userOpen: false }" class="relative" @keydown.escape.window="userOpen = false">
-                                {{-- The circles stay 36px; the button around them is the 44px target. --}}
-                                <button
-                                    type="button"
-                                    class="press -mx-1 grid size-11 place-items-center rounded-pill"
-                                    aria-haspopup="true"
-                                    aria-controls="client-user-menu"
-                                    :aria-expanded="userOpen"
-                                    @click="userOpen = ! userOpen"
-                                >
+                            {{-- The circles stay 36px; the button around them is the 44px target. --}}
+                            <x-ui.dropdown id="client-user-menu" :label="__('client.menu.user_menu')" :width="256" trigger-class="press -mx-1 grid size-11 place-items-center rounded-pill">
+                                <x-slot:trigger>
                                     <span aria-hidden="true" class="grid size-9 place-items-center rounded-pill text-xs font-extrabold {{ $circleClasses }}">{{ $user->initials }}</span>
-                                    <span class="sr-only">{{ __('client.menu.user_menu') }}</span>
-                                </button>
+                                </x-slot:trigger>
 
-                                <div
-                                    id="client-user-menu"
-                                    x-show="userOpen"
-                                    x-cloak
-                                    @click.outside="userOpen = false"
-                                    class="absolute right-0 z-40 mt-2 w-64 rounded-card border border-grey-250 bg-white p-3 text-charcoal"
-                                >
+                                <div class="border-b border-grey-200 px-3 pt-1 pb-3">
                                     <p class="font-semibold">{{ $user->name }}</p>
                                     @if ($currentOrganization)
                                         <p class="mt-0.5 text-sm text-grey-700">{{ collect([$currentOrganization->name, $position])->filter()->implode(' · ') }}</p>
                                     @endif
-                                    <ul class="mt-3 flex flex-col gap-1 border-t border-grey-200 pt-3">
-                                        @if ($currentOrganization)
-                                            <li>
-                                                <a href="{{ route('client.profile', $currentOrganization) }}" class="block rounded-field px-2 py-1.5 text-charcoal no-underline hover:bg-grey-100">{{ __('client.menu.profile') }}</a>
-                                            </li>
-                                        @endif
-                                        <li>
-                                            <form method="POST" action="{{ route('client.logout') }}">
-                                                @csrf
-                                                <button type="submit" class="w-full rounded-field px-2 py-1.5 text-left hover:bg-grey-100">{{ __('client.menu.logout') }}</button>
-                                            </form>
-                                        </li>
-                                    </ul>
                                 </div>
-                            </div>
+                                @if ($currentOrganization)
+                                    <x-ui.dropdown-item :href="route('client.profile', $currentOrganization)" class="mt-1">{{ __('client.menu.profile') }}</x-ui.dropdown-item>
+                                @endif
+                                <form method="POST" action="{{ route('client.logout') }}">
+                                    @csrf
+                                    <x-ui.dropdown-item type="submit">{{ __('client.menu.logout') }}</x-ui.dropdown-item>
+                                </form>
+                            </x-ui.dropdown>
 
                             <button
                                 type="button"

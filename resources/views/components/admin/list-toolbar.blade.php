@@ -4,13 +4,16 @@
 <div {{ $attributes->class(['mb-4 flex flex-wrap items-end gap-3']) }}>
     <div class="flex min-w-60 flex-1 flex-col gap-1.5">
         <label for="list-search" class="text-sm font-medium">{{ $searchLabel ?? __('admin.common.search') }}</label>
-        <input
-            id="list-search"
-            type="search"
-            wire:model.live.debounce.300ms="search"
-            placeholder="{{ __('admin.common.search_placeholder') }}"
-            class="w-full rounded-field border border-grey-350 bg-white px-3.5 py-2 text-base focus:border-charcoal"
-        >
+        <div class="relative">
+            <x-megis.icon name="search" class="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-grey-600" />
+            <input
+                id="list-search"
+                type="search"
+                wire:model.live.debounce.300ms="search"
+                placeholder="{{ __('admin.common.search_placeholder') }}"
+                class="field w-full pl-10"
+            >
+        </div>
     </div>
     {{ $slot }}
 </div>

@@ -3,7 +3,7 @@
     <x-ui.flash />
 
     <div class="flex flex-col gap-1">
-        <x-admin.page-header :title="__('admin.areas.title')" class="mb-0" />
+        <x-admin.page-header :title="__('admin.areas.title')" :spaced="false" />
         <p class="text-grey-700">{{ __('admin.areas.lead') }}</p>
     </div>
 

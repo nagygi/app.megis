@@ -2,6 +2,41 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.22 · {hash} · 2026-10-21
+
+UI-finomhangolás, 5. lépés: a közös komponenskészlet. A képernyők a 6–7. lépésben állnak át rá.
+
+- **Új komponensek** (`resources/views/components/ui`):
+
+| Komponens | Mire való |
+|---|---|
+| `card` | Tónus, keret, belső térköz és elem szerint; ez lesz minden fehér doboz |
+| `link-row` | Cím, alcím, chevron |
+| `icon-button` | 44 px-es kör ikon-gomb, kötelező felirattal |
+| `notice` | Info, siker, figyelmeztetés, hiba: egységes színek és képernyőolvasó-szerepek, opcionális cím és akció |
+| `empty-state` | Szimbólum, mondat, az első elem hozzáadása |
+| `dropdown`, `dropdown-item` | A menük (lásd lent) |
+| `tabs` | Aláhúzott és „mappa” változat |
+| `segmented`, `segment` | Egy választható a pillek közül |
+| `section-header` | Egy méret minden szakaszcímnek |
+
+- **Menük:**
+  - Az admin sorműveletek és a két avatar-menü ugyanaz a `dropdown`.
+  - Esc-re bezárul, és a fókusz visszaáll a gombra; bezárul kívülre kattintásra és görgetésre is. Rövid beúszással nyílik.
+  - A sorműveletek gombja a „továbbiak” (⋯) ikon 44 px-en; eddig a hamburger-ikon volt 28 px-en.
+  - Törlésre `danger` tónusú menüpont.
+- **Űrlapok:**
+  - Egy `field` stílus minden mezőn: a form-komponensek, az admin szűrők, a kereső és a listaszerkesztő eddig háromféle magasságú volt.
+  - A kereső nagyító ikont kap. A textarea `maxlength` mellett karakterszámlálót mutat.
+  - Új `radio-group` (választócsempék), `file` (pill-gombos fájlmező) és `inline` (mező és gomb egy sorban, a gomb a mezőhöz igazodik, nem a címkéhez).
+- **Admin:**
+  - Az oldalfejléc vissza linket, badge-eket és leírást is kaphat. A hét oldalon hatástalan `class="mb-0"` helyett `:spaced="false"`.
+  - A rendezés jelei (▲▼↕) ikonok.
+  - A listaszerkesztő fel/le/törlés gombjai 44 px-es ikon-gombok, a fogd-és-vidd fogó ikon („⋮⋮” helyett).
+  - A szervezet és a főbb diagnózis fülsora az új `tabs`.
+- **Markdown:** a `prose-megis` stílus (bekezdések, címek, márkás felsoroláspont, coral idézetvonal) a typography plugin nélkül.
+- **Teszt:** az admin fiókmenü tesztje átméretezés után újratölt (időzítés).
+
 ## 1.21 · ee6ddcf · 2026-10-21
 
 UI-finomhangolás, 4. lépés: a design tokenek lezárása.

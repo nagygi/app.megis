@@ -2,7 +2,7 @@
 <div class="flex flex-col gap-6">
     <x-ui.flash />
 
-    <x-admin.page-header :title="__('admin.garden.title')" class="mb-0">
+    <x-admin.page-header :title="__('admin.garden.title')" :spaced="false">
         <x-slot:actions>
             <x-ui.button :href="route('admin.main-diagnoses.create')">{{ __('admin.garden.new') }}</x-ui.button>
         </x-slot:actions>

@@ -19,9 +19,9 @@
     {{ $attributes->class(['px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-grey-700']) }}
 >
     @if ($field)
-        <button type="button" wire:click="sortBy('{{ $field }}')" class="inline-flex items-center gap-1 uppercase">
+        <button type="button" wire:click="sortBy('{{ $field }}')" class="-mx-1 inline-flex min-h-8 items-center gap-1 rounded-field px-1 uppercase hover:text-charcoal">
             {{ $slot }}
-            <span aria-hidden="true" class="text-grey-600">{{ $isSorted ? ($sortDirection === 'asc' ? '▲' : '▼') : '↕' }}</span>
+            <x-megis.icon :name="$isSorted ? ($sortDirection === 'asc' ? 'chevron-up' : 'chevron-down') : 'sort'" :class="$isSorted ? 'text-charcoal' : 'text-grey-600'" />
         </button>
     @else
         {{ $slot }}

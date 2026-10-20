@@ -27,11 +27,7 @@
         @if ($required) required aria-required="true" @endif
         @if ($hasError) aria-invalid="true" @endif
         @if ($describedBy !== '') aria-describedby="{{ $describedBy }}" @endif
-        {{ $attributes->class([
-            'w-full rounded-field border bg-white px-3.5 py-2.5 text-base text-charcoal placeholder:text-grey-600',
-            'border-coral-dark' => $hasError,
-            'border-grey-350 focus:border-charcoal' => ! $hasError,
-        ]) }}
+        {{ $attributes->class(['field w-full']) }}
     >
 
     @if ($help)

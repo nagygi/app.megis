@@ -272,7 +272,7 @@ return [
     ],
 
     'list_editor' => [
-        'add' => '+ Új elem',
+        'add' => 'Új elem',
         'drag' => 'Húzd a helyére',
         'item_label' => ':label, :number. elem',
         'up' => 'A(z) :number. elem feljebb',

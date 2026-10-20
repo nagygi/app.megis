@@ -4,7 +4,7 @@
 
     <div class="flex flex-col gap-1">
         <a href="{{ route('admin.organizations.processes', $organization) }}" class="text-sm font-semibold">← {{ __('admin.organizations.tabs.processes') }}</a>
-        <x-admin.page-header :title="$process->name" class="mb-0" />
+        <x-admin.page-header :title="$process->name" :spaced="false" />
         <p class="text-grey-700">{{ $process->kind->label() }}@if ($process->rhythm) · {{ $process->rhythm->label() }}@endif</p>
     </div>
 

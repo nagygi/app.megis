@@ -38,7 +38,9 @@
         <ol wire:sort="sortListItem('{{ $name }}', $item, $position)" class="flex flex-col gap-2">
             @foreach ($items as $index => $item)
                 <li wire:key="{{ $name }}-{{ $index }}-{{ md5((string) $item) }}" wire:sort:item="{{ $index }}" class="flex items-start gap-2">
-                    <span wire:sort:handle class="mt-2.5 cursor-grab select-none px-1 text-grey-600" title="{{ __('admin.list_editor.drag') }}" aria-hidden="true">⋮⋮</span>
+                    <span wire:sort:handle class="grid size-11 shrink-0 cursor-grab place-items-center text-grey-600" title="{{ __('admin.list_editor.drag') }}" aria-hidden="true">
+                        <x-megis.icon name="drag" />
+                    </span>
 
                     <div class="flex flex-1 flex-col gap-1">
                         <input
@@ -48,19 +50,15 @@
                             maxlength="{{ $maxLength }}"
                             aria-label="{{ __('admin.list_editor.item_label', ['label' => $label, 'number' => $index + 1]) }}"
                             @if ($errors->has($name.'.'.$index)) aria-invalid="true" aria-describedby="{{ $id }}-{{ $index }}-error" @endif
-                            @class([
-                                'w-full rounded-field border bg-white px-3.5 py-2 text-base text-charcoal',
-                                'border-coral-dark' => $errors->has($name.'.'.$index),
-                                'border-grey-350 focus:border-charcoal' => ! $errors->has($name.'.'.$index),
-                            ])
+                            class="field w-full"
                         >
                         <x-form.error :name="$name.'.'.$index" :id="$id.'-'.$index" />
                     </div>
 
-                    <div class="flex shrink-0 items-center gap-1 pt-1" wire:sort:ignore>
-                        <button type="button" wire:click="moveListItem('{{ $name }}', {{ $index }}, -1)" @disabled($loop->first) class="rounded-field px-2 py-1 text-sm hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.list_editor.up', ['number' => $index + 1]) }}">↑</button>
-                        <button type="button" wire:click="moveListItem('{{ $name }}', {{ $index }}, 1)" @disabled($loop->last) class="rounded-field px-2 py-1 text-sm hover:bg-grey-100 disabled:opacity-40" aria-label="{{ __('admin.list_editor.down', ['number' => $index + 1]) }}">↓</button>
-                        <button type="button" wire:click="removeListItem('{{ $name }}', {{ $index }})" class="rounded-field px-2 py-1 text-sm hover:bg-grey-100" aria-label="{{ __('admin.list_editor.remove', ['number' => $index + 1]) }}">×</button>
+                    <div class="flex shrink-0 items-center" wire:sort:ignore>
+                        <x-ui.icon-button icon="arrow-up" :label="__('admin.list_editor.up', ['number' => $index + 1])" wire:click="moveListItem('{{ $name }}', {{ $index }}, -1)" :disabled="$loop->first" />
+                        <x-ui.icon-button icon="arrow-down" :label="__('admin.list_editor.down', ['number' => $index + 1])" wire:click="moveListItem('{{ $name }}', {{ $index }}, 1)" :disabled="$loop->last" />
+                        <x-ui.icon-button icon="close" :label="__('admin.list_editor.remove', ['number' => $index + 1])" wire:click="removeListItem('{{ $name }}', {{ $index }})" />
                     </div>
                 </li>
             @endforeach
@@ -70,6 +68,6 @@
     <x-form.error :name="$name" :id="$id" />
 
     <div>
-        <x-ui.button tone="outline" size="sm" wire:click="addListItem('{{ $name }}')">{{ __('admin.list_editor.add') }}</x-ui.button>
+        <x-ui.button tone="outline" size="sm" icon="plus" wire:click="addListItem('{{ $name }}')">{{ __('admin.list_editor.add') }}</x-ui.button>
     </div>
 </fieldset>

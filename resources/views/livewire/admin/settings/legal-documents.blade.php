@@ -1,7 +1,7 @@
 <div class="flex max-w-3xl flex-col gap-6">
     <x-ui.flash />
 
-    <x-admin.page-header :title="__('admin.legal.title')" class="mb-0" />
+    <x-admin.page-header :title="__('admin.legal.title')" :spaced="false" />
 
     @foreach ($documents as $document)
         @php($type = $document['type'])

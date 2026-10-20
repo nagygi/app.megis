@@ -1,7 +1,7 @@
 <div class="flex max-w-2xl flex-col gap-6">
     <x-ui.flash />
 
-    <x-admin.page-header :title="__('admin.profile.title')" class="mb-0" />
+    <x-admin.page-header :title="__('admin.profile.title')" :spaced="false" />
 
     <form wire:submit="saveProfile" class="flex flex-col gap-5 rounded-card border border-grey-250 bg-white p-6">
         <div class="grid gap-5 sm:grid-cols-2">

@@ -2,7 +2,7 @@
 <div class="flex flex-col gap-6">
     <x-ui.flash />
 
-    <x-admin.page-header :title="__('admin.organizations.tabs.processes')" class="mb-0" />
+    <x-admin.page-header :title="__('admin.organizations.tabs.processes')" :spaced="false" />
 
     @if ($unclassified->isNotEmpty())
         {{-- Besorolásra vár (12 · 12.6) --}}
