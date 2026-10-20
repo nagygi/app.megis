@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.17 · {hash} · 2026-10-20
+## 1.17 · 8c43184 · 2026-10-20
 
 Értéktükör: illesztés v3 (`ertektukor-illesztes` v3).
 
