@@ -183,7 +183,7 @@ class Overview extends Component
 
         $header = ['label' => __('client.header.first_visit'), 'symbol' => 'spiral'];
 
-        if ($this->firstVisit || ! $steps->isStarted()) {
+        if ($this->firstVisit || ! $steps->hasOwnProgress()) {
             $until = $main->starts_on ? __('diagnosis.until', ['date' => $main->starts_on->format('m.d.')]) : __('diagnosis.date_open');
 
             return $header + [

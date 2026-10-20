@@ -24,7 +24,7 @@
         <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
             @if ($current && $main->acceptsInput())
                 <x-ui.button size="lg" :href="$stepUrl($current->step)">
-                    {{ $steps->isStarted() && ! $firstVisit ? __('diagnosis.continue') : __('diagnosis.start') }}
+                    {{ $steps->hasOwnProgress() && ! $firstVisit ? __('diagnosis.continue') : __('diagnosis.start') }}
                     <x-megis.icon name="arrow-right" class="size-4" />
                 </x-ui.button>
             @endif

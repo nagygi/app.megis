@@ -127,4 +127,20 @@ final readonly class StepList
     {
         return $this->doneCount() > 0;
     }
+
+    /**
+     * Whether the participant has done a step themselves. The organization
+     * values and the brand may come filled in by the admin, so on their own
+     * they do not turn V1 into V1·b "Innen folytatod" (23 · 23.2).
+     */
+    public function hasOwnProgress(): bool
+    {
+        foreach ($this->steps as $state) {
+            if ($state->done && ! in_array($state->step, [DiagnosisStep::OrganizationValues, DiagnosisStep::Brand], true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

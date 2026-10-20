@@ -54,6 +54,19 @@ it('shows the leader what awaits and moves the diagnosis to filling on the first
     expect($main->refresh()->stage)->toBe(MainDiagnosisStage::Filling);
 });
 
+it('keeps V1 "Kezdjük" while only the admin-filled organization values and brand are done', function () {
+    $setup = diagnosisTeam();
+    $main = startMainDiagnosis($setup);
+    $main->leaderParticipant()->update(['opened_at' => now()->subDay()]);
+    actingAsCustomer($setup['leader']);
+
+    $this->get(route('client.diagnosis.show', leaderParams($setup, $main)))
+        ->assertOk()
+        ->assertSee('6 lépés, és indul a diagnózis.')
+        ->assertSee('Kezdjük')
+        ->assertDontSee('Innen folytatod.');
+});
+
 it('greets the leader with "Innen folytatod" once a step is done', function () {
     $setup = diagnosisTeam();
     $main = startMainDiagnosis($setup);
