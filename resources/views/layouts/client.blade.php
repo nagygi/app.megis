@@ -81,11 +81,18 @@
 
     <div x-data="{ menuOpen: false }" @keydown.escape.window="menuOpen = false" class="desktop:flex desktop:min-h-dvh">
         @if ($user)
-            {{-- Alpine takes translate-x-full off when it opens; adding translate-x-0 next to it would lose to it in the built CSS. --}}
+            {{--
+                Below 1200px the closed menu is moved out and invisible, so its links
+                leave the tab order; Alpine takes both classes off when it opens, and
+                the focus stays inside until it closes. From 1200px it always shows.
+                Only the slide is animated: visibility must turn at once, or the focus
+                trap finds nothing to focus as it opens.
+            --}}
             <aside
                 id="client-menu"
-                class="fixed inset-y-0 right-0 z-30 w-80 max-w-full translate-x-full overflow-y-auto border-l border-grey-250 bg-white transition-transform desktop:static desktop:order-first desktop:translate-x-0 desktop:border-r desktop:border-l-0"
-                :class="{ 'translate-x-full': ! menuOpen }"
+                class="fixed inset-y-0 right-0 z-30 w-80 max-w-full overflow-y-auto border-l border-grey-250 bg-white transition-[translate] duration-200 ease-standard max-desktop:invisible max-desktop:translate-x-full desktop:static desktop:order-first desktop:border-r desktop:border-l-0"
+                :class="{ 'max-desktop:invisible max-desktop:translate-x-full': ! menuOpen }"
+                x-trap.noscroll="menuOpen"
                 aria-label="{{ __('client.menu.title') }}"
             >
                 @include('client.partials.menu', ['user' => $user, 'currentOrganization' => $currentOrganization, 'organizations' => $organizations])
@@ -97,32 +104,47 @@
         <div class="flex min-w-0 flex-1 flex-col">
             <header class="{{ $headerClasses }}">
                 <div class="mx-auto flex max-w-3xl flex-col gap-3 px-6 pt-3 pb-4 desktop:max-w-5xl">
-                    <div class="flex min-h-10 items-center gap-3">
+                    <div class="flex min-h-11 items-center gap-3">
                         @if ($back)
-                            <a href="{{ $back }}" class="inline-flex items-center gap-1 text-sm no-underline opacity-90 [color:inherit]">
-                                <span aria-hidden="true">‹</span> {{ $backLabel ?? __('ui.back') }}
+                            {{-- A 44px target with the chevron; the label gives way before the step. --}}
+                            <a href="{{ $back }}" class="-ml-2 inline-flex min-h-11 min-w-0 items-center gap-1 rounded-pill pr-3 pl-1 text-sm font-semibold no-underline [color:inherit] hover:underline">
+                                <x-megis.icon name="chevron-left" />
+                                <span class="truncate">{{ $backLabel ?? __('ui.back') }}</span>
                             </a>
                         @else
                             {{-- From 1200px the menu shows the logo. The wrapper hides this one:
                                  .megis-logo sets its display outside the utility layer. --}}
-                            <span class="flex desktop:hidden">
-                                <x-megis.logo :variant="in_array($color, ['charcoal', 'green'], true) ? 'white' : 'red-dark'" class="h-7" />
-                            </span>
+                            @php($logo = in_array($color, ['charcoal', 'green'], true) ? 'white' : 'red-dark')
+                            @if ($currentOrganization)
+                                <a href="{{ route('client.home', $currentOrganization) }}" class="flex no-underline desktop:hidden">
+                                    <x-megis.logo :variant="$logo" class="h-7" />
+                                    <span class="sr-only">{{ __('client.menu.home') }}</span>
+                                </a>
+                            @else
+                                <span class="flex desktop:hidden">
+                                    <x-megis.logo :variant="$logo" class="h-7" />
+                                </span>
+                            @endif
                         @endif
 
-                        <span class="min-w-0 flex-1 truncate text-right text-xs font-semibold tracking-wider uppercase tabular-nums">{{ $step ?? $label }}</span>
+                        <span @class([
+                            'flex-1 text-right text-xs font-semibold tracking-wider uppercase tabular-nums',
+                            'shrink-0' => $step,
+                            'min-w-0 truncate' => ! $step,
+                        ])>{{ $step ?? $label }}</span>
 
                         @if ($user)
                             <div x-data="{ userOpen: false }" class="relative" @keydown.escape.window="userOpen = false">
+                                {{-- The circles stay 36px; the button around them is the 44px target. --}}
                                 <button
                                     type="button"
-                                    class="grid size-9 place-items-center rounded-pill text-xs font-bold {{ $circleClasses }}"
+                                    class="press -mx-1 grid size-11 place-items-center rounded-pill"
                                     aria-haspopup="true"
                                     aria-controls="client-user-menu"
                                     :aria-expanded="userOpen"
                                     @click="userOpen = ! userOpen"
                                 >
-                                    <span aria-hidden="true">{{ $user->initials }}</span>
+                                    <span aria-hidden="true" class="grid size-9 place-items-center rounded-pill text-xs font-extrabold {{ $circleClasses }}">{{ $user->initials }}</span>
                                     <span class="sr-only">{{ __('client.menu.user_menu') }}</span>
                                 </button>
 
@@ -131,7 +153,7 @@
                                     x-show="userOpen"
                                     x-cloak
                                     @click.outside="userOpen = false"
-                                    class="absolute right-0 z-40 mt-2 w-64 rounded-card border border-grey-250 bg-white p-3 text-charcoal shadow-lg"
+                                    class="absolute right-0 z-40 mt-2 w-64 rounded-card border border-grey-250 bg-white p-3 text-charcoal"
                                 >
                                     <p class="font-semibold">{{ $user->name }}</p>
                                     @if ($currentOrganization)
@@ -155,12 +177,14 @@
 
                             <button
                                 type="button"
-                                class="grid size-9 place-items-center rounded-pill desktop:hidden {{ $circleClasses }}"
+                                class="press -mx-1 grid size-11 place-items-center rounded-pill desktop:hidden"
                                 aria-controls="client-menu"
                                 :aria-expanded="menuOpen"
                                 @click="menuOpen = ! menuOpen"
                             >
-                                <x-megis.icon name="menu" class="size-4" />
+                                <span aria-hidden="true" class="grid size-9 place-items-center rounded-pill {{ $circleClasses }}">
+                                    <x-megis.icon name="menu" />
+                                </span>
                                 <span class="sr-only">{{ __('client.menu.open') }}</span>
                             </button>
                         @endif
@@ -183,19 +207,23 @@
                 </div>
             </header>
 
-            {{-- Pages show their own flash messages, so Livewire pages update them after actions too. --}}
-            <main id="main" class="mx-auto w-full max-w-3xl flex-1 px-6 py-6 desktop:max-w-5xl">
+            {{-- With the plus button, the page ends above it. --}}
+            <main id="main" @class([
+                'mx-auto w-full max-w-3xl flex-1 px-6 py-6 desktop:max-w-5xl',
+                'pb-28' => $plus,
+            ])>
                 {{ $slot }}
             </main>
         </div>
     </div>
 
     @if ($plus)
+        {{-- Under the open menu's backdrop (z-20), above the iPhone's home bar. --}}
         <a
             href="{{ $plus }}"
-            class="fixed bottom-0 left-1/2 z-20 grid h-14 w-28 -translate-x-1/2 place-items-center rounded-t-full bg-coral pt-2 text-3xl font-light text-black no-underline shadow-lg hover:bg-coral-dark hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-charcoal"
+            class="press fixed bottom-0 left-1/2 z-10 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] w-28 -translate-x-1/2 place-items-center rounded-t-full bg-coral pt-2 pb-[env(safe-area-inset-bottom)] text-black no-underline hover:bg-coral-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-charcoal"
         >
-            <span aria-hidden="true">+</span>
+            <x-megis.icon name="plus" class="size-6" />
             <span class="sr-only">{{ __('processes.occasions.contribute_title') }}</span>
         </a>
     @endif

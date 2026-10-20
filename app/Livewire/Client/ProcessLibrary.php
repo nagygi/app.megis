@@ -68,6 +68,8 @@ class ProcessLibrary extends Component
             'title' => __('processes.library.title'),
             'subtitle' => __('processes.library.question'),
             'color' => 'cream',
+            'back' => route('client.home', $this->organization),
+            'backLabel' => __('client.menu.home'),
         ])->title(__('processes.library.title'));
     }
 

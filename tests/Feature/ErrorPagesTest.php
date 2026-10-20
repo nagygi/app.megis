@@ -21,6 +21,17 @@ it('renders the branded forbidden page in Hungarian', function () {
     $response->assertForbidden()->assertSee('Nincs jogosultságod');
 });
 
+it('offers the expired session page a reload of the page before and the way to the account', function () {
+    Route::get('/_test/expired', fn () => abort(419));
+
+    $response = $this->get('/_test/expired', ['referer' => url('/belepes')]);
+
+    $response->assertStatus(419)
+        ->assertSee('Lejárt a munkamenet')
+        ->assertSee('href="'.url('/belepes').'"', false)
+        ->assertSee('href="'.route('client.landing').'"', false);
+});
+
 it('renders the branded server error page without debug details', function () {
     config(['app.debug' => false]);
     Route::get('/_test/server-error', fn () => throw new RuntimeException('internal detail'));

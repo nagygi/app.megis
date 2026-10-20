@@ -65,7 +65,6 @@ it('keeps shadows out of the views: the identity is flat', function () {
     expect(viewsBreaking(fn (string $source) => (bool) preg_match('/(?<![\w-])(?:[a-z-]+:)*shadow-(?:2xs|xs|sm|md|lg|xl|2xl)(?![\w-])/', $source)))
         ->toEqual([
             'components/recorder.blade.php',
-            'layouts/client.blade.php',
             'livewire/admin/diagnoses/garden.blade.php',
         ]);
 });
@@ -122,8 +121,6 @@ it('uses only the brand weights: 400, 500, 600 and 800', function () {
     expect(viewsBreaking(fn (string $source) => (bool) preg_match('/(?<![\w-])(?:[a-z-]+:)*font-(?:thin|extralight|light|bold|black)(?![\w-])/', $source)))
         ->toEqual([
             'components/diagnosis/partials/step-row-content.blade.php',
-            'layouts/admin.blade.php',
-            'layouts/client.blade.php',
             'livewire/admin/main-diagnoses/form.blade.php',
             'livewire/client/diagnosis/experience.blade.php',
             'livewire/client/diagnosis/overview-peer.blade.php',
@@ -139,7 +136,6 @@ it('draws icons with x-megis.icon, not with Unicode signs', function () {
             'client/report/appendix.blade.php',
             'components/admin/list-editor.blade.php',
             'components/admin/th.blade.php',
-            'layouts/client.blade.php',
             'livewire/admin/clients/show.blade.php',
             'livewire/admin/diagnoses/show.blade.php',
             'livewire/admin/main-diagnoses/reading.blade.php',

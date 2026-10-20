@@ -7,8 +7,15 @@
 
 <div class="flex min-h-full flex-col gap-6 p-6">
     <div class="flex items-center justify-between">
-        <x-megis.logo class="h-8" />
-        <button type="button" class="rounded-pill p-2 desktop:hidden" @click="menuOpen = false">
+        @if ($currentOrganization)
+            <a href="{{ route('client.home', $currentOrganization) }}" class="flex no-underline">
+                <x-megis.logo class="h-8" />
+                <span class="sr-only">{{ __('client.menu.home') }}</span>
+            </a>
+        @else
+            <x-megis.logo class="h-8" />
+        @endif
+        <button type="button" class="press -mr-2 grid size-11 place-items-center rounded-pill hover:bg-grey-100 desktop:hidden" @click="menuOpen = false">
             <x-megis.icon name="close" class="size-5" :label="__('client.menu.close')" />
         </button>
     </div>
@@ -31,6 +38,20 @@
                 $reports = app(\App\Services\Report\ReportService::class)->reportsFor($user, $currentOrganization);
                 $latestReport = $reports->first();
             @endphp
+            @php($isHome = request()->routeIs('client.home'))
+            <ul class="mb-4 flex flex-col gap-1">
+                <li>
+                    <a
+                        href="{{ route('client.home', $currentOrganization) }}"
+                        @class([
+                            'block rounded-lg px-4 py-2 no-underline',
+                            'bg-charcoal font-semibold text-cream' => $isHome,
+                            'text-charcoal hover:bg-grey-100' => ! $isHome,
+                        ])
+                        @if ($isHome) aria-current="page" @endif
+                    >{{ __('client.menu.home') }}</a>
+                </li>
+            </ul>
             @if ($reports->isNotEmpty())
                 <p class="px-4 pb-1 text-xs font-semibold uppercase tracking-wide text-grey-600">{{ __('report.menu.reports') }}</p>
                 <ul class="mb-4 flex flex-col gap-1">

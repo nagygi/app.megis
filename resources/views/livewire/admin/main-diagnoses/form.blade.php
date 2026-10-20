@@ -1,19 +1,13 @@
 {{-- A1 · starting a main diagnosis (17 · 17.2), with the leader's V1 as a live preview. --}}
 @php($subjectEnum = \App\Enums\MainDiagnosisSubject::tryFrom($subject))
 
-<div>
-    <x-ui.flash class="mb-6" />
-
-    <x-admin.page-header :title="$title">
-        @if ($main)
-            <x-slot:actions>
-                <x-ui.badge tone="dark">{{ $main->stage->label() }}</x-ui.badge>
-            </x-slot:actions>
-        @endif
-    </x-admin.page-header>
+<div class="max-w-7xl">
+    <x-ui.flash />
 
     @if ($main)
         <x-admin.main-diagnosis-tabs :diagnosis="$main->diagnosis" class="mb-6" />
+    @else
+        <x-admin.page-header :title="$title" />
     @endif
 
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">

@@ -29,11 +29,17 @@
         {{ __('ui.skip_to_content') }}
     </a>
 
-    <div x-data="{ navOpen: false }" class="lg:flex lg:min-h-dvh">
+    {{--
+        Below 1024px the menu is a drawer: closed it is moved out and invisible,
+        so its links leave the tab order; open, the focus stays inside and Esc
+        or the backdrop closes it.
+    --}}
+    <div x-data="{ navOpen: false }" @keydown.escape.window="navOpen = false" class="lg:flex lg:min-h-dvh">
         <aside
             id="admin-nav"
-            class="fixed inset-y-0 left-0 z-40 w-64 -translate-x-full overflow-y-auto border-r border-grey-250 bg-white transition-transform lg:static lg:translate-x-0"
-            :class="navOpen && 'translate-x-0'"
+            class="fixed inset-y-0 left-0 z-40 w-64 overflow-y-auto border-r border-grey-250 bg-white transition-[translate] duration-200 ease-standard max-lg:invisible max-lg:-translate-x-full lg:static"
+            :class="{ 'max-lg:invisible max-lg:-translate-x-full': ! navOpen }"
+            x-trap.noscroll="navOpen"
         >
             @include('admin.partials.nav')
         </aside>
@@ -49,7 +55,7 @@
                 <div class="flex items-center gap-3 px-4 py-3 lg:px-8">
                     <button
                         type="button"
-                        class="rounded-pill p-2 lg:hidden"
+                        class="press -ml-2 grid size-11 place-items-center rounded-pill hover:text-yellow lg:hidden"
                         aria-controls="admin-nav"
                         :aria-expanded="navOpen"
                         @click="navOpen = ! navOpen"
@@ -70,12 +76,12 @@
                         <div x-data="{ open: false }" class="relative" @keydown.escape.window="open = false">
                             <button
                                 type="button"
-                                class="flex items-center gap-2 rounded-pill px-2 py-1"
+                                class="press -mr-1 grid size-11 place-items-center rounded-pill"
                                 aria-haspopup="true"
                                 :aria-expanded="open"
                                 @click="open = ! open"
                             >
-                                <span class="grid size-8 place-items-center rounded-pill bg-cream text-xs font-bold text-charcoal">{{ $admin->initials }}</span>
+                                <span class="grid size-9 place-items-center rounded-pill bg-cream text-xs font-extrabold text-charcoal">{{ $admin->initials }}</span>
                                 <span class="sr-only">{{ __('admin.user_menu.open') }}</span>
                             </button>
 

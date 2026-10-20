@@ -14,13 +14,13 @@
 
     $tabs[] = ['route' => 'admin.organizations.members', 'label' => __('admin.organizations.tabs.members')];
     $tabs[] = ['route' => 'admin.organizations.values', 'label' => __('admin.organizations.tabs.values')];
-    $tabs[] = ['route' => 'admin.organizations.processes', 'label' => __('admin.organizations.tabs.processes')];
-    $tabs[] = ['route' => 'admin.organizations.diagnoses', 'label' => __('admin.organizations.tabs.diagnoses')];
+    $tabs[] = ['route' => 'admin.organizations.processes', 'label' => __('admin.organizations.tabs.processes'), 'also' => ['admin.organizations.process-occasions']];
+    $tabs[] = ['route' => 'admin.organizations.diagnoses', 'label' => __('admin.organizations.tabs.diagnoses'), 'also' => ['admin.diagnoses.show', 'admin.main-diagnoses.*']];
 @endphp
 
 <ul class="flex gap-1 overflow-x-auto">
     @foreach ($tabs as $tab)
-        @php($isActive = request()->routeIs($tab['route']) || request()->routeIs($tab['route'].'.*'))
+        @php($isActive = request()->routeIs($tab['route'], $tab['route'].'.*', ...($tab['also'] ?? [])))
         <li>
             <a
                 href="{{ route($tab['route'], $organization) }}"

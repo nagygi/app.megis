@@ -2,6 +2,36 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.20 · {hash} · 2026-10-21
+
+UI-finomhangolás, 3. lépés: navigáció és layoutok.
+
+- **Ügyfél menü (mobil, tablet):**
+  - A bezárt menü linkjei eddig Tabbal és képernyőolvasóval elérhetők voltak; most nem.
+  - Nyitva a fókusz a menüben marad, a háttér nem görget. Esc-re bezárul, és a fókusz visszaáll a menü gombra.
+- **Haza mindenhonnan:**
+  - A logó a kezdőlapra visz, és a menü elején „Kezdőlap” pont van.
+  - Az Értéktár, a Folyamatok és a Bölcsességtár „‹ Kezdőlap” vissza linket kap; eddig zsákutcák voltak.
+- **Fejléc:**
+  - A vissza link chevron ikont és 44 px-es célterületet kap.
+  - Az avatar és a menü gomb köre marad 36 px, a kattintható terület 44 px.
+  - A lépésszám („3 / 6”) nem tűnik el hosszú vissza-felirat mellett.
+- **A „+” gomb:**
+  - Ikon, árnyék nélkül, az iPhone alsó sávja fölött.
+  - A hover nem cream-on-coral (kontraszt).
+  - A nyitott menü háttere alá kerül.
+  - Az oldal alja nem csúszik alá (T5).
+- **Admin menü mobilon:** bezáró gomb, Esc, fókuszcsapda; bezárva nem érhető el. A fejléc gombjai 44 px-esek.
+- **A főbb diagnózis hat füle (Áttekintés, Beállítás, Futás, Olvasat, Publikálás, Részdiagnózisok):**
+  - Mindegyiken ugyanaz a fejléc: a cím és a szakasz-badge, az adatsáv, a fülek, azonos szélességben.
+  - A fejléc mindig a szervezet zöldje, aktív „Diagnózisok” füllel. Eddig fülváltáskor zöld és szén között váltott, és ugrott a szélesség.
+- **Admin táblázatok mobilon:** nem szélesítik ki az oldalt. A rendezés rejtett feliratai kilógtak a görgethető táblázatból; öt admin lista 566–897 px széles volt 390 px-en.
+- **Hibaoldalak:**
+  - Új „Tovább a fiókodba” link: a belépett ügyfelet a kezdőlapjára, mást a belépéshez viszi.
+  - A 419 („Lejárt a munkamenet”) újratölti az előző oldalt.
+- **Feliratok:** „Health” → „Állapot”.
+- **Teszt:** böngészős tesztek a menükre (elérhetőség, fókusz, Esc) és a hazavezető linkekre.
+
 ## 1.19 · 2d4a6ce · 2026-10-21
 
 UI-finomhangolás, 2. lépés: visszajelzés.

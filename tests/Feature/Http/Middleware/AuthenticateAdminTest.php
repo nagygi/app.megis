@@ -69,5 +69,5 @@ it('shows the Rendszer pages to a superadmin', function () {
 
     $response = $this->get(route('admin.system.health'));
 
-    $response->assertOk()->assertSee('Health');
+    $response->assertOk()->assertSee('Állapot');
 });

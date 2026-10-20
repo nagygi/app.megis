@@ -10,6 +10,7 @@ return [
         'user_menu' => 'Felhasználói menü',
         'close' => 'Menü bezárása',
         'title' => 'Menü',
+        'home' => 'Kezdőlap',
         'profile' => 'Profil',
         'logout' => 'Kijelentkezés',
         'switch_organization' => 'Szervezet váltása',

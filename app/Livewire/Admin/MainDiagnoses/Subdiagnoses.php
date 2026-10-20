@@ -31,6 +31,6 @@ class Subdiagnoses extends Component
                 ->orderBy('diagnosed_on')
                 ->orderBy('id')
                 ->get(),
-        ])->layout('layouts::admin')->title($this->diagnosis->name);
+        ])->layout('layouts::admin', ['organization' => $this->diagnosis->organization])->title($this->diagnosis->name);
     }
 }

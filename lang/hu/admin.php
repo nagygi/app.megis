@@ -5,6 +5,7 @@ return [
     'title' => 'mégis admin',
     'version' => 'Verzió :version',
     'menu_open' => 'Menü',
+    'menu_close' => 'Menü bezárása',
 
     'nav' => [
         'organizations' => 'Szervezetek',
@@ -16,7 +17,7 @@ return [
         'areas' => 'Területek',
         'system' => 'Rendszer',
         'system_overview' => 'Áttekintés',
-        'system_health' => 'Health',
+        'system_health' => 'Állapot',
         'ai_usage' => 'AI használat',
         'ai_configuration' => 'AI konfiguráció',
         'ai_prompts' => 'Promptok',
@@ -252,7 +253,7 @@ return [
     'system' => [
         'title' => 'Rendszer',
         'overview_lead' => 'A rendszer beállításai és állapota. Csak szuperadmin látja.',
-        'health_title' => 'Health',
+        'health_title' => 'Állapot',
         'version' => 'App verzió',
         'environment' => 'Környezet',
         'deployed_at' => 'Utolsó deploy',

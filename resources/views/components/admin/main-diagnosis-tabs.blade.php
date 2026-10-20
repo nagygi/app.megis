@@ -1,7 +1,9 @@
 {{--
     The header and the tabs of a main diagnosis (17, 19 · 19.1): the diagnosis,
     its settings (A1), the Futás tab for the contact and the superadmin, its
-    subdiagnoses (17 · 17.4). The header carries the organization's colour.
+    subdiagnoses (17 · 17.4). Every tab page starts with it, so the title, the
+    stage and the tabs stay put while switching; the layout's header carries
+    the organization's colour on all of them.
 --}}
 @props(['diagnosis'])
 
@@ -22,6 +24,13 @@
 @endphp
 
 <div {{ $attributes->class(['flex flex-col gap-3']) }}>
+    <div class="flex flex-wrap items-center gap-3">
+        <h1 class="text-2xl font-semibold text-charcoal">{{ $diagnosis->name }}</h1>
+        @if ($main)
+            <x-ui.badge tone="dark">{{ $main->stage->label() }}</x-ui.badge>
+        @endif
+    </div>
+
     @if ($main)
         <p class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-yellow-pale px-3 py-2 text-sm">
             <span class="font-semibold">{{ $diagnosis->organization->name }}</span>
@@ -29,7 +38,6 @@
                 <span>{{ $diagnosis->team->name }}</span>
             @endif
             <span>{{ $main->product_name }}</span>
-            <span>{{ $main->stage->label() }}</span>
             @if ($days)
                 <span>{{ __('admin.run.day_count', $days) }}</span>
             @endif

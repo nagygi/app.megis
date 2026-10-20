@@ -5,10 +5,7 @@
 @endphp
 
 <div class="flex max-w-7xl flex-col gap-6">
-    <div class="flex flex-col gap-2">
-        <h1 class="text-2xl font-semibold text-charcoal">{{ $diagnosis->name }}</h1>
-        <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
-    </div>
+    <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
 
     <x-ui.flash />
 

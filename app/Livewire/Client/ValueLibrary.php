@@ -114,6 +114,11 @@ class ValueLibrary extends Component
             'library' => $library,
             'libraryCount' => Value::query()->availableTo(null)->count(),
             'categories' => ValueCategory::query()->whereHas('values', fn ($query) => $query->availableTo(null))->orderBy('name')->get(['id', 'name']),
-        ])->layout('layouts::client', ['title' => __('client.value_library.title'), 'subtitle' => __('client.value_library.question')]);
+        ])->layout('layouts::client', [
+            'title' => __('client.value_library.title'),
+            'subtitle' => __('client.value_library.question'),
+            'back' => route('client.home', $this->organization),
+            'backLabel' => __('client.menu.home'),
+        ]);
     }
 }

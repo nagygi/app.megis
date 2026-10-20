@@ -1,8 +1,6 @@
 {{-- Részdiagnózisok (17 · 17.4). --}}
-<div class="flex max-w-6xl flex-col gap-6">
+<div class="flex max-w-7xl flex-col gap-6">
     <x-ui.flash />
-
-    <x-admin.page-header :title="$diagnosis->name" class="mb-0" />
 
     <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
 

@@ -1,7 +1,11 @@
-{{-- Admin list table. Pass the header cells in "head" and the rows in the slot. --}}
+{{--
+    Admin list table. Pass the header cells in "head" and the rows in the slot.
+    The wrapper scrolls a wide table sideways; it is positioned so the sr-only
+    labels inside scroll with it instead of widening the page on a phone.
+--}}
 @props(['paginator' => null])
 
-<div {{ $attributes->class(['overflow-x-auto rounded-card border border-grey-250 bg-white']) }}>
+<div {{ $attributes->class(['relative overflow-x-auto rounded-card border border-grey-250 bg-white']) }}>
     <table class="w-full text-left text-sm">
         <thead class="border-b border-grey-250 bg-paper">
             <tr>{{ $head }}</tr>

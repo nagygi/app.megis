@@ -257,7 +257,7 @@ class Form extends Component
                 : null,
             'canEditSettings' => $this->main === null || ! in_array($this->main->stage, [MainDiagnosisStage::Reading, MainDiagnosisStage::Published, MainDiagnosisStage::Closed], true),
             'isDraft' => $this->main === null || $this->main->stage === MainDiagnosisStage::Draft,
-        ])->layout('layouts::admin')->title($title);
+        ])->layout('layouts::admin', ['organization' => $this->main?->diagnosis->organization])->title($title);
     }
 
     private function createOrUpdate(MainDiagnosisService $mainDiagnoses): ?MainDiagnosis

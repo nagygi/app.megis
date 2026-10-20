@@ -5,11 +5,8 @@
     $position = fn ($date) => max(0, min(100, round($start->diffInDays($date, false) / $span * 100)));
 @endphp
 
-<div class="flex max-w-6xl flex-col gap-6">
-    <div class="flex flex-col gap-2">
-        <h1 class="text-2xl font-semibold text-charcoal">{{ $diagnosis->name }}</h1>
-        <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
-    </div>
+<div class="flex max-w-7xl flex-col gap-6">
+    <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
 
     <x-ui.flash />
 

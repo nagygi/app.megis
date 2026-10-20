@@ -3,6 +3,9 @@
 return [
 
     'home' => 'Vissza a kezdőlapra',
+    // /tovabb: a signed-in customer lands on their home, anyone else on the login.
+    'account' => 'Tovább a fiókodba',
+    'reload' => 'Újratöltöm az oldalt',
 
     '403' => [
         'title' => 'Nincs jogosultságod',

@@ -75,9 +75,14 @@
 @endphp
 
 <div class="flex min-h-full flex-col gap-6 p-4">
-    <a href="{{ route('admin.dashboard') }}" class="inline-flex px-3 pt-2 no-underline">
-        <x-megis.logo class="h-9" />
-    </a>
+    <div class="flex items-center justify-between gap-2">
+        <a href="{{ route('admin.dashboard') }}" class="inline-flex px-3 pt-2 no-underline">
+            <x-megis.logo class="h-9" />
+        </a>
+        <button type="button" class="press grid size-11 place-items-center rounded-pill hover:bg-grey-100 lg:hidden" @click="navOpen = false">
+            <x-megis.icon name="close" class="size-5" :label="__('admin.menu_close')" />
+        </button>
+    </div>
 
     <nav aria-label="{{ __('admin.title') }}" class="flex flex-1 flex-col gap-6">
         @foreach ($groups as $group)
@@ -106,7 +111,7 @@
                         @click="toggle()"
                     >
                         <span>{{ $group['label'] }}</span>
-                        <svg class="size-3 transition-transform" :class="open || '-rotate-90'" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 4l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <x-megis.icon name="chevron-down" class="transition-transform" ::class="open || '-rotate-90'" />
                     </button>
                 @endif
                 <ul

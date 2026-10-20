@@ -1,5 +1,5 @@
 {{-- BT1 · Bölcsességtár (32 · 32.1). --}}
-<x-layouts::client :title="__('wisdom.title')" color="cream" :subtitle="__('wisdom.subtitle')">
+<x-layouts::client :title="__('wisdom.title')" color="cream" :subtitle="__('wisdom.subtitle')" :back="route('client.home', $organization)" :back-label="__('client.menu.home')">
     <div class="flex max-w-2xl flex-col gap-6">
         <h2 class="text-2xl font-semibold">{{ __('wisdom.question') }}</h2>
         <ul class="flex flex-col gap-2">

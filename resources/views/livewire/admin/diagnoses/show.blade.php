@@ -5,13 +5,20 @@
     $decimalLabel = fn (?float $number) => $number === null ? '–' : number_format($number, 1, ',', '');
 @endphp
 
-<div class="flex max-w-6xl flex-col gap-6">
+<div class="flex max-w-7xl flex-col gap-6">
     <x-ui.flash />
+
+    {{-- A main diagnosis starts with its title and tabs, like its other tab pages (17). --}}
+    @if ($main)
+        <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
+    @endif
 
     {{-- Header: the basic data and the status steps (04 · 4.3) --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-2">
-            <h1 class="text-2xl font-semibold text-charcoal">{{ $diagnosis->name }}</h1>
+            @unless ($main)
+                <h1 class="text-2xl font-semibold text-charcoal">{{ $diagnosis->name }}</h1>
+            @endunless
             <p class="text-grey-700">
                 {{ $diagnosis->organization->name }} · {{ $diagnosis->subjectLabel() }} · {{ $diagnosis->type->name }} · {{ $diagnosis->dateLabel() }}
             </p>
@@ -48,8 +55,6 @@
 
     @if ($main)
         {{-- The main diagnosis: stage, leader, time window (17) --}}
-        <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
-
         <section class="grid gap-4 rounded-card border border-grey-250 bg-white p-6 sm:grid-cols-2 lg:grid-cols-4" aria-label="{{ __('admin.main_diagnoses.summary') }}">
             <div>
                 <p class="text-sm text-grey-600">{{ __('admin.main_diagnoses.stage') }}</p>
