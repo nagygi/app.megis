@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.22 · {hash} · 2026-10-21
+## 1.22 · 4530bdf · 2026-10-21
 
 UI-finomhangolás, 5. lépés: a közös komponenskészlet. A képernyők a 6–7. lépésben állnak át rá.
 
