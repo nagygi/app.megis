@@ -19,6 +19,8 @@
         <exclude>
             <!-- Needs PostgreSQL (jsonb); runs once the megis_test database is available. -->
             <group>pgsql</group>
+            <!-- The UI screenshot tour (tests/Browser/ScreenshotTourTest.php), run on demand. -->
+            <group>screenshots</group>
         </exclude>
     </groups>
     <source>
