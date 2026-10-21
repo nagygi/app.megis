@@ -30,10 +30,6 @@ class EnvironmentPolicyCheck implements Check
             if (! $hasBasicAuth && blank(config('megis.staging.allowed_ips'))) {
                 $warnings[] = __('checks.environment_policy.staging_unprotected');
             }
-
-            if (blank(config('megis.mail_allowlist'))) {
-                $warnings[] = __('checks.environment_policy.staging_allowlist_empty');
-            }
         }
 
         if ($errors !== []) {

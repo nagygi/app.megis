@@ -1,7 +1,9 @@
 <?php
 
+use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\Mime\Address;
 
@@ -32,12 +34,19 @@ it('delivers only to allowlisted addresses and domains outside production', func
     expect(deliveredRecipients())->toBe(['luca@megis.hu', 'tester@example.com']);
 });
 
-it('drops a message that has no allowlisted recipient', function () {
+it('drops a message that has no allowlisted recipient and logs only the domains', function () {
     config(['megis.mail_allowlist' => ['@megis.hu']]);
+    $logged = [];
+    Event::listen(MessageLogged::class, function (MessageLogged $event) use (&$logged) {
+        $logged[] = $event;
+    });
 
-    Mail::raw('Teszt', fn ($message) => $message->to('customer@example.com'));
+    Mail::raw('Teszt', fn ($message) => $message->subject('Meghívó')->to(['customer@example.com', 'Luca@Gmail.com'])->cc('other@example.com'));
 
-    expect(deliveredMessages())->toBeEmpty();
+    expect(deliveredMessages())->toBeEmpty()
+        ->and($logged)->toHaveCount(1)
+        ->and($logged[0]->message)->toBe('Mail suppressed: no allowlisted recipient.')
+        ->and($logged[0]->context)->toBe(['subject' => 'Meghívó', 'recipient_domains' => ['example.com', 'gmail.com']]);
 });
 
 it('delivers to everyone when no allowlist is configured', function () {

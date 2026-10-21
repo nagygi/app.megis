@@ -60,7 +60,7 @@ it('succeeds with a warning summary when only warnings are found', function () {
     Storage::fake('materials');
     app(Heartbeat::class)->record(Heartbeat::SCHEDULER);
     $this->app['env'] = 'staging';
-    config(['megis.staging.allowed_ips' => ['10.0.0.1'], 'megis.mail_allowlist' => []]);
+    config(['megis.staging.basic_auth_user' => null, 'megis.staging.allowed_ips' => []]);
 
     $this->artisan('megis:setup:check')
         ->expectsOutputToContain('1 figyelmeztetés, hiba nincs.')

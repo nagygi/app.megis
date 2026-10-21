@@ -114,9 +114,7 @@ return [
         'ok' => 'A beállítások illenek a környezethez (:environment).',
         'debug_on' => 'Élesben az APP_DEBUG nem lehet bekapcsolva.',
         'url_not_https' => 'Élesben az APP_URL csak https lehet.',
-        'staging_unprotected' => 'A staging nincs védve (MEGIS_STAGING_USER vagy MEGIS_STAGING_ALLOWED_IPS).',
-        'staging_allowlist_empty' => 'Üres a MEGIS_MAIL_ALLOWLIST. Csak akkor rendben, ha a MAIL_MAILER levélcsapdára (pl. Mailpit) mutat.',
-    ],
+        'staging_unprotected' => 'A staging nincs védve (MEGIS_STAGING_USER vagy MEGIS_STAGING_ALLOWED_IPS).',    ],
 
     'pdf' => [
         'label' => 'PDF-motor',

@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\AdminUsers;
 use App\Enums\UserRole;
 use App\Models\User;
 use App\Services\Admins\AdminUserService;
+use App\Support\MailAllowlist;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -45,7 +46,7 @@ class Form extends Component
         Gate::authorize('inviteAdmin', [User::class, UserRole::Admin]);
     }
 
-    public function save(AdminUserService $admins): void
+    public function save(AdminUserService $admins, MailAllowlist $mailAllowlist): void
     {
         $actor = auth()->user();
         $isEditing = $this->user !== null;
@@ -69,7 +70,13 @@ class Form extends Component
             $this->ensureNotAdminAlready($email);
 
             $admins->invite($validated, $role, $actor);
-            session()->flash('status', __('admin.admins.invited', ['email' => $email]));
+
+            if ($mailAllowlist->allows($email)) {
+                session()->flash('status', __('admin.admins.invited', ['email' => $email]));
+            } else {
+                session()->flash('error', __('admin.admins.mail_suppressed', ['email' => $email]));
+            }
+
             $this->redirectRoute('admin.admins.index', navigate: false);
 
             return;

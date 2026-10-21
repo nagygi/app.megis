@@ -14,6 +14,7 @@ return [
     'version' => 'Verzió :version',
     'menu_open' => 'Menü',
     'menu_close' => 'Menü bezárása',
+    'mail_allowlist_notice' => 'Teszt környezet: levél csak ezekre a címekre megy ki: :entries.',
 
     'nav' => [
         'organizations' => 'Szervezetek',
@@ -102,6 +103,7 @@ return [
         'invited' => 'Meghívót küldtünk ide: :email.',
         'invitation_resent' => 'Új meghívót küldtünk.',
         'reset_sent' => 'Jelszó-beállító linket küldtünk ide: :email.',
+        'mail_suppressed' => 'Nem ment ki levél ide: :email. Ebben a környezetben csak a MEGIS_MAIL_ALLOWLIST címzettjei kapnak levelet.',
         'deactivated' => 'Inaktiválva.',
         'activated' => 'Aktiválva.',
         'already_admin' => 'Ezzel az e-mail címmel már van admin.',

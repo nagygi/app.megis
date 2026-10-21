@@ -7,7 +7,7 @@ Kiegészíti a `docs/uzemeltetes.md`-t. Itt a konkrét lépések és konfigurác
 | Környezet | Indexelés | Levelek | Védelem |
 |---|---|---|---|
 | local | noindex | Mailpit vagy log | – |
-| staging | noindex | csak a `MEGIS_MAIL_ALLOWLIST` címeire, vagy levélcsapdába | `MEGIS_STAGING_USER`/`MEGIS_STAGING_PASSWORD` és/vagy `MEGIS_STAGING_ALLOWED_IPS` |
+| staging | noindex | valódi címekre; a `MEGIS_MAIL_ALLOWLIST` megadásával csak az ott felsoroltakra | `MEGIS_STAGING_USER`/`MEGIS_STAGING_PASSWORD` és/vagy `MEGIS_STAGING_ALLOWED_IPS` |
 | production | indexelhető | valódi címekre | – |
 
 A noindex-et az `X-Robots-Tag` fejléc, a `robots.txt` és a lapok meta-tagje adja. Csak a production indexelhető.

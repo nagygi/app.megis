@@ -9,6 +9,7 @@
 
 @php
     $admin = auth('admin')->user();
+    $mailAllowlist = app(\App\Support\MailAllowlist::class);
 @endphp
 
 <!DOCTYPE html>
@@ -100,6 +101,13 @@
 
             {{-- Livewire pages show their own flash messages, so they update after actions too. --}}
             <main id="main" class="flex-1 px-4 py-6 lg:px-8">
+                {{-- Outside production the allowlist drops mail silently, in the queue worker. --}}
+                @if ($mailAllowlist->isRestricting())
+                    <x-ui.notice tone="warning" class="mb-6">
+                        {{ __('admin.mail_allowlist_notice', ['entries' => implode(', ', $mailAllowlist->entries())]) }}
+                    </x-ui.notice>
+                @endif
+
                 {{ $slot }}
             </main>
         </div>

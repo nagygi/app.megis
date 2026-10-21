@@ -29,13 +29,24 @@ it('warns when staging is neither password nor IP protected', function () {
         'megis.staging.basic_auth_user' => null,
         'megis.staging.basic_auth_password' => null,
         'megis.staging.allowed_ips' => [],
-        'megis.mail_allowlist' => ['@megis.hu'],
     ]);
 
     $result = app(EnvironmentPolicyCheck::class)->run();
 
     expect($result->status)->toBe(CheckStatus::Warning)
         ->and($result->message)->toContain('A staging nincs védve');
+});
+
+it('accepts a protected staging that sends mail to everyone', function () {
+    $this->app['env'] = 'staging';
+    config([
+        'megis.staging.allowed_ips' => ['10.0.0.1'],
+        'megis.mail_allowlist' => [],
+    ]);
+
+    $result = app(EnvironmentPolicyCheck::class)->run();
+
+    expect($result->status)->toBe(CheckStatus::Ok);
 });
 
 it('passes a correctly configured production environment', function () {

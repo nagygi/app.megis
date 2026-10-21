@@ -99,3 +99,29 @@ it('resends the invitation of an admin who never logged in', function () {
 
     Mail::assertQueued(AdminInvitationMail::class, fn (AdminInvitationMail $mail) => $mail->hasTo($target->email));
 });
+
+it('warns when the mail allowlist will drop a resent invitation or a password reset link', function (string $action, bool $isActivated) {
+    Mail::fake();
+    actingAsAdmin();
+    config(['megis.mail_allowlist' => ['@exot.hu']]);
+    $factory = User::factory()->admin();
+    $target = ($isActivated ? $factory : $factory->invited())->create(['email' => 'luca@gmail.com']);
+
+    Livewire::test(Index::class)->call($action, $target->id)
+        ->assertSee('Nem ment ki levél ide: luca@gmail.com. Ebben a környezetben csak a MEGIS_MAIL_ALLOWLIST címzettjei kapnak levelet.')
+        ->assertDontSee('küldtünk');
+})->with([
+    'resent invitation' => ['resendInvitation', false],
+    'password reset' => ['resetPassword', true],
+]);
+
+it('shows which addresses receive mail while the allowlist filters', function () {
+    actingAsAdmin();
+
+    config(['megis.mail_allowlist' => ['@exot.hu', 'tester@megis.team']]);
+    $this->get(route('admin.admins.index'))->assertOk()
+        ->assertSee('Teszt környezet: levél csak ezekre a címekre megy ki: @exot.hu, tester@megis.team.');
+
+    config(['megis.mail_allowlist' => []]);
+    $this->get(route('admin.admins.index'))->assertOk()->assertDontSee('Teszt környezet');
+});

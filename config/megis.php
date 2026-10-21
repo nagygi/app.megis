@@ -214,9 +214,9 @@ return [
     | Outgoing mail outside production
     |--------------------------------------------------------------------------
     |
-    | Outside production, mail is only delivered to these addresses or domains
-    | (e.g. "@megis.hu"). An empty list delivers nothing but the local catcher
-    | (Mailpit, log), which is configured through MAIL_MAILER.
+    | Outside production, a non-empty list limits mail to these addresses or
+    | domains (e.g. "@megis.hu"); everything else is dropped. An empty list
+    | does not filter: staging writes to real addresses.
     |
     */
 

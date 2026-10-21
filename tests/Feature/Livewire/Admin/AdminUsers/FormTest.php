@@ -30,6 +30,38 @@ it('invites a new admin with a 24-hour link', function () {
     Mail::assertQueued(AdminInvitationMail::class, fn (AdminInvitationMail $mail) => $mail->hasTo('anna@megis.hu') && $mail->inviter->is($actor));
 });
 
+it('warns instead of confirming when the mail allowlist will drop the invitation', function () {
+    Mail::fake();
+    actingAsAdmin();
+    config(['megis.mail_allowlist' => ['@exot.hu']]);
+
+    Livewire::test(Form::class)
+        ->set('last_name', 'Kovács')
+        ->set('first_name', 'Anna')
+        ->set('email', 'anna@megis.team')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(session('error'))->toBe('Nem ment ki levél ide: anna@megis.team. Ebben a környezetben csak a MEGIS_MAIL_ALLOWLIST címzettjei kapnak levelet.')
+        ->and(session('status'))->toBeNull();
+    Mail::assertQueued(AdminInvitationMail::class, fn (AdminInvitationMail $mail) => $mail->hasTo('anna@megis.team'));
+});
+
+it('confirms the invitation of an allowlisted address', function () {
+    Mail::fake();
+    actingAsAdmin();
+    config(['megis.mail_allowlist' => ['@exot.hu']]);
+
+    Livewire::test(Form::class)
+        ->set('last_name', 'Kovács')
+        ->set('first_name', 'Anna')
+        ->set('email', 'anna@exot.hu')
+        ->call('save');
+
+    expect(session('status'))->toBe('Meghívót küldtünk ide: anna@exot.hu.')
+        ->and(session('error'))->toBeNull();
+});
+
 it('gives the admin role to an existing customer account instead of creating another', function () {
     Mail::fake();
     actingAsAdmin();

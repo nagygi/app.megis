@@ -25,7 +25,7 @@ Minden adat az EU-n belül van: az adatbázis, a fájlok, a mentések és a logo
 - **Staging:**
   - Itt nézi át a mégis a kiadást.
   - Jelszóval vagy IP-szűréssel védett, és noindex.
-  - A levelek nem mennek ki valódi címre: elkapjuk őket (pl. Mailpit), vagy csak engedélyezett címlistára mennek.
+  - A levelek valódi címekre mennek, hogy a mégis a meghívókat és az értesítéseket is kipróbálhassa. A `MEGIS_MAIL_ALLOWLIST` megadásával szűkíthető a címzettek köre; ilyenkor az admin felület sávban jelzi, kik kapnak levelet.
   - Saját AI-kulcsai vannak, alacsony kerettel.
 - **Production:** csak itt indexelhetők a nyilvános oldalak.
 

@@ -8,6 +8,7 @@ use App\Enums\UserRole;
 use App\Livewire\Admin\Concerns\WithDataTable;
 use App\Models\User;
 use App\Services\Admins\AdminUserService;
+use App\Support\MailAllowlist;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -32,22 +33,22 @@ class Index extends Component
         Gate::authorize('viewAny', User::class);
     }
 
-    public function resendInvitation(int $userId, AdminUserService $admins): void
+    public function resendInvitation(int $userId, AdminUserService $admins, MailAllowlist $mailAllowlist): void
     {
         $user = $this->findAdmin($userId);
         Gate::authorize('resendInvitation', $user);
 
         $admins->sendInvitation($user, auth()->user());
-        session()->flash('status', __('admin.admins.invitation_resent'));
+        $this->flashSent($user, __('admin.admins.invitation_resent'), $mailAllowlist);
     }
 
-    public function resetPassword(int $userId, AdminUserService $admins): void
+    public function resetPassword(int $userId, AdminUserService $admins, MailAllowlist $mailAllowlist): void
     {
         $user = $this->findAdmin($userId);
         Gate::authorize('resetPassword', $user);
 
         $admins->resetPassword($user, auth()->user());
-        session()->flash('status', __('admin.admins.reset_sent', ['email' => $user->email]));
+        $this->flashSent($user, __('admin.admins.reset_sent', ['email' => $user->email]), $mailAllowlist);
     }
 
     public function deactivate(int $userId, AdminUserService $admins): void
@@ -138,5 +139,20 @@ class Index extends Component
     private function findAdmin(int $userId): User
     {
         return User::query()->admins()->findOrFail($userId);
+    }
+
+    /**
+     * The mail leaves through the queue, so the success message would hide that
+     * the allowlist drops it later.
+     */
+    private function flashSent(User $user, string $message, MailAllowlist $mailAllowlist): void
+    {
+        if ($mailAllowlist->allows($user->email)) {
+            session()->flash('status', $message);
+
+            return;
+        }
+
+        session()->flash('error', __('admin.admins.mail_suppressed', ['email' => $user->email]));
     }
 }
