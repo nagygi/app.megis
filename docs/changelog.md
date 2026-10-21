@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.27 · – · 2026-10-21
+## 1.27 · d81f3c9 · 2026-10-21
 
 Képességrendszer, K2: képességmérés (NM-12).
 
