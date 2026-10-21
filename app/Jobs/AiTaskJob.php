@@ -44,14 +44,27 @@ abstract class AiTaskJob implements ShouldQueue
     {
         $this->markFailed($exception);
 
+        $subject = $this->failureSubject();
+        $kind = $this->failureKind();
+
         app(InboxService::class)->open(
             InboxItemType::ProcessingError,
             $this->failureSummary(),
             organization: $this->failureOrganization(),
             diagnosis: $this->failureDiagnosis(),
-            subject: $this->failureSubject(),
-            dedupeKey: $this->failureSubject() === null ? null : 'processing-error:'.$this->failureSubject()->getMorphClass().':'.$this->failureSubject()->getKey(),
+            subject: $subject,
+            payload: $kind === null ? [] : ['job' => $kind],
+            dedupeKey: $subject === null ? null : 'processing-error:'.$subject->getMorphClass().':'.$subject->getKey().($kind === null ? '' : ':'.$kind),
         );
+    }
+
+    /**
+     * A second kind of work on the same subject, e.g. the capability measurement
+     * of a material: its own Beérkező row, and "Újra" starts only that work.
+     */
+    protected function failureKind(): ?string
+    {
+        return null;
     }
 
     /**

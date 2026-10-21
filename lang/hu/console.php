@@ -85,4 +85,23 @@ return [
         'done' => ':count fiók adatai törölve.',
     ],
 
+    'capabilities_run' => [
+        'not_found' => 'Nincs ilyen szervezeti anyag: :material.',
+        'empty_library' => 'A Képességtár üres, nincs mire illeszteni.',
+        'traces' => 'Nyomok: :count',
+        'findings' => 'Találatok: :count',
+        'interpretation' => 'értelmezés',
+        'rolled_back' => 'Próbafutás: semmi nem maradt meg, az AI-hívások naplója sem.',
+        'saved' => 'Mentve.',
+        'columns' => [
+            'level' => 'Szint',
+            'direction' => 'Irány',
+            'quote' => 'Idézet',
+            'capability' => 'Képesség',
+            'pattern' => 'Minta',
+            'confidence' => 'AI-konfidencia',
+            'traces' => 'Nyomok',
+        ],
+    ],
+
 ];

@@ -44,6 +44,7 @@
         <env name="AI_TRANSCRIPTION_PROVIDER" value="openai"/>
         <env name="AI_TRANSCRIPTION_MODEL" value="(null)"/>
         <env name="LARAVEL_PDF_DRIVER" value="gotenberg"/>
+        <env name="CAPABILITY_MEASUREMENT" value="false"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>

@@ -488,11 +488,14 @@ class PatternImporter
                 'imported_at' => $version !== null || $pattern->imported_at === null ? now() : $pattern->imported_at,
             ])->save();
 
-            if (($entry['sheet_maturity'] ?? null) !== null && $entry['sheet_maturity'] !== $pattern->maturity()) {
+            // The Sheet's own formula on its own counters; the product's findings come on top (NM-12).
+            $computed = PatternMaturity::compute($pattern->validity, $pattern->sheet_approved_clients, $pattern->origin);
+
+            if (($entry['sheet_maturity'] ?? null) !== null && $entry['sheet_maturity'] !== $computed) {
                 $result->warnings[] = __('admin.capabilities.import.pattern_maturity_differs', [
                     'code' => $code,
                     'sheet' => $entry['sheet_maturity']->label(),
-                    'computed' => $pattern->maturity()->label(),
+                    'computed' => $computed->label(),
                 ]);
             }
 

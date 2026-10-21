@@ -3,10 +3,12 @@
 namespace App\Services\Materials;
 
 use App\Ai\AiContext;
+use App\Enums\CapabilityMeasurementStatus;
 use App\Enums\MaterialContext;
 use App\Enums\MaterialStatus;
 use App\Enums\MirrorStatus;
 use App\Jobs\AnalyzeMaterial;
+use App\Jobs\DetectCapabilities;
 use App\Jobs\RecalculateMainDiagnosis;
 use App\Jobs\TranscribeMaterial;
 use App\Models\DiagnosisType;
@@ -14,6 +16,7 @@ use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\User;
+use App\Services\Capabilities\CapabilityMeasurementPolicy;
 use App\Services\Engine\AutomaticDiagnosisBuilder;
 use App\Services\Engine\ValueCatalog;
 use Throwable;
@@ -81,6 +84,12 @@ class MaterialPipeline
 
         // A material of a main diagnosis recalculates it (13 · 13.4, 18 · 18.4).
         $this->recalculateParent($material);
+
+        // Then its capabilities, in a job of their own (NM-12).
+        if (app(CapabilityMeasurementPolicy::class)->appliesTo($material)) {
+            $material->update(['capability_status' => CapabilityMeasurementStatus::Pending]);
+            DetectCapabilities::dispatch($material);
+        }
     }
 
     public function failed(Material $material, ?Throwable $exception): void

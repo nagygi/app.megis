@@ -118,6 +118,13 @@ php artisan megis:transcription:compare felvetel.mp3 --model=openai:gpt-4o-trans
 - **Képességtár és Mintatár:** *Képességtár → Frissítés a mégis tárából*, a „Képességrendszer · tárak” Sheet xlsx-exportjával.
   - Betöltődik a Képesség, a Képesség-részletek, a Minta és a Szabálykönyv fül.
   - A fájlban személyes adatot tartalmazó fülek is vannak (Bizonyíték, Kapcsolat, Esettár, Találat). Ezek nem töltődnek be, csak a Sheet által számolt mintánkénti darabszámaik. A fájl ne kerüljön a kódtárba.
+- **Képességmérés (NM-12):**
+  - Az értékmérés után minden diagnózis-anyagon lefut, az `ai` queue-n: Teljes, Snapshot, admin-feltöltés, bejelentkezett tükör.
+  - Kikapcsolás: `CAPABILITY_MEASUREMENT=false`. Fődiagnózison kívül: `CAPABILITY_MEASUREMENT_PLAIN=false`. Termékenként: `config/diagnosis.php`, `capability_measurement`.
+  - Csak betöltött Képességtárral fut. Üres tárnál az anyag „kihagyva” jelölést kap, AI-hívás nélkül.
+  - Átnézés az adminban: a diagnózis *Képességek* füle.
+  - Próbafutás egy anyagon, mentés nélkül: `php artisan megis:capabilities:run {anyag} --dry`.
+  - A tesztek a mérést kikapcsolva futtatják (`phpunit.xml`); a saját tesztjei bekapcsolják.
 
 ## Jogi dokumentumok
 
@@ -169,6 +176,7 @@ $env:NODE_EXTRA_CA_CERTS = "C:\út\windows-roots.pem" # npm run build (Bunny-fon
 | `php artisan megis:setup:check` | A környezet ellenőrzése (docs/uzemeltetes.md · 7) |
 | `php artisan megis:admin:create [--role=superadmin\|admin] [--invite]` | Admin létrehozása vagy meghívása (01 · 1.1) |
 | `php artisan megis:values:import {file} [--dry-run]` | Az Értéktár értékeinek betöltése és frissítése táblázatból (03 · 3.6) |
+| `php artisan megis:capabilities:run {material} [--dry]` | A képességmérés egy anyagon, a nyomok és a találatok kiírásával; `--dry`: semmi nem marad meg (NM-12, Tesztpad-kalibráció) |
 | `php artisan megis:mirror:prune` | A 24 óránál régebbi, fiókhoz nem kötött Értéktükrök törlése (06 · 6.1) |
 | `php artisan megis:prices:sync [--model=szolgáltató:modell] [--backfill]` | Az AI-modellek egységárainak frissítése a LiteLLM árlistájából; `--backfill`: az ár nélkül naplózott hívások utólagos beárazása (16 · 16.4) |
 | `php artisan megis:transcription:compare {file} --model=…` | Átíró szolgáltatók összevetése egy felvételen (12 · 12.7) |

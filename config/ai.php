@@ -158,6 +158,25 @@ return [
             'prompt' => 'diagnozis-allitasok',
             'prompt_version' => 1,
         ],
+        // Képességmérés (NM-12): A traces per chunk, B patterns per capability.
+        'capability_detection' => [
+            'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
+            'model' => env('AI_DEFAULT_MODEL', 'claude-sonnet-5-5'),
+            'max_tokens' => 16384,
+            'temperature' => 0.0,
+            'timeout' => 180,
+            'prompt' => 'kepesseg-nyomkereses',
+            'prompt_version' => 1,
+        ],
+        'capability_matching' => [
+            'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
+            'model' => env('AI_DEFAULT_MODEL', 'claude-sonnet-5-5'),
+            'max_tokens' => 8192,
+            'temperature' => 0.0,
+            'timeout' => 180,
+            'prompt' => 'kepesseg-mintaillesztes',
+            'prompt_version' => 1,
+        ],
         'reading_texts' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
             'model' => env('AI_DEFAULT_MODEL', 'claude-sonnet-5-5'),

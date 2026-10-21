@@ -1017,6 +1017,8 @@ return [
             'diagnosis_scoring' => 'Fő diagnózis: pontozás',
             'diagnosis_claims' => 'Fő diagnózis: állítások',
             'reading_texts' => 'Olvasat szövegei',
+            'capability_detection' => 'Képességmérés: nyomkeresés',
+            'capability_matching' => 'Képességmérés: mintaillesztés',
         ],
     ],
 
@@ -1213,6 +1215,7 @@ return [
             'reading' => 'Olvasat',
             'publish' => 'Publikálás',
             'subdiagnoses' => 'Részdiagnózisok',
+            'capabilities' => 'Képességek',
         ],
         'subdiagnoses_help' => 'A meghívótól az olvasat indításáig készült diagnózisok. Külön jóváhagyás nem kell: a fő diagnózissal együtt publikálódnak.',
         'subdiagnoses_empty' => 'Még nincs részdiagnózis.',

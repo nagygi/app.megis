@@ -140,6 +140,64 @@ return [
         'development' => 'fejlesztés',
     ],
 
+    'trace_direction' => [
+        'positive' => 'jelenlét',
+        'negative' => 'hiány',
+        'mixed' => 'vegyes',
+    ],
+
+    'trace_directness' => [
+        'observed' => 'megfigyelt viselkedés',
+        'self_report' => 'önbevallás',
+        'others_opinion' => 'más véleménye',
+        'interpretation' => 'szakértői értelmezés',
+    ],
+
+    'capability_state' => [
+        'present' => 'jelen lehet',
+        'absent' => 'hiányzik',
+        'no_trace' => 'nincs nyoma',
+        'no_data' => 'nincs adat',
+    ],
+
+    'capability_confidence' => [
+        'low' => 'alacsony',
+        'medium' => 'közepes',
+        'high' => 'magas',
+        'disputed' => 'vitatott',
+    ],
+
+    'finding_status' => [
+        'proposed' => 'javasolt',
+        'confirmed' => 'megerősítve',
+        'rejected' => 'elvetve',
+    ],
+
+    'finding_kind' => [
+        'pattern' => 'minta',
+        'interpretation' => 'értelmezés',
+    ],
+
+    'precondition_value' => [
+        'present' => 'megvan',
+        'partial' => 'részben',
+        'absent' => 'nincs',
+        'unknown' => 'nem tudjuk',
+    ],
+
+    'capability_measurement_status' => [
+        'pending' => 'vár',
+        'analyzing' => 'fut',
+        'processed' => 'kész',
+        'failed' => 'hiba',
+        'skipped' => 'kihagyva',
+    ],
+
+    'trace_candidate' => [
+        'new_pattern' => 'új minta jelölt',
+        'missing_capability' => 'hiányzó képesség jelölt',
+    ],
+
     'capability_rule_status' => [
         'agreed' => 'megállapodott',
         'decided' => 'döntés',
@@ -221,6 +279,9 @@ return [
         'threshold' => 'Küszöb',
         'publication' => 'Publikálás',
         'mirror_booking' => 'Értéktükör-foglalás',
+        'capability_review' => 'Képességek átnézése',
+        'pattern_review' => 'Minta felülvizsgálata',
+        'capability_candidate' => 'Minta- vagy képesség-jelölt',
     ],
 
     'ai_call_status' => [

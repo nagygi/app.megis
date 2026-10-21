@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Inbox;
 
 use App\Enums\InboxItemType;
+use App\Jobs\DetectCapabilities;
 use App\Jobs\DraftReading;
 use App\Livewire\Admin\Concerns\WithDataTable;
 use App\Mail\FeedbackReplyMail;
@@ -12,6 +13,7 @@ use App\Models\MainDiagnosisParticipant;
 use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\Organization;
+use App\Models\Pattern;
 use App\Models\Process;
 use App\Models\ReportFeedback;
 use App\Models\User;
@@ -105,6 +107,8 @@ class Index extends Component
         $item = $this->openItem($itemId, InboxItemType::ProcessingError);
 
         match (true) {
+            // The capability measurement failed, not the material (NM-12).
+            $item->subject instanceof Material && ($item->payload['job'] ?? null) === 'capability_detection' => DetectCapabilities::dispatch($item->subject, force: true),
             $item->subject instanceof Material => app(OccasionService::class)->retry($item->subject),
             $item->subject instanceof MainDiagnosis => DraftReading::dispatch($item->subject),
             default => abort(404),
@@ -238,6 +242,8 @@ class Index extends Component
     {
         return match (true) {
             $item->type === InboxItemType::Threshold && $item->diagnosis !== null => route('admin.main-diagnoses.run', $item->diagnosis),
+            $item->type === InboxItemType::CapabilityReview && $item->diagnosis !== null => route('admin.diagnoses.capabilities', $item->diagnosis),
+            $item->subject instanceof Pattern => route('admin.patterns.show', $item->subject),
             $item->subject instanceof Material => route('admin.materials.show', $item->subject),
             // "Beépítem": the reading, with the feedback next to its chapter (22 · 22.2).
             $item->subject instanceof ReportFeedback && $item->diagnosis !== null => route('admin.main-diagnoses.reading', [$item->diagnosis, 'visszajelzes' => $item->subject->id]),

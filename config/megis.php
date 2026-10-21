@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'version' => '1.26',
+    'version' => '1.27',
 
     // Set by the deploy script, shown on Rendszer → Health (docs/uzemeltetes.md · 3).
     'deployed_at' => env('MEGIS_DEPLOYED_AT'),
@@ -85,6 +85,29 @@ return [
         'chunk_characters' => 12000,
         // Detections sent to step B in one call.
         'matching_batch' => 60,
+    ],
+
+    // Képességmérés (NM-12): the AI reads every diagnosis material for capability
+    // traces after the value measurement. The switch and the limits keep the cost in hand.
+    'capabilities' => [
+        'measurement' => [
+            'enabled' => (bool) env('CAPABILITY_MEASUREMENT', true),
+            // Diagnoses outside a main diagnosis: a signed-in mirror, an admin upload.
+            'plain_diagnoses' => (bool) env('CAPABILITY_MEASUREMENT_PLAIN', true),
+            // Step B asks about at most this many capabilities per material.
+            'max_capabilities_per_material' => 20,
+            // Traces sent to one step B call.
+            'max_traces_per_capability' => 40,
+        ],
+        // The cases of the mégis tár: their names never go to the AI.
+        'case_labels' => ['DXC', 'SZV', 'Szuperszónikus', 'Kheiron'],
+        // An audit or an ESG report alone is no presence signal for these (6.1).
+        'audit_sensitive' => ['RC-67', 'RC-69', 'RC-70', 'RC-71', 'RC-72'],
+        // NY-27: a pattern is reviewed when at least this many proposals had at least this share rejected.
+        'false_alarm_review' => [
+            'min_suggestions' => 4,
+            'ratio' => 0.5,
+        ],
     ],
 
     // An uploaded ICS export (09 · 9.2): the format and the size are shown on the form.

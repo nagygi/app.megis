@@ -10,6 +10,10 @@ use App\Http\Middleware\ForbidWhileImpersonating;
 use App\Http\Middleware\ResolveOrganization;
 use App\Models\CalendarConnection;
 use App\Models\Capability;
+use App\Models\CapabilityAssessment;
+use App\Models\CapabilityFinding;
+use App\Models\CapabilityPreconditionAssessment;
+use App\Models\CapabilityTrace;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisClaim;
 use App\Models\DiagnosisRow;
@@ -102,6 +106,10 @@ class AppServiceProvider extends ServiceProvider
             'value' => Value::class,
             'capability' => Capability::class,
             'pattern' => Pattern::class,
+            'capability_trace' => CapabilityTrace::class,
+            'capability_finding' => CapabilityFinding::class,
+            'capability_assessment' => CapabilityAssessment::class,
+            'capability_precondition_assessment' => CapabilityPreconditionAssessment::class,
             'organization_value_set' => OrganizationValueSet::class,
             'diagnosis' => Diagnosis::class,
             'material' => Material::class,

@@ -193,6 +193,26 @@ class Diagnosis extends Model
     }
 
     /**
+     * The capabilities at their levels (NM-12).
+     *
+     * @return HasMany<CapabilityAssessment, $this>
+     */
+    public function capabilityAssessments(): HasMany
+    {
+        return $this->hasMany(CapabilityAssessment::class);
+    }
+
+    /**
+     * E1–E9 (6.7).
+     *
+     * @return HasMany<CapabilityPreconditionAssessment, $this>
+     */
+    public function preconditionAssessments(): HasMany
+    {
+        return $this->hasMany(CapabilityPreconditionAssessment::class);
+    }
+
+    /**
      * @return HasMany<DiagnosisRow, $this>
      */
     public function rows(): HasMany

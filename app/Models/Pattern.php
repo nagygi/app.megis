@@ -100,6 +100,7 @@ class Pattern extends Model
             'sheet_maturity' => PatternMaturity::class,
             'imported_at' => 'datetime',
             'archived_at' => 'datetime',
+            'review_flagged_at' => 'datetime',
         ];
     }
 
@@ -138,11 +139,16 @@ class Pattern extends Model
 
     /**
      * The maturity by the formula of the Sheet, from the clients with an
-     * approved finding in the mégis tár.
+     * approved finding in the mégis tár and in the product (NM-12).
      */
     public function maturity(): PatternMaturity
     {
-        return PatternMaturity::compute($this->validity, $this->sheet_approved_clients, $this->origin);
+        return PatternMaturity::compute($this->validity, $this->approvedClients(), $this->origin);
+    }
+
+    public function approvedClients(): int
+    {
+        return (int) $this->sheet_approved_clients + (int) $this->approved_organizations;
     }
 
     public function text(string $field): ?string

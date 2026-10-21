@@ -19,6 +19,8 @@
         $main && ($main->stage === \App\Enums\MainDiagnosisStage::Published || app(\App\Services\Diagnoses\ReadingService::class)->progress($main)['complete'])
             ? ['route' => 'admin.main-diagnoses.publish', 'label' => __('admin.main_diagnoses.tabs.publish')] : null,
         ['route' => 'admin.main-diagnoses.subdiagnoses', 'label' => __('admin.main_diagnoses.tabs.subdiagnoses')],
+        // Képességmérés (NM-12).
+        ['route' => 'admin.diagnoses.capabilities', 'label' => __('admin.main_diagnoses.tabs.capabilities')],
     ]));
     $days = $main?->dayCount();
 @endphp

@@ -25,6 +25,10 @@
                     @if ($isEditable && $canChangeStatus)
                         <x-ui.button tone="outline" size="sm" :href="route('admin.diagnoses.edit', $diagnosis)">{{ __('admin.diagnoses.edit_data') }}</x-ui.button>
                     @endif
+                    {{-- Képességmérés of the material the diagnosis was built from (NM-12). --}}
+                    @if ($diagnosis->material_id !== null)
+                        <x-ui.button tone="outline" size="sm" :href="route('admin.diagnoses.capabilities', $diagnosis)">{{ __('capabilities.review.title') }}</x-ui.button>
+                    @endif
                     @foreach ($canChangeStatus ? $diagnosis->status->nextStatuses() : [] as $next)
                         @php
                             [$label, $tone] = match (true) {

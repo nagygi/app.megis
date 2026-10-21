@@ -56,6 +56,7 @@ it('opens the reading, the publishing, the Képességtár and the lists of the a
     foreach ([
         route('admin.main-diagnoses.reading', $main->diagnosis, false),
         route('admin.main-diagnoses.publish', $main->diagnosis, false),
+        route('admin.diagnoses.capabilities', $main->diagnosis, false),
         route('admin.capabilities.index', [], false),
         route('admin.capabilities.import', [], false),
         route('admin.capability-groups.index', [], false),

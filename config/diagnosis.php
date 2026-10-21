@@ -20,11 +20,14 @@ return [
             'has_peers' => false,
             // At most this many measured processes (11, 18 · 18.1); null: no limit.
             'max_measured_processes' => 2,
+            // The capability measurement reads its materials (NM-12).
+            'capability_measurement' => true,
         ],
         'full' => [
             'days' => 42,
             'has_peers' => true,
             'max_measured_processes' => null,
+            'capability_measurement' => true,
         ],
     ],
 

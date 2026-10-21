@@ -2,6 +2,36 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.27 · – · 2026-10-21
+
+Képességrendszer, K2: képességmérés (NM-12).
+
+- **Mikor fut:** az értékmérés után, automatikusan, minden diagnózis-anyagon, külön jobban. Ide tartozik a Teljes, a Snapshot, az admin-feltöltés és a bejelentkezett tükör. Nem fut a nyilvános tükrön, a diktáláson és a diagnózison kívüli folyamat-alkalmon. Kikapcsolható: globálisan, termékenként, és külön a fődiagnózison kívül.
+- **Két AI-lépés:**
+  - **A, nyomkeresés:** részenként, semleges kódú képességkatalógussal (K1…). Név, RC- és M-kód, esetnév (DXC, SZV…) és forráskód nem megy az AI-nak. Nyomonként: szó szerinti idézet, hely, szerep, szint (határfelülettel), irány, közvetlenség, nyers vagy feldolgozott, jelölések, E1–E9, alternatív olvasat, jelölt.
+  - **B, mintaillesztés:** képességenként, a képesség mintáival (P1…) és a detektor-hibamintákkal mint tiltó szabályokkal (X1…). Minta nélküli képességnél értelmezés a definíció alapján, mindig alacsony.
+  - A prompt a mégis Tesztpad-promptját (v0.3) követi.
+- **Védelem:**
+  - A kérdező mondata és a forrásban nem szereplő idézet kiesik.
+  - A gép legfeljebb közepes konfidenciát ad. A hipotézis-minta találatát és az értelmezést ember hagyja jóvá (NY-26).
+  - Az újrafuttatás megtartja, amiről admin döntött.
+- **Állapot és konfidencia:** diagnózisonként, képesség × szint szerint, a Szabálykönyv szabályaival:
+  - AL-01–04;
+  - KO-02–07: független forrás, csak önkép, csábító tétel, szint és lefedettség, mikro szervezet, külső hang;
+  - egyenetlenség.
+  - A feldolgozott és a jelölt nyom csak megerősít. Az admin által beállított érték megmarad. Ha egy jóváhagyott sor automatikus értéke változik, újra jóváhagyásra vár.
+- **E1–E9** diagnózisonként, a nyomokból: megvan / részben / nincs / nem tudjuk.
+- **Admin:** a diagnózis új *Képességek* füle (fődiagnózisnál fül, sima diagnózisnál gomb). Itt lehet:
+  - megerősíteni vagy elvetni a találatot, egyenként vagy képességenként;
+  - kihagyni a nyomot;
+  - jóváhagyni vagy átírni az állapotot indokkal (a „magas” csak itt adható);
+  - akadályt megadni, E1–E9-et jóváhagyni;
+  - látni a jelölteket, és újrafuttatni a mérést.
+- **Mintatár-számlálók:** az elvetett javaslat téves riasztás. A számlálók névtelen naplóból jönnek, így ügyféltörlés után is megmaradnak. A minta-érettségbe a termék jóváhagyott ügyfelei is beszámítanak. Ha legalább 4 javaslatból legalább a felét elvetik, a minta Beérkező-sort kap felülvizsgálatra (NY-27).
+- **Beérkező:** új sortípusok: *Képességek átnézése*, *Minta felülvizsgálata*, *Minta- vagy képesség-jelölt*. A képességmérés hibája saját sort kap, és az „Újra” csak ezt indítja újra, nem az egész anyagot.
+- **Parancs:** `megis:capabilities:run {anyag} --dry` a Tesztpad-kalibrációhoz.
+- **Nincs még benne:** riport és Bridge (NM-15), érettség a második diagnózistól. A mégisnek szóló nyitott kérdések a tervben vannak: kalibráció, NY-26 értelmezése, nyers vagy feldolgozott átirat, KO-06 adatai, anonimitás, adatkezelési tájékoztató.
+
 ## 1.26 · 9e19a31 · 2026-10-21
 
 Képességrendszer, K1: Mintatár (NM-19).

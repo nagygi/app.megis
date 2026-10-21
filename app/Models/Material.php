@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CapabilityMeasurementStatus;
 use App\Enums\MaterialContext;
 use App\Enums\MaterialSource;
 use App\Enums\MaterialStatus;
@@ -23,6 +24,7 @@ use Illuminate\Support\Str;
     'audio_path', 'audio_mime', 'audio_seconds', 'text', 'segments', 'speaker_assignments', 'diagnosis_type_id', 'diagnosed_on',
     'status', 'error', 'transcription_ai_call_id', 'processed_at', 'created_by', 'parent_diagnosis_id',
     'process_occasion_id', 'is_situation', 'recording_consent_at', 'recording_consent_by', 'classified_other_at', 'placed_at',
+    'capability_status', 'capability_error', 'capability_processed_at',
 ])]
 class Material extends Model
 {
@@ -57,6 +59,8 @@ class Material extends Model
             'recording_consent_at' => 'datetime',
             'classified_other_at' => 'datetime',
             'placed_at' => 'datetime',
+            'capability_status' => CapabilityMeasurementStatus::class,
+            'capability_processed_at' => 'datetime',
         ];
     }
 
@@ -105,6 +109,24 @@ class Material extends Model
     public function scores(): HasMany
     {
         return $this->hasMany(MaterialValueScore::class);
+    }
+
+    /**
+     * The capability traces of the material (NM-12).
+     *
+     * @return HasMany<CapabilityTrace, $this>
+     */
+    public function capabilityTraces(): HasMany
+    {
+        return $this->hasMany(CapabilityTrace::class);
+    }
+
+    /**
+     * @return HasMany<CapabilityFinding, $this>
+     */
+    public function capabilityFindings(): HasMany
+    {
+        return $this->hasMany(CapabilityFinding::class);
     }
 
     /**

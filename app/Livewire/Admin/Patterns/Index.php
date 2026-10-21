@@ -115,10 +115,10 @@ class Index extends Component
         match ($maturity) {
             PatternMaturity::Rejected => $query->where('validity', PatternValidity::Rejected),
             PatternMaturity::Obsolete => $query->where('validity', PatternValidity::Obsolete),
-            PatternMaturity::Used => $query->where('validity', PatternValidity::Valid)->where('sheet_approved_clients', '>=', 2),
-            PatternMaturity::SeenOnce => $query->where('validity', PatternValidity::Valid)->where('sheet_approved_clients', 1),
-            PatternMaturity::HypothesisLiterature => $query->where('validity', PatternValidity::Valid)->where('sheet_approved_clients', 0)->whereIn('origin', $literature),
-            PatternMaturity::HypothesisOwn => $query->where('validity', PatternValidity::Valid)->where('sheet_approved_clients', 0)
+            PatternMaturity::Used => $query->where('validity', PatternValidity::Valid)->whereRaw('(sheet_approved_clients + approved_organizations) >= 2'),
+            PatternMaturity::SeenOnce => $query->where('validity', PatternValidity::Valid)->whereRaw('(sheet_approved_clients + approved_organizations) = 1'),
+            PatternMaturity::HypothesisLiterature => $query->where('validity', PatternValidity::Valid)->whereRaw('(sheet_approved_clients + approved_organizations) = 0')->whereIn('origin', $literature),
+            PatternMaturity::HypothesisOwn => $query->where('validity', PatternValidity::Valid)->whereRaw('(sheet_approved_clients + approved_organizations) = 0')
                 ->where(fn ($origin) => $origin->whereNull('origin')->orWhereNotIn('origin', $literature)),
         };
     }

@@ -15,6 +15,11 @@ enum InboxItemType: string
     case Threshold = 'threshold';
     case Publication = 'publication';
     case MirrorBooking = 'mirror_booking';
+    // Képességmérés (NM-12): proposed findings to review, a pattern with many
+    // false alarms (NY-27), and traces no pattern or capability fits.
+    case CapabilityReview = 'capability_review';
+    case PatternReview = 'pattern_review';
+    case CapabilityCandidate = 'capability_candidate';
 
     public function label(): string
     {

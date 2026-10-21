@@ -26,6 +26,7 @@ use App\Models\OccasionExperience;
 use App\Models\Process;
 use App\Models\ProcessOccasion;
 use App\Models\RawDetection;
+use App\Services\Capabilities\CapabilityAssessmentService;
 use App\Services\Inbox\InboxService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -60,6 +61,9 @@ class DiagnosisCalculator
             $this->mainRows($main, $snapshot, $materials, $scores, $processDiagnoses);
             $this->summarize($main);
         });
+
+        // The capabilities read the same materials, e.g. without a peer who withdrew (NM-12).
+        app(CapabilityAssessmentService::class)->refresh($main->diagnosis);
     }
 
     /**
