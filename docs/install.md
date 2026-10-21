@@ -115,7 +115,9 @@ php artisan megis:transcription:compare felvetel.mp3 --model=openai:gpt-4o-trans
 ## Demó diagnózis és Képességtár (M7, 07)
 
 - **Demó szervezet:** `php artisan db:seed --class=DemoDiagnosisSeeder`. Teljes diagnózis egy csapatról: 1 vezető, 4 társ, 2 mért folyamat, 4 helyzet pontokkal és idézetekkel, AI-hívás nélkül. Futó szakaszban áll, a küszöb teljesült: az adminban indítható az olvasat, onnan a publikálás, a riport és a visszajelzés. Az emberek `demo-…@example.com` címeket kapnak; belépni az adminból, „a nevében” lehet. Élesben nem fut, és egy második futtatás nem hozza létre újra.
-- **Képességtár:** *Képességtár → Frissítés a mégis tárából*, a „Képességrendszer · tárak” Sheet xlsx-exportjával. A fájl személyes adatot tartalmazó füleket is tartalmaz (Bizonyíték, Esettár, Találat): ezek nem töltődnek be, de a fájl ne kerüljön a kódtárba.
+- **Képességtár és Mintatár:** *Képességtár → Frissítés a mégis tárából*, a „Képességrendszer · tárak” Sheet xlsx-exportjával.
+  - Betöltődik a Képesség, a Képesség-részletek, a Minta és a Szabálykönyv fül.
+  - A fájlban személyes adatot tartalmazó fülek is vannak (Bizonyíték, Kapcsolat, Esettár, Találat). Ezek nem töltődnek be, csak a Sheet által számolt mintánkénti darabszámaik. A fájl ne kerüljön a kódtárba.
 
 ## Jogi dokumentumok
 

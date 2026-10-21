@@ -73,6 +73,80 @@ return [
         'questionable' => 'kérdéses',
     ],
 
+    'pattern_type' => [
+        'capability' => 'képesség-minta',
+        'precondition' => 'előfeltétel-minta',
+        'detector_error' => 'detektor-hibaminta',
+    ],
+
+    'pattern_subtype' => [
+        'presence' => 'jelenlét-jel',
+        'absence' => 'hiány-jel',
+        'anti_pattern' => 'anti-minta',
+        'borderline' => 'határeset',
+    ],
+
+    'pattern_maturity' => [
+        'hypothesis_literature' => 'hipotézis (irodalom)',
+        'hypothesis_own' => 'hipotézis (saját megfigyelés)',
+        'seen_once' => 'egy esetben láttuk',
+        'used' => 'használt',
+        'obsolete' => 'elavult',
+        'rejected' => 'elvetett',
+    ],
+
+    'pattern_validity' => [
+        'valid' => 'érvényes',
+        'obsolete' => 'elavult',
+        'rejected' => 'elvetett',
+    ],
+
+    'pattern_fit' => [
+        'exact' => 'pontos',
+        'partial' => 'részleges',
+    ],
+
+    'pattern_origin' => [
+        'own_case' => 'saját eset',
+        'external' => 'külső forrás',
+        'both' => 'mindkettő',
+    ],
+
+    'level_marker' => [
+        'boundary' => 'határfelület',
+        'micro' => 'mikro szervezet',
+    ],
+
+    'pattern_product' => [
+        'full' => 'Teljes',
+        'snapshot_internal' => 'Snapshot Belső',
+        'snapshot_external' => 'Snapshot Külső',
+        'value_measurement' => 'Értékmérés',
+        'bridge' => 'Bridge',
+        'operating_system' => 'OS',
+        'mirror' => 'Tükör',
+        'testpad' => 'Tesztpad',
+        'detector' => 'detektor (tiltó szabály)',
+    ],
+
+    'capability_rule_area' => [
+        'trace' => 'nyom',
+        'state' => 'állapot',
+        'confidence' => 'konfidencia',
+        'maturity' => 'érettség',
+        'priority' => 'prioritás',
+        'protection' => 'védelem',
+        'precondition' => 'előfeltétel',
+        'development' => 'fejlesztés',
+    ],
+
+    'capability_rule_status' => [
+        'agreed' => 'megállapodott',
+        'decided' => 'döntés',
+        'accepted' => 'javaslat, elfogadva',
+        'proposal' => 'javaslat',
+    ],
+
     'value_origin' => [
         'admin' => 'Értéktár',
         'diagnosis' => 'Diagnózisnál felvett',

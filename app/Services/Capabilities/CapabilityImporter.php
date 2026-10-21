@@ -15,11 +15,13 @@ use Illuminate\Support\Str;
 use Throwable;
 
 /**
- * "Frissítés a mégis tárából" (07 · 7.6): reads the Képesség and the
- * Képesség-részletek sheet of the xlsx export, nothing else. Matches by
- * azonosító: a new one is a new capability (v1), a changed one a new version
- * with an automatic note, one missing from the file stays. The preview runs
- * the same load and rolls it back, so it shows exactly what the load does.
+ * "Frissítés a mégis tárából" (07 · 7.6, NM-19): reads the Képesség, the
+ * Képesség-részletek, the Minta and the Szabálykönyv sheet of the xlsx
+ * export, nothing else; the case sheets (Bizonyíték, Kapcsolat, Találat,
+ * Esettár) never come in. Matches by azonosító: a new one is a new
+ * capability (v1), a changed one a new version with an automatic note, one
+ * missing from the file stays. The preview runs the same load and rolls it
+ * back, so it shows exactly what the load does.
  */
 class CapabilityImporter
 {
@@ -47,7 +49,15 @@ class CapabilityImporter
         'szukseges elofeltetelek' => 'preconditions',
         'csabito tetel' => 'tempting',
         'szinonimak kulcsszavak' => 'keywords',
+        'megerositett talalatok' => 'sheet_confirmed_findings',
+        'kapcsolt bizonyitekok' => 'sheet_linked_evidence',
     ];
+
+    /**
+     * Counts the Sheet computes from its Találat and Kapcsolat sheets: they
+     * come in as numbers and make no version.
+     */
+    private const COUNTERS = ['sheet_confirmed_findings', 'sheet_linked_evidence'];
 
     /**
      * The columns every load needs: the required fields of the card (07 · 7.2).
@@ -55,9 +65,9 @@ class CapabilityImporter
     private const REQUIRED_COLUMNS = ['code', 'name', 'group', 'level', 'status', 'definition'];
 
     /**
-     * Counts of the Mintatár: they come with the patterns (NM-19), not here.
+     * The product counts the patterns of a capability itself (NM-19).
      */
-    private const IGNORED_COLUMNS = ['mintak szama', 'megerositett talalatok', 'kapcsolt bizonyitekok'];
+    private const IGNORED_COLUMNS = ['mintak szama'];
 
     /**
      * Fields of the Képesség-részletek sheet with a place on the card;
@@ -95,6 +105,8 @@ class CapabilityImporter
     public function __construct(
         private SpreadsheetReader $reader,
         private CapabilityService $capabilities,
+        private PatternImporter $patterns,
+        private RuleImporter $rules,
     ) {}
 
     public function preview(string $path): CapabilityImportResult
@@ -113,7 +125,7 @@ class CapabilityImporter
     private function run(string $path, ?string $fileName): CapabilityImportResult
     {
         $result = new CapabilityImportResult;
-        $sheets = $this->reader->readSheets($path, [self::SHEET, self::DETAILS_SHEET]);
+        $sheets = $this->reader->readSheets($path, [self::SHEET, self::DETAILS_SHEET, PatternImporter::SHEET, RuleImporter::SHEET]);
 
         if (! isset($sheets[self::SHEET])) {
             $result->errors[] = __('admin.capabilities.import.missing_sheet', ['sheet' => self::SHEET]);
@@ -147,6 +159,15 @@ class CapabilityImporter
         try {
             $this->write($entries, array_values(array_unique($sourced)), $result);
 
+            // The patterns link to the capabilities, so they come after them.
+            foreach ([PatternImporter::SHEET => $this->patterns, RuleImporter::SHEET => $this->rules] as $sheet => $importer) {
+                if (isset($sheets[$sheet])) {
+                    $importer->load($sheets[$sheet], $result);
+                } else {
+                    $result->warnings[] = __('admin.capabilities.import.missing_optional_sheet', ['sheet' => $sheet]);
+                }
+            }
+
             if ($fileName === null) {
                 DB::rollBack();
             } else {
@@ -156,6 +177,10 @@ class CapabilityImporter
                     'updated_count' => count($result->updated),
                     'unchanged_count' => count($result->unchanged),
                     'skipped_count' => count($result->errors),
+                    'patterns_created_count' => count($result->patternsCreated),
+                    'patterns_updated_count' => count($result->patternsUpdated),
+                    'patterns_unchanged_count' => count($result->patternsUnchanged),
+                    'rules_changed_count' => count($result->rulesChanged),
                     'created_by' => auth()->id(),
                 ]);
                 DB::commit();
@@ -222,7 +247,7 @@ class CapabilityImporter
                 continue;
             }
 
-            $entry = ['line' => $line, 'code' => $code, 'attributes' => [], 'group' => '', 'links' => null, 'details' => [], 'proposed' => [], 'states' => [], 'errors' => []];
+            $entry = ['line' => $line, 'code' => $code, 'attributes' => [], 'counters' => [], 'group' => '', 'links' => null, 'details' => [], 'proposed' => [], 'states' => [], 'errors' => []];
 
             foreach ($columns as $header => $field) {
                 $this->applyCell($entry, $field, $header, $row[$header] ?? '', $result);
@@ -241,6 +266,12 @@ class CapabilityImporter
     {
         switch ($field) {
             case 'code':
+                return;
+
+            case 'sheet_confirmed_findings':
+            case 'sheet_linked_evidence':
+                $entry['counters'][$field] = is_numeric(trim($raw)) ? max(0, (int) round((float) trim($raw))) : null;
+
                 return;
 
             case 'detail':
@@ -522,8 +553,17 @@ class CapabilityImporter
             $version = $capability->recordVersion($note);
 
             if ($version !== null || $capability->imported_at === null) {
-                $capability->forceFill(['imported_at' => now()])->save();
+                $capability->forceFill(['imported_at' => now()]);
             }
+
+            // The counters of the Sheet make no version.
+            foreach (self::COUNTERS as $counter) {
+                if (array_key_exists($counter, $entry['counters'])) {
+                    $capability->forceFill([$counter => $entry['counters'][$counter]]);
+                }
+            }
+
+            $capability->save();
 
             match (true) {
                 $isNew => $result->created[] = ['code' => $code, 'name' => $capability->name],

@@ -1,4 +1,7 @@
-@php($fieldLabel = fn (string $field) => __('admin.capabilities.fields.'.$field))
+@php
+    $fieldLabel = fn (string $field) => __('admin.capabilities.fields.'.$field);
+    $patternFieldLabel = fn (string $field) => __('admin.patterns.fields.'.$field);
+@endphp
 
 <div class="flex max-w-3xl flex-col gap-6">
     <x-ui.flash />
@@ -35,7 +38,11 @@
         {{-- Előnézet: new, changed, unchanged, with the changed fields (07 · 7.6) --}}
         <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="import-preview">
             <h2 id="import-preview" class="text-lg font-semibold">{{ __('admin.capabilities.import.preview_title') }}</h2>
-            <p class="text-lg">{{ __('admin.capabilities.import.summary', ['created' => count($preview['created']), 'updated' => count($preview['updated']), 'unchanged' => count($preview['unchanged'])]) }}</p>
+            <div class="flex flex-col gap-1">
+                <p class="text-lg">{{ __('admin.capabilities.import.summary', ['created' => count($preview['created']), 'updated' => count($preview['updated']), 'unchanged' => count($preview['unchanged'])]) }}</p>
+                <p>{{ __('admin.capabilities.import.patterns_summary', ['created' => count($preview['patternsCreated']), 'updated' => count($preview['patternsUpdated']), 'unchanged' => count($preview['patternsUnchanged'])]) }}</p>
+                <p>{{ __('admin.capabilities.import.rules_summary', ['changed' => count($preview['rulesChanged'])]) }}</p>
+            </div>
 
             @if ($preview['errors'] !== [])
                 <x-ui.notice tone="error" :title="__('admin.capabilities.import.errors_title')">
@@ -98,8 +105,48 @@
                 </x-ui.disclosure>
             @endif
 
+            {{-- Minta (NM-19) and Szabálykönyv --}}
+            @if ($preview['patternsCreated'] !== [])
+                <x-ui.disclosure :summary="__('admin.capabilities.import.patterns_created_title').' ('.count($preview['patternsCreated']).')'" class="border border-grey-250">
+                    <ul class="flex flex-col gap-1">
+                        @foreach ($preview['patternsCreated'] as $row)
+                            <li><span class="font-mono text-sm">{{ $row['code'] }}</span> · {{ $row['name'] }}</li>
+                        @endforeach
+                    </ul>
+                </x-ui.disclosure>
+            @endif
+
+            @if ($preview['patternsUpdated'] !== [])
+                <div class="flex flex-col gap-2">
+                    <h3 class="font-semibold">{{ __('admin.capabilities.import.patterns_updated_title') }}</h3>
+                    <ul class="flex flex-col gap-2">
+                        @foreach ($preview['patternsUpdated'] as $row)
+                            <li>
+                                <span class="font-mono text-sm">{{ $row['code'] }}</span> · {{ $row['name'] }}
+                                <span class="block text-sm text-grey-700">{{ collect($row['fields'])->map(fn ($field) => $patternFieldLabel($field))->implode(', ') }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @foreach (['patternsInvalidated' => 'patterns_invalidated_title', 'rulesChanged' => 'rules_changed_title'] as $key => $title)
+                @if ($preview[$key] !== [])
+                    <div class="flex flex-col gap-1">
+                        <h3 class="font-semibold">{{ __('admin.capabilities.import.'.$title) }}</h3>
+                        <p class="text-sm text-grey-700">{{ implode(', ', $preview[$key]) }}</p>
+                    </div>
+                @endif
+            @endforeach
+
+            @if ($preview['patternsUnchanged'] !== [])
+                <x-ui.disclosure :summary="__('admin.capabilities.import.patterns_unchanged_title', ['count' => count($preview['patternsUnchanged'])])" class="border border-grey-250">
+                    <p class="text-sm text-grey-700">{{ implode(', ', $preview['patternsUnchanged']) }}</p>
+                </x-ui.disclosure>
+            @endif
+
             <div class="flex flex-wrap items-center gap-3">
-                @if ($preview['created'] !== [] || $preview['updated'] !== [] || $preview['archived'] !== [] || $preview['restored'] !== [])
+                @if ($preview['created'] !== [] || $preview['updated'] !== [] || $preview['archived'] !== [] || $preview['restored'] !== [] || $preview['patternsCreated'] !== [] || $preview['patternsUpdated'] !== [] || $preview['rulesChanged'] !== [])
                     <x-ui.button wire:click="load" wire:loading.attr="disabled" wire:target="load">{{ __('admin.capabilities.import.load_button') }}</x-ui.button>
                 @else
                     <p class="text-grey-700">{{ __('admin.capabilities.import.nothing') }}</p>
@@ -115,6 +162,7 @@
             <p wire:key="import-{{ $import->id }}" class="text-sm">
                 {{ $import->created_at->format('Y.m.d. H:i') }} · {{ $import->creator?->name ?? __('admin.versions.system') }} · {{ $import->file_name }}
                 <span class="block text-grey-700">{{ __('admin.capabilities.import.summary', ['created' => $import->created_count, 'updated' => $import->updated_count, 'unchanged' => $import->unchanged_count]) }}@if ($import->skipped_count > 0) · {{ __('admin.capabilities.import.skipped', ['count' => $import->skipped_count]) }}@endif</span>
+                <span class="block text-grey-700">{{ __('admin.capabilities.import.history_patterns', ['created' => $import->patterns_created_count, 'updated' => $import->patterns_updated_count, 'unchanged' => $import->patterns_unchanged_count, 'rules' => $import->rules_changed_count]) }}</span>
             </p>
         @empty
             <p class="text-grey-700">{{ __('admin.capabilities.import.no_history') }}</p>

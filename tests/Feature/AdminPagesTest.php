@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\LegalDocumentType;
+use App\Models\Capability;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisRow;
 use App\Models\DiagnosisType;
@@ -9,6 +10,7 @@ use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\Membership;
 use App\Models\Organization;
+use App\Models\Pattern;
 use App\Models\Process;
 use App\Models\Product;
 use App\Models\Team;
@@ -79,6 +81,17 @@ it('renders every admin page for a superadmin with a page heading', function (Cl
     'value categories' => fn () => route('admin.value-categories.index'),
     'new value category' => fn () => route('admin.value-categories.create'),
     'edit value category' => fn (array $models) => route('admin.value-categories.edit', $models['category']),
+    'capabilities' => fn () => route('admin.capabilities.index'),
+    'new capability' => fn () => route('admin.capabilities.create'),
+    'edit capability' => fn () => route('admin.capabilities.edit', Capability::factory()->create()),
+    'capability patterns' => fn () => route('admin.capabilities.patterns', Capability::factory()->create()),
+    'capability versions' => fn () => route('admin.capabilities.versions', Capability::factory()->create()),
+    'capability import' => fn () => route('admin.capabilities.import'),
+    'capability groups' => fn () => route('admin.capability-groups.index'),
+    'patterns' => fn () => route('admin.patterns.index'),
+    'pattern' => fn () => route('admin.patterns.show', Pattern::factory()->create()),
+    'pattern versions' => fn () => route('admin.patterns.versions', Pattern::factory()->create()),
+    'capability rules' => fn () => route('admin.capability-rules.index'),
     'legal documents' => fn () => route('admin.settings.legal'),
     'areas' => fn () => route('admin.settings.areas'),
     'profile' => fn () => route('admin.profile'),

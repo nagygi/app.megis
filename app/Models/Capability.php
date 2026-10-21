@@ -132,6 +132,16 @@ class Capability extends Model
     }
 
     /**
+     * The patterns of the Mintatár that recognise it, with the fit (NM-19).
+     *
+     * @return BelongsToMany<Pattern, $this>
+     */
+    public function patterns(): BelongsToMany
+    {
+        return $this->belongsToMany(Pattern::class)->withPivot(['fit', 'fit_note', 'position']);
+    }
+
+    /**
      * Not archived (07 · 7.5).
      *
      * @param  Builder<Capability>  $query

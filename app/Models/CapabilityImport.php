@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * A load from the mégis tár (07 · 7.6): who, when, from which file, with
- * what result. The file itself is not kept.
+ * what result: capabilities, patterns and rules (NM-19). The file itself is not kept.
  */
-#[Fillable(['file_name', 'created_count', 'updated_count', 'unchanged_count', 'skipped_count', 'created_by'])]
+#[Fillable([
+    'file_name', 'created_count', 'updated_count', 'unchanged_count', 'skipped_count', 'created_by',
+    'patterns_created_count', 'patterns_updated_count', 'patterns_unchanged_count', 'rules_changed_count',
+])]
 class CapabilityImport extends Model
 {
     /**

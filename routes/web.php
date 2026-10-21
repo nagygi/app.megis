@@ -128,7 +128,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('kepessegtar/kepessegek/uj', Admin\Capabilities\Form::class)->name('capabilities.create');
         Route::livewire('kepessegtar/frissites', Admin\Capabilities\Import::class)->name('capabilities.import');
         Route::livewire('kepessegtar/kepessegek/{capability}', Admin\Capabilities\Form::class)->name('capabilities.edit');
+        Route::livewire('kepessegtar/kepessegek/{capability}/mintak', Admin\Capabilities\Patterns::class)->name('capabilities.patterns');
         Route::livewire('kepessegtar/kepessegek/{capability}/verziok', Admin\Capabilities\Versions::class)->name('capabilities.versions');
+        Route::livewire('kepessegtar/mintak', Admin\Patterns\Index::class)->name('patterns.index');
+        Route::livewire('kepessegtar/mintak/{pattern}', Admin\Patterns\Show::class)->name('patterns.show');
+        Route::livewire('kepessegtar/mintak/{pattern}/verziok', Admin\Patterns\Versions::class)->name('patterns.versions');
+        Route::livewire('kepessegtar/szabalykonyv', Admin\CapabilityRules\Index::class)->name('capability-rules.index');
         Route::livewire('kepessegtar/csoportok', Admin\CapabilityGroups\Index::class)->name('capability-groups.index');
         Route::livewire('kepessegtar/csoportok/uj', Admin\CapabilityGroups\Form::class)->name('capability-groups.create');
         Route::livewire('kepessegtar/csoportok/{group}/szerkesztes', Admin\CapabilityGroups\Form::class)->name('capability-groups.edit');

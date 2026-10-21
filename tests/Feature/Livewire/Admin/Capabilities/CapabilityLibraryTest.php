@@ -17,35 +17,6 @@ use App\Services\Capabilities\CapabilityImporter;
 use App\Services\Capabilities\CapabilityService;
 use Illuminate\Http\UploadedFile;
 use Livewire\Livewire;
-use OpenSpout\Common\Entity\Row;
-use OpenSpout\Writer\XLSX\Writer;
-
-/**
- * A synthetic export of the mégis tár: sheet name => rows, the first row is the header.
- *
- * @param  array<string, list<list<string>>>  $sheets
- */
-function capabilitySpreadsheet(array $sheets): string
-{
-    $path = tempnam(sys_get_temp_dir(), 'kepessegtar').'.xlsx';
-    $writer = new Writer;
-    $writer->openToFile($path);
-    $first = true;
-
-    foreach ($sheets as $name => $rows) {
-        $sheet = $first ? $writer->getCurrentSheet() : $writer->addNewSheetAndMakeItCurrent();
-        $sheet->setName($name);
-        $first = false;
-
-        foreach ($rows as $row) {
-            $writer->addRow(Row::fromValues($row));
-        }
-    }
-
-    $writer->close();
-
-    return $path;
-}
 
 function capabilityHeader(): array
 {

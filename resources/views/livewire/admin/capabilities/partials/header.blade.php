@@ -42,7 +42,7 @@
 
     <x-ui.tabs
         :label="$capability->name"
-        :tabs="collect(['admin.capabilities.edit' => 'data', 'admin.capabilities.versions' => 'versions'])->map(fn (string $tab, string $route) => [
+        :tabs="collect(['admin.capabilities.edit' => 'data', 'admin.capabilities.patterns' => 'patterns', 'admin.capabilities.versions' => 'versions'])->map(fn (string $tab, string $route) => [
             'href' => route($route, $capability),
             'label' => __('admin.capabilities.tabs.'.$tab),
             'active' => request()->routeIs($route),

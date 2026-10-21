@@ -2,6 +2,22 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.26 · – · 2026-10-21
+
+Képességrendszer, K1: Mintatár (NM-19).
+
+- **Betöltés:** a *Frissítés a mégis tárából* a Képesség és a Képesség-részletek fül mellett a Minta és a Szabálykönyv fület is betölti, egy feltöltésben, ugyanazzal az előnézettel.
+  - A Bizonyíték, a Kapcsolat, a Találat és az Esettár ügyféladat, soha nem jön be. A mintákhoz csak a Sheet által számolt darabszámok jönnek (jóváhagyott ügyfelek, javasolt találatok, téves riasztások, bizonyítékok), a képességekhez a megerősített találatok és a kapcsolt bizonyítékok száma. Ezek nem írnak verziót.
+  - A régi kézi oszlopok („… (v0.3.2, kézi)”) kimaradnak. Az ideiglenes azonosító (pl. F33-M01) hiba, az ismeretlen képességkód figyelmeztetés.
+  - Az illeszkedés lehet egy szó minden kapcsolt képességre, vagy soronként képességenként, megjegyzéssel.
+- **Javítás:** az xlsx-beolvasó a képletcellák számított értékét adja, nem a képletet. A Sheet számlálói és a minta-érettség képletek.
+- **Minta-érettség:** a Sheet képlete szerint számolva (hipotézis irodalomból vagy saját megfigyelésből / egy esetben láttuk / használt / elavult / elvetett). A valódi v0.4-es táron egyezik a Sheettel: 6 használt, 142 egy esetben látott, 24 + 26 hipotézis.
+- **Admin:**
+  - *Képességtár → Minták*: lista szűrőkkel (képesség, típus, altípus, érettség, szint, termék, érvényes) és csak olvasható adatlap verziókkal. A detektor-hibaminta jelzést kap: ügyfél soha nem látja.
+  - *Képességtár → Szabálykönyv*: a 75 szabály területtel és státusszal.
+  - A képesség adatlapján új *Minták* fül, altípus szerint. Minta nélkül: „a felismerés a definíció alapján értelmezés”.
+- **Próba a valódi v0.4-es táron:** 75 képesség, 198 minta, 357 képesség–minta kapcsolat, 75 szabály, hiba nélkül. Egy figyelmeztetés: az M-012 illeszkedése „jelenlét (csapat)”, ez a Sheetben javítandó.
+
 ## 1.25 · 274f547 · 2026-10-21
 
 UI-finomhangolás, 8. lépés: lezárás.

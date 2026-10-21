@@ -15,9 +15,9 @@ use Livewire\WithFileUploads;
 use OpenSpout\Common\Exception\OpenSpoutException;
 
 /**
- * Képességtár → Frissítés a mégis tárából (07 · 7.6): upload the xlsx
- * export, see how many capabilities are new, changed and unchanged and which
- * fields changed, then "Betöltöm". The file is not kept.
+ * Képességtár → Frissítés a mégis tárából (07 · 7.6, NM-19): upload the xlsx
+ * export, see how many capabilities and patterns are new, changed and
+ * unchanged and which fields changed, then "Betöltöm". The file is not kept.
  */
 class Import extends Component
 {
@@ -57,6 +57,9 @@ class Import extends Component
             'created' => count($result->created),
             'updated' => count($result->updated),
             'unchanged' => count($result->unchanged),
+            'patterns_created' => count($result->patternsCreated),
+            'patterns_updated' => count($result->patternsUpdated),
+            'rules_changed' => count($result->rulesChanged),
         ]));
     }
 

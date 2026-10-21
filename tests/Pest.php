@@ -38,6 +38,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Writer\XLSX\Writer;
 use Tests\TestCase;
 
 /*
@@ -438,4 +440,31 @@ function adminLoginInBrowser(User $admin): mixed
     $page->press('Belépek');
 
     return $page;
+}
+
+/**
+ * A synthetic export of the mégis tár: sheet name => rows, the first row is the header.
+ *
+ * @param  array<string, list<list<string>>>  $sheets
+ */
+function capabilitySpreadsheet(array $sheets): string
+{
+    $path = tempnam(sys_get_temp_dir(), 'kepessegtar').'.xlsx';
+    $writer = new Writer;
+    $writer->openToFile($path);
+    $first = true;
+
+    foreach ($sheets as $name => $rows) {
+        $sheet = $first ? $writer->getCurrentSheet() : $writer->addNewSheetAndMakeItCurrent();
+        $sheet->setName($name);
+        $first = false;
+
+        foreach ($rows as $row) {
+            $writer->addRow(Row::fromValues($row));
+        }
+    }
+
+    $writer->close();
+
+    return $path;
 }

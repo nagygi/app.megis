@@ -40,8 +40,10 @@
         [
             'label' => __('admin.nav.capability_library'),
             'items' => [
-                ['route' => 'admin.capabilities.index', 'active' => ['admin.capabilities.index', 'admin.capabilities.create', 'admin.capabilities.edit', 'admin.capabilities.versions'], 'label' => __('admin.nav.capabilities')],
+                ['route' => 'admin.capabilities.index', 'active' => ['admin.capabilities.index', 'admin.capabilities.create', 'admin.capabilities.edit', 'admin.capabilities.patterns', 'admin.capabilities.versions'], 'label' => __('admin.nav.capabilities')],
+                ['route' => 'admin.patterns.index', 'active' => 'admin.patterns.*', 'label' => __('admin.nav.patterns')],
                 ['route' => 'admin.capability-groups.index', 'active' => 'admin.capability-groups.*', 'label' => __('admin.nav.capability_groups')],
+                ['route' => 'admin.capability-rules.index', 'active' => 'admin.capability-rules.*', 'label' => __('admin.nav.capability_rules')],
                 ['route' => 'admin.capabilities.import', 'active' => 'admin.capabilities.import', 'label' => __('admin.nav.capability_import')],
             ],
         ],

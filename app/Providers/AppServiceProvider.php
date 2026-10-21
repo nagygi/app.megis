@@ -20,6 +20,7 @@ use App\Models\MainDiagnosisParticipant;
 use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\OrganizationValueSet;
+use App\Models\Pattern;
 use App\Models\PersonalValueSet;
 use App\Models\ProcessConversation;
 use App\Models\ReportFeedback;
@@ -100,6 +101,7 @@ class AppServiceProvider extends ServiceProvider
         Relation::enforceMorphMap([
             'value' => Value::class,
             'capability' => Capability::class,
+            'pattern' => Pattern::class,
             'organization_value_set' => OrganizationValueSet::class,
             'diagnosis' => Diagnosis::class,
             'material' => Material::class,
