@@ -12,6 +12,22 @@
 width: 100% !important;
 }
 
+.body {
+padding: 0 12px !important;
+}
+
+.header-inner {
+width: 100% !important;
+}
+
+.header-cell {
+padding: 0 16px !important;
+}
+
+.content-cell {
+padding: 28px 24px !important;
+}
+
 .footer {
 width: 100% !important;
 }

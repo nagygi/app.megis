@@ -5,6 +5,11 @@ return [
     'greeting' => 'Szia!',
     'salutation' => 'mégis',
 
+    // The shared footer of every mail (resources/views/vendor/mail).
+    'layout' => [
+        'tagline' => 'A mégis segít, hogy a szervezet értékeiből tett legyen.',
+    ],
+
     'admin_invitation' => [
         'subject' => 'Meghívó a mégis admin felületére',
         'body' => ':inviter meghívott a mégis admin felületére. Állítsd be a jelszavad.',

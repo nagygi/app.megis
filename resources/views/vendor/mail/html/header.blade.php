@@ -1,12 +1,15 @@
 @props(['url'])
 <tr>
 <td class="header">
-<a href="{{ $url }}" style="display: inline-block;">
-@if (trim($slot) === 'Laravel')
-<img src="https://laravel.com/img/notification-logo-v2.1.png" class="logo" alt="Laravel Logo">
-@else
-{!! $slot !!}
-@endif
+<table class="header-inner" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
+<tr>
+<td class="header-cell">
+<a href="{{ $url }}" target="_blank" rel="noopener">
+{{-- A PNG: Gmail and Outlook do not show SVG. The alt text stands in when images are blocked. --}}
+<img src="{{ asset('images/mail/logo.png') }}" class="logo" width="112" height="47" alt="{{ __('ui.brand') }}">
 </a>
+</td>
+</tr>
+</table>
 </td>
 </tr>

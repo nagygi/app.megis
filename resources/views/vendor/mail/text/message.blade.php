@@ -20,8 +20,8 @@
 
     {{-- Footer --}}
     <x-slot:footer>
-        <x-mail::footer>
-            © {{ date('Y') }} {{ config('app.name') }}. @lang('All rights reserved.')
+        <x-mail::footer :tagline="__('mail.layout.tagline')">
+            © {{ date('Y') }} {{ __('ui.brand') }}. @lang('All rights reserved.')
         </x-mail::footer>
     </x-slot:footer>
 </x-mail::layout>
