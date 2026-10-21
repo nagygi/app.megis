@@ -71,9 +71,10 @@
         ];
     }
 
-    $linkClasses = fn (bool $isActive): string => $isActive
-        ? 'flex min-h-10 items-center justify-between gap-2 rounded-field bg-charcoal px-3 py-2 font-semibold text-cream no-underline'
-        : 'flex min-h-10 items-center justify-between gap-2 rounded-field px-3 py-2 text-charcoal no-underline hover:bg-grey-100';
+    // Items inside a labelled group are sub-items: smaller and greyer than the top-level ones.
+    $linkClasses = fn (bool $isActive, bool $nested): string => 'flex min-h-10 items-center justify-between gap-2 rounded-field px-3 py-2 no-underline '
+        .($nested ? 'text-sm ' : '')
+        .($isActive ? 'bg-charcoal font-semibold text-cream' : ($nested ? 'text-grey-700 hover:bg-grey-100 hover:text-charcoal' : 'text-charcoal hover:bg-grey-100'));
 @endphp
 
 <div class="flex min-h-full flex-col gap-6 p-4">
@@ -107,7 +108,7 @@
                 @if ($group['label'])
                     <button
                         type="button"
-                        class="flex min-h-9 w-full items-center justify-between gap-2 rounded-field px-3 text-left text-xs font-semibold tracking-wide text-grey-700 uppercase hover:bg-grey-100"
+                        class="flex min-h-9 w-full items-center justify-between gap-2 rounded-field px-3 text-left text-xs font-semibold tracking-wide text-charcoal uppercase hover:bg-grey-100"
                         aria-controls="admin-nav-group-{{ $loop->index }}"
                         :aria-expanded="open"
                         @click="toggle()"
@@ -118,7 +119,11 @@
                 @endif
                 <ul
                     id="admin-nav-group-{{ $loop->index }}"
-                    class="flex flex-col gap-1"
+                    @class([
+                        'flex flex-col',
+                        'gap-1' => ! $group['label'],
+                        'mt-1 ml-3 gap-0.5 border-l-2 border-grey-200 pl-2' => $group['label'],
+                    ])
                     @if ($group['label']) x-show="open" @endif
                 >
                     @foreach ($group['items'] as $item)
@@ -126,7 +131,7 @@
                         <li>
                             <a
                                 href="{{ route($item['route']) }}"
-                                class="{{ $linkClasses($isActive) }}"
+                                class="{{ $linkClasses($isActive, (bool) $group['label']) }}"
                                 @if ($isActive) aria-current="page" @endif
                             >
                                 <span>{{ $item['label'] }}</span>
