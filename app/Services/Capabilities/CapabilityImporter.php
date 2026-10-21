@@ -92,21 +92,6 @@ class CapabilityImporter
         'kerdeses' => CapabilityNature::Questionable,
     ];
 
-    /**
-     * The empty values of the Sheet (kepessegrendszer_osszefoglalo.md · 7).
-     */
-    private const EMPTY_STATES = [
-        'nincs elég külső bizonyíték' => 'insufficient_evidence',
-        'nem értelmezhető' => 'not_applicable',
-        'nincs még' => 'not_yet',
-    ];
-
-    /**
-     * A precondition (E1–E9) or another capability (RC-xx, ÚJ-xx) with its
-     * note in parentheses; a code inside someone else's parentheses is only a mention.
-     */
-    private const LINK_PATTERN = '/(?<paren>\((?:[^()]++|(?&paren))*\))|(?<![\p{L}\p{N}-])(?<code>E[1-9]|RC-\d{2,3}|[ÚU]J-\d{2,3})(?![\p{L}\p{N}-])(?:\s*(?<note>(?&paren)))?/u';
-
     public function __construct(
         private SpreadsheetReader $reader,
         private CapabilityService $capabilities,
@@ -193,7 +178,7 @@ class CapabilityImporter
         $columns = [];
 
         foreach ($headers as $header) {
-            $key = self::normalize($header);
+            $key = SheetCells::normalize($header);
 
             if ($key === '' || in_array($key, self::IGNORED_COLUMNS, true)) {
                 if ($header !== '') {
@@ -223,7 +208,7 @@ class CapabilityImporter
         $codeHeader = array_search('code', $columns, true);
 
         foreach ($rows as $line => $row) {
-            $code = self::code($row[$codeHeader] ?? '');
+            $code = SheetCells::code($row[$codeHeader] ?? '');
 
             if ($code === '') {
                 $result->errors[] = __('admin.capabilities.import.missing_code', ['line' => $line]);
@@ -266,21 +251,21 @@ class CapabilityImporter
             case 'non_examples':
             case 'overlaps':
             case 'keywords':
-                $entry['attributes'][$field] = $this->items($raw, $field, $entry, $result);
+                $entry['attributes'][$field] = SheetCells::items($raw, $field, $entry);
 
                 return;
 
             case 'group':
-                $entry['group'] = $this->text($raw, $field, $entry);
+                $entry['group'] = SheetCells::text($raw, $field, $entry);
 
                 return;
 
             case 'level':
             case 'status':
             case 'nature':
-                $text = $this->text($raw, $field, $entry);
+                $text = SheetCells::text($raw, $field, $entry);
                 $options = ['level' => self::LEVELS, 'status' => self::STATUSES, 'nature' => self::NATURES][$field];
-                $value = $options[self::normalize($text)] ?? null;
+                $value = $options[SheetCells::normalize($text)] ?? null;
 
                 if ($value === null && $text !== '') {
                     $entry['errors'][$field] = __('admin.capabilities.import.unknown_option', ['field' => __('admin.capabilities.fields.'.$field), 'value' => $text]);
@@ -291,7 +276,7 @@ class CapabilityImporter
                 return;
 
             case 'tempting':
-                $text = $this->text($raw, $field, $entry);
+                $text = SheetCells::text($raw, $field, $entry);
                 $answer = Str::lower(Str::ascii($text));
                 $entry['attributes']['tempting'] = match (true) {
                     str_starts_with($answer, 'igen') => true,
@@ -312,11 +297,11 @@ class CapabilityImporter
                 return;
 
             case 'preconditions':
-                $text = $this->text($raw, $field, $entry);
-                $entry['links'] = $this->links($text);
+                $text = SheetCells::text($raw, $field, $entry);
+                $entry['links'] = SheetCells::links($text);
 
                 // What the codes and their notes do not say stays readable as a detail.
-                $rest = trim((string) preg_replace(self::LINK_PATTERN, '', $text), " \t\n\r,;|.");
+                $rest = SheetCells::linkRest($text);
 
                 if ($rest !== '') {
                     $this->addDetail($entry, $header, $text);
@@ -325,7 +310,7 @@ class CapabilityImporter
                 return;
 
             default:
-                $entry['attributes'][$field] = $this->text($raw, $field, $entry);
+                $entry['attributes'][$field] = SheetCells::text($raw, $field, $entry);
         }
     }
 
@@ -338,7 +323,7 @@ class CapabilityImporter
      */
     private function applyDetails(array $sheet, array &$entries, CapabilityImportResult $result): array
     {
-        $headers = collect($sheet['headers'])->mapWithKeys(fn (string $header) => [self::normalize($header) => $header]);
+        $headers = collect($sheet['headers'])->mapWithKeys(fn (string $header) => [SheetCells::normalize($header) => $header]);
         $capabilityHeader = $headers->get('kepesseg') ?? $sheet['headers'][0] ?? null;
         $fieldHeader = $headers->get('mezo') ?? $sheet['headers'][1] ?? null;
         $valueHeader = $headers->get('ertek') ?? $sheet['headers'][2] ?? null;
@@ -354,7 +339,7 @@ class CapabilityImporter
         foreach ($sheet['rows'] as $row) {
             $key = trim($row[$capabilityHeader] ?? '');
             $label = trim($row[$fieldHeader] ?? '');
-            $code = isset($entries[self::code($key)]) ? self::code($key) : $byName->get(mb_strtolower($key));
+            $code = isset($entries[SheetCells::code($key)]) ? SheetCells::code($key) : $byName->get(mb_strtolower($key));
 
             if ($label === '') {
                 continue;
@@ -368,7 +353,7 @@ class CapabilityImporter
 
             $entry = &$entries[$code];
             $raw = $row[$valueHeader] ?? '';
-            $normalized = self::normalize($label);
+            $normalized = SheetCells::normalize($label);
 
             if (preg_match('/^erettseg ([1-6])\b/', $normalized, $stage) === 1) {
                 $field = 'stage_'.$stage[1];
@@ -390,13 +375,13 @@ class CapabilityImporter
             };
 
             if ($field === 'keywords') {
-                $entry['attributes']['keywords'] = [...($entry['attributes']['keywords'] ?? []), ...$this->items($raw, $field, $entry, $result)];
+                $entry['attributes']['keywords'] = [...($entry['attributes']['keywords'] ?? []), ...SheetCells::items($raw, $field, $entry)];
             } elseif (str_starts_with($field, 'appearance_')) {
-                $entry['attributes']['appearances'][substr($field, strlen('appearance_'))] = $this->text($raw, $field, $entry);
+                $entry['attributes']['appearances'][substr($field, strlen('appearance_'))] = SheetCells::text($raw, $field, $entry);
             } elseif (str_starts_with($field, 'stage_')) {
-                $entry['attributes']['stages'][substr($field, strlen('stage_'))] = $this->text($raw, $field, $entry);
+                $entry['attributes']['stages'][substr($field, strlen('stage_'))] = SheetCells::text($raw, $field, $entry);
             } else {
-                $entry['attributes'][$field] = $this->text($raw, $field, $entry);
+                $entry['attributes'][$field] = SheetCells::text($raw, $field, $entry);
             }
 
             unset($entry);
@@ -635,75 +620,13 @@ class CapabilityImporter
     }
 
     /**
-     * A text cell: an empty value of the Sheet becomes empty with its state,
-     * a "[JAVASLAT]" prefix becomes a mark on the field.
-     *
-     * @param  array<string, mixed>  $entry
-     */
-    private function text(string $raw, string $field, array &$entry): string
-    {
-        $text = trim($raw);
-        $state = self::emptyState($text);
-
-        if ($state !== null) {
-            $entry['states'][$field] = $state;
-
-            return '';
-        }
-
-        if (preg_match('/^\[javaslat\]\s*/iu', $text) === 1) {
-            $entry['proposed'][] = $field;
-            $text = trim((string) preg_replace('/^\[javaslat\]\s*/iu', '', $text));
-        }
-
-        return $text;
-    }
-
-    /**
-     * A list cell: one item per line, without bullets.
-     *
-     * @param  array<string, mixed>  $entry
-     * @return list<string>
-     */
-    private function items(string $raw, string $field, array &$entry, CapabilityImportResult $result): array
-    {
-        $text = trim($raw);
-        $state = self::emptyState($text);
-
-        if ($state !== null) {
-            $entry['states'][$field] = $state;
-
-            return [];
-        }
-
-        $items = [];
-
-        foreach (preg_split('/\R/u', $text) ?: [] as $line) {
-            $item = trim((string) preg_replace('/^\s*(?:[-•*–]|\d+[.)])\s+/u', '', $line));
-
-            if (preg_match('/^\[javaslat\]\s*/iu', $item) === 1) {
-                $entry['proposed'][] = $field;
-                $item = trim((string) preg_replace('/^\[javaslat\]\s*/iu', '', $item));
-            }
-
-            if ($item !== '' && ! in_array($item, $items, true)) {
-                $items[] = $item;
-            }
-        }
-
-        $entry['proposed'] = array_values(array_unique($entry['proposed']));
-
-        return $items;
-    }
-
-    /**
      * @param  array<string, mixed>  $entry
      */
     private function addDetail(array &$entry, string $label, string $raw): void
     {
         $value = trim($raw);
 
-        if ($value === '' || self::emptyState($value) !== null) {
+        if ($value === '' || SheetCells::emptyState($value) !== null) {
             return;
         }
 
@@ -716,58 +639,5 @@ class CapabilityImporter
         }
 
         $entry['details'][] = ['label' => $label, 'value' => $value];
-    }
-
-    /**
-     * @return list<array{code: string, note: string|null}>
-     */
-    private function links(string $text): array
-    {
-        preg_match_all(self::LINK_PATTERN, $text, $matches, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL);
-        $links = [];
-
-        foreach ($matches as $match) {
-            if (($match['code'] ?? null) === null) {
-                continue;
-            }
-
-            $code = self::code($match['code']);
-            $note = $match['note'] === null ? null : trim(mb_substr($match['note'], 1, -1));
-
-            if (isset($links[$code])) {
-                $links[$code]['note'] = collect([$links[$code]['note'], $note])->filter()->implode('; ') ?: null;
-
-                continue;
-            }
-
-            $links[$code] = ['code' => $code, 'note' => filled($note) ? $note : null];
-        }
-
-        return array_values($links);
-    }
-
-    private static function emptyState(string $text): ?string
-    {
-        $lower = mb_strtolower($text);
-
-        foreach (self::EMPTY_STATES as $prefix => $state) {
-            if (str_starts_with($lower, $prefix)) {
-                return $state;
-            }
-        }
-
-        return null;
-    }
-
-    private static function code(string $code): string
-    {
-        $code = mb_strtoupper(trim($code));
-
-        return (string) preg_replace('/^UJ-/u', 'ÚJ-', $code);
-    }
-
-    private static function normalize(string $text): string
-    {
-        return Str::of($text)->ascii()->lower()->replaceMatches('/[^a-z0-9 ]+/', ' ')->squish()->toString();
     }
 }
