@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.26 · – · 2026-10-21
+## 1.26 · 9e19a31 · 2026-10-21
 
 Képességrendszer, K1: Mintatár (NM-19).
 
