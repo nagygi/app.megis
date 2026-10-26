@@ -50,9 +50,9 @@ return [
     // (06 · 6.1); the real product is chosen at the conversation.
     'individual_product' => env('MEGIS_INDIVIDUAL_PRODUCT', 'Snapshot · Belső'),
 
-    // "Letöltöm · PDF" on the client side (28 · 28.3): off for now, so the buttons
-    // are hidden; the download routes keep working.
-    'pdf_downloads' => (bool) env('MEGIS_PDF_DOWNLOADS', false),
+    // "Letöltöm · PDF" on the client side (28 · 28.3). Off hides the buttons;
+    // the download routes keep working.
+    'pdf_downloads' => (bool) env('MEGIS_PDF_DOWNLOADS', true),
 
     /*
     |--------------------------------------------------------------------------
