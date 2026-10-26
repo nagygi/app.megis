@@ -108,6 +108,16 @@ final class ReportText
         return trans_choice($meta['threshold_overridden'] ? 'report.threshold_overridden' : 'report.threshold_missing', $count, ['count' => $count]);
     }
 
+    /**
+     * "Öt érték", "Négy folyamat", "A márkád alapja · négy elem": a chapter by its rows.
+     */
+    public static function groupTitle(string $chapter, int $count): string
+    {
+        $word = HungarianNumber::word($count);
+
+        return __('report.groups.'.$chapter, ['count' => $chapter === 'brand' ? $word : mb_ucfirst($word)]);
+    }
+
     public static function decimal(?float $number): string
     {
         return $number === null ? '–' : number_format($number, 1, ',', '');

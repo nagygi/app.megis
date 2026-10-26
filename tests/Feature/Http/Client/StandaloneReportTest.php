@@ -40,25 +40,45 @@ it('renders the report of a published user diagnosis to that user, page by page 
     $parameters = [$organization, $diagnosis];
 
     $this->get(route('client.report.show', $parameters))->assertOk()
-        ->assertSee('A te diagnózisod')
+        ->assertSee('A válasz')
         ->assertSee('Mennyire lesz nálad az értékekből tett?')
-        ->assertSee('Következő: Értékek');
+        ->assertSee('Egy érték')
+        ->assertSee('0 / 8 · A válasz')
+        ->assertSee(route('client.report.chapter', [...$parameters, 'ertekek']), false);
     $this->get(route('client.report.chapter', [...$parameters, 'ertekek']))->assertOk()
         ->assertSee('Mennyire élnek nálad az értékeid?')
         ->assertSee('Kompetens')
         ->assertSee('3-nak látod, 5-öt mutatsz.')
+        ->assertSee('2 / 8 · Értékek')
         ->assertDontSee('Egyén');
     $this->get(route('client.report.item', [...$parameters, 'ertekek', $row->id]))->assertOk()
+        ->assertSee('diagnózis-nézet')
         ->assertSee('Mit jelent?')
         ->assertSee('Érti és jól csinálja a dolgát.')
-        ->assertSee('Meg tudtam volna csinálni, de fél év múlva újra elromlana.');
+        ->assertSee('Meg tudtam volna csinálni, de fél év múlva újra elromlana.')
+        ->assertSee('Kompetens · 1 / 1 érték')
+        ->assertSee('A diagnózisod');
     $this->get(route('client.report.closing', $parameters))->assertOk()
+        ->assertSee('A diagnózisod')
         ->assertSee('Ez a te diagnózisod.')
+        ->assertSee('A képesség, amivel kezdenél')
         ->assertSee('<h3>Hol kezdjük</h3>', false)
         ->assertSee('<strong>szakmai igényesség</strong>', false);
     $this->get(route('client.report.appendix', $parameters))->assertOk()
         ->assertSee('a mégis rögzítette')
         ->assertDontSee('Állítások bizonyítékkal');
+});
+
+it('keeps the places of what is coming, and has no summary dot without a main diagnosis', function () {
+    [$organization, $user, $diagnosis] = standaloneUserDiagnosis();
+    actingAsCustomer($user);
+
+    $this->get(route('client.report.show', [$organization, $diagnosis]))->assertOk()
+        ->assertSee('Összefoglaló')
+        ->assertDontSee(route('client.report.summary', [$organization, $diagnosis]))
+        ->assertSee('Öt érték a megjelenéseken')
+        ->assertSee('Képesség')
+        ->assertSee('hamarosan');
 });
 
 it('has no summary, internal working or comparison without a main diagnosis', function (string $page) {
@@ -97,7 +117,7 @@ it('shows a team diagnosis to its members and the organization\'s leaders', func
     $url = route('client.report.show', [$organization, $diagnosis]);
 
     actingAsCustomer($member);
-    $this->get($url)->assertOk()->assertSee('A ti diagnózisotok');
+    $this->get($url)->assertOk()->assertSee('Mennyire lesz nálatok az értékekből tett?');
     actingAsCustomer($leader);
     $this->get($url)->assertOk();
     actingAsCustomer($outsider);

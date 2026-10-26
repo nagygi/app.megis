@@ -19,6 +19,10 @@
     'step' => null,
     // [3, 6] draws the step bar under the title (prototype .prog).
     'progress' => null,
+    // The chapter dots of the report (prototype .prg): [['href', 'label', 'current', 'soon']]; no href, no link.
+    'dots' => null,
+    // A dark pill before the note, "diagnózis-nézet" (27 · 27.5).
+    'badge' => null,
     // The page label right of the logo when there is no step, e.g. "Első belépés".
     'label' => null,
     // The coral plus to V11, on the homes of a running diagnosis (15 · 15.5).
@@ -39,6 +43,13 @@
     $onDark = in_array($color, ['charcoal', 'green'], true);
     // Cream circles on dark headers, charcoal ones on light headers.
     $circleClasses = $onDark ? 'bg-cream text-charcoal' : 'bg-charcoal text-cream';
+    // The report's chapter dots: the current one filled, a page that is not there dashed (prototype .prg).
+    $dotClasses = fn (array $dot): array => [
+        'block h-2 rounded-pill',
+        ($onDark ? 'bg-yellow' : 'bg-charcoal') => $dot['current'],
+        ($onDark ? 'bg-green-muted' : 'bg-cream') => ! $dot['current'] && $dot['href'],
+        ($onDark ? 'border border-dashed border-green-muted' : 'border border-dashed border-charcoal/40') => ! $dot['current'] && ! $dot['href'],
+    ];
 
     $user = $guest ? null : auth('web')->user();
     $impersonation = $guest ? null : app(\App\Services\Auth\ImpersonationService::class)->current();
@@ -188,19 +199,46 @@
 
                     <div class="flex items-center gap-3">
                         @if ($symbol)
-                            {{-- Charcoal on the cream of the libraries (prototype .bar.tr). --}}
-                            <x-megis.symbol :name="$symbol" class="{{ $onDark ? 'text-yellow' : ($color === 'cream-line' ? 'text-charcoal' : 'text-coral') }}" />
+                            {{-- Charcoal on the cream of the libraries and the light yellow of the report (prototype .bar.tr, .bar.tl). --}}
+                            <x-megis.symbol :name="$symbol" class="{{ $onDark ? 'text-yellow' : (in_array($color, ['cream-line', 'light-yellow'], true) ? 'text-charcoal' : 'text-coral') }}" />
                         @endif
                         <div>
                             <h1 class="text-2xl leading-tight font-extrabold uppercase [text-wrap:pretty]">{{ $title }}</h1>
                             @if ($subtitle)
                                 <p class="mt-1 text-sm">{{ $subtitle }}</p>
                             @endif
-                            @if ($note)
-                                <p class="text-sm">{{ $note }}</p>
+                            @if ($note || $badge)
+                                <p class="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm">
+                                    @if ($badge)
+                                        <span class="rounded-pill bg-charcoal px-2 py-0.5 text-xs font-semibold tracking-wide text-cream">{{ $badge }}</span>
+                                    @endif
+                                    {{ $note }}
+                                </p>
                             @endif
                         </div>
                     </div>
+
+                    @if ($dots)
+                        <nav aria-label="{{ __('report.dots.label') }}">
+                            <ol class="flex gap-1">
+                                @foreach ($dots as $dot)
+                                    <li class="flex-1">
+                                        @if ($dot['href'] && ! $dot['current'])
+                                            <a href="{{ $dot['href'] }}" class="block py-2" title="{{ $dot['label'] }}">
+                                                <span @class($dotClasses($dot))></span>
+                                                <span class="sr-only">{{ $dot['label'] }}</span>
+                                            </a>
+                                        @else
+                                            <span class="block py-2" @if ($dot['current']) aria-current="page" @endif title="{{ $dot['label'] }}{{ ($dot['soon'] ?? false) ? ' · '.__('report.soon') : '' }}">
+                                                <span @class($dotClasses($dot))></span>
+                                                <span class="sr-only">{{ $dot['label'] }}{{ ($dot['soon'] ?? false) ? ' · '.__('report.soon') : '' }}</span>
+                                            </span>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ol>
+                        </nav>
+                    @endif
 
                     @if ($progress)
                         @php([$current, $total] = $progress)

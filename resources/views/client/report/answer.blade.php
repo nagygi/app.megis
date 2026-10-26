@@ -1,38 +1,66 @@
-{{-- R0 · A válasz (27 · 27.2); a standalone diagnosis goes on to its chapters (04 · 4.6). --}}
+{{-- R0 · A válasz (27 · 27.2, prototype R0): the two rings, the ladder, the breakdown; Brand and Képesség are coming. --}}
+@use('App\Services\Report\ReportService')
 @use('App\Services\Report\ReportText')
-@php($ring = $report['ring'])
-<x-layouts::client :title="ReportText::copy('title', $report['meta'])" color="light-yellow" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$homeUrl" :back-label="__('diagnosis.home_back')">
-    <div class="flex max-w-2xl flex-col gap-6">
-        <h2 class="text-xl font-semibold">{{ ReportText::copy('question.answer', $report['meta']) }}</h2>
-
-        <x-ui.card as="section" padding="lg" class="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left" aria-label="{{ __('report.ring.label') }}">
-            <x-report.ring :percent="$ring['percent']" />
-            <div class="flex flex-col items-center gap-1 sm:items-start">
-                <p class="text-lg font-semibold">{{ __('report.ring.label') }}</p>
-                <p class="text-grey-700">{{ __('report.ring.points', ['points' => $ring['points'], 'max' => $ring['max'], 'count' => $ring['measuring_points']]) }}</p>
-                <p class="text-sm text-grey-700">{{ __('report.ring.optimum') }}</p>
-                @unless ($preview ?? false)
-                    <x-ui.button tone="ghost" size="sm" :href="route('client.wisdom.show', [$organization, 'szazalek-es-pontok'])">{{ __('report.ring.what') }}</x-ui.button>
-                @endunless
+@php
+    $ring = $report['ring'];
+    $meta = $report['meta'];
+    $hasSummary = ! $meta['snapshot'] && ! ($meta['standalone'] ?? false);
+    $firstChapter = array_key_first($report['chapters']);
+@endphp
+<x-layouts::client
+    :title="__('report.pages.answer')"
+    color="light-yellow"
+    symbol="growth-rings"
+    :label="__('report.pages.answer')"
+    :subtitle="ReportText::copy('question.answer', $meta)"
+    :note="__('report.meta', ['subject' => $meta['subject_name'], 'product' => $meta['product'], 'date' => \Illuminate\Support\Carbon::parse($meta['published_on'])->format('m.d.')])"
+    :dots="$dots"
+    :back="$homeUrl"
+    :back-label="__('diagnosis.home_back')"
+>
+    <div class="flex max-w-2xl flex-col gap-5">
+        <div class="flex items-center gap-4">
+            <x-report.rings :percent="$ring['percent']" />
+            <div class="flex min-w-0 flex-1 flex-col gap-3">
+                <x-report.ring-legend
+                    :percent="$ring['percent']"
+                    :label="__('report.ring.label')"
+                    :points="__('report.ring.points', ['points' => $ring['points'], 'max' => $ring['max'], 'count' => $ring['measuring_points']])"
+                    :href="$firstChapter === null ? null : $url('chapter', [ReportService::SLUGS[$firstChapter]])"
+                />
+                <x-report.ring-legend tone="yellow" :label="__('report.brand_ring')" soon />
             </div>
-        </x-ui.card>
+        </div>
 
-        <x-report.scale :value="$ring['step']" />
+        @unless ($preview)
+            <a href="{{ route('client.wisdom.show', [$organization, 'szazalek-es-pontok']) }}" class="self-start text-sm text-charcoal underline underline-offset-3">{{ __('report.ring.what') }}</a>
+        @endunless
 
-        <ul class="flex flex-col gap-2" aria-label="{{ __('report.question.internal') }}">
+        <x-report.ladder :value="$ring['measuring_points'] > 0 ? $ring['points'] / $ring['measuring_points'] : null" />
+
+        <x-report.group
+            :label="__('report.groups.internal', ['count' => $ring['measuring_points'], 'points' => $ring['points'], 'max' => $ring['max']])"
+            :href="$hasSummary ? $url('internal') : null"
+            :link-label="$hasSummary ? __('report.groups.summary_link') : null"
+        >
             @foreach ($report['chapters'] as $key => $chapter)
-                <li>
-                    <x-ui.link-row :href="$url('chapter', [\App\Services\Report\ReportService::SLUGS[$key]])" :title="__('report.chapters.'.$key)">
-                        <x-slot:trailing>{{ __('report.block_points', $chapter['points']) }}</x-slot:trailing>
-                    </x-ui.link-row>
-                </li>
+                <x-report.row
+                    :href="$url('chapter', [ReportService::SLUGS[$key]])"
+                    :title="ReportText::groupTitle($key, count($chapter['rows']))"
+                    :value="$chapter['average']"
+                    :number="$chapter['points']['points'].' / '.$chapter['points']['max']"
+                />
             @endforeach
-        </ul>
+        </x-report.group>
 
-        @if ($report['meta']['standalone'] ?? false)
-            @include('client.report.partials.footer', ['current' => null])
-        @else
-            <x-ui.page-nav :label="__('report.title')" :next="$url('summary')" :next-label="__('report.summary_link')" />
-        @endif
+        <x-report.group :label="__('report.groups.brand_soon')" soon>
+            @foreach (__('report.groups.brand_rows') as $title)
+                <x-report.row :title="$title" soon :pill="false" />
+            @endforeach
+        </x-report.group>
+
+        <x-report.capability-card />
+
+        <x-report.footer :status="$nav['status']" :next="$nav['next']" :next-label="$nav['nextLabel']" />
     </div>
 </x-layouts::client>

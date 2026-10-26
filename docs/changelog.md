@@ -2,6 +2,29 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.31 · HASH · 2026-10-26
+
+A riport a prototípus szerint („2 · Riport”: R0–R9, RM, S1), a fő és az önálló diagnózisnál is (27, 28, 04 · 4.6).
+
+- **Keret minden lapon:**
+  - **Fejléc:** szimbólum, a lap címe, a kérdés, a meta-sor („Alany · Termék · 10.26.”); a mélyítő lapon a „diagnózis-nézet” jelvény.
+  - **Fejezet-pöttyök** (R0–R8): link a meglévő lapokra, szaggatott pötty, ahol a lap hiányzik vagy hamarosan jön.
+  - **Lábléc:** Coach, „2 / 8 · Értékek”, és egy gomb a következő oldalra. A márkád alapja után a zárólap jön, amíg az R6–R8 nincs kész.
+- **Lapok:**
+  - **R0:** két gyűrű jelmagyarázattal és 80%-os sávval, a lépcső jelölővel, a fejezetek hatszeletes mini-sávval.
+  - **R1:** öt színes blokk.
+  - **R1·b:** csoportonként minden belső mérőpont.
+  - **R1·c:** táblák a csapat-oszlop kiemelésével.
+  - **R2–R4:** sorok rés- vagy alkalom-alsorral, utánuk az állítások.
+  - **R5:** a fa kilenc eleme körben, lenyíló elemenkénti sorok.
+  - **R2·b–R5·b:** PHI, lépcső, megélés, definíció, bizonyíték.
+  - **R9:** egy mondat, csendes összegzés, sárga javaslat-blokk a foglalással.
+  - **RM:** táblázat és lenyíló listák.
+  - **S1:** egy lapon, a „Snapshot · Külső” helyével.
+- **Hamarosan:** mindenhol ott van a helyük, inaktívan, „hamarosan” felirattal. Ez a Brand gyűrű, a Brand csoport és a Brand riport; a Képesség; a Coach; a Bridge to Purpose; a Megosztás; a fa „kívül” oldala és további öt eleme.
+- **Nézetváltó:** karcsú pill, bal oldalt az „összevetés” link. A visszajelzés vonallal válik el, kártya nélkül.
+- Nincs adatbázis-változás.
+
 ## 1.30 · 9707836 · 2026-10-26
 
 Az önálló diagnózis riportja a felhasználónál, és előnézete publikálás előtt (04 · 4.6, 06 · 6.5).

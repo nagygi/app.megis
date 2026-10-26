@@ -1,76 +1,103 @@
-{{-- R2·b · R3·b · R4·b · R5·b: "Miért {p} a {tétel}?" (27 · 27.5–27.8). --}}
+{{-- R2·b · R3·b · R4·b · R5·b: "Miért {p} a {tétel}?", frozen to the diagnosis' date (27 · 27.5–27.8, prototype R2·b). --}}
 @use('App\Services\Report\ReportService')
 @use('App\Services\Report\ReportText')
 @php
     $key = $chapter['key'];
-    $slug = ReportService::SLUGS[$key];
-    $chapterUrl = $url('chapter', [$slug]);
+    $meta = $report['meta'];
+    $chapterUrl = $url('chapter', [ReportService::SLUGS[$key]]);
+    $symbol = match ($key) {
+        'brand' => \App\Enums\TreeElement::from($item['element'])->symbol(),
+        'processes' => 'soil',
+        'areas' => 'growth-rings',
+        default => 'root',
+    };
+    $whole = $item['score_whole'] ?? null;
+    $experienceLine = match (true) {
+        $meta['has_peers'] => __('report.experience_line', ['leader' => ReportText::decimal($item['leader']), 'peers' => ReportText::decimal($item['peers']), 'count' => $item['peer_count']]),
+        $item['situations'] !== null => __('report.experience_self', ['leader' => ReportText::decimal($item['leader']), 'situations' => ReportText::decimal($item['situations'])]),
+        default => null,
+    };
 @endphp
-<x-layouts::client :title="$item['label']" :color="$key === 'brand' ? 'light-yellow' : 'green'" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$chapterUrl" :back-label="__('report.back_to_chapter', ['chapter' => __('report.chapters.'.$key)])">
-    <div class="flex max-w-2xl flex-col gap-6">
-        <h2 class="text-xl font-semibold">{{ __('report.question.item', ['score' => ReportText::score($item), 'label' => $item['label']]) }}</h2>
-
-        @unless ($report['meta']['standalone'] ?? false)
+<x-layouts::client
+    :title="$item['label']"
+    :color="$key === 'brand' ? 'light-yellow' : 'green'"
+    :symbol="$symbol"
+    :label="$item['label']"
+    :subtitle="__('report.question.item', ['score' => ReportText::score($item), 'label' => $item['label']])"
+    :badge="__('report.diagnosis_view')"
+    :note="__('report.item_meta', ['date' => \Illuminate\Support\Carbon::parse($meta['published_on'])->format('m.d.'), 'area' => __('report.item_area.'.$key), 'chapter' => __('report.item_chapter.'.$key)])"
+    :back="$chapterUrl"
+    :back-label="__('report.chapters.'.$key)"
+>
+    <div class="flex max-w-2xl flex-col gap-5">
+        @unless ($meta['snapshot'] || ($meta['standalone'] ?? false))
             @include('client.report.partials.switch')
         @endunless
 
-        <x-ui.card as="section" class="flex flex-col gap-2" :aria-label="__('report.phi')">
-            <p class="text-3xl font-extrabold tabular-nums">{{ ReportText::score($item) }}</p>
-            <x-report.scale :value="$item['score']" />
-            @if (in_array($key, ['values', 'brand'], true) || $key === 'processes')
-                @if ($report['meta']['shows_experience'] && ($item['leader'] !== null || $item['peers'] !== null))
-                    <p class="text-sm">{{ $report['meta']['has_peers']
-                        ? __('report.experience_line', ['leader' => ReportText::decimal($item['leader']), 'peers' => ReportText::decimal($item['peers']), 'count' => $item['peer_count']])
-                        : __('report.experience_self', ['leader' => ReportText::decimal($item['leader']), 'situations' => ReportText::decimal($item['situations'])]) }}</p>
-                @endif
-                @if ($sentence = ReportText::gap($item, $report['meta']))
-                    <p @class(['text-grey-700' => ! $report['meta']['shows_experience']])>{{ $sentence }}</p>
-                @endif
+        <section class="flex items-center gap-3.5" aria-label="{{ __('report.phi') }}">
+            <p class="flex shrink-0 flex-col items-center">
+                <span class="text-xs font-semibold tracking-[.07em] text-grey-700">{{ __('report.phi') }}</span>
+                <span @class(['text-5xl leading-none font-extrabold tabular-nums', 'text-coral-ink' => $whole !== null && $whole <= 2])>{{ ReportText::score($item) }}</span>
+            </p>
+            <x-report.ladder class="min-w-0 flex-1" :value="$item['score']" marker="charcoal" />
+        </section>
+
+        @if (in_array($key, ['values', 'brand', 'processes'], true))
+            @if ($item['experience'] !== null && $meta['shows_experience'])
+                <div class="flex flex-col border-t border-grey-200">
+                    <x-report.row :title="__('report.experience')" :meta="$experienceLine" :bar="false" :number="$item['experience_whole']" />
+                </div>
             @endif
-            @if ($item['occasions'])
-                <p class="text-sm text-grey-700">{{ __('report.occasions', ['count' => $item['occasions']['count'], 'yes' => $item['occasions']['yes'] ?? 0, 'partial' => $item['occasions']['partial'] ?? 0, 'no' => $item['occasions']['no'] ?? 0]) }}</p>
+            @if ($sentence = ReportText::gap($item, $meta))
+                <p @class(['font-semibold', 'text-coral-ink' => $meta['shows_experience'] && ($item['gap'] ?? null) !== null, 'text-grey-700' => ! $meta['shows_experience']])>{{ $sentence }}</p>
             @endif
-        </x-ui.card>
+        @endif
+
+        @if ($item['occasions'])
+            <p class="text-sm text-grey-700">{{ __('report.occasions', ['count' => $item['occasions']['count'], 'yes' => $item['occasions']['yes'] ?? 0, 'partial' => $item['occasions']['partial'] ?? 0, 'no' => $item['occasions']['no'] ?? 0]) }}</p>
+        @endif
+
+        @if ($key === 'brand')
+            <p class="flex items-center gap-2 text-xs font-semibold tracking-[.08em] text-green uppercase">{{ __('report.tree.outside') }} <x-report.soon /></p>
+        @endif
 
         @if ($item['definition'])
-            <section class="flex flex-col gap-2" aria-labelledby="definition-title">
-                <h3 id="definition-title" class="font-semibold">{{ ReportText::copy('definition', $report['meta']) }}</h3>
+            <section class="flex flex-col gap-1" aria-labelledby="definition-title">
+                <h2 id="definition-title" class="text-xs font-semibold tracking-[.08em] text-green uppercase">{{ ReportText::copy('definition', $meta) }}</h2>
                 @if (filled($item['definition']['meaning']))
-                    <p>{{ $item['definition']['meaning'] }}</p>
+                    <p class="text-sm leading-relaxed">{{ $item['definition']['meaning'] }}</p>
                 @endif
-                <x-ui.card as="dl" padding="sm" class="grid gap-1 text-sm sm:grid-cols-[6rem_1fr]" :aria-label="ReportText::copy('definition', $report['meta'])">
+                <dl class="grid gap-x-2 gap-y-0.5 text-sm sm:grid-cols-[5rem_1fr]">
                     <dt class="font-semibold text-coral-ink">{{ __('report.definition_low') }}</dt>
                     <dd>{{ $item['definition']['low'] ?: '–' }}</dd>
                     <dt class="font-semibold text-green">{{ __('report.definition_high') }}</dt>
                     <dd>{{ $item['definition']['high'] ?: '–' }}</dd>
-                </x-ui.card>
+                </dl>
             </section>
         @endif
 
         @if ($item['what_we_look_at'])
             <section class="flex flex-col gap-1" aria-labelledby="look-title">
-                <h3 id="look-title" class="font-semibold">{{ __('report.what_we_look_at') }}</h3>
-                <p>{{ $item['what_we_look_at'] }}</p>
+                <h2 id="look-title" class="text-xs font-semibold tracking-[.08em] text-green uppercase">{{ __('report.what_we_look_at') }}</h2>
+                <p class="text-sm leading-relaxed">{{ $item['what_we_look_at'] }}</p>
             </section>
         @endif
 
         @foreach ($item['claims'] as $claim)
-            @include('client.report.partials.claim', ['claim' => $claim, 'withQuote' => false])
+            @include('client.report.partials.claim', ['claim' => $claim, 'claimRow' => null, 'withQuote' => false])
         @endforeach
 
         <section class="flex flex-col gap-2" aria-labelledby="evidence-title">
-            <h3 id="evidence-title" class="font-semibold">{{ trans_choice('report.evidence', count($item['traces']), ['count' => count($item['traces'])]) }}</h3>
+            <h2 id="evidence-title" class="text-xs font-semibold tracking-[.08em] text-green uppercase">{{ trans_choice('report.evidence', count($item['traces']), ['count' => count($item['traces'])]) }}</h2>
             @foreach ($item['traces'] as $trace)
                 @include('client.report.partials.quote', ['trace' => $trace])
             @endforeach
         </section>
 
-        <x-ui.page-nav
-            :label="__('report.chapters.'.$key)"
-            :back="$chapterUrl"
-            :back-label="__('report.back_to_chapter', ['chapter' => __('report.chapters.'.$key)])"
-            :next="$next ? $url('item', [$slug, $next['id']]) : null"
-            :next-label="$next ? __('report.next_item', ['label' => $next['label']]) : null"
-        />
+        <div class="flex flex-col border-t border-grey-200">
+            <x-report.row :title="__('report.coach.why')" :meta="__('report.coach.from_evidence')" symbol="spiral" soon />
+        </div>
+
+        <x-report.footer :status="$nav['status']" :next="$nav['next']" :next-label="$nav['nextLabel']" />
     </div>
 </x-layouts::client>

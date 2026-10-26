@@ -1,6 +1,9 @@
 <?php
 
 use App\Enums\DiagnosisRowKind;
+use App\Models\Diagnosis;
+use App\Models\DiagnosisRow;
+use App\Models\DiagnosisText;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
@@ -120,6 +123,48 @@ it('tours the published report and the libraries', function () {
         'library-01-values' => route('client.values', $setup['organization'], false),
         'library-02-processes' => route('client.processes', $setup['organization'], false),
         'library-03-wisdom' => route('client.wisdom.index', $setup['organization'], false),
+    ]);
+})->group('screenshots');
+
+it('tours every page of the report (prototype 2 · Riport)', function () {
+    [$setup, $main] = publishedReport();
+    $params = [$setup['organization'], $main->diagnosis];
+    $rows = $main->diagnosis->rows()->get();
+    $value = $rows->where('kind', DiagnosisRowKind::Value)->sortBy('position')->first();
+    $brand = $rows->where('kind', DiagnosisRowKind::TreeElement)->whereNotNull('score_state')->first();
+
+    $page = loginInBrowser($setup['leader']);
+    tourPages($page, array_filter([
+        'riport-r0' => route('client.report.show', $params, false),
+        'riport-r1' => route('client.report.summary', $params, false),
+        'riport-r1b' => route('client.report.internal', $params, false),
+        'riport-r1c' => route('client.report.compare', $params, false),
+        'riport-r2' => route('client.report.chapter', [...$params, 'ertekek'], false),
+        'riport-r2b' => route('client.report.item', [...$params, 'ertekek', $value->id], false),
+        'riport-r3' => route('client.report.chapter', [...$params, 'folyamatok'], false),
+        'riport-r4' => route('client.report.chapter', [...$params, 'teruletek'], false),
+        'riport-r5' => route('client.report.chapter', [...$params, 'markad-alapja'], false),
+        'riport-r5b' => $brand ? route('client.report.item', [...$params, 'markad-alapja', $brand->id], false) : null,
+        'riport-r9' => route('client.report.closing', $params, false),
+        'riport-rm' => route('client.report.appendix', $params, false),
+    ]));
+})->group('screenshots');
+
+it('tours the report of a standalone diagnosis (04 · 4.6)', function () {
+    $organization = Organization::factory()->create();
+    $user = customerOf($organization);
+    $standalone = Diagnosis::factory()->forUser($user, $organization)->ofType('mirror')->published()->create(['name' => 'Értéktükör · 2026.10.26.']);
+    $standaloneRow = DiagnosisRow::factory()->for($standalone)->scored(5.0)->create(['quotes' => [['detection_id' => null, 'speaker' => 'Beszélő 1', 'quote' => 'Meg tudtam volna csinálni, de fél év múlva újra elromlana.']]]);
+    DiagnosisRow::factory()->for($standalone)->scored(2.0)->create();
+    DiagnosisText::query()->create(['diagnosis_id' => $standalone->id, 'key' => 'recommendation', 'text' => "### Hol kezdjük\n\nA **szakmai igényesség** mellett.", 'status' => 'approved', 'approved_at' => now()]);
+
+    $page = loginInBrowser($user);
+    $standaloneParams = [$organization, $standalone];
+    tourPages($page, [
+        'onallo-r0' => route('client.report.show', $standaloneParams, false),
+        'onallo-r2' => route('client.report.chapter', [...$standaloneParams, 'ertekek'], false),
+        'onallo-r2b' => route('client.report.item', [...$standaloneParams, 'ertekek', $standaloneRow->id], false),
+        'onallo-r9' => route('client.report.closing', $standaloneParams, false),
     ]);
 })->group('screenshots');
 

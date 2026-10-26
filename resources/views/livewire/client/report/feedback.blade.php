@@ -1,7 +1,7 @@
-{{-- R2·c · Magatokra ismertek? (28 · 28.1). The poll runs only while a dictation is on its way. --}}
+{{-- R2·c · Magatokra ismertek? (28 · 28.1, prototype .fb): under a line, the question and the chips. The poll runs only while a dictation is on its way. --}}
 <div @if ($dictations !== []) wire:poll.2s="pollDictations" @endif>
-    <x-ui.card as="section" class="flex flex-col gap-3" aria-labelledby="feedback-{{ $chapter }}">
-        <h3 id="feedback-{{ $chapter }}" class="text-lg font-semibold">{{ __('report.feedback.question') }}</h3>
+    <section class="flex flex-col gap-2.5 border-t border-grey-200 pt-3" aria-labelledby="feedback-{{ $chapter }}">
+        <h3 id="feedback-{{ $chapter }}" class="font-semibold">{{ __('report.feedback.question') }}</h3>
 
         @if ($latest)
             <p class="text-sm text-grey-700" role="status">
@@ -28,5 +28,5 @@
                 </form>
             @endif
         @endif
-    </x-ui.card>
+    </section>
 </div>

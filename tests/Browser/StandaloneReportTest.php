@@ -22,7 +22,7 @@ it('writes the recommendation with a subheading and previews the user\'s report 
 
     $page->navigate(route('admin.diagnoses.preview', $diagnosis, false))
         ->assertSee('Így látja:')
-        ->withinFrame('iframe', fn ($frame) => $frame->assertSee('A te diagnózisod'))
+        ->withinFrame('iframe', fn ($frame) => $frame->assertSee('Mennyire lesz nálad az értékekből tett?'))
         ->assertNoJavaScriptErrors()
         ->assertNoAccessibilityIssues();
 });

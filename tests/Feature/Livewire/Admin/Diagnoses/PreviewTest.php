@@ -58,7 +58,7 @@ it('renders the standalone report in the frame, clickable, before publishing', f
     $row = DiagnosisRow::factory()->for($diagnosis)->scored(4.0)->create();
 
     $this->get(route('admin.main-diagnoses.preview', $diagnosis))->assertOk()
-        ->assertSee('A ti diagnózisotok')
+        ->assertSee('Mennyire lesz nálatok az értékekből tett?')
         ->assertSee(route('admin.main-diagnoses.preview', [$diagnosis, 'ertekek']), false);
     $this->get(route('admin.main-diagnoses.preview', [$diagnosis, 'ertekek', $row->id]))->assertOk();
     $this->get(route('admin.main-diagnoses.preview', [$diagnosis, 'zarolap']))->assertOk()->assertDontSee('Letöltöm · PDF');

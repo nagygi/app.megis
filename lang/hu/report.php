@@ -50,10 +50,13 @@ return [
     'threshold_missing' => '{1} Még :count társ hangja kell, hogy lássátok a rést.|[2,*] Még :count társ hangja kell, hogy lássátok a rést.',
     'threshold_overridden' => '{1} Még :count társ hangja kellett volna, hogy lássátok a rést.|[2,*] Még :count társ hangja kellett volna, hogy lássátok a rést.',
     'biggest_gap' => 'A legnagyobb rés',
+    'biggest_gap_short' => 'a legnagyobb rés',
     'biggest_gap_sentence' => 'A legnagyobb rés: :label. :sentence',
     'crack_marker' => 'repedés',
     'breakpoint_marker' => 'töréspont',
     'claim_marker' => 'a diagnózis állítása · a mégis átnézte',
+    'claim_marker_short' => 'a diagnózis állítása',
+    'claim_reviewed' => 'a mégis átnézte',
     'evidence_link' => 'bizonyítékok',
     'claim_kinds' => [
         'strength' => 'Erősség',
@@ -135,6 +138,12 @@ return [
     // A user's own standalone diagnosis speaks to one person (04 · 4.6).
     'self' => [
         'title' => 'A te diagnózisod',
+        'pages' => [
+            'closing' => 'A diagnózisod',
+        ],
+        'capability' => [
+            'start_with' => 'A képesség, amivel kezdenél',
+        ],
         'question' => [
             'answer' => 'Mennyire lesz nálad az értékekből tett?',
             'values' => 'Mennyire élnek nálad az értékeid?',
@@ -168,6 +177,140 @@ return [
     ],
 
     'phi' => 'PHI',
+
+    // The prototype's frame of the report pages (2 · Riport): titles, dots, footer, and what is coming.
+    'soon' => 'hamarosan',
+    'pages' => [
+        'answer' => 'A válasz',
+        'summary' => 'Vezetői összefoglaló',
+        'internal' => 'Belső működés',
+        'compare' => 'Te · csapat · szervezet',
+        'closing' => 'A diagnózisotok',
+        'snapshot' => 'Snapshot · Belső',
+    ],
+    'meta' => ':subject · :product · :date',
+    'diagnosis_view' => 'diagnózis-nézet',
+    'dots' => [
+        'label' => 'Fejezetek',
+        'answer' => 'A válasz',
+        'summary' => 'Összefoglaló',
+        'values' => 'Értékek',
+        'processes' => 'Folyamatok',
+        'areas' => 'Területek',
+        'brand' => 'A márkád alapja',
+        'brand_report' => 'Brand riport',
+        'capability' => 'Képesség',
+        'bridge' => 'Bridge to Purpose',
+    ],
+    'footer' => [
+        'label' => 'Lapozás',
+        'step' => ':current / 8 · :chapter',
+        'internal' => 'Belső működés · 2–5. fejezet',
+        'compare' => 'Belső működés · összevetés',
+        'item' => ':label · :current / :total :noun',
+    ],
+    'nouns' => [
+        'values' => 'érték',
+        'processes' => 'folyamat',
+        'areas' => 'terület',
+        'brand' => 'elem',
+    ],
+    // "Öt érték", "A márkád alapja · négy elem": the groups of rows.
+    'groups' => [
+        'values' => ':count érték',
+        'processes' => ':count folyamat',
+        'areas' => ':count terület',
+        'brand' => 'A márkád alapja · :count elem',
+        'points' => ':label · :points / :max',
+        'internal' => 'Belső működés · :count mérőpont · :points / :max',
+        'summary_link' => 'összefoglaló',
+        'brand_soon' => 'Brand',
+        'brand_rows' => [
+            'values' => 'Öt érték a megjelenéseken',
+            'channels' => 'Négy csatorna',
+            'assets' => 'Hét fix brand asset',
+        ],
+        'tree_more' => 'A fa további öt eleme',
+    ],
+    'brand_ring' => 'Brand',
+    'capability' => [
+        'title' => 'Képesség',
+        'text' => 'Melyik képességet érdemes fejleszteni, hogy az értékből tett legyen.',
+        'start_with' => 'A képesség, amivel kezdenétek',
+    ],
+    'brand_report' => [
+        'title' => 'Brand riport',
+        'text' => 'Mennyi látszik az értékekből kifelé: öt érték a megjelenéseken, négy csatorna, hét asset.',
+    ],
+    'coach' => [
+        'name' => 'Coach',
+        'why' => 'Miért lett ez így?',
+        'from_evidence' => 'a Coach a bizonyítékból válaszol',
+    ],
+    'summary_page' => [
+        'question' => 'Mi tartja a diagnózist, öt blokkban?',
+        'biggest_gap' => 'A legnagyobb rés: :label.',
+        'brand' => 'A márkád alapja · PHI belül :inside',
+        'internal' => 'Belső működés · :percent%',
+        'internal_meta' => 'értékek · folyamatok · területek · a fa négy eleme',
+        'claims' => 'a diagnózis állításai',
+        'claims_marker' => 'a mégis átnézte · bizonyítékok a fejezetekben',
+        'where_to_start' => 'Hol kezdenénk:',
+    ],
+    'internal_page' => [
+        'question' => 'Mennyi lesz az értékekből tett?',
+        'meta' => ':percent% · :points / :max · :count mérőpont',
+    ],
+    'compare_page' => [
+        'question' => 'Hol válik el a három olvasat?',
+        'meta' => 'te · a csapat · a szervezet',
+        'lead' => 'Mindhárom ugyanahhoz mér: a szervezet értékeihez. A váltó azt váltja, kinek az adatából számolunk.',
+        'note' => 'A csapat-szám három kitöltő fölött látszik, név nélkül. A szervezet a szervezet összes diagnosztizált csapata.',
+    ],
+    'process_meta' => ':count rutin · :calendar a naptárban · :missing nincs · :measured mérve',
+    'brand_meta' => ':count elem · PHI belül :inside',
+    'item_meta' => ':date · :area · :chapter',
+    'item_area' => [
+        'values' => 'Belső működés',
+        'processes' => 'Belső működés',
+        'areas' => 'Belső működés',
+        'brand' => 'a márkád alapja',
+    ],
+    'item_chapter' => [
+        'values' => 'értékek',
+        'processes' => 'folyamatok',
+        'areas' => 'területek',
+        'brand' => 'belül és kívül',
+    ],
+    'experience' => 'Megélés',
+    'what_we_look_at_process' => 'Mit nézünk ebben a rutinban',
+    'tree' => [
+        'inside' => 'Belül',
+        'outside' => 'Kívül',
+        'list' => 'Elemenként · a sor lenyílik',
+        'inside_short' => 'b',
+        'outside_short' => 'k',
+        'center' => 'PHI belül',
+        'crack' => 'repedés · két fok vagy több',
+        'circle_label' => 'A fa elemei: :elements',
+    ],
+    'closing_page' => [
+        'internal_brand' => 'Belső működés · Brand',
+        'recommendation' => 'A javaslatunk',
+        'share' => 'Megosztás',
+        'bridge_meta' => 'a terv · ki viszi · a 90 nap',
+    ],
+    'appendix_page' => [
+        'question' => 'Miből dolgoztunk?',
+    ],
+    'snapshot_page' => [
+        'meta' => ':processes · :from → :to',
+        'brand_row' => 'gyökér és törzs · belülről',
+        'outside' => 'Snapshot · Külső',
+        'deeper' => 'Mélyebben',
+        'outside_meta' => '2 hét · egy csatorna · a korona és az árnyék kívülről',
+        'coach' => 'A gyökér és a törzs belülről látszik. Hogy a korona és az árnyék kifelé is így áll-e, a Külső snapshot mutatja meg.',
+    ],
 
     // Where a quote comes from, never whose (18 · 18.2).
     'trace' => [

@@ -27,6 +27,30 @@ it('renders every page of the report to the leader (27)', function () {
     $this->get(route('client.report.closing', $parameters))->assertOk()->assertSee('Ez a ti diagnózisotok.');
 });
 
+it('links the chapter dots and the footer page by page, and marks what is coming (prototype R0–R8)', function () {
+    [$setup, $main] = publishedReport();
+    actingAsCustomer($setup['leader']);
+    $parameters = [$setup['organization'], $main->diagnosis];
+    $values = $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Value)->get();
+    [$first, $second] = app(ReportBuilder::class)->build($main)['chapters']['values']['rows'];
+
+    $this->get(route('client.report.show', $parameters))->assertOk()
+        ->assertSee('0 / 8 · A válasz')
+        ->assertSee('href="'.route('client.report.summary', $parameters).'"', false)
+        ->assertSee('href="'.route('client.report.chapter', [...$parameters, 'ertekek']).'"', false)
+        ->assertSee('Brand riport · hamarosan')
+        ->assertSee('Bridge to Purpose · hamarosan')
+        ->assertSee('Képesség');
+    $this->get(route('client.report.chapter', [...$parameters, 'ertekek']))->assertOk()
+        ->assertSee('2 / 8 · Értékek')
+        ->assertSee('href="'.route('client.report.chapter', [...$parameters, 'folyamatok']).'"', false);
+    $this->get(route('client.report.item', [...$parameters, 'ertekek', $first['id']]))->assertOk()
+        ->assertSee($first['label'].' · 1 / '.$values->count().' érték')
+        ->assertSee('href="'.route('client.report.item', [...$parameters, 'ertekek', $second['id']]).'"', false);
+    $this->get(route('client.report.chapter', [...$parameters, 'markad-alapja']))->assertOk()
+        ->assertSee('href="'.route('client.report.closing', $parameters).'"', false);
+});
+
 it('shows the report to the organization\'s leaders but never to a peer (27 · 27.1)', function () {
     [$setup, $main] = publishedReport();
     $parameters = [$setup['organization'], $main->diagnosis];
