@@ -14,9 +14,17 @@ return [
         'profile' => 'Profil',
         'logout' => 'Kijelentkezem',
         'switch_organization' => 'Szervezet váltása',
+        // M1: the menu's question and the line under each item.
+        'heading' => 'Mit akarsz megérteni?',
         'mirror' => 'Értéktükör',
+        'mirror_meta' => 'egy helyzet, és a benne hallható értékeid',
+        'libraries' => 'Tárak',
         'value_library' => 'Értéktár',
+        'value_library_meta' => ':count érték, definícióval',
+        'value_library_browse' => 'böngészhető értékek',
         'processes' => 'Folyamatok',
+        'processes_meta' => ':count rutin · :calendar a naptárban',
+        'wisdom_meta' => 'folyamat · küldetésfa · öt terület · % és pontok',
     ],
 
     // The page label in the header, right of the logo (prototype: V1, V10, T5).
@@ -52,6 +60,7 @@ return [
         ],
         'edit' => 'Szerkesztem',
         'score_from' => 'a :date-i diagnózisból',
+        'scores_from' => 'A pontok a :date-i diagnózisból.',
         'older_definition' => 'A :date-i diagnózis a korábbi definícióval mért.',
         'add_to_own' => 'Hozzáadom a sajátjaimhoz',
         'added_to_own' => 'A(z) :name bekerült a saját értékeid közé.',

@@ -2,6 +2,7 @@
 title: A diagnózis folyamata
 sentence: Nyolc lépés a beállítástól az átbeszélésig, és hogy kinek mi a dolga.
 chapter:
+symbol: spiral
 ---
 
 ## spiral | Beállítjuk · mégis

@@ -2,6 +2,7 @@
 title: A küldetésfa · a márkád alapja
 sentence: Négy elem, ami belülről tartja a működést.
 chapter: brand
+symbol: fruit
 ---
 
 A fa alsó fele belülről látszik, a felső kifelé hat. A diagnózis a négy belső elemet nézi.

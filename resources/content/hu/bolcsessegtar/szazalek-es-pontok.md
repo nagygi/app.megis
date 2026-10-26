@@ -2,6 +2,7 @@
 title: A % és a pontok
 sentence: Mérőpont, PHI, százalék, lépcső, megélés és rés.
 chapter:
+symbol: growth-rings
 ---
 
 ## circle | Mérőpont

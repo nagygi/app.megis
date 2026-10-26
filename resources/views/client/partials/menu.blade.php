@@ -1,151 +1,203 @@
 {{--
-    The customer menu (15 · 15.3). Menu items appear only once their feature
+    The customer menu (15 · 15.3, prototype M1): cream on charcoal, one level
+    with groups that open in place. Menu items appear only once their feature
     exists, the user may use it and it has content; the diagnosis tickets add
     them. At the bottom: the organization row (15 · 15.4), Profil, Kijelentkezés.
     The layout passes the current organization and the user's organizations.
 --}}
 
-<div class="flex min-h-full flex-col gap-6 p-6">
-    <div class="flex items-center justify-between">
+@php
+    $route = request()->route();
+    $routeDiagnosis = $route?->parameter('diagnosis');
+    $routeDiagnosisId = $routeDiagnosis instanceof \Illuminate\Database\Eloquent\Model ? $routeDiagnosis->getKey() : $routeDiagnosis;
+
+    if ($currentOrganization) {
+        // Riportok and Fejezetek after publishing (27 · 27.12); the published standalone diagnoses too (04 · 4.6).
+        $reportService = app(\App\Services\Report\ReportService::class);
+        $reports = $reportService->reportsFor($user, $currentOrganization);
+        $latestReport = $reports->first();
+        $standaloneReports = $reportService->standaloneReportsFor($user, $currentOrganization);
+        $showsChapters = $latestReport !== null && ! $latestReport->isSnapshot();
+
+        // A report's own pages; the internal working and the brand base belong to Fejezetek.
+        $onReport = fn ($diagnosisId) => request()->routeIs('client.report.*')
+            && ! request()->routeIs('client.report.appendix')
+            && (string) $routeDiagnosisId === (string) $diagnosisId;
+        $internalActive = $showsChapters && request()->routeIs('client.report.internal') && $onReport($latestReport->diagnosis_id);
+        $brandActive = $showsChapters && request()->routeIs('client.report.chapter', 'client.report.item')
+            && $route->parameter('chapter') === \App\Services\Report\ReportService::SLUGS['brand'] && $onReport($latestReport->diagnosis_id);
+
+        // Tárak / Folyamatok for the leaders (11 · 11.5, 15 · 15.3); without it the Értéktár stands alone.
+        $showsProcesses = \App\Services\Processes\ProcessService::canManageLibrary($user, $currentOrganization);
+        $valueCount = $currentOrganization->valueSet()->withCount('items')->first()?->items_count ?? 0;
+        $valuesActive = request()->routeIs('client.values');
+        $processesActive = request()->routeIs('client.processes*');
+
+        if ($showsProcesses) {
+            $routines = \App\Models\Process::query()
+                ->whereBelongsTo($currentOrganization)
+                ->whereNull('parent_id')
+                ->where('kind', '!=', \App\Enums\ProcessKind::OneOff);
+            $routineCount = (clone $routines)->count();
+            $calendarCount = $routines->where('source', \App\Enums\ProcessSource::Calendar)->count();
+        }
+
+        $reportRowActive = fn ($diagnosisId) => $onReport($diagnosisId) && ! $internalActive && ! $brandActive;
+        // The group holding the page opens; Riportok also when none does, as in the prototype.
+        $chaptersOpen = $internalActive || $brandActive;
+        $librariesOpen = $showsProcesses && ($valuesActive || $processesActive);
+        $reportsOpen = ! $chaptersOpen && ! $librariesOpen;
+
+        $reportsMeta = collect([
+            ...$reports->map(fn ($main) => collect([$main->product_name, $main->published_at?->format('m.d.')])->filter()->implode(' · ')),
+            ...$standaloneReports->map(fn ($diagnosis) => $diagnosis->name),
+        ])->take(2)->implode(' · ');
+    }
+@endphp
+
+<div class="flex min-h-full flex-col">
+    <div class="flex items-center justify-between px-6 pt-3">
         @if ($currentOrganization)
-            <a href="{{ route('client.home', $currentOrganization) }}" class="flex no-underline">
-                <x-megis.logo class="h-8" />
+            <a href="{{ route('client.home', $currentOrganization) }}" class="flex min-h-11 items-center no-underline">
+                <x-megis.logo variant="yellow-light" class="h-7" />
                 <span class="sr-only">{{ __('client.menu.home') }}</span>
             </a>
         @else
-            <x-megis.logo class="h-8" />
+            <span class="flex min-h-11 items-center">
+                <x-megis.logo variant="yellow-light" class="h-7" />
+            </span>
         @endif
-        <button type="button" class="press -mr-2 grid size-11 place-items-center rounded-pill hover:bg-grey-100 desktop:hidden" @click="menuOpen = false">
-            <x-megis.icon name="close" class="size-5" :label="__('client.menu.close')" />
+        {{-- The circle stays 36px; the button around it is the 44px target. --}}
+        <button type="button" class="press -mr-1 grid size-11 place-items-center rounded-pill desktop:hidden" @click="menuOpen = false">
+            <span class="grid size-9 place-items-center rounded-pill border-[1.5px] border-grey-700">
+                <x-megis.icon name="close" :label="__('client.menu.close')" />
+            </span>
         </button>
     </div>
 
-    <nav class="flex-1" aria-label="{{ __('client.menu.title') }}">
-        @if ($currentOrganization)
-            @php
-                $menuItems = [
-                    ['route' => 'client.mirror.record', 'active' => 'client.mirror.*', 'label' => __('client.menu.mirror')],
-                    ['route' => 'client.values', 'active' => 'client.values', 'label' => __('client.menu.value_library')],
-                ];
+    <p class="px-6 pt-5 text-xl leading-tight font-extrabold uppercase [text-wrap:balance]">{{ __('client.menu.heading') }}</p>
 
-                // Tárak / Folyamatok for the leaders (11 · 11.5, 15 · 15.3).
-                if (\App\Services\Processes\ProcessService::canManageLibrary($user, $currentOrganization)) {
-                    $menuItems[] = ['route' => 'client.processes', 'active' => 'client.processes*', 'label' => __('client.menu.processes')];
-                }
-            @endphp
-            @php
-                // Riportok and Fejezetek after publishing (27 · 27.12); the published standalone diagnoses too (04 · 4.6).
-                $reports = app(\App\Services\Report\ReportService::class)->reportsFor($user, $currentOrganization);
-                $latestReport = $reports->first();
-                $standaloneReports = app(\App\Services\Report\ReportService::class)->standaloneReportsFor($user, $currentOrganization);
-            @endphp
-            @php($isHome = request()->routeIs('client.home'))
-            <ul class="mb-4 flex flex-col gap-1">
-                <li>
-                    <a
-                        href="{{ route('client.home', $currentOrganization) }}"
-                        @class([
-                            'block rounded-field px-4 py-2 no-underline',
-                            'bg-charcoal font-semibold text-cream' => $isHome,
-                            'text-charcoal hover:bg-grey-100' => ! $isHome,
-                        ])
-                        @if ($isHome) aria-current="page" @endif
-                    >{{ __('client.menu.home') }}</a>
-                </li>
-            </ul>
-            @if ($reports->isNotEmpty() || $standaloneReports->isNotEmpty())
-                <p class="px-4 pb-1 text-xs font-semibold uppercase tracking-wide text-grey-600">{{ __('report.menu.reports') }}</p>
-                <ul class="mb-4 flex flex-col gap-1">
-                    @foreach ($reports as $reportMain)
-                        <li>
-                            <a href="{{ route('client.report.show', [$currentOrganization, $reportMain->diagnosis]) }}" class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">
-                                {{ __('report.menu.report_row', ['product' => $reportMain->product_name, 'date' => $reportMain->published_at?->format('m.d.') ?? '–', 'percent' => $reportMain->calculation['ring'] ?? '–']) }}
-                            </a>
-                        </li>
-                    @endforeach
-                    @foreach ($standaloneReports as $standaloneReport)
-                        <li>
-                            <a href="{{ route('client.report.show', [$currentOrganization, $standaloneReport]) }}" class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">
-                                {{ __('report.menu.standalone_row', ['name' => $standaloneReport->name]) }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            @endif
-            @if ($reports->isNotEmpty())
-                <ul class="mb-4 flex flex-col gap-1">
-                    <li><a href="{{ route('client.report.appendix', [$currentOrganization, $latestReport->diagnosis]) }}" class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.appendix_link') }}</a></li>
-                </ul>
-                @unless ($latestReport->isSnapshot())
-                    <p class="px-4 pb-1 text-xs font-semibold uppercase tracking-wide text-grey-600">{{ __('report.menu.chapters') }}</p>
-                    <ul class="mb-4 flex flex-col gap-1">
-                        <li><a href="{{ route('client.report.internal', [$currentOrganization, $latestReport->diagnosis]) }}" class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.menu.internal') }}</a></li>
-                        <li><a href="{{ route('client.report.chapter', [$currentOrganization, $latestReport->diagnosis, 'markad-alapja']) }}" class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.menu.brand') }}</a></li>
-                    </ul>
-                @endunless
-            @endif
-            @php($menuItems[] = ['route' => 'client.wisdom.index', 'active' => 'client.wisdom.*', 'label' => __('wisdom.menu')])
-            <ul class="flex flex-col gap-1">
-                @foreach ($menuItems as $item)
-                    @php($isActive = request()->routeIs($item['active']))
-                    <li>
-                        <a
-                            href="{{ route($item['route'], $currentOrganization) }}"
-                            @class([
-                                'block rounded-field px-4 py-2 no-underline',
-                                'bg-charcoal font-semibold text-cream' => $isActive,
-                                'text-charcoal hover:bg-grey-100' => ! $isActive,
-                            ])
-                            @if ($isActive) aria-current="page" @endif
-                        >{{ $item['label'] }}</a>
-                    </li>
-                @endforeach
+    <nav class="flex-1 px-6 pt-3 pb-6" aria-label="{{ __('client.menu.title') }}">
+        @if ($currentOrganization)
+            <ul class="flex flex-col">
+                @if ($reports->isNotEmpty() || $standaloneReports->isNotEmpty())
+                    <x-client.menu-group :title="__('report.menu.reports')" :meta="$reportsMeta" symbol="growth-rings" :open="$reportsOpen">
+                        @foreach ($reports as $reportMain)
+                            <x-client.menu-link
+                                nested
+                                :href="route('client.report.show', [$currentOrganization, $reportMain->diagnosis])"
+                                :title="$reportMain->product_name"
+                                :meta="__('report.menu.report_meta', ['date' => $reportMain->published_at?->format('m.d.') ?? '–', 'percent' => $reportMain->calculation['ring'] ?? '–'])"
+                                :active="$reportRowActive($reportMain->diagnosis_id)"
+                            />
+                        @endforeach
+                        @foreach ($standaloneReports as $standaloneReport)
+                            <x-client.menu-link
+                                nested
+                                :href="route('client.report.show', [$currentOrganization, $standaloneReport])"
+                                :title="__('report.menu.standalone_row', ['name' => $standaloneReport->name])"
+                                :meta="$standaloneReport->diagnosed_on?->format('m.d.')"
+                                :active="$reportRowActive($standaloneReport->id)"
+                            />
+                        @endforeach
+                    </x-client.menu-group>
+                @endif
+
+                @if ($showsChapters)
+                    <x-client.menu-group :title="__('report.menu.chapters')" :meta="__('report.menu.internal').' · '.__('report.menu.brand')" symbol="root" :open="$chaptersOpen">
+                        <x-client.menu-link nested :href="route('client.report.internal', [$currentOrganization, $latestReport->diagnosis])" :title="__('report.menu.internal')" :meta="__('report.menu.internal_meta')" :active="$internalActive" />
+                        <x-client.menu-link nested :href="route('client.report.chapter', [$currentOrganization, $latestReport->diagnosis, \App\Services\Report\ReportService::SLUGS['brand']])" :title="__('report.menu.brand')" :meta="__('report.menu.brand_meta')" :active="$brandActive" />
+                    </x-client.menu-group>
+                @endif
+
+                @php($valuesMeta = $valueCount > 0 ? __('client.menu.value_library_meta', ['count' => $valueCount]) : __('client.menu.value_library_browse'))
+                @if ($showsProcesses)
+                    <x-client.menu-group :title="__('client.menu.libraries')" :meta="__('client.menu.value_library').' · '.__('client.menu.processes')" symbol="fruit" :open="$librariesOpen">
+                        <x-client.menu-link nested :href="route('client.values', $currentOrganization)" :title="__('client.menu.value_library')" :meta="$valuesMeta" :active="$valuesActive" />
+                        <x-client.menu-link nested :href="route('client.processes', $currentOrganization)" :title="__('client.menu.processes')" :meta="__('client.menu.processes_meta', ['count' => $routineCount, 'calendar' => $calendarCount])" :active="$processesActive" />
+                    </x-client.menu-group>
+                @else
+                    <x-client.menu-link :href="route('client.values', $currentOrganization)" :title="__('client.menu.value_library')" :meta="$valuesMeta" symbol="fruit" :active="$valuesActive" />
+                @endif
+
+                <x-client.menu-link :href="route('client.mirror.record', $currentOrganization)" :title="__('client.menu.mirror')" :meta="__('client.menu.mirror_meta')" symbol="tree-of-life" :active="request()->routeIs('client.mirror.*')" />
+                <x-client.menu-link :href="route('client.wisdom.index', $currentOrganization)" :title="__('wisdom.menu')" :meta="__('client.menu.wisdom_meta')" symbol="growth-rings" :active="request()->routeIs('client.wisdom.*')" />
+
+                @if ($reports->isNotEmpty())
+                    <x-client.menu-link
+                        :href="route('client.report.appendix', [$currentOrganization, $latestReport->diagnosis])"
+                        :title="__('report.appendix_link')"
+                        :meta="__('report.menu.appendix_meta')"
+                        symbol="soil"
+                        symbol-class="text-coral"
+                        :active="request()->routeIs('client.report.appendix') && (string) $routeDiagnosisId === (string) $latestReport->diagnosis_id"
+                    />
+                @endif
             </ul>
         @endif
     </nav>
 
-    <div class="flex flex-col gap-3 border-t border-grey-250 pt-4">
+    <div class="flex flex-col gap-1 border-t border-grey-700 px-6 pt-3 pb-5" @if ($currentOrganization && $organizations->count() > 1) x-data="{ open: false }" @endif>
         @if ($currentOrganization)
-            @if ($organizations->count() > 1)
-                <div x-data="{ open: false }">
+            @php($organizationMeta = $latestReport ? collect([$latestReport->product_name, $latestReport->published_at?->format('m.d.')])->filter()->implode(' · ') : null)
+            <div class="flex items-center justify-between gap-3">
+                @if ($organizations->count() > 1)
                     <button
                         type="button"
-                        class="flex w-full items-center justify-between gap-2 rounded-card bg-grey-100 px-4 py-3 text-left"
+                        class="press flex min-h-11 min-w-0 flex-1 items-center gap-2 text-left hover:text-yellow"
                         :aria-expanded="open"
                         aria-controls="organization-switcher"
                         @click="open = ! open"
                     >
-                        <span>
-                            <span class="block font-semibold">{{ $currentOrganization->name }}</span>
-                            <span class="block text-sm text-grey-600">{{ __('client.menu.switch_organization') }}</span>
+                        <span class="min-w-0">
+                            <span class="block truncate text-sm font-semibold">{{ $currentOrganization->name }}</span>
+                            <span class="block text-xs text-grey-400">{{ $organizationMeta ?? __('client.menu.switch_organization') }}</span>
+                            @if ($organizationMeta)
+                                <span class="sr-only">{{ __('client.menu.switch_organization') }}</span>
+                            @endif
                         </span>
-                        <x-megis.icon name="chevron-right" class="size-4 transition-transform" ::class="open && 'rotate-90'" />
+                        <x-megis.icon name="chevron-down" class="shrink-0 text-grey-400 transition-transform duration-200" ::class="open && 'rotate-180'" />
                     </button>
+                @else
+                    <div class="min-w-0 flex-1 py-1.5">
+                        <span class="block truncate text-sm font-semibold">{{ $currentOrganization->name }}</span>
+                        @if ($organizationMeta)
+                            <span class="block text-xs text-grey-400">{{ $organizationMeta }}</span>
+                        @endif
+                    </div>
+                @endif
 
-                    <ul id="organization-switcher" x-show="open" x-cloak class="mt-2 flex flex-col gap-1">
-                        @foreach ($organizations as $organization)
-                            <li>
-                                <a
-                                    href="{{ route('client.home', $organization) }}"
-                                    class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100"
-                                    @if ($organization->is($currentOrganization)) aria-current="true" @endif
-                                >{{ $organization->name }}</a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-            @else
-                <div class="rounded-card bg-grey-100 px-4 py-3">
-                    <span class="block font-semibold">{{ $currentOrganization->name }}</span>
-                </div>
+                <a
+                    href="{{ route('client.profile', $currentOrganization) }}"
+                    class="press inline-flex min-h-11 shrink-0 items-center gap-1 text-sm font-semibold text-yellow no-underline"
+                    @if (request()->routeIs('client.profile')) aria-current="page" @endif
+                >
+                    {{ __('client.menu.profile') }}
+                    <x-megis.icon name="chevron-right" />
+                </a>
+            </div>
+
+            @if ($organizations->count() > 1)
+                <ul id="organization-switcher" x-show="open" x-cloak class="flex flex-col pb-1">
+                    @foreach ($organizations as $organization)
+                        <li>
+                            <a
+                                href="{{ route('client.home', $organization) }}"
+                                @class([
+                                    'press flex min-h-11 items-center text-sm no-underline [color:inherit] hover:text-yellow',
+                                    'font-semibold text-yellow' => $organization->is($currentOrganization),
+                                ])
+                                @if ($organization->is($currentOrganization)) aria-current="true" @endif
+                            >{{ $organization->name }}</a>
+                        </li>
+                    @endforeach
+                </ul>
             @endif
-
-            <a href="{{ route('client.profile', $currentOrganization) }}" class="rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('client.menu.profile') }}</a>
         @endif
 
         <form method="POST" action="{{ route('client.logout') }}">
             @csrf
-            <button type="submit" class="w-full rounded-field px-4 py-2 text-left hover:bg-grey-100">{{ __('client.menu.logout') }}</button>
+            <button type="submit" class="press min-h-11 text-left text-sm text-grey-400 hover:text-cream">{{ __('client.menu.logout') }}</button>
         </form>
     </div>
 </div>

@@ -98,6 +98,7 @@ class ValueLibrary extends Component
         $editable = app(MainDiagnosisService::class)->acceptingInputFor($user, $this->organization)->first();
         $canEditOwn = $editable !== null && ($editable->isLeader($user) || $editable->participantFor($user, ParticipantRole::Peer)?->started_at !== null);
         $isOrganizationLeader = app(MainDiagnosisService::class)->isOrganizationLeader($this->organization, $user);
+        $valueSet = $valueSet !== null && $valueSet->items->isNotEmpty() ? $valueSet : null;
 
         return view('livewire.client.value-library', [
             // The score of the viewer's latest published report, team view (30, question 1).
@@ -110,13 +111,22 @@ class ValueLibrary extends Component
             'organizationEditUrl' => $isOrganizationLeader && $editable !== null && $editable->isLeader($user) && ! $this->organization->isIndividual()
                 ? route('client.diagnosis.szervezet-ertekei', [$this->organization, $editable->diagnosis])
                 : null,
-            'valueSet' => $valueSet !== null && $valueSet->items->isNotEmpty() ? $valueSet : null,
+            'valueSet' => $valueSet,
             'library' => $library,
             'libraryCount' => Value::query()->availableTo(null)->count(),
             'categories' => ValueCategory::query()->whereHas('values', fn ($query) => $query->availableTo(null))->orderBy('name')->get(['id', 'name']),
         ])->layout('layouts::client', [
+            // M2: cream with the yellow line, the root, "5 érték · … definíciója · 03.04." under the question.
             'title' => __('client.value_library.title'),
+            'color' => 'cream-line',
+            'symbol' => 'root',
+            'label' => __('client.value_library.title'),
             'subtitle' => __('client.value_library.question'),
+            'note' => $valueSet === null ? null : __('client.value_library.set_header', [
+                'count' => $valueSet->items->count(),
+                'organization' => $this->organization->name,
+                'date' => ($valueSet->latestVersion?->created_at ?? $valueSet->updated_at)->format('m.d.'),
+            ]),
             'back' => route('client.home', $this->organization),
             'backLabel' => __('client.menu.home'),
         ]);

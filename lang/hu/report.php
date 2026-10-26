@@ -157,11 +157,14 @@ return [
     ],
     'menu' => [
         'reports' => 'Riportok',
-        'report_row' => ':product · :date · Belső :percent%',
+        'report_meta' => ':date · Belső :percent%',
         'standalone_row' => ':name',
         'chapters' => 'Fejezetek',
         'internal' => 'Belső működés',
+        'internal_meta' => 'értékek · folyamatok · területek · a fa',
         'brand' => 'A márkád alapja',
+        'brand_meta' => 'a fa kilenc eleme · belül és kívül',
+        'appendix_meta' => 'Melléklet · idézetek · állítások · mérőpontok',
     ],
 
     'phi' => 'PHI',

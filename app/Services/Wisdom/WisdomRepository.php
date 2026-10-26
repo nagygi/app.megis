@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 /**
  * The Bölcsességtár's topics (32 · 32.4): markdown files per language in
  * resources/content/{locale}/bolcsessegtar, changed with a deploy. A topic
- * has a front matter (title, sentence, chapter), an intro and items:
+ * has a front matter (title, sentence, chapter, symbol), an intro and items:
  * "## {symbol} | {name}", the first paragraph the sentence, the rest the description.
  */
 class WisdomRepository
@@ -27,7 +27,7 @@ class WisdomRepository
     }
 
     /**
-     * @return array{slug: string, title: string, sentence: string, chapter: ?string, intro: string, items: list<array{symbol: string, name: string, sentence: string, description: string}>}|null
+     * @return array{slug: string, title: string, sentence: string, chapter: ?string, symbol: ?string, intro: string, items: list<array{symbol: string, name: string, sentence: string, description: string}>}|null
      */
     public function find(string $slug): ?array
     {
@@ -82,6 +82,8 @@ class WisdomRepository
             'title' => $meta['title'] ?? Str::headline($slug),
             'sentence' => $meta['sentence'] ?? '',
             'chapter' => filled($meta['chapter'] ?? null) ? $meta['chapter'] : null,
+            // The topic's symbol on BT1 (prototype: spiral, fruit, mycelium, growth rings).
+            'symbol' => filled($meta['symbol'] ?? null) ? $meta['symbol'] : null,
             'intro' => $intro,
             'items' => array_values($items),
         ];

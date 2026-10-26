@@ -88,11 +88,12 @@
                 leave the tab order; Alpine takes both classes off when it opens, and
                 the focus stays inside until it closes. From 1200px it always shows.
                 Only the slide is animated: visibility must turn at once, or the focus
-                trap finds nothing to focus as it opens.
+                trap finds nothing to focus as it opens. On a phone it covers the
+                screen, as M1; from 768px it is a 320px drawer, then the side column.
             --}}
             <aside
                 id="client-menu"
-                class="fixed inset-y-0 left-0 z-30 w-80 max-w-full overflow-y-auto border-r border-grey-250 bg-white transition-[translate] duration-200 ease-standard max-desktop:invisible max-desktop:-translate-x-full desktop:static desktop:order-first"
+                class="on-dark fixed inset-y-0 left-0 z-30 w-full overflow-y-auto bg-charcoal text-cream md:w-80 transition-[translate] duration-200 ease-standard max-desktop:invisible max-desktop:-translate-x-full desktop:static desktop:order-first"
                 :class="{ 'max-desktop:invisible max-desktop:-translate-x-full': ! menuOpen }"
                 x-trap.noscroll="menuOpen"
                 aria-label="{{ __('client.menu.title') }}"
@@ -187,7 +188,8 @@
 
                     <div class="flex items-center gap-3">
                         @if ($symbol)
-                            <x-megis.symbol :name="$symbol" class="{{ $onDark ? 'text-yellow' : 'text-coral' }}" />
+                            {{-- Charcoal on the cream of the libraries (prototype .bar.tr). --}}
+                            <x-megis.symbol :name="$symbol" class="{{ $onDark ? 'text-yellow' : ($color === 'cream-line' ? 'text-charcoal' : 'text-coral') }}" />
                         @endif
                         <div>
                             <h1 class="text-2xl leading-tight font-extrabold uppercase [text-wrap:pretty]">{{ $title }}</h1>
