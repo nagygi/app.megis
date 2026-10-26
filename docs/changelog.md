@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.32 · HASH · 2026-10-26
+## 1.32 · 0066c17 · 2026-10-26
 
 Képességmérés a vezető és a társ útjában: kitöltés, futás, kész (NM-12; 17 · 17.3, 23, 25, 26).
 
