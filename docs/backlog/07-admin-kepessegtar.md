@@ -45,7 +45,7 @@ A listák az Értéktár lista-szerkesztőjével működnek (03 · 3.2), de egy 
 Ugyanúgy működik, mint az Értéktárban (03 · 3.3):
 
 - Minden változást tartalmazó mentés és betöltés új verziót hoz létre.
-- Mentéskor opcionális megjegyzés: mi változott és miért. Betöltésnél ez automatikus: „Frissítés a mégis tárából, {dátum}”.
+- Mentéskor opcionális megjegyzés: mi változott és miért. Betöltésnél ez automatikus: „Képesség Import, {dátum}”.
 - Ahol a képességet használják, ott rögzítjük a használt verziót.
 - Bármely két verzió összehasonlítható egymás mellett.
 - Az archiválás nem hoz létre új verziót, de eseményként látszik a verziótörténetben.
@@ -79,7 +79,7 @@ Ugyanúgy működik, mint az Értéktárban (03 · 3.5): az archivált képessé
 
 - **Forrás:** a „Képességrendszer · tárak” Sheet xlsx-exportja (Képesség és Képesség-részletek fül). Indulásra 75 képesség: RC-01–RC-72 és ÚJ-01–ÚJ-03.
 - A prototípus `data/kepessegtar-72.json`-ja nem forrás: régi munkaváltozat, minden sorban azonos sablonszövegekkel.
-- **Feltöltés:** *Képességtár → Frissítés a mégis tárából*.
+- **Feltöltés:** *Képességtár → Képesség Import*.
 - **Előnézet:** hány új, változott és változatlan képesség van, és képességenként a változott mezők. Utána „Betöltöm”.
 - **Párosítás azonosító szerint:**
   - új azonosító: új képesség, v1;

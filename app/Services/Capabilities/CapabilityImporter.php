@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 use Throwable;
 
 /**
- * "Frissítés a mégis tárából" (07 · 7.6, NM-19): reads the Képesség, the
+ * "Képesség Import" (07 · 7.6, NM-19): reads the Képesség, the
  * Képesség-részletek, the Minta and the Szabálykönyv sheet of the xlsx
  * export, nothing else; the case sheets (Bizonyíték, Kapcsolat, Találat,
  * Esettár) never come in. Matches by azonosító: a new one is a new

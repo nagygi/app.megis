@@ -31,7 +31,7 @@ class CapabilityPolicy
     }
 
     /**
-     * "Frissítés a mégis tárából" (07 · 7.6).
+     * "Képesség Import" (07 · 7.6).
      */
     public function import(User $actor): bool
     {

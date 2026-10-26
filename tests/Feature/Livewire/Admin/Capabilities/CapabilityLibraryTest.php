@@ -119,7 +119,7 @@ it('previews the load without writing, then loads it as v1 (07 · 7.6)', functio
             'nyomáspróba: bukási jel' => 'Elmarad a kérés.',
         ])
         ->and($feedback->latestVersion->number)->toBe(1)
-        ->and($feedback->latestVersion->note)->toBe('Frissítés a mégis tárából, '.now()->format('Y.m.d.'));
+        ->and($feedback->latestVersion->note)->toBe('Képesség Import, '.now()->format('Y.m.d.'));
 
     // "[JAVASLAT]" is a mark on the field, the precondition text beyond the codes stays readable.
     $decision = Capability::query()->firstWhere('code', 'RC-02');
@@ -216,7 +216,7 @@ it('saves a change as a new version with its note and drops the Sheet marks of t
         ->and($decision->preconditions->pluck('pivot.note', 'code')->all())->toBe(['E1' => 'a fájdalom és a döntési jog egy helyen; M-015', 'E6' => 'mozgástér']);
 
     Livewire::test(Versions::class, ['capability' => $decision])
-        ->assertSeeInOrder(['v2', 'Jelleg, Szinonimák, kulcsszavak', 'A jelleget a mégis megerősítette.', 'v1', 'Frissítés a mégis tárából']);
+        ->assertSeeInOrder(['v2', 'Jelleg, Szinonimák, kulcsszavak', 'A jelleget a mégis megerősítette.', 'v1', 'Képesség Import']);
 });
 
 it('creates a capability with a unique code and name, list items up to 1000 characters (07 · 7.2)', function () {
@@ -294,7 +294,7 @@ it('keeps the Képességtár for the admins', function () {
     $this->get(route('admin.capabilities.import'))->assertRedirect(route('admin.login'));
 
     actingAsAdmin();
-    $this->get(route('admin.capabilities.index'))->assertOk()->assertSee('Frissítés a mégis tárából');
+    $this->get(route('admin.capabilities.index'))->assertOk()->assertSee('Képesség Import');
     $this->get(route('admin.capability-groups.index'))->assertOk()->assertSee('Kapcsolati intelligencia');
 });
 

@@ -15,7 +15,7 @@ use Livewire\WithFileUploads;
 use OpenSpout\Common\Exception\OpenSpoutException;
 
 /**
- * Képességtár → Frissítés a mégis tárából (07 · 7.6, NM-19): upload the xlsx
+ * Képességtár → Képesség Import (07 · 7.6, NM-19): upload the xlsx
  * export, see how many capabilities and patterns are new, changed and
  * unchanged and which fields changed, then "Betöltöm". The file is not kept.
  */
