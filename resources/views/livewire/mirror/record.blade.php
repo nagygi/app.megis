@@ -32,15 +32,18 @@
     @elseif ($mode === 'text')
         <x-form.textarea name="text" wire:model="text" rows="10" :label="__('mirror.text_label')" :help="__('mirror.text_help')" maxlength="{{ config('megis.materials.text_max_characters') }}" required />
     @else
-        <x-form.file
-            name="file"
-            id="mirror-file"
-            wire:model="file"
-            accept=".{{ implode(',.', config('megis.materials.text_extensions')) }}"
-            :label="__('mirror.file_label')"
-            :help="__('mirror.file_help', $textRules)"
-            required
-        />
+        {{-- Framed like the recorder, so the three read as tabs of one panel. --}}
+        <x-ui.card padding="lg">
+            <x-form.file
+                name="file"
+                id="mirror-file"
+                wire:model="file"
+                accept=".{{ implode(',.', config('megis.materials.text_extensions')) }}"
+                :label="__('mirror.file_label')"
+                :help="__('mirror.file_help', $textRules)"
+                required
+            />
+        </x-ui.card>
     @endif
 
     @if ($isPublic)
