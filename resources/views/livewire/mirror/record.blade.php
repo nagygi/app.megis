@@ -21,7 +21,8 @@
     @endif
 
     <x-ui.segmented :label="__('mirror.title')">
-        @foreach (['record' => __('mirror.mode_record'), 'text' => __('mirror.mode_text'), 'file' => __('mirror.mode_file')] as $key => $label)
+        {{-- The order and the words of every longer text (x-form.long-text); telling stays the default here. --}}
+        @foreach (['text' => __('ui.long_text.write'), 'record' => __('ui.long_text.speak'), 'file' => __('ui.long_text.upload')] as $key => $label)
             <x-ui.segment :selected="$mode === $key" wire:click="setMode('{{ $key }}')">{{ $label }}</x-ui.segment>
         @endforeach
     </x-ui.segmented>

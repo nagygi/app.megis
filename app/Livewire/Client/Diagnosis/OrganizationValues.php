@@ -199,6 +199,11 @@ class OrganizationValues extends Component
         return $this->organization;
     }
 
+    protected function dictationLimit(string $field): ?int
+    {
+        return 500;
+    }
+
     protected function dictated(string $field): void
     {
         $this->persist(app(OrganizationValueSetService::class));

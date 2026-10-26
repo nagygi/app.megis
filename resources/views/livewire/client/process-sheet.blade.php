@@ -1,5 +1,5 @@
 {{-- V6·e · the data sheet of a process (11 · 11.3); every change saves at once. --}}
-<div class="flex max-w-2xl flex-col gap-6">
+<div class="flex max-w-2xl flex-col gap-6" @if ($dictations !== []) wire:poll.2s="pollDictations" @endif>
     <x-ui.flash />
 
     <p class="text-grey-700">
@@ -20,7 +20,18 @@
         <x-ui.card as="section" class="flex flex-col gap-3" aria-labelledby="description-title">
             <h2 id="description-title" class="text-lg font-semibold">{{ __('processes.sheet.description') }}</h2>
             @if ($editable)
-                <x-form.textarea name="description" wire:model.live.blur="description" :label="__('processes.sheet.description')" :help="__('processes.sheet.description_help')" rows="3" maxlength="2000" />
+                {{-- The card's title names the field; the label stays for screen readers. --}}
+                <x-form.long-text
+                    name="description"
+                    wire:model.live.blur="description"
+                    :label="__('processes.sheet.description')"
+                    label-hidden
+                    :help="__('processes.sheet.description_help')"
+                    rows="4"
+                    :max="\App\Livewire\Client\ProcessSheet::DESCRIPTION_MAX"
+                    :pending="isset($dictations['description'])"
+                    :tools="$canDictate"
+                />
             @else
                 <p class="whitespace-pre-line">{{ $process->description }}</p>
             @endif
@@ -147,7 +158,15 @@
                     </x-form.select>
                     <x-form.input name="metric.target" wire:model="metric.target" :label="__('processes.sheet.metric_fields.target')" />
                 </div>
-                <x-form.textarea name="metric.description" wire:model="metric.description" :label="__('processes.sheet.metric_fields.description')" rows="2" />
+                <x-form.long-text
+                    name="metric.description"
+                    wire:model="metric.description"
+                    :label="__('processes.sheet.metric_fields.description')"
+                    rows="2"
+                    :max="\App\Livewire\Client\ProcessSheet::METRIC_DESCRIPTION_MAX"
+                    :pending="isset($dictations['metric.description'])"
+                    :tools="$canDictate"
+                />
                 <x-ui.button type="submit" tone="outline" icon="plus" class="self-start" data-focus-errors>{{ __('processes.sheet.add_metric') }}</x-ui.button>
             </form>
         @endif

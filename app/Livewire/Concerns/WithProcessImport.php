@@ -14,7 +14,7 @@ use Throwable;
  * Several processes at once from a written or spoken text (11 · 11.2, 11.6):
  * the AI reads the rows, the user edits or removes them, then adds them. The
  * component says who may do it and for which organization; with WithDictation
- * the text can be spoken.
+ * the text can be spoken or uploaded.
  */
 trait WithProcessImport
 {
@@ -30,7 +30,7 @@ trait WithProcessImport
     public function parseImport(ProcessImporter $importer): void
     {
         $this->authorizeImport();
-        $this->validate(['importText' => ['required', 'string', 'min:3', 'max:10000']], attributes: ['importText' => __('processes.import.text')]);
+        $this->validate(['importText' => ['required', 'string', 'min:3', 'max:'.ProcessImporter::TEXT_MAX]], attributes: ['importText' => __('processes.import.text')]);
 
         try {
             $rows = $importer->parse($this->importOrganization(), $this->importText);

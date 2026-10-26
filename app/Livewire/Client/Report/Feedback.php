@@ -121,4 +121,9 @@ class Feedback extends Component
     {
         return $this->main->diagnosis->organization;
     }
+
+    protected function dictationLimit(string $field): ?int
+    {
+        return 3000;
+    }
 }

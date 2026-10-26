@@ -125,9 +125,13 @@ class Brand extends Component
         return $this->organization;
     }
 
+    protected function dictationLimit(string $field): ?int
+    {
+        return 500;
+    }
+
     protected function dictated(string $field): void
     {
-        $this->{$field} = mb_substr($this->{$field}, 0, 500);
         $this->persist(app(OrganizationValueSetService::class));
     }
 

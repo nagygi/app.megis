@@ -142,6 +142,16 @@ return [
             'prompt' => 'folyamat-szovegbol',
             'prompt_version' => 1,
         ],
+        // A spoken or uploaded text that does not fit its field, condensed while the user waits.
+        'text_condensing' => [
+            'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
+            'model' => env('AI_SMALL_MODEL', 'claude-haiku-5-5'),
+            'max_tokens' => 4096,
+            'temperature' => 0.2,
+            'timeout' => 60,
+            'prompt' => 'szoveg-tomorites',
+            'prompt_version' => 1,
+        ],
         'occasion_analysis' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
             'model' => env('AI_DEFAULT_MODEL', 'claude-sonnet-5-5'),

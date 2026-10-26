@@ -16,12 +16,16 @@
 
     <x-form.error name="answers" id="answers" />
 
-    <div class="flex flex-col gap-1.5">
-        <x-form.textarea name="note" wire:model.blur="note" :label="__('processes.occasions.note')" rows="2" :disabled="! $editable" />
-        @if ($editable)
-            <x-diagnosis.dictate field="note" :label="__('processes.occasions.note')" :pending="isset($dictations['note'])" />
-        @endif
-    </div>
+    <x-form.long-text
+        name="note"
+        wire:model.blur="note"
+        :label="__('processes.occasions.note')"
+        rows="2"
+        :max="3000"
+        :pending="isset($dictations['note'])"
+        :tools="$editable"
+        :disabled="! $editable"
+    />
 
     @foreach ([['title' => __('diagnosis.experience.values'), 'rows' => $valueRows], ['title' => __('diagnosis.experience.brand'), 'rows' => $treeRows]] as $block)
         <section class="flex flex-col gap-3" aria-label="{{ $block['title'] }}">

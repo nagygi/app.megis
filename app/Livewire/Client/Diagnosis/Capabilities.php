@@ -160,6 +160,11 @@ class Capabilities extends Component
         return $this->organization;
     }
 
+    protected function dictationLimit(string $field): ?int
+    {
+        return 3000;
+    }
+
     protected function dictated(string $field): void
     {
         $story = $this->story((int) substr($field, strlen('answers.')));

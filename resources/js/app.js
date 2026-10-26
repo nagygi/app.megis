@@ -1,6 +1,7 @@
 import { Livewire, Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
 import mirrorRecorder from './recorder';
 import dictation from './dictation';
+import longText from './long-text';
 import markdownEditor from './markdown-editor';
 import turnstileWidget from './turnstile';
 import megisConfirm from './confirm';
@@ -12,6 +13,7 @@ window.Alpine = Alpine;
 
 Alpine.data('mirrorRecorder', mirrorRecorder);
 Alpine.data('dictation', dictation);
+Alpine.data('longText', longText);
 Alpine.data('markdownEditor', markdownEditor);
 Alpine.data('turnstileWidget', turnstileWidget);
 Alpine.store('toasts', toasts);

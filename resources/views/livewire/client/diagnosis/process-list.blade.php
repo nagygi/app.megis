@@ -65,7 +65,15 @@
                     @endforeach
                 </x-form.select>
             </div>
-            <x-form.textarea name="description" wire:model="description" :label="__('processes.sheet.description')" rows="2" maxlength="2000" />
+            <x-form.long-text
+                name="description"
+                wire:model="description"
+                :label="__('processes.sheet.description')"
+                rows="3"
+                :max="\App\Livewire\Client\ProcessSheet::DESCRIPTION_MAX"
+                :pending="isset($dictations['description'])"
+                :tools="$canDictate"
+            />
             <x-ui.button type="submit" tone="outline" icon="plus" class="self-start" data-focus-errors>{{ __('processes.list.add') }}</x-ui.button>
         </x-ui.card>
 

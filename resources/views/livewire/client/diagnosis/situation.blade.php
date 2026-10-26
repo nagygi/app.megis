@@ -6,7 +6,7 @@
     </div>
 
     <x-ui.segmented :label="__('processes.occasions.situation')">
-        @foreach (['record' => __('mirror.mode_record'), 'text' => __('mirror.mode_text')] as $key => $label)
+        @foreach (['text' => __('ui.long_text.write'), 'record' => __('ui.long_text.speak')] as $key => $label)
             <x-ui.segment :selected="$mode === $key" wire:click="setMode('{{ $key }}')">{{ $label }}</x-ui.segment>
         @endforeach
     </x-ui.segmented>

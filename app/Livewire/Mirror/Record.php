@@ -109,7 +109,7 @@ class Record extends Component
                 'mimetypes:audio/webm,video/webm,audio/ogg,audio/mp4,video/mp4,audio/x-m4a,audio/mpeg,audio/wav,audio/x-wav',
             ],
             ...$this->contactRules(),
-        ], ['recording.required' => __('mirror.recording_missing'), ...$this->contactMessages()], ['recording' => __('mirror.mode_record'), ...$this->contactAttributes()]);
+        ], ['recording.required' => __('mirror.recording_missing'), ...$this->contactMessages()], ['recording' => __('ui.long_text.speak'), ...$this->contactAttributes()]);
         $this->guard();
 
         $material = $materials->fromAudio($this->recording, $this->context(), MaterialSource::Recording, $this->user(), $this->organization);

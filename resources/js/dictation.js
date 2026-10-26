@@ -8,6 +8,7 @@ export default (config) => ({
     uploading: false,
     seconds: 0,
     error: null,
+    notice: null,
     recorder: null,
     stream: null,
     timer: null,
@@ -23,6 +24,13 @@ export default (config) => ({
         return `${minutes}:${seconds}`;
     },
 
+    // A transcript that did not fit was condensed: the component says so.
+    applied(event) {
+        if (event.target === this.$wire.$el && event.detail.field === config.field) {
+            this.notice = event.detail.notice;
+        }
+    },
+
     async toggle() {
         if (this.recording) {
             this.stop();
@@ -35,6 +43,7 @@ export default (config) => ({
 
     async start() {
         this.error = null;
+        this.notice = null;
 
         try {
             this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });

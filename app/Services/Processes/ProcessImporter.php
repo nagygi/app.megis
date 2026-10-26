@@ -20,6 +20,11 @@ use Illuminate\Support\Facades\DB;
  */
 class ProcessImporter
 {
+    /**
+     * The longest text the processes are read from.
+     */
+    public const TEXT_MAX = 10000;
+
     public function __construct(
         private AiGateway $ai,
         private ProcessService $processes,

@@ -20,8 +20,16 @@
 
             @if (in_array($answer, ['partial', 'no'], true))
                 <form wire:submit="send" class="flex flex-col gap-2">
-                    <x-form.textarea name="text" wire:model="text" :label="__('report.feedback.what')" rows="3" required />
-                    <x-diagnosis.dictate field="text" :label="__('report.feedback.what')" :pending="isset($dictations['text'])" />
+                    <x-form.long-text
+                        name="text"
+                        :id="'feedback-text-'.$chapter"
+                        wire:model="text"
+                        :label="__('report.feedback.what')"
+                        rows="3"
+                        :max="3000"
+                        :pending="isset($dictations['text'])"
+                        required
+                    />
                     <div>
                         <x-ui.button type="submit" size="sm" data-focus-errors>{{ __('report.feedback.send') }}</x-ui.button>
                     </div>

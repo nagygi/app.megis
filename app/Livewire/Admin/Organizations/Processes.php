@@ -21,6 +21,7 @@ use App\Services\Audit\AuditLogger;
 use App\Services\Calendar\CalendarException;
 use App\Services\Calendar\CalendarService;
 use App\Services\Processes\OccasionService;
+use App\Services\Processes\ProcessImporter;
 use App\Services\Processes\ProcessService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -288,6 +289,11 @@ class Processes extends Component
     protected function dictationOrganization(): ?Organization
     {
         return $this->organization;
+    }
+
+    protected function dictationLimit(string $field): ?int
+    {
+        return ProcessImporter::TEXT_MAX;
     }
 
     protected function dictationUser(): ?User

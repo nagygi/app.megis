@@ -7,6 +7,7 @@ use App\Enums\ProcessKind;
 use App\Enums\ProcessRhythm;
 use App\Exceptions\DiagnosisException;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
+use App\Livewire\Client\ProcessSheet;
 use App\Livewire\Concerns\WithDictation;
 use App\Livewire\Concerns\WithProcessImport;
 use App\Models\CalendarConnection;
@@ -14,6 +15,7 @@ use App\Models\Diagnosis;
 use App\Models\Organization;
 use App\Models\Process;
 use App\Services\Calendar\CalendarDetector;
+use App\Services\Processes\ProcessImporter;
 use App\Services\Processes\ProcessService;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -119,7 +121,7 @@ class ProcessList extends Component
             'name' => ['required', 'string', 'min:2', 'max:255'],
             'rhythm' => ['nullable', Rule::enum(ProcessRhythm::class)],
             'parentId' => ['nullable', Rule::in(Process::query()->whereBelongsTo($this->organization)->whereNull('parent_id')->pluck('id'))],
-            'description' => ['nullable', 'string', 'max:2000'],
+            'description' => ['nullable', 'string', 'max:'.ProcessSheet::DESCRIPTION_MAX],
         ], attributes: [
             'name' => __('processes.list.fields.name'),
             'rhythm' => __('processes.list.fields.rhythm'),
@@ -202,12 +204,17 @@ class ProcessList extends Component
 
     protected function canDictate(string $field): bool
     {
-        return $this->acceptsInput() && ! $this->isImpersonating() && $field === 'importText';
+        return $this->acceptsInput() && ! $this->isImpersonating() && in_array($field, ['importText', 'description'], true);
     }
 
     protected function dictationOrganization(): ?Organization
     {
         return $this->organization;
+    }
+
+    protected function dictationLimit(string $field): ?int
+    {
+        return $field === 'importText' ? ProcessImporter::TEXT_MAX : ProcessSheet::DESCRIPTION_MAX;
     }
 
     private function process(int $id): Process

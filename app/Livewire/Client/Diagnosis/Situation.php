@@ -51,7 +51,7 @@ class Situation extends Component
         $this->authorizeContribution();
         $this->validate([
             'recording' => ['required', 'file', 'max:51200', 'mimetypes:audio/webm,video/webm,audio/ogg,audio/mp4,video/mp4,audio/x-m4a,audio/mpeg,audio/wav,audio/x-wav'],
-        ], ['recording.required' => __('mirror.recording_missing')], ['recording' => __('mirror.mode_record')]);
+        ], ['recording.required' => __('mirror.recording_missing')], ['recording' => __('ui.long_text.speak')]);
 
         $this->placeNext($occasions->situationRecording($this->main(), $this->user(), $this->recording, $seconds));
     }

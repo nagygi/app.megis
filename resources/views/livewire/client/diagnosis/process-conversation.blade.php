@@ -10,27 +10,23 @@
     <ol class="flex flex-col gap-4">
         @foreach (\App\Models\ProcessConversation::QUESTIONS as $question)
             @php($field = 'answers.'.$question)
-            <x-ui.card as="li" wire:key="question-{{ $question }}" class="flex flex-col gap-2" x-data="{ length: 0 }" x-init="length = $refs.answer.value.length">
-                <label for="answer-{{ $question }}" class="flex gap-3 font-semibold">
-                    <span class="grid size-7 shrink-0 place-items-center rounded-pill bg-coral text-xs font-extrabold text-black" aria-hidden="true">{{ $question }}</span>
-                    {{ __('processes.conversation.questions.'.$question) }}
-                </label>
-                <textarea
-                    id="answer-{{ $question }}"
-                    x-ref="answer"
-                    x-on:input="length = $el.value.length"
+            <x-ui.card as="li" wire:key="question-{{ $question }}">
+                <x-form.long-text
+                    :name="$field"
+                    :id="'answer-'.$question"
                     wire:model.live.blur="answers.{{ $question }}"
+                    :label="__('processes.conversation.answer', ['number' => $question])"
                     rows="3"
-                    maxlength="3000"
-                    @disabled(! $editable)
-                    @error($field) aria-invalid="true" aria-describedby="answer-{{ $question }}-error" @enderror
-                    class="field w-full"
-                ></textarea>
-                <p class="self-end text-sm text-grey-600 tabular-nums" x-cloak><span x-text="length"></span> / 3000</p>
-                <x-form.error :name="$field" :id="'answer-'.$question" />
-                @if ($editable)
-                    <x-diagnosis.dictate :field="$field" :label="__('processes.conversation.answer', ['number' => $question])" :pending="isset($dictations[$field])" />
-                @endif
+                    :max="3000"
+                    :pending="isset($dictations[$field])"
+                    :tools="$editable"
+                    :disabled="! $editable"
+                >
+                    <x-slot:caption class="flex gap-3 font-semibold">
+                        <span class="grid size-7 shrink-0 place-items-center rounded-pill bg-coral text-xs font-extrabold text-black" aria-hidden="true">{{ $question }}</span>
+                        {{ __('processes.conversation.questions.'.$question) }}
+                    </x-slot:caption>
+                </x-form.long-text>
             </x-ui.card>
         @endforeach
     </ol>

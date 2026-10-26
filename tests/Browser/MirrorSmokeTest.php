@@ -51,7 +51,7 @@ it('walks the public Értéktükör from the opening through each value to the f
         ->assertButtonEnabled('Kész · mutasd a tükröt')
         ->assertNoJavaScriptErrors();
 
-    $page->click('Inkább leírom');
+    $page->click('Leírom');
     $page->fill('text', 'A héten inkább most mondom, mint csütörtökön, hogy csúszunk. A végén nevettünk egyet.');
     $page->fill('email', 'anna@example.com');
     $page->check('#mirror-consent');

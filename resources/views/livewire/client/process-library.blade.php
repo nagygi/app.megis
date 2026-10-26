@@ -1,5 +1,5 @@
 {{-- Tárak → Folyamatok (11 · 11.5; prototype M4): one row a routine, divided by a line. --}}
-<div class="flex max-w-2xl flex-col gap-6">
+<div class="flex max-w-2xl flex-col gap-6" @if ($dictations !== []) wire:poll.2s="pollDictations" @endif>
     <x-ui.flash />
 
     @if ($processes->isEmpty())
@@ -42,7 +42,15 @@
                     <option value="{{ $rhythmOption->value }}">{{ $rhythmOption->label() }}</option>
                 @endforeach
             </x-form.select>
-            <x-form.textarea name="description" wire:model="description" :label="__('processes.sheet.description')" rows="2" maxlength="2000" />
+            <x-form.long-text
+                name="description"
+                wire:model="description"
+                :label="__('processes.sheet.description')"
+                rows="3"
+                :max="\App\Livewire\Client\ProcessSheet::DESCRIPTION_MAX"
+                :pending="isset($dictations['description'])"
+                :tools="$canDictate"
+            />
             <div class="flex flex-wrap gap-2">
                 <x-ui.button type="submit" icon="plus" data-focus-errors>{{ __('processes.list.add') }}</x-ui.button>
                 <x-ui.button tone="outline" wire:click="$set('adding', false)">{{ __('diagnosis.cancel') }}</x-ui.button>

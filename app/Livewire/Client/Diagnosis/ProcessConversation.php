@@ -117,6 +117,11 @@ class ProcessConversation extends Component
         return $this->organization;
     }
 
+    protected function dictationLimit(string $field): ?int
+    {
+        return 3000;
+    }
+
     protected function dictated(string $field): void
     {
         $question = (int) substr($field, strlen('answers.'));

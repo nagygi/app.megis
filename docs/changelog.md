@@ -2,6 +2,28 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.33 · HASH · 2026-10-26
+
+Leírom · Elmondom · Feltöltöm: a hosszabb szöveges mezők fölött fülsor. A szöveg beírható, elmondható vagy fájlból tölthető.
+
+- **Új közös mező (`x-form.long-text`):**
+  - **Leírom:** a megszokott szövegmező, karakterszámlálóval.
+  - **Elmondom:** felvétel, legfeljebb 3 perc; az átirat a szöveg végére kerül.
+  - **Feltöltöm:** txt, md, docx vagy pdf, legfeljebb 10 MB; a fájl szövege a szöveg végére kerül. A fájlt nem tároljuk, csak beolvassuk.
+  - Ha megjött az átirat vagy a fájl szövege, a mező magától visszavált a Leírom fülre, és a szöveg javítható.
+- **Hol van:**
+  - a folyamat adatlapján a leírás és a saját mérőszám leírása (a dupla „Leírás · opcionális” címke is eltűnt);
+  - új folyamat a Tárak → Folyamatokban és a diagnózis folyamatlistáján;
+  - „Folyamatok szövegből” (a vezetőnél és az adminnál is);
+  - a Beszélgetés négy kérdése, a Képességek helyzetei, az alkalom jegyzete és a riport „Miben nem?” visszajelzése.
+- **Rövid mezők:** az 500 karakteres márka- és szervezetiérték-mezőkön marad a mikrofon gomb, fülsor nincs.
+- **Ami nem fér el:**
+  - Ha az elmondott vagy feltöltött szöveg hosszabb, mint amennyit a mező enged, az AI a maradék helyre tömöríti. Ha már kevés hely maradt, a meglévő szöveggel együtt tömöríti.
+  - A mező alatt egy sor szól erről, például: „A fájl szövege 8 400 karakter volt, nem fért el: az AI 1 790 karakterre tömörítette. Nézd át.”
+  - Ha az AI nem válaszol, a szöveg a mező határán levágva kerül be, és ezt is jelezzük.
+  - Új AI-feladat: *Szöveg tömörítése mezőhöz* (`text_condensing`, kis modell, `szoveg-tomorites` v1 prompt).
+- **Értéktükör és Egy helyzet:** ugyanazok a feliratok, ugyanabban a sorrendben: Leírom · Elmondom · Feltöltöm (az Egy helyzetnél csak az első kettő). Alapból továbbra is az Elmondom van kiválasztva.
+
 ## 1.32 · 0066c17 · 2026-10-26
 
 Képességmérés a vezető és a társ útjában: kitöltés, futás, kész (NM-12; 17 · 17.3, 23, 25, 26).

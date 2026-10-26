@@ -136,4 +136,9 @@ class OccasionExperienceForm extends Component
     {
         return $this->organization;
     }
+
+    protected function dictationLimit(string $field): ?int
+    {
+        return 3000;
+    }
 }

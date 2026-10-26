@@ -1,8 +1,8 @@
 {{--
-    Several processes at once from a written or spoken text (11 · 11.2, 11.6).
-    The Livewire component uses WithProcessImport, and WithDictation for the
-    microphone; "parents" are the organization's top-level processes. The rows
-    are edited here and added together.
+    Several processes at once from a written, spoken or uploaded text (11 ·
+    11.2, 11.6). The Livewire component uses WithProcessImport, and
+    WithDictation for Elmondom and Feltöltöm; "parents" are the organization's
+    top-level processes. The rows are edited here and added together.
 --}}
 @props(['rows', 'parents', 'canDictate' => false, 'pending' => false, 'bordered' => false])
 
@@ -16,10 +16,15 @@
 
     @if ($rows === [])
         <form wire:submit="parseImport" class="flex flex-col gap-3">
-            <x-form.textarea name="importText" wire:model="importText" :label="__('processes.import.text')" rows="5" maxlength="10000" />
-            @if ($canDictate)
-                <x-diagnosis.dictate field="importText" :label="__('processes.import.text')" :pending="$pending" />
-            @endif
+            <x-form.long-text
+                name="importText"
+                wire:model="importText"
+                :label="__('processes.import.text')"
+                rows="5"
+                :max="\App\Services\Processes\ProcessImporter::TEXT_MAX"
+                :pending="$pending"
+                :tools="$canDictate"
+            />
             <div wire:loading wire:target="parseImport" class="text-sm" role="status">{{ __('processes.import.parsing') }}</div>
             <x-ui.button type="submit" tone="outline" class="self-start" data-focus-errors>{{ __('processes.import.parse') }}</x-ui.button>
         </form>

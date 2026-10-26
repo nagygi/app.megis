@@ -5,6 +5,7 @@ namespace App\Livewire\Client;
 use App\Enums\MembershipStatus;
 use App\Enums\MetricRhythm;
 use App\Enums\ParticipantRole;
+use App\Livewire\Concerns\WithDictation;
 use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
 use App\Models\Membership;
@@ -13,19 +14,27 @@ use App\Models\Process;
 use App\Models\ProcessMetric;
 use App\Models\ProcessParticipant;
 use App\Models\User;
+use App\Services\Auth\ImpersonationService;
 use App\Services\Processes\ProcessService;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 /**
  * V6·e · the data sheet of a process (11 · 11.3): responsible, participants,
  * teams, own measures. Opens from the diagnosis (V6·d, V6·f) and from
- * Tárak → Folyamatok (11 · 11.5).
+ * Tárak → Folyamatok (11 · 11.5). The descriptions are written, told or uploaded.
  */
 class ProcessSheet extends Component
 {
+    use WithDictation, WithFileUploads;
+
+    public const DESCRIPTION_MAX = 2000;
+
+    public const METRIC_DESCRIPTION_MAX = 1000;
+
     public Organization $organization;
 
     public Process $process;
@@ -74,7 +83,7 @@ class ProcessSheet extends Component
     {
         $processes = app(ProcessService::class);
         $this->authorizeEdit();
-        $this->validate(['description' => ['nullable', 'string', 'max:2000']], attributes: ['description' => __('processes.list.fields.description')]);
+        $this->validate(['description' => ['nullable', 'string', 'max:'.self::DESCRIPTION_MAX]], attributes: ['description' => __('processes.list.fields.description')]);
 
         $processes->setDescription($this->process, $this->description);
         $this->dispatch('saved');
@@ -125,7 +134,7 @@ class ProcessSheet extends Component
             'metric.unit' => ['nullable', 'string', 'max:50'],
             'metric.rhythm' => ['required', Rule::enum(MetricRhythm::class)],
             'metric.target' => ['nullable', 'string', 'max:100'],
-            'metric.description' => ['nullable', 'string', 'max:1000'],
+            'metric.description' => ['nullable', 'string', 'max:'.self::METRIC_DESCRIPTION_MAX],
         ], attributes: collect(['name', 'unit', 'rhythm', 'target', 'description'])
             ->mapWithKeys(fn (string $field) => ['metric.'.$field => __('processes.sheet.metric_fields.'.$field)])->all());
 
@@ -160,6 +169,7 @@ class ProcessSheet extends Component
 
         return view('livewire.client.process-sheet', [
             'editable' => $this->canEdit(),
+            'canDictate' => $this->canDictate('description'),
             'canRecord' => $this->canRecordValues(),
             'members' => $this->members(),
             'teams' => $this->organization->teams()->orderBy('name')->get(['id', 'name']),
@@ -172,6 +182,33 @@ class ProcessSheet extends Component
             'backLabel' => $this->diagnosis ? __('processes.list.title') : __('processes.library.title'),
             'color' => 'cream',
         ])->title($this->process->name);
+    }
+
+    protected function canDictate(string $field): bool
+    {
+        return in_array($field, ['description', 'metric.description'], true)
+            && $this->canEdit()
+            && ! app(ImpersonationService::class)->isImpersonating();
+    }
+
+    protected function dictationOrganization(): ?Organization
+    {
+        return $this->organization;
+    }
+
+    protected function dictationLimit(string $field): ?int
+    {
+        return $field === 'description' ? self::DESCRIPTION_MAX : self::METRIC_DESCRIPTION_MAX;
+    }
+
+    /**
+     * The description saves at once, as when typed; the metric's with its form.
+     */
+    protected function dictated(string $field): void
+    {
+        if ($field === 'description') {
+            $this->updatedDescription();
+        }
     }
 
     private function backUrl(): string

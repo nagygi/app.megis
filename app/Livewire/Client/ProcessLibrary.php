@@ -4,22 +4,28 @@ namespace App\Livewire\Client;
 
 use App\Enums\ProcessKind;
 use App\Enums\ProcessRhythm;
+use App\Livewire\Concerns\WithDictation;
 use App\Models\CalendarConnection;
 use App\Models\Organization;
 use App\Models\Process;
+use App\Services\Auth\ImpersonationService;
 use App\Services\Processes\ProcessService;
 use App\Services\Report\ReportService;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 /**
  * Tárak → Folyamatok (11 · 11.5): the organization's routines, whether they
- * are in the calendar and measured; "+ Rutin" adds one by hand. The list a
- * published diagnosis recorded does not change, the library can.
+ * are in the calendar and measured; "+ Rutin" adds one by hand, its
+ * description written, told or uploaded. The list a published diagnosis
+ * recorded does not change, the library can.
  */
 class ProcessLibrary extends Component
 {
+    use WithDictation, WithFileUploads;
+
     public Organization $organization;
 
     public bool $adding = false;
@@ -44,7 +50,7 @@ class ProcessLibrary extends Component
         $this->validate([
             'name' => ['required', 'string', 'min:2', 'max:255'],
             'rhythm' => ['nullable', Rule::enum(ProcessRhythm::class)],
-            'description' => ['nullable', 'string', 'max:2000'],
+            'description' => ['nullable', 'string', 'max:'.ProcessSheet::DESCRIPTION_MAX],
         ], attributes: [
             'name' => __('processes.list.fields.name'),
             'rhythm' => __('processes.list.fields.rhythm'),
@@ -78,6 +84,7 @@ class ProcessLibrary extends Component
 
         return view('livewire.client.process-library', [
             'processes' => $processes,
+            'canDictate' => $this->canDictate('description'),
             'scores' => collect($snapshot?->data['chapters']['processes']['rows'] ?? [])->keyBy(fn (array $row) => mb_strtolower(trim($row['label']))),
         ])->layout('layouts::client', [
             // M4: cream with the yellow line, the mycelium, "naptár összekötve · 03.02. · 7 rutin · 5 mérve".
@@ -102,5 +109,20 @@ class ProcessLibrary extends Component
     public function canView(): bool
     {
         return ProcessService::canManageLibrary(auth('web')->user(), $this->organization);
+    }
+
+    protected function canDictate(string $field): bool
+    {
+        return $field === 'description' && $this->canView() && ! app(ImpersonationService::class)->isImpersonating();
+    }
+
+    protected function dictationOrganization(): ?Organization
+    {
+        return $this->organization;
+    }
+
+    protected function dictationLimit(string $field): ?int
+    {
+        return ProcessSheet::DESCRIPTION_MAX;
     }
 }

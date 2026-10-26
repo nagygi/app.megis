@@ -17,7 +17,7 @@
         @foreach ($stories as $story)
             @php($field = 'answers.'.$story->id)
             @php($value = collect($values)->firstWhere('key', $story->value_key))
-            <x-ui.card as="li" wire:key="story-{{ $story->id }}" class="flex flex-col gap-3" x-data="{ length: 0 }" x-init="length = $refs.answer.value.length">
+            <x-ui.card as="li" wire:key="story-{{ $story->id }}" class="flex flex-col gap-3">
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex flex-col gap-1 pt-2">
                         <div class="flex flex-wrap items-center gap-2">
@@ -47,26 +47,20 @@
                     @endif
                 </div>
 
-                <label for="story-{{ $story->id }}" class="font-semibold">{{ $story->question }}</label>
-                <textarea
-                    id="story-{{ $story->id }}"
-                    x-ref="answer"
-                    x-on:input="length = $el.value.length"
+                <x-form.long-text
+                    :name="$field"
+                    :id="'story-'.$story->id"
                     wire:model.live.blur="answers.{{ $story->id }}"
+                    :label="$story->value_name"
                     rows="4"
-                    maxlength="3000"
+                    :max="3000"
                     placeholder="{{ __('capabilities.step.placeholder') }}"
-                    @disabled(! $editable)
-                    @error($field) aria-invalid="true" aria-describedby="story-{{ $story->id }}-error" @enderror
-                    class="field w-full"
-                ></textarea>
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    @if ($editable)
-                        <x-diagnosis.dictate :field="$field" :label="$story->value_name" :pending="isset($dictations[$field])" />
-                    @endif
-                    <p class="ml-auto text-sm text-grey-600 tabular-nums" x-cloak><span x-text="length"></span> / 3000</p>
-                </div>
-                <x-form.error :name="$field" :id="'story-'.$story->id" />
+                    :pending="isset($dictations[$field])"
+                    :tools="$editable"
+                    :disabled="! $editable"
+                >
+                    <x-slot:caption class="font-semibold">{{ $story->question }}</x-slot:caption>
+                </x-form.long-text>
 
                 @if ($editable && count($values) > 1)
                     <x-ui.disclosure :summary="__('capabilities.step.other_value')">

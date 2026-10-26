@@ -1087,6 +1087,7 @@ return [
             'calendar_naming' => 'Naptár-jelöltek elnevezése',
             'conversation_summary' => 'Beszélgetés-kivonat',
             'process_parsing' => 'Folyamatok szövegből',
+            'text_condensing' => 'Szöveg tömörítése mezőhöz',
             'occasion_analysis' => 'Folyamat-alkalom elemzése',
             'transcription' => 'Átirat beszélő-felismeréssel',
             'diagnosis_scoring' => 'Fő diagnózis: pontozás',
