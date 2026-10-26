@@ -32,6 +32,8 @@ class ProcessSheet extends Component
 
     public ?Diagnosis $diagnosis = null;
 
+    public string $description = '';
+
     public ?int $responsibleId = null;
 
     public ?int $newParticipantId = null;
@@ -62,9 +64,20 @@ class ProcessSheet extends Component
 
         abort_unless($this->canView(), 403);
 
+        $this->description = (string) $process->description;
         $this->responsibleId = $process->responsible_user_id;
         $this->teamIds = $process->teams()->pluck('teams.id')->all();
         $this->metricDate = today()->toDateString();
+    }
+
+    public function updatedDescription(): void
+    {
+        $processes = app(ProcessService::class);
+        $this->authorizeEdit();
+        $this->validate(['description' => ['nullable', 'string', 'max:2000']], attributes: ['description' => __('processes.list.fields.description')]);
+
+        $processes->setDescription($this->process, $this->description);
+        $this->dispatch('saved');
     }
 
     public function updatedResponsibleId(): void

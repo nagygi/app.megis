@@ -44,6 +44,7 @@
                     <option value="{{ $rhythmOption->value }}">{{ $rhythmOption->label() }}</option>
                 @endforeach
             </x-form.select>
+            <x-form.textarea name="description" wire:model="description" :label="__('processes.sheet.description')" rows="2" maxlength="2000" />
             <div class="flex flex-wrap gap-2">
                 <x-ui.button type="submit" icon="plus" data-focus-errors>{{ __('processes.list.add') }}</x-ui.button>
                 <x-ui.button tone="outline" wire:click="$set('adding', false)">{{ __('diagnosis.cancel') }}</x-ui.button>

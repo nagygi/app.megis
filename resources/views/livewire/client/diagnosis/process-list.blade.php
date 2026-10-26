@@ -1,5 +1,5 @@
 {{-- V6·d · Detektált folyamatok (11 · 11.2). --}}
-<div class="flex max-w-2xl flex-col gap-6">
+<div class="flex max-w-2xl flex-col gap-6" @if ($dictations !== []) wire:poll.2s="pollDictations" @endif>
     <x-ui.flash />
 
     <div class="flex flex-col gap-1">
@@ -65,8 +65,11 @@
                     @endforeach
                 </x-form.select>
             </div>
+            <x-form.textarea name="description" wire:model="description" :label="__('processes.sheet.description')" rows="2" maxlength="2000" />
             <x-ui.button type="submit" tone="outline" icon="plus" class="self-start" data-focus-errors>{{ __('processes.list.add') }}</x-ui.button>
         </x-ui.card>
+
+        <x-processes.import :rows="$importRows" :parents="$parents" :can-dictate="$canDictate" :pending="isset($dictations['importText'])" />
     @endif
 
     @if ($goingOn->isNotEmpty())

@@ -9,6 +9,8 @@ use App\Enums\ProcessConfidence;
 use App\Enums\ProcessKind;
 use App\Enums\ProcessRhythm;
 use App\Exceptions\DiagnosisException;
+use App\Livewire\Concerns\WithDictation;
+use App\Livewire\Concerns\WithProcessImport;
 use App\Models\CalendarConnection;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
@@ -35,10 +37,11 @@ use Livewire\WithFileUploads;
  * the leader, the calendar row, uncertain and other rows apart for review,
  * "A mégis javaslata" for V6·f, and the materials waiting to be classified (12 · 12.6).
  * The leader's iCal link or exported file can be loaded here at their request (09 · 9.2).
+ * Several processes can be added at once from a written or spoken text.
  */
 class Processes extends Component
 {
-    use WithFileUploads;
+    use WithDictation, WithFileUploads, WithProcessImport;
 
     public Organization $organization;
 
@@ -47,15 +50,17 @@ class Processes extends Component
     public ?int $editingId = null;
 
     /**
-     * @var array{name: string, kind: string, accepted: bool, responsible_user_id: ?int, parent_id: ?int}
+     * @var array{name: string, description: string, kind: string, accepted: bool, responsible_user_id: ?int, parent_id: ?int}
      */
-    public array $edit = ['name' => '', 'kind' => 'routine', 'accepted' => false, 'responsible_user_id' => null, 'parent_id' => null];
+    public array $edit = ['name' => '', 'description' => '', 'kind' => 'routine', 'accepted' => false, 'responsible_user_id' => null, 'parent_id' => null];
 
     public string $newName = '';
 
     public ?string $newRhythm = null;
 
     public ?int $newParentId = null;
+
+    public string $newDescription = '';
 
     /**
      * "Besorolásra vár": material uuid => process id and date (12 · 12.6).
@@ -94,6 +99,7 @@ class Processes extends Component
         $this->editingId = $process->id;
         $this->edit = [
             'name' => $process->name,
+            'description' => (string) $process->description,
             'kind' => $process->kind->value,
             'accepted' => $process->isAccepted(),
             'responsible_user_id' => $process->responsible_user_id,
@@ -109,16 +115,19 @@ class Processes extends Component
 
         $this->validate([
             'edit.name' => ['required', 'string', 'min:2', 'max:255'],
+            'edit.description' => ['nullable', 'string', 'max:2000'],
             'edit.kind' => ['required', Rule::enum(ProcessKind::class)],
             'edit.responsible_user_id' => ['nullable', Rule::in($this->members()->pluck('id'))],
             'edit.parent_id' => ['nullable', Rule::in(Process::query()->whereBelongsTo($this->organization)->whereNull('parent_id')->whereKeyNot($process->id)->pluck('id'))],
         ], attributes: [
             'edit.name' => __('processes.list.fields.name'),
+            'edit.description' => __('processes.list.fields.description'),
             'edit.parent_id' => __('processes.list.fields.parent'),
         ]);
 
         try {
             $processes->rename($process, $this->edit['name'], auth('admin')->user());
+            $processes->setDescription($process, $this->edit['description']);
             $processes->setKind($process, ProcessKind::from($this->edit['kind']));
             $processes->setResponsible($process, $this->edit['responsible_user_id'] ? User::query()->find($this->edit['responsible_user_id']) : null);
 
@@ -145,16 +154,18 @@ class Processes extends Component
             'newName' => ['required', 'string', 'min:2', 'max:255'],
             'newRhythm' => ['nullable', Rule::enum(ProcessRhythm::class)],
             'newParentId' => ['nullable', Rule::in(Process::query()->whereBelongsTo($this->organization)->whereNull('parent_id')->pluck('id'))],
-        ], attributes: ['newName' => __('processes.list.fields.name')]);
+            'newDescription' => ['nullable', 'string', 'max:2000'],
+        ], attributes: ['newName' => __('processes.list.fields.name'), 'newDescription' => __('processes.list.fields.description')]);
 
         $processes->addManual(
             $this->organization,
             $this->newName,
             filled($this->newRhythm) ? ProcessRhythm::from($this->newRhythm) : null,
             $this->newParentId ? $this->process($this->newParentId) : null,
+            $this->newDescription,
         );
 
-        $this->reset(['newName', 'newRhythm', 'newParentId']);
+        $this->reset(['newName', 'newRhythm', 'newParentId', 'newDescription']);
     }
 
     /**
@@ -251,6 +262,31 @@ class Processes extends Component
             'members' => $this->members(),
             'parents' => $processes->whereNull('parent_id')->values(),
         ])->layout('layouts::admin', ['organization' => $this->organization])->title($this->organization->name);
+    }
+
+    protected function authorizeImport(): void
+    {
+        Gate::authorize('update', $this->organization);
+    }
+
+    protected function importOrganization(): Organization
+    {
+        return $this->organization;
+    }
+
+    protected function canDictate(string $field): bool
+    {
+        return Gate::allows('update', $this->organization) && $field === 'importText';
+    }
+
+    protected function dictationOrganization(): ?Organization
+    {
+        return $this->organization;
+    }
+
+    protected function dictationUser(): ?User
+    {
+        return auth('admin')->user();
     }
 
     /**

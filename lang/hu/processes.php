@@ -59,6 +59,7 @@ return [
             'name' => 'Név',
             'rhythm' => 'Ritmus',
             'parent' => 'Szülő folyamat',
+            'description' => 'Leírás',
         ],
         'parent_none' => 'Nincs, önálló folyamat',
         'add' => 'Hozzáadom',
@@ -81,6 +82,8 @@ return [
 
     'sheet' => [
         'lead' => 'Felelős, résztvevők, saját mérőszám.',
+        'description' => 'Leírás · opcionális',
+        'description_help' => 'Mire való, mi történik rajta, kik vannak ott.',
         'occasions' => ':count alkalom',
         'duration' => ':minutes perc',
         'responsible' => 'Felelős · opcionális',
@@ -144,6 +147,27 @@ return [
         'calendar_instead' => 'Inkább a naptárral',
         'one_needed' => 'A továbblépéshez legalább egy kérdésre válaszolj.',
         'failure_summary' => ':name beszélgetéséből nem sikerült kiolvasni a folyamatokat.',
+    ],
+
+    // Several processes at once from a written or spoken text (11 · 11.2, 11.6).
+    'import' => [
+        'title' => 'Folyamatok szövegből vagy beszédből',
+        'lead' => 'Írd le vagy mondd el a visszatérő alkalmaitokat. Kigyűjtjük belőle a folyamatokat, átnézed őket, és egyszerre felveszed.',
+        'text' => 'A folyamatok leírása',
+        'parse' => 'Feldolgozom',
+        'parsing' => 'Feldolgozás…',
+        'failed' => 'Most nem sikerült feldolgozni a szöveget. Próbáld újra kicsit később.',
+        'none' => 'Nem találtunk benne folyamatot. Írd le részletesebben a visszatérő alkalmaitokat.',
+        'found' => '{1} Egy folyamatot találtunk.|[2,*] :count folyamatot találtunk.',
+        'review' => 'Írd át, ami nem stimmel, és vedd ki, ami nem kell.',
+        'row' => ':number. folyamat',
+        'remove' => ':name kivétele',
+        'from_text' => 'Ebből a szövegből',
+        'existing' => 'Már megvan',
+        'save' => '{1} Felveszem a folyamatot|[2,*] Felveszem mind a :count folyamatot',
+        'back' => 'Vissza a szöveghez',
+        'cancel' => 'Mégse',
+        'done' => '{0} Nem vettünk fel új folyamatot: mind megvolt már.|{1} Egy folyamatot felvettünk.|[2,*] :count folyamatot felvettünk.',
     ],
 
     'library' => [

@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\DiagnosisStep;
+use App\Enums\MainDiagnosisStage;
 use App\Enums\ProcessConfidence;
 use App\Enums\ProcessKind;
 use App\Enums\ProcessSource;
@@ -20,6 +21,7 @@ use App\Models\Process;
 use App\Models\ProcessConversation as Conversation;
 use App\Models\Product;
 use App\Services\Ai\AiGateway;
+use App\Services\MainDiagnoses\StageMachine;
 use App\Services\Processes\ConversationService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -86,12 +88,15 @@ it('adds a process by hand, not in the calendar', function () {
     Livewire::test(ProcessList::class, processParams($setup, $main))
         ->set('name', 'Havi zárás')
         ->set('rhythm', 'monthly')
+        ->set('description', ' A hónap számainak lezárása. ')
         ->call('addManual')
         ->assertHasNoErrors()
         ->assertSee('Kézzel hozzáadva · 1')
-        ->assertSee('nincs a naptárban · 0 alkalom');
+        ->assertSee('nincs a naptárban · 0 alkalom')
+        ->assertSee('A hónap számainak lezárása.');
 
-    expect(Process::query()->sole()->source)->toBe(ProcessSource::Manual);
+    expect(Process::query()->sole()->source)->toBe(ProcessSource::Manual)
+        ->and(Process::query()->sole()->description)->toBe('A hónap számainak lezárása.');
 });
 
 it('measures at most two processes in Snapshot · Belső', function () {
@@ -158,6 +163,40 @@ it('keeps the data sheet: responsible, participants, teams, own measures with va
         ->and($process->participants()->sole()->user_id)->toBe($setup['peers'][0]->id)
         ->and($process->teams()->pluck('teams.id')->all())->toBe([$setup['team']->id])
         ->and($metric->values()->sole()->created_by)->toBe($setup['leader']->id);
+});
+
+it('keeps an optional description on the data sheet', function () {
+    $setup = diagnosisTeam();
+    $main = startMainDiagnosis($setup);
+    $process = Process::factory()->for($setup['organization'])->create(['name' => 'Ops heti']);
+    actingAsCustomer($setup['leader']);
+
+    $component = Livewire::test(ProcessSheet::class, [...processParams($setup, $main), 'process' => $process])
+        ->set('description', 'A hét hibái és a javításuk.')
+        ->assertHasNoErrors()
+        ->assertDispatched('saved');
+
+    expect($process->refresh()->description)->toBe('A hét hibái és a javításuk.');
+
+    $component->set('description', str_repeat('a', 2001))->assertHasErrors(['description' => 'max']);
+    expect($process->refresh()->description)->toBe('A hét hibái és a javításuk.');
+
+    $component->set('description', '  ')->assertHasNoErrors();
+    expect($process->refresh()->description)->toBeNull();
+});
+
+it('shows the description read-only once the reading has started', function () {
+    [$setup, $main] = runningDiagnosis();
+    $process = Process::factory()->for($setup['organization'])->create(['description' => 'A hét hibái.']);
+    app(StageMachine::class)->transition($main, MainDiagnosisStage::Reading, $setup['admin']);
+    actingAsCustomer($setup['leader']);
+
+    Livewire::test(ProcessSheet::class, [...processParams($setup, $main->refresh()), 'process' => $process])
+        ->assertSee('A hét hibái.')
+        ->set('description', 'Más leírás')
+        ->assertForbidden();
+
+    expect($process->refresh()->description)->toBe('A hét hibái.');
 });
 
 it('lets the responsible record a value, but not edit the sheet', function () {
@@ -403,13 +442,16 @@ it('lets the admin edit processes, review uncertain ones and write the recommend
         ->assertSee('Egyeztetés')
         ->call('startEdit', $process->id)
         ->set('edit.name', 'Heti egyeztetés')
+        ->set('edit.description', 'A hét ügyfélügyei.')
         ->set('edit.accepted', true)
         ->call('saveEdit')
         ->assertHasNoErrors()
+        ->assertSee('A hét ügyfélügyei.')
         ->set('recommendation', 'A heti egyeztetés legyen benne.')
         ->call('saveRecommendation');
 
     expect($process->refresh()->name)->toBe('Heti egyeztetés')
+        ->and($process->description)->toBe('A hét ügyfélügyei.')
         ->and($process->accepted_at)->not->toBeNull()
         ->and($process->renames()->sole()->created_by)->toBe($setup['admin']->id)
         ->and($setup['organization']->refresh()->process_recommendation)->toBe('A heti egyeztetés legyen benne.');

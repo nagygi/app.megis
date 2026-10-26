@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * processes it measures.
  */
 #[Fillable([
-    'organization_id', 'parent_id', 'name', 'rhythm', 'rhythm_label', 'duration_minutes', 'headcount',
+    'organization_id', 'parent_id', 'name', 'description', 'rhythm', 'rhythm_label', 'duration_minutes', 'headcount',
     'occurrence_label', 'kind', 'source', 'confidence', 'unclear', 'accepted_at', 'responsible_user_id',
     'breakpoint_candidate', 'calendar_series_key', 'merge_candidate_id',
 ])]

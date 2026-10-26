@@ -27,6 +27,9 @@
                 @endif
                 · {{ $process->confidence->label() }}
             </p>
+            @if ($process->description)
+                <p class="line-clamp-2 text-sm">{{ $process->description }}</p>
+            @endif
         </div>
         <x-ui.button tone="outline" size="sm" icon-right="chevron-right" :href="$sheetUrl($process)">{{ __('processes.list.open') }}</x-ui.button>
     </div>

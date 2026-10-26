@@ -7,6 +7,7 @@ use App\Enums\MaterialSource;
 use App\Enums\MaterialStatus;
 use App\Models\Material;
 use App\Models\Organization;
+use App\Models\User;
 use App\Services\Materials\MaterialPipeline;
 use App\Services\Materials\MaterialStore;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -46,7 +47,7 @@ trait WithDictation
             $this->dictationAudio,
             MaterialContext::Dictation,
             MaterialSource::Recording,
-            auth('web')->user(),
+            $this->dictationUser(),
             $this->dictationOrganization(),
         );
 
@@ -62,7 +63,7 @@ trait WithDictation
     public function pollDictations(): void
     {
         foreach ($this->dictations as $field => $materialId) {
-            $material = Material::query()->whereKey($materialId)->where('user_id', auth('web')->id())->first();
+            $material = Material::query()->whereKey($materialId)->where('user_id', $this->dictationUser()?->id)->first();
 
             if ($material === null) {
                 unset($this->dictations[$field]);
@@ -95,6 +96,14 @@ trait WithDictation
      * Called after a transcript went into a field, e.g. to save it.
      */
     protected function dictated(string $field): void {}
+
+    /**
+     * Whose recording it is: the customer; the admin's tab says the admin.
+     */
+    protected function dictationUser(): ?User
+    {
+        return auth('web')->user();
+    }
 
     abstract protected function canDictate(string $field): bool;
 

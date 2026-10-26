@@ -7,6 +7,8 @@ use App\Enums\ProcessKind;
 use App\Enums\ProcessRhythm;
 use App\Exceptions\DiagnosisException;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
+use App\Livewire\Concerns\WithDictation;
+use App\Livewire\Concerns\WithProcessImport;
 use App\Models\CalendarConnection;
 use App\Models\Diagnosis;
 use App\Models\Organization;
@@ -16,14 +18,16 @@ use App\Services\Processes\ProcessService;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 /**
  * V6·d · Detektált folyamatok (11 · 11.2): a machine suggestion to approve,
- * in four groups. Rename, type, subprocess, accept; add by hand.
+ * in four groups. Rename, type, subprocess, accept; add by hand, or several
+ * at once from a written or spoken text.
  */
 class ProcessList extends Component
 {
-    use InteractsWithMainDiagnosis;
+    use InteractsWithMainDiagnosis, WithDictation, WithFileUploads, WithProcessImport;
 
     public ?int $renamingId = null;
 
@@ -38,6 +42,8 @@ class ProcessList extends Component
     public ?string $rhythm = null;
 
     public ?int $parentId = null;
+
+    public string $description = '';
 
     public function mount(Organization $organization, Diagnosis $diagnosis): void
     {
@@ -113,10 +119,12 @@ class ProcessList extends Component
             'name' => ['required', 'string', 'min:2', 'max:255'],
             'rhythm' => ['nullable', Rule::enum(ProcessRhythm::class)],
             'parentId' => ['nullable', Rule::in(Process::query()->whereBelongsTo($this->organization)->whereNull('parent_id')->pluck('id'))],
+            'description' => ['nullable', 'string', 'max:2000'],
         ], attributes: [
             'name' => __('processes.list.fields.name'),
             'rhythm' => __('processes.list.fields.rhythm'),
             'parentId' => __('processes.list.fields.parent'),
+            'description' => __('processes.list.fields.description'),
         ]);
 
         $processes->addManual(
@@ -124,9 +132,10 @@ class ProcessList extends Component
             $this->name,
             $this->rhythm === null || $this->rhythm === '' ? null : ProcessRhythm::from($this->rhythm),
             $this->parentId === null ? null : $this->process($this->parentId),
+            $this->description,
         );
 
-        $this->reset(['name', 'rhythm', 'parentId']);
+        $this->reset(['name', 'rhythm', 'parentId', 'description']);
     }
 
     public function acceptAll(ProcessService $processes): void
@@ -171,6 +180,7 @@ class ProcessList extends Component
             'parents' => Process::query()->whereBelongsTo($this->organization)->whereNull('parent_id')->orderBy('name')->get(['id', 'name']),
             'goingOn' => Process::query()->whereBelongsTo($this->organization)->whereNull('parent_id')->where('kind', '!=', ProcessKind::OneOff)->withCount('children')->orderBy('id')->get(),
             'editable' => $this->acceptsInput(),
+            'canDictate' => $this->canDictate('importText'),
             'sheetUrl' => fn (Process $process) => route('client.diagnosis.process', [$this->organization, $this->diagnosis, $process]),
         ])->layout('layouts::client', [
             ...$this->stepLayout(DiagnosisStep::Processes),
@@ -178,6 +188,26 @@ class ProcessList extends Component
             'back' => route('client.diagnosis.folyamatok', [$this->organization, $this->diagnosis]),
             'backLabel' => DiagnosisStep::Processes->label(),
         ])->title(__('processes.list.title'));
+    }
+
+    protected function authorizeImport(): void
+    {
+        $this->authorizeInput();
+    }
+
+    protected function importOrganization(): Organization
+    {
+        return $this->organization;
+    }
+
+    protected function canDictate(string $field): bool
+    {
+        return $this->acceptsInput() && ! $this->isImpersonating() && $field === 'importText';
+    }
+
+    protected function dictationOrganization(): ?Organization
+    {
+        return $this->organization;
     }
 
     private function process(int $id): Process

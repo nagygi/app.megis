@@ -15,6 +15,18 @@
         <p class="text-sm text-grey-700">{{ __('processes.list.renamed_from', ['name' => $process->renames->first()->old_name]) }}</p>
     @endif
 
+    {{-- Leírás --}}
+    @if ($editable || $process->description)
+        <x-ui.card as="section" class="flex flex-col gap-3" aria-labelledby="description-title">
+            <h2 id="description-title" class="text-lg font-semibold">{{ __('processes.sheet.description') }}</h2>
+            @if ($editable)
+                <x-form.textarea name="description" wire:model.live.blur="description" :label="__('processes.sheet.description')" :help="__('processes.sheet.description_help')" rows="3" maxlength="2000" />
+            @else
+                <p class="whitespace-pre-line">{{ $process->description }}</p>
+            @endif
+        </x-ui.card>
+    @endif
+
     {{-- Felelős --}}
     <x-ui.card as="section" class="flex flex-col gap-3" aria-labelledby="responsible-title">
         <h2 id="responsible-title" class="text-lg font-semibold">{{ __('processes.sheet.responsible') }}</h2>

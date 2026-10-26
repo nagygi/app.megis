@@ -35,6 +35,7 @@ A lista gépi javaslat, jóváhagyásra. Négy csoportja van: Erős minta · Biz
 
 - Név, mellette „átnevezés”. Az átnevezés nyoma megmarad: a régi név, ki és mikor nevezte át.
 - Ritmus · létszám · előfordulás.
+- A leírás, ha van, két sorig.
 - Konfidencia: magas / közepes / alacsony / kézzel / beszélgetésből.
 - Típusváltó:
   - **rutin:** mérjük, a diagnózisba kerül;
@@ -53,9 +54,21 @@ A lista gépi javaslat, jóváhagyásra. Négy csoportja van: Erős minta · Biz
 - Mezők:
   - név (kötelező);
   - ritmus: heti · kétheti · havi · negyedéves · alkalmi;
-  - szülő folyamat (opcionális).
+  - szülő folyamat (opcionális);
+  - leírás (opcionális, legfeljebb 2000 karakter).
 - Jelölése: „nincs a naptárban · 0 alkalom”.
 - Ugyanúgy mérhető, mint a többi. Alkalmat a feltöltéskor kap (12).
+
+**Felvétel szövegből vagy beszédből** („Folyamatok szövegből vagy beszédből”)
+
+- A vezető leírja vagy diktálja a visszatérő alkalmakat, legfeljebb 10 000 karakterben. A diktálás átirata a mezőbe kerül, szerkeszthető.
+- „Feldolgozom”: az AI (`process_parsing`, prompt `folyamat-szovegbol`) kigyűjti a folyamatokat: név, leírás, ritmus, szülő.
+  - A szülő lehet a szöveg egy másik folyamata vagy egy meglévő felső szintű folyamat.
+  - Legfeljebb két szint: amit az AI mélyebbre tenne, a vonala legfelső folyamata alá kerül.
+  - A szervezetnek már meglévő nevű folyamat nem jelenik meg újra; az alfolyamatai a meglévő alá kerülnek.
+- **Előnézet:** soronként szerkeszthető név, ritmus, szülő és leírás; a sor kivehető. „Vissza a szöveghez”, „Mégse”.
+- „Felveszem mind a N folyamatot”: kézzel hozzáadottként jönnek létre („Kézzel hozzáadva”). Ami közben már létezik, kimarad.
+- Ha az AI nem válaszol, vagy nincs folyamat a szövegben, a mező alatt hibaüzenet jelzi.
 
 **A lap alja**
 
@@ -66,6 +79,7 @@ A lista gépi javaslat, jóváhagyásra. Négy csoportja van: Erős minta · Biz
 ### 11.3 Adatlap (V6·e)
 
 - **Fejléc:** ritmus · hossz · alkalmak száma.
+- **Leírás** (opcionális, legfeljebb 2000 karakter): mire való, mi történik rajta, kik vannak ott. Elhagyáskor mentődik; olvasónak csak akkor látszik, ha van.
 - **Felelős** (opcionális): a szervezet egy felhasználója.
   - Az emlékeztető az [NM-10](../backlog_nem_MVP/NM-10-emlekezteto-folyamat-felelosenek.md) jegyben jön, addig a felület nem ígéri.
 - **Résztvevők:** a naptárból jönnek, e-mail alapján a szervezet felhasználóihoz párosítva.
@@ -97,7 +111,7 @@ A lista gépi javaslat, jóváhagyásra. Négy csoportja van: Erős minta · Biz
 
 - **Fejléc:** „naptár összekötve · 03.02. · 7 rutin · 5 mérve”.
 - **Soronként:** név, ritmus, felelős, létszám, naptárban van-e, mérjük-e. Pont csak publikálás után látszik.
-- „+ Rutin”: kézi hozzáadás. A sor az adatlapra nyílik.
+- „+ Rutin”: kézi hozzáadás (név, ritmus, leírás). A sor az adatlapra nyílik.
 - **Szerkesztés:**
   - a diagnózis futása alatt szerkeszthető;
   - publikálás után a diagnózishoz rögzített lista nem változik, a tár viszont tovább szerkeszthető.
@@ -110,7 +124,8 @@ A lista gépi javaslat, jóváhagyásra. Négy csoportja van: Erős minta · Biz
   - A *Bizonytalan* és az *Egyéb* sorok külön blokkban látszanak, átnézésre.
 - **Naptár sor:** forrás, mióta van összekötve, eseményszám, „a metaadat {dátum}-ig él”, hibaállapot (09). Ha admin töltötte be, ez is látszik: „betöltötte: {név}”.
 - **Naptár betöltése a vezető nevében** (09 · 9.2): futó diagnózisnál a sorok alatt az iCal cím és az .ics fájl betöltése, a „{Név} kérte, és ő adta át” jelölőnégyzettel. Futó diagnózis nélkül csak egy sor jelzi, hogy ilyenkor nem lehet betölteni.
-- **Szerkesztés:** az admin ugyanazokkal a szabályokkal szerkeszthet, vehet fel és zárhat ki folyamatot, mint a vezető. Az átnevezés nyoma itt is megmarad.
+- **Szerkesztés:** az admin ugyanazokkal a szabályokkal szerkeszthet, vehet fel és zárhat ki folyamatot, mint a vezető. Az átnevezés nyoma itt is megmarad. A leírás a név alatt rövidítve látszik, szerkesztéskor teljes.
+- **Felvétel szövegből vagy beszédből:** ugyanaz, mint a V6·d-n (11.2), például az ügyféltől kapott leírásból. A diktálás felvétele az adminé.
 - **A mégis javaslata:** opcionális szöveg, legfeljebb 255 karakter. A V6·f-en jelenik meg.
 
 ## Nincs benne

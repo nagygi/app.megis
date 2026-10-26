@@ -27,6 +27,8 @@ class ProcessLibrary extends Component
 
     public ?string $rhythm = null;
 
+    public string $description = '';
+
     public function mount(Organization $organization): void
     {
         $this->organization = $organization;
@@ -41,9 +43,14 @@ class ProcessLibrary extends Component
         $this->validate([
             'name' => ['required', 'string', 'min:2', 'max:255'],
             'rhythm' => ['nullable', Rule::enum(ProcessRhythm::class)],
-        ], attributes: ['name' => __('processes.list.fields.name'), 'rhythm' => __('processes.list.fields.rhythm')]);
+            'description' => ['nullable', 'string', 'max:2000'],
+        ], attributes: [
+            'name' => __('processes.list.fields.name'),
+            'rhythm' => __('processes.list.fields.rhythm'),
+            'description' => __('processes.list.fields.description'),
+        ]);
 
-        $process = $processes->addManual($this->organization, $this->name, filled($this->rhythm) ? ProcessRhythm::from($this->rhythm) : null);
+        $process = $processes->addManual($this->organization, $this->name, filled($this->rhythm) ? ProcessRhythm::from($this->rhythm) : null, description: $this->description);
 
         $this->redirect(route('client.processes.show', [$this->organization, $process]), navigate: false);
     }

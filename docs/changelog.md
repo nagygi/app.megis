@@ -2,6 +2,22 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.29 · HASH · 2026-10-26
+
+Folyamatok: leírás, és felvétel szövegből vagy beszédből (11).
+
+- **Leírás:** minden folyamat kaphat opcionális leírást, legfeljebb 2000 karakterben.
+  - Megadható a kézi hozzáadásnál (V6·d, Tárak → Folyamatok „+ Rutin”, admin), és az adatlapon (V6·e), ahol elhagyáskor mentődik.
+  - A V6·d kártyán két sorig, az admin táblában a név alatt rövidítve látszik.
+- **Felvétel szövegből vagy beszédből (új):** a V6·d-n és az admin *Folyamatok* fülén.
+  - A szöveg begépelhető vagy diktálható. A diktálás átirata a mezőbe kerül.
+  - „Feldolgozom”: az AI kigyűjti a folyamatokat névvel, leírással, ritmussal és szülővel. A szülő a szöveg egy másik folyamata vagy egy meglévő felső szintű folyamat lehet; legfeljebb két szint.
+  - A már meglévő nevű folyamat nem jön újra, az alfolyamatai a meglévő alá kerülnek.
+  - Előnézet: soronként szerkeszthető név, ritmus, szülő és leírás, a sor kivehető. A felvett folyamatok „Kézzel hozzáadva” jönnek létre.
+  - Új AI-feladat: `process_parsing`, prompt: `folyamat-szovegbol` v1. A hívás a gombnyomásra fut, a válaszra várva.
+- **Diktálás az adminban:** az admin felvétele az adminé (eddig a diktálás csak ügyféloldalon volt).
+- **Adatbázis:** `processes.description`.
+
 ## 1.28 · 46056a3 · 2026-10-26
 
 Értéktükör a prototípus szerint: ET4 elmélyülés, a teljes kép a fával, az e-mail a beküldés előtt (06, NM-06).

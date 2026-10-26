@@ -41,7 +41,7 @@ class ProcessService
     /**
      * "Folyamat vagy alfolyamat hozzáadása": "nincs a naptárban · 0 alkalom" (11 · 11.2).
      */
-    public function addManual(Organization $organization, string $name, ?ProcessRhythm $rhythm, ?Process $parent = null): Process
+    public function addManual(Organization $organization, string $name, ?ProcessRhythm $rhythm, ?Process $parent = null, ?string $description = null): Process
     {
         if ($parent !== null) {
             $this->ensureCanHaveChildren($parent, $organization);
@@ -51,6 +51,7 @@ class ProcessService
             'organization_id' => $organization->id,
             'parent_id' => $parent?->id,
             'name' => trim($name),
+            'description' => filled($description) ? trim($description) : null,
             'rhythm' => $rhythm,
             'kind' => ProcessKind::Routine,
             'source' => ProcessSource::Manual,
@@ -73,6 +74,14 @@ class ProcessService
             $process->renames()->create(['old_name' => $process->name, 'new_name' => $name, 'created_by' => $actor?->id]);
             $process->update(['name' => $name]);
         });
+    }
+
+    /**
+     * The optional description (11 · 11.3); an empty one is removed.
+     */
+    public function setDescription(Process $process, ?string $description): void
+    {
+        $process->update(['description' => filled($description) ? trim($description) : null]);
     }
 
     /**

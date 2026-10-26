@@ -132,6 +132,16 @@ return [
             'prompt' => 'beszelgetes-kivonat',
             'prompt_version' => 1,
         ],
+        // Several processes at once from a written or spoken text (11 · 11.2, 11.6).
+        'process_parsing' => [
+            'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
+            'model' => env('AI_DEFAULT_MODEL', 'claude-sonnet-5-5'),
+            'max_tokens' => 8192,
+            'temperature' => 0.2,
+            'timeout' => 90,
+            'prompt' => 'folyamat-szovegbol',
+            'prompt_version' => 1,
+        ],
         'occasion_analysis' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
             'model' => env('AI_DEFAULT_MODEL', 'claude-sonnet-5-5'),

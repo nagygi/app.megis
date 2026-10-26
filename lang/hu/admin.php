@@ -1017,6 +1017,7 @@ return [
             'mirror_deepening' => 'Értéktükör: elmélyülés (ET4)',
             'calendar_naming' => 'Naptár-jelöltek elnevezése',
             'conversation_summary' => 'Beszélgetés-kivonat',
+            'process_parsing' => 'Folyamatok szövegből',
             'occasion_analysis' => 'Folyamat-alkalom elemzése',
             'transcription' => 'Átirat beszélő-felismeréssel',
             'diagnosis_scoring' => 'Fő diagnózis: pontozás',

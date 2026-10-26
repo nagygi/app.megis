@@ -1,5 +1,5 @@
 {{-- The organization's Folyamatok tab (11 · 11.6). --}}
-<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-6" @if ($dictations !== []) wire:poll.2s="pollDictations" @endif>
     <x-ui.flash />
 
     <x-admin.page-header :title="__('admin.organizations.tabs.processes')" :spaced="false" />
@@ -131,6 +131,9 @@
                                             <x-ui.button tone="outline" size="sm" wire:click="$set('editingId', null)">{{ __('admin.common.cancel') }}</x-ui.button>
                                         </div>
                                     </div>
+                                    <div class="sm:col-span-2 lg:col-span-5">
+                                        <x-form.textarea name="edit.description" wire:model="edit.description" :label="__('processes.sheet.description')" rows="2" maxlength="2000" />
+                                    </div>
                                 </form>
                             </td>
                         </tr>
@@ -138,6 +141,9 @@
                         <tr wire:key="process-{{ $process->id }}">
                             <td class="px-3 py-2">
                                 <a href="{{ route('admin.organizations.process-occasions', [$organization, $process]) }}" class="font-semibold">{{ $process->name }}</a>
+                                @if ($process->description)
+                                    <span class="block max-w-sm text-xs text-grey-700">{{ \Illuminate\Support\Str::limit($process->description, 120) }}</span>
+                                @endif
                                 @if ($process->renames->isNotEmpty())
                                     <span class="block text-xs text-grey-700">{{ __('processes.list.renamed_from', ['name' => $process->renames->last()->old_name]) }}</span>
                                 @endif
@@ -164,6 +170,8 @@
         </section>
     @endforeach
 
+    <x-processes.import :rows="$importRows" :parents="$parents" can-dictate :pending="isset($dictations['importText'])" bordered />
+
     <div class="grid gap-6 lg:grid-cols-2">
         <x-ui.card as="form" bordered padding="lg" wire:submit="addProcess" class="flex flex-col gap-4">
             <h2 class="text-lg font-semibold">{{ __('processes.list.add_title') }}</h2>
@@ -180,6 +188,7 @@
                     <option value="{{ $parent->id }}">{{ $parent->name }}</option>
                 @endforeach
             </x-form.select>
+            <x-form.textarea name="newDescription" wire:model="newDescription" :label="__('processes.sheet.description')" rows="2" maxlength="2000" />
             <x-ui.button type="submit" tone="outline" icon="plus" class="self-start">{{ __('processes.list.add') }}</x-ui.button>
         </x-ui.card>
 
