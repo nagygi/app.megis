@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.31 · HASH · 2026-10-26
+## 1.31 · ba261de · 2026-10-26
 
 A riport a prototípus szerint („2 · Riport”: R0–R9, RM, S1), a fő és az önálló diagnózisnál is (27, 28, 04 · 4.6).
 
