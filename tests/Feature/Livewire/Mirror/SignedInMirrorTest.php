@@ -1,10 +1,8 @@
 <?php
 
-use App\Enums\InboxItemType;
 use App\Enums\MaterialContext;
 use App\Livewire\Mirror\Record;
 use App\Livewire\Mirror\Result;
-use App\Models\InboxItem;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Services\Ai\AiGateway;
@@ -56,22 +54,7 @@ it('records in the user’s name as well', function () {
     expect(signedInMirror($organization)->user_id)->toBe($customer->id);
 });
 
-it('shows no e-mail step and keeps the curiosity questions when finishing', function () {
-    $organization = Organization::factory()->create();
-    actingAsCustomer(customerOf($organization));
-    $session = signedInMirror($organization);
-
-    Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])
-        ->call('showFull')
-        ->assertDontSee('Létrehozom a fiókot')
-        ->set('curiosity', ['gap'])
-        ->call('finish')
-        ->assertRedirect(route('client.values', $organization));
-
-    expect($session->fresh()->curiosity)->toBe(['gap']);
-});
-
-it('opens a booking row from the own menu', function () {
+it('shows no account step and no booking, and keeps the curiosity questions when finishing', function () {
     config(['megis.booking_url' => 'https://foglalas.example.com']);
     $organization = Organization::factory()->create();
     actingAsCustomer(customerOf($organization));
@@ -79,10 +62,41 @@ it('opens a booking row from the own menu', function () {
 
     Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])
         ->call('showFull')
-        ->assertSee('https://foglalas.example.com')
-        ->call('book');
+        ->assertDontSee('Nézd meg a leveled')
+        ->assertDontSee('https://foglalas.example.com')
+        ->set('curiosity', ['gap'])
+        ->call('finish')
+        ->assertRedirect(route('client.values', $organization));
 
-    expect(InboxItem::query()->sole()->type)->toBe(InboxItemType::MirrorBooking);
+    expect($session->fresh()->curiosity)->toBe(['gap']);
+});
+
+it('deepens the values from the own menu too (ET4)', function () {
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+    $session = signedInMirror($organization);
+
+    Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])
+        ->call('showValue', 1)
+        ->assertSee('Egyenesség · 1 / 1')
+        ->assertSee('azonnal szóltam')
+        ->assertSee('Soha.');
+});
+
+it('lists the earlier mirrors on the Értéktükör page, to open them again', function () {
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+    $session = signedInMirror($organization);
+
+    $this->get(route('client.mirror.record', $organization))
+        ->assertOk()
+        ->assertSee('Korábbi tükreid')
+        ->assertSee(route('client.mirror.result', [$organization, $session]))
+        ->assertSee('Egyenesség');
+
+    actingAsCustomer(customerOf($organization));
+
+    $this->get(route('client.mirror.record', $organization))->assertOk()->assertDontSee('Korábbi tükreid');
 });
 
 it('does not show someone else’s mirror', function () {

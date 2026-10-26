@@ -39,8 +39,9 @@ use Illuminate\Support\Str;
 
 /**
  * The Értéktükör (06 · 6.1, 6.2): from the recording to the values with
- * quotes, then to an account and a diagnosis. An anonymous mirror lives 24
- * hours; nothing goes to the Értéktár before the account is confirmed (plan 3.7).
+ * quotes, then to an account and a diagnosis. The e-mail comes with the
+ * recording (ET2); an anonymous mirror lives 24 hours, and nothing goes to the
+ * Értéktár before the account is confirmed (plan 3.7).
  */
 class MirrorService
 {
@@ -172,26 +173,20 @@ class MirrorService
     }
 
     /**
-     * ET5 "Létrehozom a fiókot" or "Időpontot foglalok": a confirmation link for
-     * a new address; an existing account signs in on the spot instead (06 · 6.1).
-     * The mirror's 24 hours start again with the link, so the two expire together.
-     *
-     * @param  list<string>  $curiosity
+     * The e-mail and the accepted documents of ET2, with the recording: a
+     * confirmation link for a new address; an existing account signs in on
+     * ET5 instead (06 · 6.1). The mirror's 24 hours follow the link's, so the
+     * two expire together. The processing status is not touched.
      */
-    public function requestAccount(MirrorSession $session, string $email, array $curiosity, bool $booking): string
+    public function requestAccount(MirrorSession $session, string $email): string
     {
         $email = Str::lower(trim($email));
 
         $session->update([
             'email' => $email,
-            'curiosity' => array_values(array_intersect($curiosity, MirrorSession::CURIOSITY)),
             'accepted_legal_versions' => $this->legalDocuments->currentAcceptable()->pluck('id')->all(),
             'accepted_at' => now(),
         ]);
-
-        if ($booking) {
-            $this->recordBooking($session);
-        }
 
         $existing = User::query()->where('email', $email)->first();
 
@@ -205,7 +200,7 @@ class MirrorService
         Mail::to($email)->queue(new MirrorConfirmationMail($issued->plainToken));
 
         $session->update([
-            'status' => MirrorStatus::AwaitingConfirmation,
+            'confirmation_sent_at' => now(),
             'expires_at' => $issued->token->expires_at,
         ]);
 
@@ -213,13 +208,13 @@ class MirrorService
     }
 
     /**
-     * The mirror waiting for this confirmation: the latest one sent to the address.
+     * The mirror waiting for this confirmation: the latest one sent to the
+     * address, read or still being read.
      */
     public function sessionForToken(UserToken $token): ?MirrorSession
     {
         return MirrorSession::query()
             ->where('email', $token->user->email)
-            ->where('status', MirrorStatus::AwaitingConfirmation)
             ->whereNull('claimed_at')
             ->latest('id')
             ->first();
@@ -246,13 +241,7 @@ class MirrorService
             $session = $this->sessionForToken($token);
 
             if ($session !== null) {
-                foreach ($session->accepted_legal_versions ?? [] as $versionId) {
-                    LegalAcceptance::query()->firstOrCreate(
-                        ['user_id' => $user->id, 'legal_document_version_id' => $versionId],
-                        ['accepted_at' => $session->accepted_at ?? now()],
-                    );
-                }
-
+                $this->recordAcceptances($session, $user);
                 $this->claim($session, $user, $organization);
             }
 
@@ -264,19 +253,36 @@ class MirrorService
      * An existing account signed in on ET5: the mirror goes to its active
      * organization, as from the own menu (06 · 6.1, 6.2).
      */
-    public function attachToExisting(MirrorSession $session, User $user): Diagnosis
+    public function attachToExisting(MirrorSession $session, User $user): ?Diagnosis
     {
-        return DB::transaction(function () use ($session, $user): Diagnosis {
+        return DB::transaction(function () use ($session, $user): ?Diagnosis {
             $organization = $this->landing->organizationFor($user) ?? $this->createIndividualOrganization($user);
+            $this->recordAcceptances($session, $user);
 
             return $this->claim($session, $user, $organization);
         });
     }
 
-    public function claim(MirrorSession $session, User $user, Organization $organization): Diagnosis
+    /**
+     * The mirror and its diagnosis go to the account. A mirror still being read
+     * gets its diagnosis when the reading ends (MaterialPipeline::analyzed).
+     */
+    public function claim(MirrorSession $session, User $user, Organization $organization): ?Diagnosis
     {
-        $material = $session->material;
+        // Locked, so the reading cannot end between the check and the claim.
+        $material = Material::query()->lockForUpdate()->findOrFail($session->material_id);
         $material->update(['user_id' => $user->id, 'organization_id' => $organization->id]);
+
+        if ($material->status !== MaterialStatus::Processed) {
+            $session->update([
+                'user_id' => $user->id,
+                'organization_id' => $organization->id,
+                'claimed_at' => now(),
+                'expires_at' => null,
+            ]);
+
+            return null;
+        }
 
         $diagnosis = $this->diagnoses->build(
             $material,
@@ -302,6 +308,8 @@ class MirrorService
     /**
      * "Időpontot foglalok": the booking itself is in the external calendar; the
      * click opens a Beérkező row with the ticked questions (22 · 22.2, question 3).
+     * ET5 has no booking for now (2026-10-26); the row, the mail and the
+     * datasheet badge stay for when it comes back.
      */
     public function recordBooking(MirrorSession $session): void
     {
@@ -396,6 +404,19 @@ class MirrorService
             });
 
         return $count;
+    }
+
+    /**
+     * The document versions accepted on ET2, at the time they were accepted.
+     */
+    private function recordAcceptances(MirrorSession $session, User $user): void
+    {
+        foreach ($session->accepted_legal_versions ?? [] as $versionId) {
+            LegalAcceptance::query()->firstOrCreate(
+                ['user_id' => $user->id, 'legal_document_version_id' => $versionId],
+                ['accepted_at' => $session->accepted_at ?? now()],
+            );
+        }
     }
 
     /**

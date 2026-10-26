@@ -93,6 +93,7 @@ php artisan megis:values:import "docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx"
 - Hangot az átíró dolgoz fel. Amíg a 12.7 PoC nem választott szolgáltatót, helyben a minta-átíró használható: `MEGIS_TRANSCRIBER=fake`. Ez mindig ugyanazt a rövid átiratot adja, élesben nem indul el.
 - A felvételek hosszát az `ffprobe` méri (`FFPROBE_PATH`). Nélküle a böngésző által mért hossz marad, és a setup check figyelmeztet.
 - A névtelen tükrök takarítása: `php artisan megis:mirror:prune` (óránként ütemezve).
+- Az ET4 elmélyülés (mégis Coach) a mérés után, külön jobban fut az `ai` queue-n, tükrönként egy AI-hívással. Kikapcsolás: `MIRROR_DEEPENING=false`; ilyenkor az ET4 az Értéktár szavait mutatja. A tesztek kikapcsolva futtatják (`phpunit.xml`); a saját tesztjei bekapcsolják.
 
 ### Átíró szolgáltatók összevetése (12.7)
 

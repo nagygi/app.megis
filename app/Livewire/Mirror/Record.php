@@ -2,18 +2,22 @@
 
 namespace App\Livewire\Mirror;
 
+use App\Enums\LegalDocumentType;
 use App\Enums\MaterialContext;
 use App\Enums\MaterialSource;
 use App\Exceptions\UnreadableMaterialException;
 use App\Livewire\Concerns\ChecksTurnstile;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
+use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\SupportQuestion;
 use App\Models\User;
+use App\Services\Legal\LegalDocuments;
 use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\Materials\MaterialStore;
 use App\Services\Mirror\MirrorService;
+use App\Services\Mirror\MirrorValueGroup;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
@@ -25,8 +29,10 @@ use Livewire\WithFileUploads;
 
 /**
  * ET2 · the recording (06 · 6.1): spoken in the browser, typed, or a file.
- * Public, it is protected by Turnstile and an IP limit; from the own menu
- * (06 · 6.2) it belongs to the signed-in user and the active organization.
+ * Public, it asks for the e-mail and the accepted documents with it and is
+ * protected by Turnstile and an IP limit; from the own menu (06 · 6.2) it
+ * belongs to the signed-in user and the active organization, and lists the
+ * earlier mirrors.
  */
 class Record extends Component
 {
@@ -44,6 +50,13 @@ class Record extends Component
 
     /** @var TemporaryUploadedFile|null */
     public $file = null;
+
+    /**
+     * The first part of the registration, before the mirror is sent (06 · 6.1).
+     */
+    public string $email = '';
+
+    public bool $consent = false;
 
     /**
      * The main diagnosis the mirror belongs to (17 · 17.4, 17.6).
@@ -80,7 +93,8 @@ class Record extends Component
                 'max:51200',
                 'mimetypes:audio/webm,video/webm,audio/ogg,audio/mp4,video/mp4,audio/x-m4a,audio/mpeg,audio/wav,audio/x-wav',
             ],
-        ], ['recording.required' => __('mirror.recording_missing')], ['recording' => __('mirror.mode_record')]);
+            ...$this->contactRules(),
+        ], ['recording.required' => __('mirror.recording_missing'), ...$this->contactMessages()], ['recording' => __('mirror.mode_record'), ...$this->contactAttributes()]);
         $this->guard();
 
         $material = $materials->fromAudio($this->recording, $this->context(), MaterialSource::Recording, $this->user(), $this->organization);
@@ -96,8 +110,9 @@ class Record extends Component
     public function submitText(MaterialStore $materials, MirrorService $mirrors): void
     {
         $this->validate(
-            ['text' => ['required', 'string', 'min:50', 'max:'.config('megis.materials.text_max_characters')]],
-            attributes: ['text' => __('mirror.text_label')],
+            ['text' => ['required', 'string', 'min:50', 'max:'.config('megis.materials.text_max_characters')], ...$this->contactRules()],
+            $this->contactMessages(),
+            ['text' => __('mirror.text_label'), ...$this->contactAttributes()],
         );
         $this->guard();
 
@@ -108,7 +123,8 @@ class Record extends Component
     {
         $this->validate([
             'file' => ['required', 'file', 'max:'.config('megis.materials.text_max_kilobytes'), 'extensions:'.implode(',', config('megis.materials.text_extensions'))],
-        ], attributes: ['file' => __('mirror.file_label')]);
+            ...$this->contactRules(),
+        ], $this->contactMessages(), ['file' => __('mirror.file_label'), ...$this->contactAttributes()]);
         $this->guard();
 
         try {
@@ -120,13 +136,16 @@ class Record extends Component
         $this->begin($material, $mirrors);
     }
 
-    public function render(): View
+    public function render(LegalDocuments $legalDocuments): View
     {
         $view = view('livewire.mirror.record', [
             'questions' => SupportQuestion::query()->forRecording()->pluck('text')->all(),
             'textRules' => ['formats' => implode(', ', config('megis.materials.text_extensions')), 'size' => (int) (config('megis.materials.text_max_kilobytes') / 1024)],
             'isPublic' => $this->organization === null,
             'diagnosisOptions' => $this->diagnosisOptions(),
+            'termsUrl' => $legalDocuments->current(LegalDocumentType::Terms) ? route('legal.show', LegalDocumentType::Terms->value) : null,
+            'privacyUrl' => $legalDocuments->current(LegalDocumentType::PrivacyPolicy) ? route('legal.show', LegalDocumentType::PrivacyPolicy->value) : null,
+            'previousMirrors' => $this->previousMirrors(),
         ]);
 
         return $this->organization === null
@@ -165,9 +184,70 @@ class Record extends Component
         $session = $mirrors->start($material, $this->user(), $this->organization);
         session()->push('mirror_tokens', $session->token);
 
+        // The confirmation link goes out now; the mirror is read meanwhile (06 · 6.1).
+        if ($this->organization === null) {
+            $mirrors->requestAccount($session, $this->email);
+        }
+
         $this->redirect($this->organization === null
             ? route('mirror.result', $session)
             : route('client.mirror.result', [$this->organization, $session]), navigate: false);
+    }
+
+    /**
+     * The e-mail and the accepted ÁSZF and privacy policy, public only (06 · 6.1).
+     *
+     * @return array<string, list<string>>
+     */
+    private function contactRules(): array
+    {
+        return $this->organization === null
+            ? ['email' => ['required', 'string', 'email', 'max:255'], 'consent' => ['accepted']]
+            : [];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function contactMessages(): array
+    {
+        return ['consent.accepted' => __('mirror.consent_required')];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function contactAttributes(): array
+    {
+        return ['email' => __('mirror.email')];
+    }
+
+    /**
+     * The own menu lists the earlier mirrors, to open them again (06 · 6.2).
+     *
+     * @return Collection<int, array{session: MirrorSession, values: string}>
+     */
+    private function previousMirrors(): Collection
+    {
+        $user = $this->user();
+
+        if ($this->organization === null || $user === null) {
+            return collect();
+        }
+
+        $mirrors = app(MirrorService::class);
+
+        return MirrorSession::query()
+            ->where('user_id', $user->id)
+            ->where('organization_id', $this->organization->id)
+            ->whereNotNull('claimed_at')
+            ->latest('id')
+            ->limit(10)
+            ->get()
+            ->map(fn (MirrorSession $session) => [
+                'session' => $session,
+                'values' => $mirrors->groups($session)->where('excluded', false)->map(fn (MirrorValueGroup $group) => $group->name)->implode(' · '),
+            ]);
     }
 
     /**

@@ -13,8 +13,9 @@ use App\Models\User;
  * Where a customer arrives after logging in (14 · 14.4). The system picks the
  * page, not the user: the diagnosis the user leads (V1 while filling in,
  * later its home), otherwise the one they are a peer in (T1, T5; 26 · 26.4).
- * Someone who has only made an Értéktükör sees their values (30); otherwise
- * the organization home opens.
+ * Someone who has only made an Értéktükör sees their latest mirror, its
+ * values expanded and the full picture (06 · 6.1); otherwise the organization
+ * home opens.
  */
 class LandingResolver
 {
@@ -30,8 +31,12 @@ class LandingResolver
             return route('client.diagnosis.show', [$organization, $main->diagnosis]);
         }
 
-        if ($organization->isIndividual() && MirrorSession::query()->where('user_id', $user->id)->whereNotNull('claimed_at')->exists()) {
-            return route('client.values', $organization);
+        $mirror = $organization->isIndividual()
+            ? MirrorSession::query()->where('user_id', $user->id)->where('organization_id', $organization->id)->whereNotNull('claimed_at')->latest('id')->first()
+            : null;
+
+        if ($mirror !== null) {
+            return route('client.mirror.result', [$organization, $mirror]);
         }
 
         return route('client.home', $organization);

@@ -164,7 +164,8 @@ class PersonalValueSetService
     /**
      * The values of an Értéktükör with their quotes, "nem az enyém" left out
      * (24 · 24.5). A matched value comes as the Értéktár value, an unmatched
-     * one as the "AI által detektált" value made of it.
+     * one as the "AI által detektált" value made of it. What the user took or
+     * wrote on ET4 replaces the Értéktár's meaning and scale ends (NM-06).
      *
      * @param  list<int>  $existingValueIds
      * @return list<array<string, mixed>>
@@ -172,6 +173,7 @@ class PersonalValueSetService
     public function itemsFromMirror(MirrorSession $session, array $existingValueIds, int $limit): array
     {
         $items = [];
+        $insights = $session->insights()->get()->keyBy('group_key');
 
         foreach ($this->mirrors->groups($session) as $group) {
             if ($group->excluded || count($items) >= $limit) {
@@ -186,8 +188,14 @@ class PersonalValueSetService
             }
 
             $existingValueIds[] = $value->id;
+            $item = $this->itemFromValue($value, PersonalValueSetItem::SOURCE_MIRROR);
+            $insight = $insights->get($group->key);
+
             $items[] = [
-                ...$this->itemFromValue($value, PersonalValueSetItem::SOURCE_MIRROR),
+                ...$item,
+                'meaning' => $insight?->meaning ?? $item['meaning'],
+                'low_example' => $insight?->low_example ?? $item['low_example'],
+                'high_example' => $insight?->high_example ?? $item['high_example'],
                 'example' => $group->quotes[0] ?? ($value->examples[0] ?? ''),
                 'quotes' => $group->quotes,
             ];

@@ -2,46 +2,57 @@
 
 namespace App\Livewire\Mirror;
 
-use App\Enums\LegalDocumentType;
-use App\Enums\MirrorStatus;
+use App\Enums\MirrorInsightStatus;
 use App\Livewire\Concerns\ChecksTurnstile;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\Value;
 use App\Services\Auth\CustomerAuthenticator;
-use App\Services\Auth\LandingResolver;
 use App\Services\Auth\LoginCodeService;
 use App\Services\Auth\LoginOutcome;
-use App\Services\Legal\LegalDocuments;
+use App\Services\Mirror\MirrorInsightService;
 use App\Services\Mirror\MirrorService;
+use App\Services\Mirror\MirrorValueGroup;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 /**
- * ET3 · the values with quotes, then ET5 · the full picture with the
- * curiosity questions and the account (06 · 6.1). From the own menu (6.2)
- * there is no e-mail and no account step.
+ * ET3 · the values with quotes, ET4 · one value in the user's own words
+ * (NM-06), ET5 · the full picture with the curiosity questions (06 · 6.1).
+ * The e-mail came with the recording: at the end a new address is asked to
+ * confirm it, an existing account signs in. From the own menu (6.2) there is
+ * no account step.
  */
 class Result extends Component
 {
     use ChecksTurnstile;
 
+    public const STEPS = ['values', 'value', 'full'];
+
     public MirrorSession $session;
 
     public ?Organization $organization = null;
 
+    #[Url(as: 'lap', history: true)]
     public string $step = 'values';
 
-    public string $email = '';
-
-    public bool $consent = false;
+    /**
+     * ET4: the kept value on the page, from 1.
+     */
+    #[Url(as: 'ertek', history: true)]
+    public int $position = 1;
 
     /** @var list<string> */
     public array $curiosity = [];
+
+    public bool $rewriting = false;
+
+    public string $meaning = '';
 
     public string $loginMode = 'password';
 
@@ -61,10 +72,9 @@ class Result extends Component
 
         $this->session = $session;
         $this->curiosity = $session->curiosity ?? [];
-        $this->email = (string) $session->email;
 
-        if ($session->status === MirrorStatus::AwaitingConfirmation) {
-            $this->step = 'sent';
+        if (! in_array($this->step, self::STEPS, true)) {
+            $this->step = 'values';
         }
     }
 
@@ -96,75 +106,126 @@ class Result extends Component
         $mirrors->retry($this->session);
     }
 
-    public function showFull(): void
-    {
-        $this->step = 'full';
-    }
-
-    public function backToValues(): void
+    public function showValues(): void
     {
         $this->step = 'values';
     }
 
     /**
-     * "Létrehozom a fiókot" and "Időpontot foglalok" (06 · 6.1, ET5).
+     * ET4, the n-th kept value.
      */
-    public function createAccount(bool $booking, MirrorService $mirrors): void
+    public function showValue(int $position): void
     {
-        abort_if($this->organization !== null || ! $this->session->isAnonymous(), 403);
+        $this->step = 'value';
+        $this->position = max(1, $position);
+        $this->rewriting = false;
+        $this->resetValidation();
+    }
 
-        $this->validate([
-            'email' => ['required', 'string', 'email', 'max:255'],
-            'consent' => ['accepted'],
-            'curiosity' => ['array'],
-            'curiosity.*' => [Rule::in(MirrorSession::CURIOSITY)],
-        ], ['consent.accepted' => __('mirror.consent_required')], ['email' => __('mirror.email')]);
-        $this->checkTurnstile();
+    public function showFull(): void
+    {
+        $this->step = 'full';
+    }
 
-        $result = $mirrors->requestAccount($this->session, $this->email, $this->curiosity, $booking);
+    /**
+     * "Ez az": the Coach's sentence is the user's meaning (NM-06).
+     */
+    public function accept(MirrorService $mirrors, MirrorInsightService $insights): void
+    {
+        $this->ensureOwner();
+        $group = $this->currentGroup($mirrors);
 
-        $this->step = $result === MirrorService::EXISTING_ACCOUNT ? 'existing' : 'sent';
+        if ($group !== null) {
+            $insights->accept($this->session, $group->key);
+        }
+    }
+
+    /**
+     * "Átírom": the user's own sentence instead.
+     */
+    public function startRewrite(MirrorService $mirrors, MirrorInsightService $insights): void
+    {
+        $this->ensureOwner();
+        $group = $this->currentGroup($mirrors);
+
+        $this->meaning = $group === null ? '' : (string) $insights->forSession($this->session)->get($group->key)?->meaning;
+        $this->rewriting = true;
+    }
+
+    public function cancelRewrite(): void
+    {
+        $this->rewriting = false;
+        $this->resetValidation();
+    }
+
+    public function saveRewrite(MirrorService $mirrors, MirrorInsightService $insights): void
+    {
+        $this->ensureOwner();
+        $this->validate(
+            ['meaning' => ['required', 'string', 'max:'.MirrorInsightService::MEANING_MAX]],
+            attributes: ['meaning' => __('mirror.coach_rewrite_label')],
+        );
+
+        $group = $this->currentGroup($mirrors);
+
+        if ($group !== null) {
+            $insights->rewrite($this->session, $group->key, $this->meaning);
+        }
+
+        $this->rewriting = false;
+    }
+
+    /**
+     * A ticked question is kept at once; there is no button for it (ET5).
+     */
+    public function updatedCuriosity(): void
+    {
+        $this->ensureOwner();
+        $this->saveCuriosity();
     }
 
     /**
      * An existing account signs in on the spot, so the mirror is not lost (06 · 6.1).
      */
-    public function loginWithPassword(CustomerAuthenticator $authenticator, MirrorService $mirrors, LandingResolver $landing): void
+    public function loginWithPassword(CustomerAuthenticator $authenticator, MirrorService $mirrors): void
     {
+        abort_unless($this->session->belongsToExistingAccount(), 403);
         $this->validate(['password' => ['required', 'string']], attributes: ['password' => __('mirror.password')]);
         $this->checkTurnstile();
         $this->throttleLogin();
 
-        [$outcome, $user] = $authenticator->attemptPassword($this->session->email ?? $this->email, $this->password);
+        [$outcome, $user] = $authenticator->attemptPassword((string) $this->session->email, $this->password);
 
         if ($outcome !== LoginOutcome::Success || $user === null) {
             throw ValidationException::withMessages(['password' => __('mirror.login_failed')]);
         }
 
-        $this->signIn($user, $authenticator, $mirrors, $landing);
+        $this->signIn($user, $authenticator, $mirrors);
     }
 
     public function sendCode(LoginCodeService $codes): void
     {
+        abort_unless($this->session->belongsToExistingAccount(), 403);
         $this->checkTurnstile();
         $this->throttleLogin();
 
-        $codes->send($this->session->email ?? $this->email);
+        $codes->send((string) $this->session->email);
         $this->codeSent = true;
     }
 
-    public function loginWithCode(LoginCodeService $codes, CustomerAuthenticator $authenticator, MirrorService $mirrors, LandingResolver $landing): void
+    public function loginWithCode(LoginCodeService $codes, CustomerAuthenticator $authenticator, MirrorService $mirrors): void
     {
+        abort_unless($this->session->belongsToExistingAccount(), 403);
         $this->validate(['code' => ['required', 'string', 'size:6']], attributes: ['code' => __('mirror.code')]);
         $this->throttleLogin();
 
-        $user = $codes->verifyCode($this->session->email ?? $this->email, $this->code);
+        $user = $codes->verifyCode((string) $this->session->email, $this->code);
 
         if ($user === null) {
             throw ValidationException::withMessages(['code' => __('mirror.code_invalid')]);
         }
 
-        $this->signIn($user, $authenticator, $mirrors, $landing);
+        $this->signIn($user, $authenticator, $mirrors);
     }
 
     /**
@@ -189,31 +250,34 @@ class Result extends Component
         $this->redirect(route('client.values', $this->organization), navigate: false);
     }
 
-    public function book(MirrorService $mirrors): void
-    {
-        $this->ensureOwner();
-        $this->saveCuriosity();
-        $mirrors->recordBooking($this->session->fresh());
-
-        session()->flash('status', __('mirror.booking_saved'));
-    }
-
-    public function render(MirrorService $mirrors, LegalDocuments $legalDocuments): View
+    public function render(MirrorService $mirrors, MirrorInsightService $insights): View
     {
         $this->session->refresh();
         $groups = $mirrors->groups($this->session);
-        $kept = $groups->where('excluded', false);
+        $kept = $groups->where('excluded', false)->values();
+
+        // A value taken out on ET3 leaves ET4 for the list.
+        if ($this->step === 'value' && $kept->isEmpty()) {
+            $this->step = 'values';
+        }
+
+        $this->position = min(max(1, $this->position), max(1, $kept->count()));
+        $current = $this->step === 'value' ? $kept->get($this->position - 1) : null;
 
         $view = view('livewire.mirror.result', [
             'groups' => $groups,
             'keptGroups' => $kept,
+            'current' => $current,
+            'next' => $current === null ? null : $kept->get($this->position),
+            'insight' => $current === null ? null : $insights->forSession($this->session)->get($current->key),
+            'insightPending' => $this->session->insight_status === MirrorInsightStatus::Pending,
+            'libraryValue' => $current?->valueId === null ? null : Value::query()->find($current->valueId),
+            'fromRecording' => (bool) $this->session->material?->source->hasAudio(),
             'isPublic' => $this->organization === null,
             'isExpired' => $this->session->isAnonymous() && $this->session->isExpired(),
             'canRetry' => $mirrors->canRetry($this->session),
             'otherValues' => max(0, Value::query()->availableTo(null)->count() - $kept->whereNotNull('valueId')->count()),
-            'bookingUrl' => config('megis.booking_url'),
-            'termsUrl' => $legalDocuments->current(LegalDocumentType::Terms) ? route('legal.show', LegalDocumentType::Terms->value) : null,
-            'privacyUrl' => $legalDocuments->current(LegalDocumentType::PrivacyPolicy) ? route('legal.show', LegalDocumentType::PrivacyPolicy->value) : null,
+            'accountUrl' => $this->accountUrl(),
         ]);
 
         return $this->organization === null
@@ -222,17 +286,18 @@ class Result extends Component
     }
 
     /**
-     * A claimed mirror is its owner's; an anonymous one only opens in the
-     * browser that made it.
+     * The own mirror opens in the browser that made it, read or claimed; a
+     * claimed one opens for its owner too, in the account.
      */
     private function canSee(MirrorSession $session): bool
     {
-        if ($session->user_id !== null) {
-            return auth('web')->id() === $session->user_id
-                && ($this->organization === null || $session->organization_id === $this->organization->id);
+        $isOwner = $session->user_id !== null && auth('web')->id() === $session->user_id;
+
+        if ($this->organization !== null) {
+            return $isOwner && $session->organization_id === $this->organization->id;
         }
 
-        return $this->organization === null && in_array($session->token, session('mirror_tokens', []), true);
+        return $isOwner || in_array($session->token, session('mirror_tokens', []), true);
     }
 
     private function ensureOwner(): void
@@ -240,10 +305,29 @@ class Result extends Component
         abort_unless($this->canSee($this->session), 403);
     }
 
+    private function currentGroup(MirrorService $mirrors): ?MirrorValueGroup
+    {
+        return $mirrors->groups($this->session)->where('excluded', false)->values()->get($this->position - 1);
+    }
+
     private function saveCuriosity(): void
     {
         $this->validate(['curiosity' => ['array'], 'curiosity.*' => [Rule::in(MirrorSession::CURIOSITY)]]);
         $this->session->update(['curiosity' => array_values($this->curiosity)]);
+    }
+
+    /**
+     * A claimed public mirror points to the account: open there, or sign in first.
+     */
+    private function accountUrl(): ?string
+    {
+        if ($this->organization !== null || $this->session->isAnonymous()) {
+            return null;
+        }
+
+        return auth('web')->id() === $this->session->user_id && $this->session->organization !== null
+            ? route('client.mirror.result', [$this->session->organization, $this->session])
+            : route('client.login');
     }
 
     private function throttleLogin(): void
@@ -257,11 +341,15 @@ class Result extends Component
         RateLimiter::hit($key, 60);
     }
 
-    private function signIn(User $user, CustomerAuthenticator $authenticator, MirrorService $mirrors, LandingResolver $landing): void
+    /**
+     * Signed in, the mirror goes to the account and opens there, expanded (06 · 6.1).
+     */
+    private function signIn(User $user, CustomerAuthenticator $authenticator, MirrorService $mirrors): void
     {
         $authenticator->login($user);
         $mirrors->attachToExisting($this->session, $user);
+        $this->session->refresh();
 
-        $this->redirect($landing->urlFor($user), navigate: false);
+        $this->redirect(route('client.mirror.result', [$this->session->organization, $this->session]), navigate: false);
     }
 }

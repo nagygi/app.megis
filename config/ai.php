@@ -104,6 +104,16 @@ return [
             'prompt' => 'ertektukor-pontozas',
             'prompt_version' => 2,
         ],
+        // ET4: the mégis Coach puts each value of a mirror into the user's own words (NM-06).
+        'mirror_deepening' => [
+            'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
+            'model' => env('AI_DEFAULT_MODEL', 'claude-sonnet-5-5'),
+            'max_tokens' => 4096,
+            'temperature' => 0.4,
+            'timeout' => 120,
+            'prompt' => 'ertektukor-elmelyules',
+            'prompt_version' => 1,
+        ],
         'calendar_naming' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
             'model' => env('AI_SMALL_MODEL', 'claude-haiku-5-5'),

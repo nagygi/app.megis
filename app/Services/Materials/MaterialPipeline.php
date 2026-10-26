@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Services\Capabilities\CapabilityMeasurementPolicy;
 use App\Services\Engine\AutomaticDiagnosisBuilder;
 use App\Services\Engine\ValueCatalog;
+use App\Services\Mirror\MirrorInsightService;
 use Throwable;
 
 /**
@@ -76,11 +77,18 @@ class MaterialPipeline
     public function analyzed(Material $material): void
     {
         match ($material->context) {
-            MaterialContext::PublicMirror => $this->mirrorSession($material)?->update(['status' => MirrorStatus::Ready]),
+            MaterialContext::PublicMirror => $this->finishPublicMirror($material),
             MaterialContext::Mirror => $this->finishSignedInMirror($material),
             MaterialContext::AdminUpload => $this->buildUploadDiagnoses($material),
             MaterialContext::Dictation, MaterialContext::Occasion => null,
         };
+
+        // ET4 · the mégis Coach's suggestions, in a job of their own (NM-06).
+        $session = $material->context->isMirror() && config('megis.mirror.deepening') ? $this->mirrorSession($material) : null;
+
+        if ($session !== null) {
+            app(MirrorInsightService::class)->start($session);
+        }
 
         // A material of a main diagnosis recalculates it (13 · 13.4, 18 · 18.4).
         $this->recalculateParent($material);
@@ -158,6 +166,41 @@ class MaterialPipeline
     private function mirrorSession(Material $material): ?MirrorSession
     {
         return MirrorSession::query()->where('material_id', $material->id)->first();
+    }
+
+    /**
+     * The e-mail comes before the mirror is read, so the account may be confirmed
+     * while it is: then the diagnosis is built here, as claim() would (06 · 6.1).
+     */
+    private function finishPublicMirror(Material $material): void
+    {
+        $session = $this->mirrorSession($material);
+
+        if ($session === null) {
+            return;
+        }
+
+        if ($session->claimed_at === null) {
+            // Only while unclaimed: a confirmation in the meantime has set its own status.
+            MirrorSession::query()->whereKey($session->id)->whereNull('claimed_at')->update(['status' => MirrorStatus::Ready]);
+
+            return;
+        }
+
+        if ($session->diagnosis_id === null && $material->user !== null && $material->organization !== null) {
+            $diagnosis = $this->diagnoses->build(
+                $material,
+                $material->user,
+                $material->organization,
+                DiagnosisType::byKey(DiagnosisType::MIRROR),
+                __('mirror.diagnosis_name', ['date' => $session->created_at->format('Y.m.d.')]),
+                $session->created_at,
+            );
+
+            $session->update(['diagnosis_id' => $diagnosis->id]);
+        }
+
+        $session->update(['status' => MirrorStatus::Claimed]);
     }
 
     /**

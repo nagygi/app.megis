@@ -39,7 +39,7 @@ return [
 
     'mirror_confirmation' => [
         'subject' => 'Erősítsd meg a mégis-fiókodat',
-        'body' => 'Köszönjük, hogy belenéztél az Értéktükörbe. Erősítsd meg az e-mail címedet, és a tükröd a fiókodba kerül.',
+        'body' => 'Köszönjük, hogy belenéztél az Értéktükörbe. Erősítsd meg az e-mail címedet, és a tükröd a fiókodba kerül: ott bármikor visszanézheted az értékeidet kibontva, és a teljes képet is.',
         'action' => 'Megerősítem',
         'validity' => 'A link 24 óráig él. Ha addig nem erősíted meg, a tükröd törlődik.',
     ],

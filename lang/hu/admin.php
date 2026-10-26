@@ -1012,6 +1012,7 @@ return [
             'mirror_detection' => 'Értéktükör: szabad detektálás',
             'mirror_matching' => 'Értéktükör: illesztés',
             'mirror_scoring' => 'Értéktükör: pontozás',
+            'mirror_deepening' => 'Értéktükör: elmélyülés (ET4)',
             'calendar_naming' => 'Naptár-jelöltek elnevezése',
             'conversation_summary' => 'Beszélgetés-kivonat',
             'occasion_analysis' => 'Folyamat-alkalom elemzése',

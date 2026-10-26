@@ -20,6 +20,7 @@ use App\Models\User;
 use App\Services\Inbox\InboxService;
 use App\Services\MainDiagnoses\DiagnosisRunService;
 use App\Services\MainDiagnoses\MainDiagnosisService;
+use App\Services\Mirror\MirrorInsightService;
 use App\Services\Processes\OccasionService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
@@ -109,6 +110,8 @@ class Index extends Component
         match (true) {
             // The capability measurement failed, not the material (NM-12).
             $item->subject instanceof Material && ($item->payload['job'] ?? null) === 'capability_detection' => DetectCapabilities::dispatch($item->subject, force: true),
+            // The mégis Coach's ET4 suggestions failed, not the mirror (NM-06).
+            $item->subject instanceof Material && ($item->payload['job'] ?? null) === 'mirror_deepening' => app(MirrorInsightService::class)->start(MirrorSession::query()->where('material_id', $item->subject->id)->firstOrFail()),
             $item->subject instanceof Material => app(OccasionService::class)->retry($item->subject),
             $item->subject instanceof MainDiagnosis => DraftReading::dispatch($item->subject),
             default => abort(404),

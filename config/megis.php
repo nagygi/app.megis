@@ -120,6 +120,9 @@ return [
         'anonymous_hours' => 24,
         // Public submissions per IP address and hour.
         'submissions_per_hour' => 5,
+        // ET4: the mégis Coach's suggestions, one more AI call per mirror (NM-06).
+        // Off, ET4 shows the Értéktár's words.
+        'deepening' => (bool) env('MIRROR_DEEPENING', true),
     ],
 
     /*

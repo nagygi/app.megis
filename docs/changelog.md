@@ -2,6 +2,25 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.28 · – · 2026-10-26
+
+Értéktükör a prototípus szerint: ET4 elmélyülés, a teljes kép a fával, az e-mail a beküldés előtt (06, NM-06).
+
+- **ET2:** a regisztráció első része a beküldés előtt jön. Kártya: „Hova küldjük a tükröd?”, e-mail mező és az ÁSZF meg az adatvédelmi szabályzat elfogadása (a 05-ös jegyben feltöltött hatályos verzióra linkel). Nélkülük a tükör nem küldhető be. A megerősítő levél a beküldéssel megy ki. Meglévő aktív fióknál nem megy levél: a felhasználó az ET5-ön lép be helyben.
+- **ET3:** a megtartott értékek neve az ET4-re visz. Lent: az első érték neve és „A teljes kép”.
+- **ET4 · elmélyülés (új):**
+  - Értékenként egy lap, lapozással („Egyenesség · 1 / 3”).
+  - A mégis Coach a kitöltő idézeteiből írja: mit jelent nálad (elfogadható: „Ez az”, vagy átírható: „Átírom”), miben látszik, mi az 1 és mi a 6. Alatta az idézetek, amikből épült.
+  - Új AI-feladat: `mirror_deepening`, prompt: `ertektukor-elmelyules` v1. A mérés után külön jobban fut, tükrönként egy hívással; az ET3 nem vár rá.
+  - Ha a Coach nem válaszol, az Értéktár szavai állnak a helyén. A hiba az Értékmérések alatt Feldolgozási hiba sort nyit, az „Újra” csak a Coachot indítja.
+  - Kikapcsolható: `MIRROR_DEEPENING=false`.
+  - Az elfogadott vagy átírt definíció és a két skálavég a saját értékek lépésébe (24 · V2) készen érkezik.
+- **ET5 · teljes kép:** charcoal manifesztó-sáv, a fa kilenc eleme egy körön a saját értékek körül, a kíváncsiság-kérdések mellett az elemek jelei. A jelölés azonnal mentődik. **E-mail mező és időpontfoglalás nincs** (a foglalás kódja megmarad, egyelőre nem hívja semmi). Alul: „Nézd meg a leveled”, vagy belépés a meglévő fiókba.
+- **A megerősítés után:** a felhasználó a tükre eredményére érkezik a fiókban, onnan az ET4 és az ET5 is elérhető. A megerősítés a feldolgozás vége előtt is jöhet; ilyenkor a diagnózis a feldolgozás végén épül meg. Magánszemélynél a belépés is a legutóbbi tükörre visz (eddig az Értéktárra).
+- **Saját menü:** az ET4 itt is megvan. Az *Értéktükör* lapján új lista: „Korábbi tükreid”. Az ET5-ön nincs foglalás.
+- **Meglévő fiók:** az ET2-n elfogadott dokumentumverziók a belépéskor a fiókhoz kerülnek.
+- **Adatbázis:** `mirror_sessions.confirmation_sent_at`, `mirror_sessions.insight_status`, új tábla: `mirror_value_insights`. Az „awaiting_confirmation” státuszt új tükör már nem kapja.
+
 ## 1.27 · d81f3c9 · 2026-10-21
 
 Képességrendszer, K2: képességmérés (NM-12).
