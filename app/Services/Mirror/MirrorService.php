@@ -342,10 +342,17 @@ class MirrorService
 
     /**
      * "Elküldöm" on ET5: the ticked questions and the kept values by e-mail to
-     * the mégis (megis.interest_email, 06 · 6.1).
+     * the mégis (megis.interest_email, 06 · 6.1), once a mirror.
      */
     public function sendInterest(MirrorSession $session): void
     {
+        // Marked before the mail, so a double click does not send twice.
+        $marked = MirrorSession::query()->whereKey($session->id)->whereNull('interest_sent_at')->update(['interest_sent_at' => now()]);
+
+        if ($marked === 0) {
+            return;
+        }
+
         $values = $this->groups($session)->where('excluded', false)->pluck('name')->values()->all();
 
         Mail::to(config('megis.interest_email'))->send(new MirrorInterestMail($session, $session->curiosity ?? [], $values));

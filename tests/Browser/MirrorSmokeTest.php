@@ -95,6 +95,13 @@ it('walks the public Értéktükör from the opening through each value to the f
         ->assertNoAccessibilityIssues()
         ->assertNoJavaScriptErrors();
 
+    // "Elküldöm" goes once; "Hamarosan" stands in its place
+    $page->check('input[value="gap"]');
+    $page->press('Elküldöm');
+    $page->assertSee('Hamarosan')
+        ->assertDontSee('Elküldöm')
+        ->assertNoAccessibilityIssues();
+
     $page->resize(390, 844);
     expect($page->script('() => document.documentElement.scrollWidth'))->toBeLessThanOrEqual(390);
 });

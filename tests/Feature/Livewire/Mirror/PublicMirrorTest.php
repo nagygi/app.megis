@@ -543,9 +543,9 @@ it('mails the ticked questions to the configured address with "Elküldöm", the 
         ->set('curiosity', ['inner', 'gap'])
         ->call('sendInterest')
         ->assertHasNoErrors()
-        ->assertSee('Elküldtük')
-        ->assertSee('A mégis hamarosan jelentkezik ide: anna@example.com.')
-        ->call('sendInterest');
+        ->assertSee('Hamarosan')
+        ->assertSee('Elküldtük a kérdéseidet, a mégis ide jelentkezik: anna@example.com.')
+        ->assertDontSeeHtml('wire:click="sendInterest"');
 
     Mail::assertQueued(MirrorInterestMail::class, 1);
     Mail::assertQueued(MirrorInterestMail::class, function (MirrorInterestMail $mail) {
@@ -558,19 +558,28 @@ it('mails the ticked questions to the configured address with "Elküldöm", the 
     });
 });
 
-it('mails the questions of one mirror three times in an hour', function () {
+it('mails the questions of one mirror once, not again after a new tick or on a reopened page', function () {
     Mail::fake();
     $session = submitTextMirror();
 
-    $component = Livewire::test(Result::class, ['session' => $session])->call('showFull');
+    Livewire::test(Result::class, ['session' => $session])
+        ->call('showFull')
+        ->set('curiosity', ['outer'])
+        ->call('sendInterest')
+        ->set('curiosity', ['outer', 'gap'])
+        ->call('sendInterest')
+        ->assertSee('Hamarosan');
 
-    foreach ([['outer'], ['outer', 'gap'], ['gap']] as $curiosity) {
-        $component->set('curiosity', $curiosity)->call('sendInterest')->assertHasNoErrors();
-    }
+    Livewire::test(Result::class, ['session' => $session->fresh()])
+        ->call('showFull')
+        ->assertSee('Hamarosan')
+        ->assertDontSeeHtml('wire:click="sendInterest"')
+        ->call('sendInterest');
 
-    $component->set('curiosity', ['inner'])->call('sendInterest')->assertSee('Ezt már elküldted. A mégis hamarosan jelentkezik.');
+    app(MirrorService::class)->sendInterest($session);
 
-    Mail::assertQueued(MirrorInterestMail::class, 3);
+    Mail::assertQueued(MirrorInterestMail::class, 1);
+    expect($session->fresh()->interest_sent_at)->not->toBeNull();
 });
 
 it('marks a value not mine on ET3', function () {

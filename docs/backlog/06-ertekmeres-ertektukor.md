@@ -71,7 +71,7 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 - A fa kilenc eleme egy körön a felhasználó értékei körül: gyökér, törzs, korona, árnyék, talaj, micélium, évgyűrűk, a kör, illat.
 - Négy kíváncsiság-kérdés jelölőnégyzettel, mindegyik mellett a hozzá tartozó elemek jele (belül: gyökér, törzs · kívül: korona, árnyék · a kettő között: micélium · képesség: tűz). A jelölés azonnal mentődik; az admin a felhasználó adatlapján (33) látja.
 - Alatta **„Elküldöm”** (2026.10.26.): a jelölt kérdések és a megtartott értékek e-mailben mennek a `MEGIS_INTEREST_EMAIL` címre (most: ng@exot.hu). A válasz a kitöltőnek megy; bejelentkezett felhasználónál a levélben link az adatlapjára (33).
-  - Jelölés nélkül a gomb tiltott. Elküldés után a gomb tiltott, alatta zöld visszajelzés: „Elküldtük · A mégis hamarosan jelentkezik ide: {e-mail}.” Új jelölés után újra küldhető, tükrönként óránként háromszor.
+  - Jelölés nélkül a gomb tiltott. Tükrönként egyszer küldhető (2026.10.26.): elküldés után a gomb helyén charcoal kártya évgyűrű-jellel: „Hamarosan · Elküldtük a kérdéseidet, a mégis ide jelentkezik: {e-mail}.” Új jelölés vagy újranyitott oldal után sem küldhető újra. A jelölés ezután is mentődik.
   - A saját menüben is megvan, a „Befejezem” mellett.
 - **E-mail mező és időpontfoglalás nincs** (2026.10.26.). A foglalás (Beérkező-sor, levél, adatlap-jelvény) a kódban megmarad, egyelőre nem hívja semmi.
 - Az alján:

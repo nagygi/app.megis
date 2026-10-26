@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
  */
 #[Fillable([
     'user_id', 'organization_id', 'material_id', 'diagnosis_id', 'status', 'insight_status', 'email',
-    'accepted_legal_versions', 'accepted_at', 'confirmation_sent_at', 'curiosity', 'booking_requested_at', 'claimed_at', 'expires_at',
+    'accepted_legal_versions', 'accepted_at', 'confirmation_sent_at', 'curiosity', 'interest_sent_at', 'booking_requested_at', 'claimed_at', 'expires_at',
 ])]
 class MirrorSession extends Model
 {
@@ -59,6 +59,7 @@ class MirrorSession extends Model
             'accepted_at' => 'datetime',
             'confirmation_sent_at' => 'datetime',
             'curiosity' => 'array',
+            'interest_sent_at' => 'datetime',
             'booking_requested_at' => 'datetime',
             'claimed_at' => 'datetime',
             'expires_at' => 'datetime',

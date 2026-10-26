@@ -50,8 +50,6 @@ class Result extends Component
     /** @var list<string> */
     public array $curiosity = [];
 
-    public bool $interestSent = false;
-
     public bool $rewriting = false;
 
     public string $meaning = '';
@@ -184,18 +182,16 @@ class Result extends Component
     {
         $this->ensureOwner();
         $this->saveCuriosity();
-        $this->interestSent = false;
     }
 
     /**
-     * "Elküldöm": the ticked questions go to the mégis by e-mail; a mirror
-     * sends three times in an hour. Sent, the same ticks are not sent again.
+     * "Elküldöm": the ticked questions go to the mégis by e-mail, once a mirror.
      */
     public function sendInterest(MirrorService $mirrors): void
     {
         $this->ensureOwner();
 
-        if ($this->interestSent) {
+        if ($this->session->interest_sent_at !== null) {
             return;
         }
 
@@ -204,15 +200,7 @@ class Result extends Component
         }
 
         $this->saveCuriosity();
-        $key = 'mirror-interest:'.$this->session->id;
-
-        if (RateLimiter::tooManyAttempts($key, 3)) {
-            throw ValidationException::withMessages(['curiosity' => __('mirror.interest_limited')]);
-        }
-
-        RateLimiter::hit($key, 3600);
         $mirrors->sendInterest($this->session);
-        $this->interestSent = true;
     }
 
     /**
@@ -309,6 +297,7 @@ class Result extends Component
             'canRetry' => $mirrors->canRetry($this->session),
             'otherValues' => max(0, Value::query()->availableTo(null)->count() - $kept->whereNotNull('valueId')->count()),
             'accountUrl' => $this->accountUrl(),
+            'interestSent' => $this->session->interest_sent_at !== null,
             'interestEmail' => $this->session->user?->email ?? $this->session->email,
         ]);
 

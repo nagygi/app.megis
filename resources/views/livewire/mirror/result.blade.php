@@ -193,16 +193,21 @@
             @endforeach
         </fieldset>
 
-        {{-- "Elküldöm": the ticked questions go to the mégis by e-mail; sent, the button rests until a new tick --}}
-        <div class="-mt-2 flex flex-col items-start gap-3">
-            <x-ui.button :tone="$isPublic ? 'dark' : 'outline'" icon="mail" wire:click="sendInterest" :disabled="$curiosity === [] || $interestSent">{{ __('mirror.send_interest') }}</x-ui.button>
-            <x-form.error name="curiosity" id="curiosity" role="alert" />
-            @if ($interestSent)
-                <x-ui.notice tone="success" :title="__('mirror.interest_sent_title')" class="self-stretch">
-                    {{ $interestEmail ? __('mirror.interest_sent', ['email' => $interestEmail]) : __('mirror.interest_sent_plain') }}
-                </x-ui.notice>
-            @endif
-        </div>
+        {{-- "Elküldöm": the ticked questions go to the mégis by e-mail, once a mirror; sent, "Hamarosan" stands in its place --}}
+        @if ($interestSent)
+            <div class="on-dark -mt-2 flex items-center gap-4 rounded-card bg-charcoal p-5 text-cream" role="status">
+                <x-megis.symbol name="growth-rings" class="size-12 shrink-0 text-yellow" />
+                <div class="flex min-w-0 flex-col gap-1">
+                    <p class="text-xl leading-tight font-extrabold text-yellow uppercase">{{ __('mirror.interest_sent_title') }}</p>
+                    <p class="break-words">{{ $interestEmail ? __('mirror.interest_sent', ['email' => $interestEmail]) : __('mirror.interest_sent_plain') }}</p>
+                </div>
+            </div>
+        @else
+            <div class="-mt-2 flex flex-col items-start gap-3">
+                <x-ui.button :tone="$isPublic ? 'dark' : 'outline'" icon="mail" wire:click="sendInterest" :disabled="$curiosity === []">{{ __('mirror.send_interest') }}</x-ui.button>
+                <x-form.error name="curiosity" id="curiosity" role="alert" />
+            </div>
+        @endif
 
         @if (! $isPublic)
             <div>
