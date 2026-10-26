@@ -59,20 +59,18 @@
             <p class="text-sm text-grey-700">{{ __('admin.processes.no_calendar') }}</p>
         @endforelse
 
-        {{-- At the leader's request: their iCal link or exported file (09 · 9.2); a superadmin picks the member. --}}
+        {{-- At a member's request: their iCal link or exported file (09 · 9.2). --}}
         @if ($calendarUser)
             <x-ui.card as="section" bordered padding="sm" class="flex flex-col gap-4" aria-labelledby="calendar-load">
                 <div class="flex flex-col gap-1">
                     <h3 id="calendar-load" class="font-semibold">{{ __('admin.processes.load_title', ['name' => $calendarUser->name]) }}</h3>
                     <p class="text-sm text-grey-700">{{ __('admin.processes.load_help') }}</p>
                 </div>
-                @if ($chooseCalendarUser)
-                    <x-form.select name="calendarUserId" wire:model.live="calendarUserId" :label="__('admin.processes.load_for')" :help="__('admin.processes.load_for_help')" class="sm:max-w-sm">
-                        @foreach ($members as $member)
-                            <option value="{{ $member->id }}">{{ $member->name }}</option>
-                        @endforeach
-                    </x-form.select>
-                @endif
+                <x-form.select name="calendarUserId" wire:model.live="calendarUserId" :label="__('admin.processes.load_for')" :help="__('admin.processes.load_for_help')" class="sm:max-w-sm">
+                    @foreach ($members as $member)
+                        <option value="{{ $member->id }}">{{ $member->name }}</option>
+                    @endforeach
+                </x-form.select>
                 <x-form.checkbox name="leaderAsked" wire:model="leaderAsked" :label="__('admin.processes.leader_asked', ['name' => $calendarUser->name])" :help="__('admin.processes.leader_asked_help')" />
                 <div class="grid gap-4 lg:grid-cols-2">
                     <form wire:submit="connectCalendarUrl" class="flex flex-col gap-3">
@@ -88,7 +86,7 @@
                 </div>
             </x-ui.card>
         @else
-            <p class="text-sm text-grey-700">{{ $chooseCalendarUser ? __('admin.processes.no_members') : __('admin.processes.no_running') }}</p>
+            <p class="text-sm text-grey-700">{{ __('admin.processes.no_members') }}</p>
         @endif
     </section>
 

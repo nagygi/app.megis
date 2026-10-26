@@ -89,26 +89,13 @@ it('shows why an unreadable file was not loaded', function () {
         ->and(AuditEvent::query()->exists())->toBeFalse();
 });
 
-it('loads a calendar only for a running diagnosis', function () {
+it("loads a calendar in any member's name without a running diagnosis", function () {
     $setup = diagnosisTeam(peers: 1);
-    actingAsAdmin($setup['admin']);
-
-    Livewire::test(Processes::class, ['organization' => $setup['organization']])
-        ->assertSee(__('admin.processes.no_running'))
-        ->set('icsUrl', 'https://calendar.example.com/secret.ics')
-        ->set('leaderAsked', true)
-        ->call('connectCalendarUrl')
-        ->assertForbidden();
-});
-
-it("lets a superadmin load a calendar in any member's name without a running diagnosis", function () {
-    $setup = diagnosisTeam(peers: 1);
-    $superadmin = actingAsAdmin(User::factory()->superadmin()->create());
+    $admin = actingAsAdmin($setup['admin']);
     $peer = $setup['peers'][0];
     $ics = sampleIcs($peer->email, $setup['leader']->email);
 
     Livewire::test(Processes::class, ['organization' => $setup['organization']])
-        ->assertDontSee(__('admin.processes.no_running'))
         ->assertSee(__('admin.processes.load_for'))
         ->set('calendarUserId', $peer->id)
         ->assertSee(__('admin.processes.load_title', ['name' => $peer->name]))
@@ -119,30 +106,34 @@ it("lets a superadmin load a calendar in any member's name without a running dia
 
     $connection = CalendarConnection::query()->sole();
     expect($connection->user_id)->toBe($peer->id)
-        ->and($connection->connected_by_id)->toBe($superadmin->id)
+        ->and($connection->connected_by_id)->toBe($admin->id)
         ->and($connection->main_diagnosis_id)->toBeNull()
         ->and(AuditEvent::query()->sole()->subject_user_id)->toBe($peer->id);
 });
 
-it("ties a superadmin's load to the running diagnosis only for its leader", function () {
+it('ties the load to the running diagnosis only for its leader', function () {
     $setup = diagnosisTeam(peers: 1);
-    $main = startMainDiagnosis($setup);
-    actingAsAdmin(User::factory()->superadmin()->create());
-    Http::fake(['calendar.example.com/*' => Http::response(sampleIcs($setup['leader']->email, $setup['peers'][0]->email))]);
+    startMainDiagnosis($setup);
+    actingAsAdmin($setup['admin']);
+    $peer = $setup['peers'][0];
+    Http::fake(['calendar.example.com/*' => Http::response(sampleIcs($peer->email, $setup['leader']->email))]);
 
     Livewire::test(Processes::class, ['organization' => $setup['organization']])
         ->assertSet('calendarUserId', $setup['leader']->id)
+        ->set('calendarUserId', $peer->id)
         ->set('icsUrl', 'https://calendar.example.com/secret.ics')
         ->set('leaderAsked', true)
         ->call('connectCalendarUrl')
         ->assertHasNoErrors();
 
-    expect(CalendarConnection::query()->sole()->main_diagnosis_id)->toBe($main->id);
+    $connection = CalendarConnection::query()->sole();
+    expect($connection->user_id)->toBe($peer->id)
+        ->and($connection->main_diagnosis_id)->toBeNull();
 });
 
-it('lets a superadmin load a calendar only in a member\'s name', function () {
+it("loads a calendar only in a member's name", function () {
     $setup = diagnosisTeam(peers: 1);
-    actingAsAdmin(User::factory()->superadmin()->create());
+    actingAsAdmin($setup['admin']);
 
     Livewire::test(Processes::class, ['organization' => $setup['organization']])
         ->set('calendarUserId', User::factory()->create()->id)
