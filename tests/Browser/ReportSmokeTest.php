@@ -64,6 +64,7 @@ it('opens the reading, the publishing, the Képességtár and the lists of the a
         route('admin.capability-rules.index', [], false),
         route('admin.inbox.index', [], false),
         route('admin.measurements.index', [], false),
+        route('admin.mirrors.index', [], false),
         route('admin.diagnoses.index', [], false),
         route('admin.clients.index', [], false),
         route('admin.clients.show', $setup['leader'], false),

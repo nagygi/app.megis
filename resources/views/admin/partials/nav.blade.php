@@ -27,6 +27,7 @@
         [
             'label' => __('admin.nav.measurements'),
             'items' => [
+                ['route' => 'admin.mirrors.index', 'active' => 'admin.mirrors.*', 'label' => __('admin.nav.mirrors')],
                 ['route' => 'admin.measurements.index', 'active' => 'admin.measurements.*', 'label' => __('admin.nav.inbox'), 'count' => $inbox->openMeasurementCount(auth()->user())],
             ],
         ],

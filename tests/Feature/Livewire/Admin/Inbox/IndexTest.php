@@ -68,6 +68,14 @@ it('lists the Értéktükör rows under Értékmérések, not in the Beérkező'
         ->assertSee('Valaki időpontot foglalna');
 });
 
+it('opens the mirror from its booking row, the unconfirmed one too', function () {
+    actingAsAdmin();
+    $mirror = MirrorSession::factory()->create(['email' => 'anna@example.com', 'confirmation_sent_at' => now()]);
+    app(InboxService::class)->open(InboxItemType::MirrorBooking, 'anna@example.com időpontot foglalna', subject: $mirror);
+
+    Livewire::test(MeasurementsIndex::class)->assertSee(route('admin.mirrors.show', $mirror));
+});
+
 it('closes a row and shows who closed it under "Lezártak"', function () {
     $admin = actingAsAdmin();
     $item = app(InboxService::class)->open(InboxItemType::ProcessingError, 'Nem sikerült feldolgozni egy anyagot.');

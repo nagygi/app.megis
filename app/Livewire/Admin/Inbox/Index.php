@@ -250,7 +250,7 @@ class Index extends Component
             $item->subject instanceof Material => route('admin.materials.show', $item->subject),
             // "Beépítem": the reading, with the feedback next to its chapter (22 · 22.2).
             $item->subject instanceof ReportFeedback && $item->diagnosis !== null => route('admin.main-diagnoses.reading', [$item->diagnosis, 'visszajelzes' => $item->subject->id]),
-            $item->subject instanceof MirrorSession && $item->subject->user !== null => route('admin.clients.show', $item->subject->user),
+            $item->subject instanceof MirrorSession => route('admin.mirrors.show', $item->subject),
             $item->diagnosis !== null => route('admin.diagnoses.show', $item->diagnosis),
             default => null,
         };

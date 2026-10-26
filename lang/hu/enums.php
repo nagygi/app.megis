@@ -305,6 +305,14 @@ return [
         'text_upload' => 'feltöltött leirat',
     ],
 
+    'mirror_status' => [
+        'processing' => 'feldolgozás alatt',
+        'ready' => 'kész',
+        'failed' => 'sikertelen',
+        'awaiting_confirmation' => 'kész',
+        'claimed' => 'kész',
+    ],
+
     'material_status' => [
         'pending' => 'sorban áll',
         'transcribing' => 'átírás',

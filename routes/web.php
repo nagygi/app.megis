@@ -93,7 +93,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->scopeBindings();
 
         Route::livewire('beerkezo', Admin\Inbox\Index::class)->name('inbox.index');
-        Route::livewire('ertekmeresek', Admin\Measurements\Index::class)->name('measurements.index');
+        // Értékmérések: every mirror, and the Beérkező of the Értéktükör.
+        Route::livewire('ertekmeresek', Admin\Mirrors\Index::class)->name('mirrors.index');
+        Route::livewire('ertekmeresek/beerkezo', Admin\Measurements\Index::class)->name('measurements.index');
+        // By id: the token opens the mirror in the browser that made it.
+        Route::livewire('ertekmeresek/{mirror:id}', Admin\Mirrors\Show::class)->whereNumber('mirror')->name('mirrors.show');
 
         Route::livewire('diagnozisok', Admin\Diagnoses\Index::class)->name('diagnoses.index');
         Route::livewire('diagnozisok/uj', Admin\Diagnoses\Form::class)->name('diagnoses.create');

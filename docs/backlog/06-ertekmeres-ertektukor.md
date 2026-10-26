@@ -103,6 +103,10 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
   - Nem lesz diagnózis.
   - Az eredmény 24 óráig él, utána törlődik. A tükör és a megerősítő link egyszerre jár le.
   - Csak a névtelen statisztika marad meg: a szabad értéknév és az illeszkedés, idézet nélkül.
+- **Az adminban** (*Értékmérések › Értéktükrök*): minden tükör listában, a nyilvános és a saját menüből indított is.
+  - A meg nem erősített tükör is látszik, amíg él: az e-mail és a lejárat.
+  - Szűrők: fiók (megerősítésre vár, belépésre vár, fiókban), feldolgozás, forrás. Keresni e-mailre vagy névre lehet.
+  - Az adatlapon az értékek az idézetekkel (mint az ET3-on, a „nem az enyém” is), az ET4 definíciói és az ET5 kíváncsiság-kérdései. Innen nyílik az anyag (átirat, hang), a diagnózis és a felhasználó adatlapja.
 
 ### 6.2 Értéktükör a saját menüből
 

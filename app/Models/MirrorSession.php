@@ -135,4 +135,19 @@ class MirrorSession extends Model
     {
         return $this->isAnonymous() && $this->email !== null && $this->confirmation_sent_at === null;
     }
+
+    /**
+     * Whose the mirror is, for the admin list (Értékmérések).
+     *
+     * @return 'claimed'|'awaiting_confirmation'|'awaiting_login'|'anonymous'
+     */
+    public function accountState(): string
+    {
+        return match (true) {
+            ! $this->isAnonymous() => 'claimed',
+            $this->awaitsConfirmation() => 'awaiting_confirmation',
+            $this->belongsToExistingAccount() => 'awaiting_login',
+            default => 'anonymous',
+        };
+    }
 }

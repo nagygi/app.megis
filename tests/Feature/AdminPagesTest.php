@@ -9,6 +9,7 @@ use App\Models\LegalDocumentVersion;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\Membership;
+use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\Pattern;
 use App\Models\Process;
@@ -64,6 +65,8 @@ it('renders every admin page for a superadmin with a page heading', function (Cl
     'client datasheet' => fn (array $models) => route('admin.clients.show', $models['customer']),
     'inbox' => fn () => route('admin.inbox.index'),
     'measurements' => fn () => route('admin.measurements.index'),
+    'mirrors' => fn () => route('admin.mirrors.index'),
+    'mirror' => fn () => route('admin.mirrors.show', MirrorSession::factory()->create()),
     'diagnoses' => fn () => route('admin.diagnoses.index'),
     'new diagnosis' => fn () => route('admin.diagnoses.create'),
     'diagnosis' => fn (array $models) => route('admin.diagnoses.show', $models['diagnosis']),
