@@ -1549,6 +1549,7 @@ return [
         'view_list' => 'Lista',
         'new' => 'Új diagnózis',
         'show_all' => 'Vázlat és lezárt is',
+        'organization' => 'Szervezet',
         'subject' => 'Alany',
         'contact' => 'Kapcsolattartó',
         'all' => 'Mind',

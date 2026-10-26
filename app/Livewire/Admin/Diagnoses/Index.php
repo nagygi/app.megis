@@ -45,6 +45,9 @@ class Index extends Component
     #[Url(as: 'kapcsolattarto', except: '')]
     public string $contact = '';
 
+    #[Url(as: 'szervezet', except: '')]
+    public string $organization = '';
+
     /** Draft and closed diagnoses too. */
     #[Url(as: 'mind', except: false)]
     public bool $showAll = false;
@@ -108,6 +111,7 @@ class Index extends Component
             ->whereIn('stage', array_keys($stages))
             ->when(MainDiagnosisSubject::tryFrom($this->subject), fn ($query, MainDiagnosisSubject $subject) => $query->where('subject', $subject))
             ->when($this->contact !== '', fn ($query) => $query->whereHas('diagnosis.organization', fn ($organization) => $organization->where('contact_admin_id', $this->contact === 'en' ? auth('admin')->id() : (int) $this->contact)))
+            ->when($this->organization !== '', fn ($query) => $query->whereHas('diagnosis', fn ($diagnosis) => $diagnosis->where('organization_id', (int) $this->organization)))
             ->with(['diagnosis.organization', 'diagnosis.team', 'leader', 'participants'])
             ->latest('id')
             ->get();
@@ -152,6 +156,7 @@ class Index extends Component
                 'cards' => $cards->filter(fn (array $card) => $card['main']->stage->value === $stage)->values(),
             ]),
             'openCount' => app(InboxService::class)->openCount(auth()->user()),
+            'organizations' => Organization::query()->orderBy('name')->pluck('name', 'id')->all(),
             'subjects' => collect(MainDiagnosisSubject::cases())->mapWithKeys(fn (MainDiagnosisSubject $subject) => [$subject->value => $subject->label()])->all(),
             'contacts' => User::query()->admins()->orderBy('last_name')->orderBy('first_name')->get(),
         ])->layout('layouts::admin')->title(__('admin.garden.title'));

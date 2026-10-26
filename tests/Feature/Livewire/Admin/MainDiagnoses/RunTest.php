@@ -205,6 +205,10 @@ it('shows the main diagnoses in the garden by stage (19 · 19.2)', function () {
         ->set('subject', 'person')
         ->assertDontSee($main->diagnosis->name)
         ->set('subject', '')
+        ->set('organization', (string) $invited->diagnosis->organization_id)
+        ->assertSee($invited->diagnosis->name)
+        ->assertDontSee($main->diagnosis->name)
+        ->set('organization', '')
         ->set('view', 'lista')
         ->assertSee(__('admin.diagnoses.name'));
 });

@@ -20,6 +20,12 @@
 
         {{-- The same build as the list's filters (x-admin.list-toolbar); the checkbox sits on the fields' line. --}}
         <div class="flex flex-wrap items-end gap-3">
+            <x-form.select name="organization" wire:model.live="organization" :label="__('admin.garden.organization')">
+                <option value="">{{ __('admin.garden.all') }}</option>
+                @foreach ($organizations as $id => $name)
+                    <option value="{{ $id }}">{{ $name }}</option>
+                @endforeach
+            </x-form.select>
             <x-form.select name="subject" wire:model.live="subject" :label="__('admin.garden.subject')">
                 <option value="">{{ __('admin.garden.all') }}</option>
                 @foreach ($subjects as $value => $label)
