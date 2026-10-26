@@ -190,6 +190,7 @@ return [
     // The occasions of a running diagnosis (12).
     'occasions' => [
         'contribute_title' => 'Hozzáteszek',
+        'contribute_close' => 'Vissza a kezdőlapra',
         'measure' => 'Mérés indítása',
         'mirror_help' => 'Mondd el, mi foglalkoztat – megmutatjuk, mely értékek szólnak belőle.',
         'situation' => 'Egy helyzet',

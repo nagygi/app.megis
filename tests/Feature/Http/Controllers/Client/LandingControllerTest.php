@@ -3,6 +3,7 @@
 use App\Models\Membership;
 use App\Models\Organization;
 use App\Models\User;
+use Illuminate\Support\Facades\Queue;
 
 it('sends the customer to the last used organization', function () {
     $first = Organization::factory()->create(['name' => 'A Kft.']);
@@ -15,6 +16,19 @@ it('sends the customer to the last used organization', function () {
     $response = $this->get(route('client.landing'));
 
     $response->assertRedirect(route('client.home', $second));
+});
+
+it('opens a published diagnosis on login and from the home alike (B2 · elkészült → V12)', function () {
+    Queue::fake();
+    [$setup, $main] = publishedReport();
+    actingAsCustomer($setup['leader']);
+    $page = route('client.diagnosis.show', [$setup['organization'], $main->diagnosis]);
+
+    $this->get(route('client.landing'))->assertRedirect($page);
+    $this->get(route('client.home', $setup['organization']))->assertRedirect($page);
+
+    actingAsCustomer($setup['peers'][0]);
+    $this->get(route('client.landing'))->assertRedirect($page);
 });
 
 it('shows the paused page when no organization is active', function () {

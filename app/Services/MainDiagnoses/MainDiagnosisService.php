@@ -397,6 +397,42 @@ class MainDiagnosisService
     }
 
     /**
+     * What a leader will see on first entry (V1) before there is a diagnosis to
+     * count with: the steps of the subject and product, "A szervezet értékei" and
+     * "A márkád alapja" read-only for a leader who is not the organization's
+     * (17 · 17.3). The A1 preview and the organization home read it (26 · 26.4).
+     */
+    public function previewSteps(Organization $organization, MainDiagnosisSubject $subject, ?User $leader): StepList
+    {
+        $isOrganizationLeader = $subject === MainDiagnosisSubject::Individual
+            || ($leader !== null && $this->isOrganizationLeader($organization, $leader));
+
+        return new StepList(array_map(function (DiagnosisStep $step) use ($isOrganizationLeader): StepState {
+            $readonly = ! $isOrganizationLeader && in_array($step, [DiagnosisStep::OrganizationValues, DiagnosisStep::Brand], true);
+
+            return new StepState(
+                step: $step,
+                done: false,
+                readonly: $readonly,
+                minutes: $readonly ? (int) config('diagnosis.readonly_step_minutes') : $step->minutes(),
+            );
+        }, MainDiagnosis::stepsFor($subject, $organization->product?->key)));
+    }
+
+    /**
+     * A peer's steps in a product, none of them done yet (25 · 25.3, 26 · 26.4).
+     */
+    public function previewPeerSteps(?string $productKey): StepList
+    {
+        return new StepList(array_map(fn (DiagnosisStep $step) => new StepState(
+            step: $step,
+            done: false,
+            readonly: false,
+            minutes: $step->minutes(),
+        ), MainDiagnosis::peerStepsFor($productKey)));
+    }
+
+    /**
      * Team members who can be peers: everyone but the leader, whatever their tags (17 · 17.2).
      *
      * @return Collection<int, User>

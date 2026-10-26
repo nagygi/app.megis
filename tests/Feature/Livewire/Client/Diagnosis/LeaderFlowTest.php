@@ -24,9 +24,11 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Value;
 use App\Services\Auth\LandingResolver;
+use App\Services\MainDiagnoses\ExperienceService;
 use App\Services\MainDiagnoses\StepProgress;
 use App\Services\Values\ValueService;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
 
 function leaderParams(array $setup, $main): array
@@ -276,6 +278,27 @@ it('saves the brand base boxes and needs all four for "Tovább"', function () {
         ->call('next')
         ->assertHasNoErrors()
         ->assertRedirect(route('client.diagnosis.megeles', leaderParams($setup, $main)));
+});
+
+it('opens a filled step again from V10 and goes back home from it', function () {
+    Queue::fake();
+    [$setup, $main] = runningDiagnosis();
+    actingAsCustomer($setup['leader']);
+    $home = route('client.diagnosis.show', leaderParams($setup, $main));
+
+    $this->get(route('client.diagnosis.megeles', leaderParams($setup, $main)))
+        ->assertOk()
+        ->assertSeeHtml('href="'.$home.'"')
+        ->assertSee('Diagnózis');
+
+    $keys = collect(app(ExperienceService::class)->rows($main->valueSetVersion->snapshot))->pluck('key');
+    $component = Livewire::test(Experience::class, leaderParams($setup, $main));
+
+    foreach ($keys as $key) {
+        $component->set('answers.'.$key, '3');
+    }
+
+    $component->call('submit')->assertHasNoErrors()->assertRedirect($home);
 });
 
 it('sends the experience as a Megélés subdiagnosis with the value set version', function () {

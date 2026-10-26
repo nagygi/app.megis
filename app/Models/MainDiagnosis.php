@@ -224,7 +224,17 @@ class MainDiagnosis extends Model
      */
     public function peerSteps(): array
     {
-        return self::filterSteps(config('diagnosis.peer_steps'), $this->product_key);
+        return self::peerStepsFor($this->product_key);
+    }
+
+    /**
+     * A peer's steps in a product; the organization home previews the same (26 · 26.4).
+     *
+     * @return list<DiagnosisStep>
+     */
+    public static function peerStepsFor(?string $productKey): array
+    {
+        return self::filterSteps(config('diagnosis.peer_steps'), $productKey);
     }
 
     /**

@@ -2,6 +2,26 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.34 · HASH · 2026-10-27
+
+A belépés utáni címlap az út előnézetével, és visszaút a kitöltött lépésekhez (26 · 26.4, prototípus: „A vezető útja”, „A csapat hangja”, B2).
+
+- **Címlap, amíg a diagnózis nem nyílt meg a usernek (új):**
+  - Eddig csak „Szia …” és „amint elindul” állt rajta. Most az út is látszik, szürkén, nem kattinthatóan.
+  - **A vezető útja:** a lépések percekkel, a „csak olvasható” jelzéssel, alatta „A végén”. Ezt látja a még draft diagnózis vezetője, és a szervezet vezetője, ha nincs szerepe egy diagnózisban.
+  - Alatta **A csapat hangja · {csapat}:** a társak nevei és a társ útja: Meghívó → Mi vár rád → a lépései → Amíg fut, hozzáteszel → Útravaló. A „A csapat az induláskor kap meghívót.” sor zárja. Csak társakkal járó terméknél.
+  - **A társnak** csak a saját útja: „{vezető} hamarosan meghív a(z) {csapat} diagnózisába.” (ha még nincs diagnózis: „Amikor a vezetőd elindítja a diagnózist, meghívót kapsz.”), a lépései, a Hozzáteszel és az Útravaló.
+  - A draft továbbra is az adminé: a V1 a meghívó után nyílik, a társ T1-e az „Indul” után.
+  - Az admin A1 előnézete és a címlap ugyanabból számolja a vezető lépéseit.
+- **Belépés = logó:** a Kezdőlap ugyanazt a diagnózist nyitja, mint a belépés. A publikált diagnózis a belépéskor is megnyílik (vezetőnél V12, társnál T5 az Útravalóval), egyéni szervezetben is az Értéktükör előtt.
+- **Visszaút a kitöltött lépésekhez:**
+  - Ha a vezető diagnózisa már fut, vagy a társnak nincs több lépése, a kezdőlapról nyitott lépés vissza-nyila és a „Tovább” is a kezdőlapra visz („Diagnózis”, illetve „Kezdőlap”), nem a következő lépésre.
+  - V10, Onboarding: a lenyitott lépéslista fölött egy sor mondja meg, meddig javíthatók a lépések, és hogy a szervezet értékei és a márkád alapja az induláskor rögzültek.
+  - T5·b: a megadott megélés is újranyitható („megélés megvan”), kitöltve. A lapon ott a coral plusz.
+  - V11·c: Beküldöm / Kihagyom után a kezdőlap jön (eddig a Hozzáteszek). A T5·b-ről nyitva oda vezet vissza.
+  - V11: a coral plusz helyén coral ×, vissza a kezdőlapra.
+- Nincs adatbázis-változás.
+
 ## 1.33 · 6e020a2 · 2026-10-26
 
 Leírom · Elmondom · Feltöltöm: a hosszabb szöveges mezők fölött fülsor. A szöveg beírható, elmondható vagy fájlból tölthető.

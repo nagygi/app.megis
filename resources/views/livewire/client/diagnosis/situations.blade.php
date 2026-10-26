@@ -19,10 +19,11 @@
                             · {{ $material->is_situation ? ($material->audio_seconds !== null ? __('processes.occasions.spoken', ['duration' => $material->durationLabel()]) : __('processes.occasions.written')) : __('processes.occasions.uploaded') }}
                             @if ($material->process_occasion_id !== null)
                                 ·
-                                @if ($experience?->isSubmitted())
+                                {{-- Given or not, the experience opens again until reading (prototype T5·b → V11·c). --}}
+                                @if ($editable)
+                                    <a href="{{ route('client.diagnosis.occasion-experience', [$organization, $diagnosis, $material, 'from' => 'helyzeteim']) }}" @class(['font-semibold', 'text-coral-ink' => ! $experience?->isSubmitted()])>{{ $experience?->isSubmitted() ? __('processes.occasions.experience_given') : __('processes.occasions.experience_missing') }}</a>
+                                @elseif ($experience?->isSubmitted())
                                     {{ __('processes.occasions.experience_given') }}
-                                @elseif ($editable)
-                                    <a href="{{ route('client.diagnosis.occasion-experience', [$organization, $diagnosis, $material]) }}" class="font-semibold text-coral-ink">{{ __('processes.occasions.experience_missing') }}</a>
                                 @else
                                     <span class="text-coral-ink">{{ __('processes.occasions.experience_missing') }}</span>
                                 @endif

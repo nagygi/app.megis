@@ -99,8 +99,20 @@ return [
         'greeting' => 'Szia, :name!',
         'lead' => 'Itt fogod látni a(z) :organization diagnózisát, amint elindul.',
         'lead_not_participant' => 'Jelenleg nincs olyan diagnózis, amelyben részt veszel.',
-        'diagnoses' => 'A diagnózisaid',
-        'publishes' => 'publikálás: :date',
+        // The way ahead before the diagnosis opens (26 · 26.4, prototype "A vezető útja", "A csapat hangja").
+        'leader_path' => 'A vezető útja',
+        'team_path' => 'A csapat hangja',
+        'team_path_named' => 'A csapat hangja · :team',
+        'team_path_help' => 'A csapat az induláskor kap meghívót.',
+        'invited_soon' => ':leader hamarosan meghív a(z) :subject diagnózisába.',
+        'invited_later' => 'Amikor a vezetőd elindítja a diagnózist, meghívót kapsz.',
+        'path' => [
+            'label' => 'A társ útja',
+            'invitation' => 'Meghívó',
+            'contribute' => 'Amíg fut, hozzáteszel',
+            'takeaway' => 'Útravaló',
+        ],
+        'takeaway_help' => 'a publikálás után · a te értékeid, ahogy a helyzeteidben látszanak',
     ],
 
     'profile' => [

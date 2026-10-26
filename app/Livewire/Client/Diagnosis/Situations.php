@@ -10,6 +10,7 @@ use App\Models\Material;
 use App\Models\OccasionExperience;
 use App\Models\Organization;
 use App\Services\Materials\MaterialStore;
+use App\Services\Processes\OccasionService;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -62,6 +63,10 @@ class Situations extends Component
             'back' => $this->overviewUrl(),
             'backLabel' => __('diagnosis.home_back'),
             'color' => 'cream',
+            // The coral plus stays here too while it runs (prototype T5·b).
+            'plus' => app(OccasionService::class)->canContribute($this->main(), $this->user())
+                ? route('client.diagnosis.contribute', [$this->organization, $this->diagnosis])
+                : null,
         ])->title(__('processes.occasions.situations_title'));
     }
 }

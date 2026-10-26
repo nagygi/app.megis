@@ -20,7 +20,8 @@ use Livewire\WithFileUploads;
 /**
  * V11·c · A megélésed (12 · 12.4): after placing a material, before the
  * analysis. Each row 1–6 or "nem tudom", whether it was effective, a note;
- * "Kihagyom" is an equal way and can be made up later.
+ * "Kihagyom" is an equal way and can be made up later. Afterwards back home
+ * (V10, T5), or to T5·b when opened from there.
  */
 class OccasionExperienceForm extends Component
 {
@@ -37,6 +38,11 @@ class OccasionExperienceForm extends Component
 
     public string $note = '';
 
+    /**
+     * "helyzeteim" when opened from T5·b: the way back leads there.
+     */
+    public string $from = '';
+
     public function mount(Organization $organization, Diagnosis $diagnosis, Material $material): void
     {
         $this->bootDiagnosis($organization, $diagnosis);
@@ -44,6 +50,7 @@ class OccasionExperienceForm extends Component
         abort_if($material->process_occasion_id === null, 404);
 
         $this->materialUuid = $material->uuid;
+        $this->from = request()->query('from') === 'helyzeteim' ? 'helyzeteim' : '';
         $existing = OccasionExperience::query()->where('process_occasion_id', $material->process_occasion_id)->where('user_id', $this->user()->id)->first();
 
         if ($existing?->isSubmitted()) {
@@ -74,7 +81,7 @@ class OccasionExperienceForm extends Component
         $occasions->experience($this->material(), $this->user(), array_intersect_key($this->answers, array_flip($keys)), $this->effectiveness, $this->note, skip: false);
 
         session()->flash('status', __('processes.occasions.experience_saved'));
-        $this->redirect($this->contributeUrl(), navigate: false);
+        $this->redirect($this->returnUrl(), navigate: false);
     }
 
     public function skip(OccasionService $occasions): void
@@ -82,7 +89,7 @@ class OccasionExperienceForm extends Component
         $this->authorizeExperience();
 
         $occasions->experience($this->material(), $this->user(), null, null, null, skip: true);
-        $this->redirect($this->contributeUrl(), navigate: false);
+        $this->redirect($this->returnUrl(), navigate: false);
     }
 
     public function render(): View
@@ -100,8 +107,8 @@ class OccasionExperienceForm extends Component
         ])->layout('layouts::client', [
             'title' => __('processes.occasions.experience_title'),
             'subtitle' => collect([$material->occasion?->process?->name, $material->occasion?->occurred_at?->format('Y.m.d.'), $material->is_situation ? __('processes.occasions.situation') : $material->source->label()])->filter()->implode(' · '),
-            'back' => $this->contributeUrl(),
-            'backLabel' => __('processes.occasions.contribute_title'),
+            'back' => $this->fromSituations() ? $this->situationsUrl() : $this->contributeUrl(),
+            'backLabel' => $this->fromSituations() ? __('processes.occasions.situations_title') : __('processes.occasions.contribute_title'),
             'color' => 'cream',
         ])->title(__('processes.occasions.experience_title'));
     }
@@ -112,6 +119,24 @@ class OccasionExperienceForm extends Component
     private function rows(): array
     {
         return app(ExperienceService::class)->rows($this->main()->valueSetVersion?->snapshot ?? []);
+    }
+
+    private function fromSituations(): bool
+    {
+        return $this->from === 'helyzeteim';
+    }
+
+    private function situationsUrl(): string
+    {
+        return route('client.diagnosis.situations', [$this->organization, $this->diagnosis]);
+    }
+
+    /**
+     * After "Beküldöm" or "Kihagyom": T5·b when opened from there, otherwise the home (prototype V11·c).
+     */
+    private function returnUrl(): string
+    {
+        return $this->fromSituations() ? $this->situationsUrl() : $this->overviewUrl();
     }
 
     private function material(): Material

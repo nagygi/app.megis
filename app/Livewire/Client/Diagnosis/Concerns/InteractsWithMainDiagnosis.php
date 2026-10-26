@@ -82,21 +82,33 @@ trait InteractsWithMainDiagnosis
     }
 
     /**
-     * Where "Tovább" goes: the next step, or back to the overview after the last one.
+     * A step opened again from the home (V10, T5): the leader's diagnosis runs,
+     * or the peer has no step left. The arrow and "Tovább" then go home
+     * instead of walking the steps again.
+     */
+    public function isRevisit(): bool
+    {
+        return $this->isLeader()
+            ? ! $this->main()->stage->isBeforeRunning()
+            : $this->steps()->current() === null;
+    }
+
+    /**
+     * Where "Tovább" goes: the next step, or back to the overview after the last one or on a revisit.
      */
     public function nextUrl(DiagnosisStep $step): string
     {
-        $next = $this->steps()->after($step);
+        $next = $this->isRevisit() ? null : $this->steps()->after($step);
 
         return $next === null ? $this->overviewUrl() : $this->stepUrl($next->step);
     }
 
     /**
-     * The header arrow: the previous step, or the overview from the first one.
+     * The header arrow: the previous step, or the overview from the first one or on a revisit.
      */
     public function previousUrl(DiagnosisStep $step): string
     {
-        $previous = $this->steps()->before($step);
+        $previous = $this->isRevisit() ? null : $this->steps()->before($step);
 
         return $previous === null ? $this->overviewUrl() : $this->stepUrl($previous->step);
     }
@@ -107,12 +119,19 @@ trait InteractsWithMainDiagnosis
     public function stepLayout(DiagnosisStep $step): array
     {
         $steps = $this->steps();
-        $previous = $steps->before($step);
+        $revisit = $this->isRevisit();
+        $previous = $revisit ? null : $steps->before($step);
+        // The home's own label: "Diagnózis" on V10, "Kezdőlap" on T5.
+        $home = match (true) {
+            ! $revisit => __('diagnosis.overview_back'),
+            $this->isLeader() => __('client.header.diagnosis'),
+            default => __('diagnosis.home_back'),
+        };
 
         return [
             'title' => $step->label(),
             'back' => $this->previousUrl($step),
-            'backLabel' => $previous?->step->label() ?? __('diagnosis.overview_back'),
+            'backLabel' => $previous?->step->label() ?? $home,
             'step' => $steps->position($step).' / '.$steps->count(),
             'progress' => [$steps->position($step), $steps->count()],
             'color' => 'cream',

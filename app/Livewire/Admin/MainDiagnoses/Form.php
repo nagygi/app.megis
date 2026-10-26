@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Admin\MainDiagnoses;
 
-use App\Enums\DiagnosisStep;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\MainDiagnosisSubject;
 use App\Enums\MembershipStatus;
@@ -16,6 +15,7 @@ use App\Models\Organization;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\MainDiagnoses\MainDiagnosisService;
+use App\Services\MainDiagnoses\StepState;
 use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -496,18 +496,11 @@ class Form extends Component
             return [];
         }
 
-        $isOrganizationLeader = $subject === MainDiagnosisSubject::Individual
-            || ($leader !== null && $mainDiagnoses->isOrganizationLeader($organization, $leader));
-
-        return array_map(function (DiagnosisStep $step) use ($isOrganizationLeader): array {
-            $readonly = ! $isOrganizationLeader && in_array($step, [DiagnosisStep::OrganizationValues, DiagnosisStep::Brand], true);
-
-            return [
-                'label' => $step->label(),
-                'minutes' => $readonly ? (int) config('diagnosis.readonly_step_minutes') : $step->minutes(),
-                'readonly' => $readonly,
-            ];
-        }, MainDiagnosis::stepsFor($subject, $organization->product?->key));
+        return array_map(fn (StepState $state): array => [
+            'label' => $state->step->label(),
+            'minutes' => $state->minutes,
+            'readonly' => $state->readonly,
+        ], $mainDiagnoses->previewSteps($organization, $subject, $leader)->steps);
     }
 
     /**

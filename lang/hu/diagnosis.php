@@ -17,7 +17,7 @@ return [
     'continue_lead' => 'Innen folytatod.',
     'continue_count' => ':done / :count kész · kb. :minutes perc van hátra',
     'running_lead' => 'A diagnózis fut · publikálás: :date',
-    'running_help' => 'A kész lépéseket az olvasat indításáig (:date) javíthatod.',
+    'running_help' => 'A kész lépéseket az olvasat indításáig (:date) javíthatod. A szervezet értékei és a márkád alapja az induláskor rögzültek.',
     'reading_lead' => 'Elindult a mégis olvasata.',
     'reading_help' => 'A lépések már csak olvashatók.',
     'continue' => 'Folytatom',

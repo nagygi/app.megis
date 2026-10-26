@@ -27,6 +27,8 @@
     'label' => null,
     // The coral plus to V11, on the homes of a running diagnosis (15 · 15.5).
     'plus' => null,
+    // The coral close button in its place on V11: back to the home (prototype V11).
+    'close' => null,
 ])
 
 @php
@@ -265,21 +267,21 @@
             {{-- With the plus button, the page ends above it. --}}
             <main id="main" @class([
                 'mx-auto w-full max-w-3xl flex-1 px-6 py-6 desktop:max-w-5xl',
-                'pb-28' => $plus,
+                'pb-28' => $plus || $close,
             ])>
                 {{ $slot }}
             </main>
         </div>
     </div>
 
-    @if ($plus)
+    @if ($plus || $close)
         {{-- Under the open menu's backdrop (z-20), above the iPhone's home bar. --}}
         <a
-            href="{{ $plus }}"
+            href="{{ $plus ?? $close }}"
             class="press fixed bottom-0 left-1/2 z-10 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] w-28 -translate-x-1/2 place-items-center rounded-t-full bg-coral pt-2 pb-[env(safe-area-inset-bottom)] text-black no-underline hover:bg-coral-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-charcoal"
         >
-            <x-megis.icon name="plus" class="size-6" />
-            <span class="sr-only">{{ __('processes.occasions.contribute_title') }}</span>
+            <x-megis.icon :name="$plus ? 'plus' : 'close'" class="size-6" />
+            <span class="sr-only">{{ $plus ? __('processes.occasions.contribute_title') : __('processes.occasions.contribute_close') }}</span>
         </a>
     @endif
 

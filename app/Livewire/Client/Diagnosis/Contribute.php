@@ -115,6 +115,7 @@ class Contribute extends Component
             'back' => $this->overviewUrl(),
             'backLabel' => __('diagnosis.home_back'),
             'color' => 'cream',
+            'close' => $this->overviewUrl(),
         ])->title(__('processes.occasions.contribute_title'));
     }
 

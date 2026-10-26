@@ -12,7 +12,8 @@ use App\Models\User;
 /**
  * Where a customer arrives after logging in (14 · 14.4). The system picks the
  * page, not the user: the diagnosis the user leads (V1 while filling in,
- * later its home), otherwise the one they are a peer in (T1, T5; 26 · 26.4).
+ * later its home, V12 when published), otherwise the one they are a peer in
+ * (T1, T5; 26 · 26.4).
  * Someone who has only made an Értéktükör sees their latest mirror, its
  * values expanded and the full picture (06 · 6.1); otherwise the organization
  * home opens.
@@ -54,8 +55,9 @@ class LandingResolver
 
     /**
      * The latest main diagnosis the user leads in the organization; if none, the
-     * latest running one they are a peer in (26 · 26.4). Published ones open
-     * their report once it exists (27).
+     * latest running one they are a peer in (26 · 26.4). After them a published
+     * one: the leader's V12, the peer's T5 with the Útravaló (B2, 27, 29). The
+     * organization home opens the same one.
      */
     public function diagnosisFor(User $user, Organization $organization): ?MainDiagnosis
     {
@@ -68,6 +70,8 @@ class LandingResolver
             ->first();
 
         return $query(ParticipantRole::Leader, [MainDiagnosisStage::Invited, MainDiagnosisStage::Filling, MainDiagnosisStage::Running, MainDiagnosisStage::Reading])
-            ?? $query(ParticipantRole::Peer, [MainDiagnosisStage::Running, MainDiagnosisStage::Reading]);
+            ?? $query(ParticipantRole::Peer, [MainDiagnosisStage::Running, MainDiagnosisStage::Reading])
+            ?? $query(ParticipantRole::Leader, [MainDiagnosisStage::Published])
+            ?? $query(ParticipantRole::Peer, [MainDiagnosisStage::Published]);
     }
 }

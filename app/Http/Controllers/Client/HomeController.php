@@ -7,33 +7,32 @@ use App\Http\Controllers\Controller;
 use App\Models\MainDiagnosis;
 use App\Models\Organization;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use App\Services\Auth\LandingResolver;
+use App\Services\MainDiagnoses\HomePreview;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * The organization's home (26 · 26.4): the newest main diagnosis the user
- * leads, otherwise the newest one they are a peer in; the page of that
- * diagnosis opens (V1, V10, T5). Without a diagnosis, a greeting.
+ * The organization's home (26 · 26.4): the diagnosis the login opens too
+ * (V1, V10, V12, T1, T5). Before one opens for the user, a greeting with the
+ * way ahead: the leader's steps and the team's, or the peer's.
  */
 class HomeController extends Controller
 {
-    public function __invoke(Request $request, Organization $organization): View|RedirectResponse
+    public function __invoke(Request $request, Organization $organization, LandingResolver $landing, HomePreview $preview): View|RedirectResponse
     {
         $user = $request->user();
-        $diagnoses = $this->diagnoses($organization, $user);
-        $home = $diagnoses->first(fn (MainDiagnosis $main) => $main->isLeader($user)) ?? $diagnoses->first();
 
-        if ($home !== null) {
+        if ($home = $landing->diagnosisFor($user, $organization)) {
             return redirect()->route('client.diagnosis.show', [$organization, $home->diagnosis]);
         }
 
         return view('client.home', [
             'organization' => $organization,
             'user' => $user,
-            'diagnoses' => $diagnoses,
             'lead' => $this->lead($organization, $user),
+            'preview' => $preview->for($organization, $user),
         ]);
     }
 
@@ -49,7 +48,7 @@ class HomeController extends Controller
 
         $waiting = MainDiagnosis::query()
             ->withParticipant($user)
-            ->inStages(MainDiagnosisStage::Invited, MainDiagnosisStage::Filling)
+            ->inStages(MainDiagnosisStage::Draft, MainDiagnosisStage::Invited, MainDiagnosisStage::Filling)
             ->whereHas('diagnosis', $inOrganization)
             ->exists();
 
@@ -61,23 +60,5 @@ class HomeController extends Controller
         return $waiting || ! $started
             ? __('client.home.lead', ['organization' => $organization->name])
             : __('client.home.lead_not_participant');
-    }
-
-    /**
-     * @return Collection<int, MainDiagnosis>
-     */
-    private function diagnoses(Organization $organization, User $user): Collection
-    {
-        return MainDiagnosis::query()
-            ->withParticipant($user)
-            ->whereNotIn('stage', [MainDiagnosisStage::Draft->value, MainDiagnosisStage::Closed->value])
-            ->whereHas('diagnosis', fn ($query) => $query->where('organization_id', $organization->id))
-            ->with('diagnosis.team', 'diagnosis.organization', 'diagnosis.user')
-            ->latest('id')
-            ->get()
-                // Peers are invited when the diagnosis starts running (25 · 25.1).
-            ->filter(fn (MainDiagnosis $main) => $main->isLeader($user)
-                || in_array($main->stage, [MainDiagnosisStage::Running, MainDiagnosisStage::Reading, MainDiagnosisStage::Published], true))
-            ->values();
     }
 }

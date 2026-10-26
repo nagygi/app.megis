@@ -44,7 +44,11 @@
                             <x-megis.icon name="chevron-down" class="transition-transform duration-200 group-open:rotate-180" />
                         </span>
                     </summary>
-                    <div class="px-5 pb-5">
+                    <div class="flex flex-col gap-3 px-5 pb-5">
+                        {{-- The way back to the filled steps: until reading they can be corrected. --}}
+                        <p class="text-sm text-grey-700">
+                            {{ $main->acceptsInput() ? __('diagnosis.running_help', ['date' => $main->readingStartsOn()->format('m.d.')]) : __('diagnosis.reading_help') }}
+                        </p>
                         <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" />
                     </div>
                 </details>

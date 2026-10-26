@@ -11,7 +11,57 @@ it('greets the customer until a diagnosis of the organization starts', function 
 
     $this->get(route('client.home', $organization))
         ->assertOk()
-        ->assertSee('Itt fogod látni a(z) Acme Kft. diagnózisát, amint elindul.');
+        ->assertSee('Itt fogod látni a(z) Acme Kft. diagnózisát, amint elindul.')
+        // A member's way ahead: the peer's (26 · 26.4).
+        ->assertSee('A csapat hangja')
+        ->assertSee('Amikor a vezetőd elindítja a diagnózist, meghívót kapsz.')
+        ->assertSee('Útravaló')
+        ->assertDontSee('A vezető útja');
+});
+
+it('shows the leader of a draft diagnosis their steps and the team\'s, not clickable (26 · 26.4)', function () {
+    $setup = diagnosisTeam(peers: 2);
+    $main = startMainDiagnosis($setup, invite: false);
+    $setup['peers'][0]->update(['first_name' => 'Bea', 'last_name' => 'Társ']);
+    actingAsCustomer($setup['leader']);
+
+    $this->get(route('client.home', $setup['organization']))
+        ->assertOk()
+        ->assertSee('amint elindul')
+        ->assertSee('A vezető útja')
+        ->assertSee('Saját értékek')
+        ->assertSee('A csapat hangja · '.$setup['team']->name)
+        ->assertSee($setup['peers'][0]->name)
+        ->assertSee('Meghívó')
+        ->assertSee('A csapat az induláskor kap meghívót.')
+        ->assertDontSeeHtml('href="'.route('client.diagnosis.sajat-ertekek', [$setup['organization'], $main->diagnosis]).'"');
+});
+
+it('shows an organization leader without a role the leader\'s way, with the team being set up', function () {
+    $setup = diagnosisTeam(peers: 2, organizationLeader: false);
+    startMainDiagnosis($setup, invite: false);
+    $organizationLeader = User::factory()->create();
+    Membership::factory()->for($setup['organization'])->for($organizationLeader)->create(['is_organization_leader' => true]);
+    actingAsCustomer($organizationLeader);
+
+    $this->get(route('client.home', $setup['organization']))
+        ->assertOk()
+        ->assertSee('A vezető útja')
+        ->assertSee('A csapat hangja · '.$setup['team']->name)
+        ->assertSee($setup['peers'][1]->name);
+});
+
+it('tells a peer of a draft diagnosis who will invite them, with the peer\'s way', function () {
+    $setup = diagnosisTeam(peers: 1);
+    startMainDiagnosis($setup, invite: false);
+    actingAsCustomer($setup['peers'][0]);
+
+    $this->get(route('client.home', $setup['organization']))
+        ->assertOk()
+        ->assertSee('amint elindul')
+        ->assertSee($setup['leader']->name.' hamarosan meghív a(z) '.$setup['team']->name.' diagnózisába.')
+        ->assertSee('Hozzáteszel')
+        ->assertDontSee('A vezető útja');
 });
 
 it('tells an organization leader who is not in the running diagnosis that they take part in none', function () {

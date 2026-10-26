@@ -240,7 +240,8 @@ it('records the experience of an occasion, or its skipping (V11·c)', function (
     Livewire::test(OccasionExperienceForm::class, $params)
         ->assertSee('Hogyan élted meg ezt a helyzetet?')
         ->call('skip')
-        ->assertRedirect(route('client.diagnosis.contribute', [$setup['organization'], $main->diagnosis]));
+        // Back to the home afterwards (prototype V11·c → V10).
+        ->assertRedirect(route('client.diagnosis.show', [$setup['organization'], $main->diagnosis]));
 
     $experience = OccasionExperience::query()->sole();
     expect($experience->skipped_at)->not->toBeNull()
@@ -269,6 +270,32 @@ it('records the experience of an occasion, or its skipping (V11·c)', function (
         ->and($experience->answers)->toHaveCount($keys->count())
         ->and($experience->value_set_version_id)->toBe($main->value_set_version_id);
     Queue::assertPushed(RecalculateMainDiagnosis::class);
+});
+
+it('opens a given experience again from T5·b and returns there (T5·b → V11·c)', function () {
+    [$setup, $main, $retro] = occasionDiagnosis();
+    $leader = $setup['leader'];
+    actingAsCustomer($leader);
+    $material = situationMaterial($main, $leader);
+    app(OccasionService::class)->place($material, $retro, today()->toDateString(), $leader, false);
+    $keys = collect(app(ExperienceService::class)->rows($main->valueSetVersion->snapshot))->pluck('key');
+    app(OccasionService::class)->experience($material, $leader, $keys->mapWithKeys(fn ($key) => [$key => '4'])->all(), 'yes', 'Első', skip: false);
+    $situations = route('client.diagnosis.situations', occasionParams($setup, $main));
+    $form = route('client.diagnosis.occasion-experience', [...occasionParams($setup, $main), 'material' => $material, 'from' => 'helyzeteim']);
+
+    $this->get($situations)->assertOk()
+        ->assertSeeHtml('href="'.e($form).'"')
+        // The coral plus stays on T5·b while it runs.
+        ->assertSeeHtml('href="'.route('client.diagnosis.contribute', occasionParams($setup, $main)).'"');
+
+    $this->get($form)->assertOk()->assertSeeHtml('href="'.$situations.'"');
+
+    Livewire::withQueryParams(['from' => 'helyzeteim'])
+        ->test(OccasionExperienceForm::class, [...occasionParams($setup, $main), 'material' => $material])
+        ->assertSet('answers.'.$keys->first(), '4')
+        ->set('effectiveness', 'partial')
+        ->call('submit')
+        ->assertRedirect($situations);
 });
 
 it('lists the own situations with the missing experience, never anyone else\'s (T5·b)', function () {
