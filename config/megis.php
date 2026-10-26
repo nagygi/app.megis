@@ -231,10 +231,10 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    // Named routes listed in sitemap.xml. Only public pages belong here (NFR · 6).
+    // Named routes listed in sitemap.xml. Only pages robots.txt lets crawlers
+    // fetch belong here: for now, the home page alone (NFR · 6).
     'sitemap_routes' => [
         'public.home',
-        'mirror.record',
     ],
 
     // First URL segments that can never become an organization slug, on top

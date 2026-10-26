@@ -6,27 +6,29 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 
 /**
- * robots.txt and sitemap.xml (NFR · 6 and 9). Only production may be indexed,
- * and only public pages are listed.
+ * robots.txt and sitemap.xml (NFR · 6 and 9). Only production may be crawled,
+ * and there only the home page: everything else stays out of search engines.
  */
 class SeoController extends Controller
 {
     /**
-     * Paths that are never meant for search engines, even in production.
+     * What a crawler may fetch in production: the home page and the assets it
+     * needs to render.
      *
      * @var list<string>
      */
-    private const DISALLOWED_PATHS = ['/admin', '/belepes', '/meghivo', '/livewire'];
+    private const ALLOWED_PATHS = ['/$', '/build/'];
 
     public function robots(): Response
     {
         $lines = ['User-agent: *'];
 
         if (app()->isProduction()) {
-            foreach (self::DISALLOWED_PATHS as $path) {
-                $lines[] = 'Disallow: '.$path;
+            foreach (self::ALLOWED_PATHS as $path) {
+                $lines[] = 'Allow: '.$path;
             }
 
+            $lines[] = 'Disallow: /';
             $lines[] = 'Sitemap: '.route('sitemap');
         } else {
             $lines[] = 'Disallow: /';
