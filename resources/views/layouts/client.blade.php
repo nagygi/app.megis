@@ -1,8 +1,8 @@
 {{--
     Frame of every customer page (15). Mobile first; from 1200px the menu stays
     open on the side. The header colour is set by the page (15 · 15.2).
-    As in the prototype: the avatar opens the user menu, the round button next
-    to it the menu.
+    On phones the round button on the left opens the menu, the avatar on the
+    right the user menu.
 --}}
 @props([
     'title',
@@ -92,8 +92,8 @@
             --}}
             <aside
                 id="client-menu"
-                class="fixed inset-y-0 right-0 z-30 w-80 max-w-full overflow-y-auto border-l border-grey-250 bg-white transition-[translate] duration-200 ease-standard max-desktop:invisible max-desktop:translate-x-full desktop:static desktop:order-first desktop:border-r desktop:border-l-0"
-                :class="{ 'max-desktop:invisible max-desktop:translate-x-full': ! menuOpen }"
+                class="fixed inset-y-0 left-0 z-30 w-80 max-w-full overflow-y-auto border-r border-grey-250 bg-white transition-[translate] duration-200 ease-standard max-desktop:invisible max-desktop:-translate-x-full desktop:static desktop:order-first"
+                :class="{ 'max-desktop:invisible max-desktop:-translate-x-full': ! menuOpen }"
                 x-trap.noscroll="menuOpen"
                 aria-label="{{ __('client.menu.title') }}"
             >
@@ -107,9 +107,30 @@
             <header class="{{ $headerClasses }}">
                 <div class="mx-auto flex max-w-3xl flex-col gap-3 px-6 pt-3 pb-4 desktop:max-w-5xl">
                     <div class="flex min-h-11 items-center gap-3">
+                        @if ($user)
+                            {{-- The circles stay 36px; the button around them is the 44px target. --}}
+                            <button
+                                type="button"
+                                class="press -ml-1 grid size-11 place-items-center rounded-pill desktop:hidden"
+                                aria-controls="client-menu"
+                                :aria-expanded="menuOpen"
+                                @click="menuOpen = ! menuOpen"
+                            >
+                                <span aria-hidden="true" class="grid size-9 place-items-center rounded-pill {{ $circleClasses }}">
+                                    <x-megis.icon name="menu" />
+                                </span>
+                                <span class="sr-only">{{ __('client.menu.open') }}</span>
+                            </button>
+                        @endif
+
                         @if ($back)
-                            {{-- A 44px target with the chevron; the label gives way before the step. --}}
-                            <a href="{{ $back }}" class="-ml-2 inline-flex min-h-11 min-w-0 items-center gap-1 rounded-pill pr-3 pl-1 text-sm font-semibold no-underline [color:inherit] hover:underline">
+                            {{-- A 44px target with the chevron; the label gives way before the step.
+                                 It reaches into the padding only where it starts the row. --}}
+                            <a href="{{ $back }}" @class([
+                                'inline-flex min-h-11 min-w-0 items-center gap-1 rounded-pill pr-3 pl-1 text-sm font-semibold no-underline [color:inherit] hover:underline',
+                                '-ml-2' => ! $user,
+                                'desktop:-ml-2' => $user,
+                            ])>
                                 <x-megis.icon name="chevron-left" />
                                 <span class="truncate">{{ $backLabel ?? __('ui.back') }}</span>
                             </a>
@@ -136,8 +157,7 @@
                         ])>{{ $step ?? $label }}</span>
 
                         @if ($user)
-                            {{-- The circles stay 36px; the button around them is the 44px target. --}}
-                            <x-ui.dropdown id="client-user-menu" :label="__('client.menu.user_menu')" :width="256" trigger-class="press -mx-1 grid size-11 place-items-center rounded-pill">
+                            <x-ui.dropdown id="client-user-menu" :label="__('client.menu.user_menu')" :width="256" trigger-class="press -mr-1 grid size-11 place-items-center rounded-pill">
                                 <x-slot:trigger>
                                     <span aria-hidden="true" class="grid size-9 place-items-center rounded-pill text-xs font-extrabold {{ $circleClasses }}">{{ $user->initials }}</span>
                                 </x-slot:trigger>
@@ -156,19 +176,6 @@
                                     <x-ui.dropdown-item type="submit">{{ __('client.menu.logout') }}</x-ui.dropdown-item>
                                 </form>
                             </x-ui.dropdown>
-
-                            <button
-                                type="button"
-                                class="press -mx-1 grid size-11 place-items-center rounded-pill desktop:hidden"
-                                aria-controls="client-menu"
-                                :aria-expanded="menuOpen"
-                                @click="menuOpen = ! menuOpen"
-                            >
-                                <span aria-hidden="true" class="grid size-9 place-items-center rounded-pill {{ $circleClasses }}">
-                                    <x-megis.icon name="menu" />
-                                </span>
-                                <span class="sr-only">{{ __('client.menu.open') }}</span>
-                            </button>
                         @endif
                     </div>
 
