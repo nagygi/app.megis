@@ -24,7 +24,8 @@
     $circumference = 2 * M_PI * 54;
 @endphp
 
-    <x-ui.card as="section" padding="lg" x-data="mirrorRecorder(@js($recorderConfig))" class="flex flex-col items-center gap-5" aria-live="polite">
+    {{-- @js is not compiled in a component's attribute, Js::from in an echo is --}}
+    <x-ui.card as="section" padding="lg" x-data="mirrorRecorder({{ \Illuminate\Support\Js::from($recorderConfig) }})" class="flex flex-col items-center gap-5" aria-live="polite">
         <template x-if="! supported">
             <p class="text-center">{{ __('mirror.unsupported') }}</p>
         </template>

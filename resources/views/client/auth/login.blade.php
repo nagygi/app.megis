@@ -16,13 +16,13 @@
             <x-form.input name="password" type="password" :label="__('auth_ui.password')" autocomplete="current-password" />
         </template>
 
-        {{-- The way in is chosen before the button that uses it. --}}
+        {{-- The way in is chosen before the button that uses it. @js is not compiled in a component's attribute. --}}
         <x-ui.button
             tone="ghost"
             size="sm"
             class="-mt-2 -ml-1.5 self-start"
             @click="withPassword = ! withPassword"
-            x-text="withPassword ? @js(__('auth_ui.customer.with_code')) : @js(__('auth_ui.customer.with_password'))"
+            x-text="withPassword ? {{ \Illuminate\Support\Js::from(__('auth_ui.customer.with_code')) }} : {{ \Illuminate\Support\Js::from(__('auth_ui.customer.with_password')) }}"
         >{{ __('auth_ui.customer.with_password') }}</x-ui.button>
 
         <x-turnstile />

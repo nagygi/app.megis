@@ -30,9 +30,11 @@ it('walks the public Értéktükör from the opening through each value to the f
     $page->assertSee('Belenézek a tükörbe')->assertNoAccessibilityIssues();
 
     $page->click('Belenézek a tükörbe');
+    // The recorder's Alpine component starts (its config came through as JS)
     $page->assertPathIs('/ertektukor')
         ->assertSee('Hova küldjük a tükröd?')
-        ->assertNoAccessibilityIssues();
+        ->assertNoAccessibilityIssues()
+        ->assertNoJavaScriptErrors();
 
     $page->click('Inkább leírom');
     $page->fill('text', 'A héten inkább most mondom, mint csütörtökön, hogy csúszunk. A végén nevettünk egyet.');
@@ -45,6 +47,15 @@ it('walks the public Értéktükör from the opening through each value to the f
         ->assertSee('Egyenesség')
         ->assertSee('Játékosság')
         ->assertNoAccessibilityIssues();
+
+    // "nem az enyém" strikes the value through in its place; it can be taken back
+    $page->click('[aria-label="Játékosság: nem az enyém"]');
+    $page->assertVisible('[aria-label="Játékosság: mégis az enyém"]')
+        ->assertVisible('h3.line-through')
+        ->assertNoJavaScriptErrors();
+    $page->click('[aria-label="Játékosság: mégis az enyém"]');
+    $page->assertVisible('[aria-label="Játékosság: nem az enyém"]')
+        ->assertMissing('h3.line-through');
 
     // ET4, value by value
     $page->click('h3 [wire\\:click="showValue(1)"]');

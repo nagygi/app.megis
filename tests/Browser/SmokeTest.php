@@ -42,7 +42,15 @@ it('logs a customer in with an e-mailed code', function () {
     $customer = customerOf($organization);
 
     $page = visit('/belepes');
-    $page->assertNoAccessibilityIssues()->fill('email', $customer->email);
+    $page->assertNoAccessibilityIssues()->assertNoJavaScriptErrors();
+
+    // The way in switches, and the button says the other one
+    $page->press('Jelszóval lépek be');
+    $page->assertVisible('#password')->assertSee('Inkább kódot kérek');
+    $page->press('Inkább kódot kérek');
+    $page->assertMissing('#password');
+
+    $page->fill('email', $customer->email);
     passTurnstile($page);
     $page->press('Belépek');
 

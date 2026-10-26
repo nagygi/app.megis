@@ -343,6 +343,19 @@ it('deletes an unclaimed mirror after 24 hours and keeps only the anonymous stat
         ]);
 });
 
+it('leaves a value marked not mine out of the anonymous statistics', function () {
+    [$directness] = engineScenario();
+    $session = textMirror();
+    app(MirrorService::class)->toggle($session->fresh(), 'free:játékosság');
+
+    $this->travel(25)->hours();
+    app(MirrorService::class)->pruneExpired();
+
+    expect(AnonymousValueStat::query()->get(['free_name', 'value_id'])->toArray())->toBe([
+        ['free_name' => 'Egyenes beszéd', 'value_id' => $directness->id],
+    ]);
+});
+
 it('keeps a claimed mirror', function () {
     engineScenario();
     $session = textMirror();

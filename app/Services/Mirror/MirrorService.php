@@ -111,7 +111,8 @@ class MirrorService
 
     /**
      * The values on ET3, the strongest first; each detection is counted with
-     * its best match, or by its free name when nothing matched.
+     * its best match, or by its free name when nothing matched. A value marked
+     * "nem az enyém" keeps its place, struck through, so it can be taken back.
      *
      * @return Collection<int, MirrorValueGroup>
      */
@@ -147,7 +148,7 @@ class MirrorService
                     valueId: $value?->id,
                 );
             })
-            ->sortByDesc(fn (MirrorValueGroup $group) => [$group->excluded ? 0 : 1, count($group->quotes)])
+            ->sortByDesc(fn (MirrorValueGroup $group) => count($group->quotes))
             ->values();
     }
 
@@ -366,8 +367,8 @@ class MirrorService
 
     /**
      * After 24 hours an unclaimed mirror goes; only the free name and the match
-     * stay, without the quote (06 · 6.1). An account started for it and never
-     * confirmed goes with it.
+     * stay, without the quote (06 · 6.1), and not for a value marked "nem az
+     * enyém". An account started for it and never confirmed goes with it.
      */
     public function pruneExpired(): int
     {
@@ -381,7 +382,7 @@ class MirrorService
             ->each(function (MirrorSession $session) use (&$count, $threshold): void {
                 DB::transaction(function () use ($session, $threshold): void {
                     if ($session->material !== null) {
-                        foreach ($session->material->detections as $detection) {
+                        foreach ($session->material->detections->reject->isExcluded() as $detection) {
                             // Only a real match counts, the same threshold as everywhere (06 · 6.4).
                             $best = $detection->matches->first(fn ($match) => $match->confidence >= $threshold);
 

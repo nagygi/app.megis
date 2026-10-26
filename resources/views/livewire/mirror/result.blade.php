@@ -267,10 +267,11 @@
                     @else
                         <h3 class="pt-2 text-xl font-semibold text-grey-700 line-through">{{ $group->name }}</h3>
                     @endif
+                    {{-- @js is not compiled in a component's attribute, Js::from in an echo is --}}
                     <x-ui.button
                         tone="outline"
                         size="sm"
-                        wire:click="toggle(@js($group->key))"
+                        wire:click="toggle({{ \Illuminate\Support\Js::from($group->key) }})"
                         aria-pressed="{{ $group->excluded ? 'true' : 'false' }}"
                         aria-label="{{ $group->excluded ? __('mirror.mine_again_label', ['name' => $group->name]) : __('mirror.not_mine_label', ['name' => $group->name]) }}"
                     >{{ $group->excluded ? __('mirror.mine_again') : __('mirror.not_mine') }}</x-ui.button>

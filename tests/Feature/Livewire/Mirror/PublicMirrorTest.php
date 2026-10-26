@@ -518,6 +518,7 @@ it('marks a value not mine on ET3', function () {
     $key = app(MirrorService::class)->groups($session)->first()->key;
 
     Livewire::test(Result::class, ['session' => $session])
+        ->assertSeeHtml('wire:click="toggle(\''.$key.'\')"')
         ->call('toggle', $key)
         ->assertSee('mégis az enyém');
 
@@ -619,9 +620,12 @@ it('pages through the kept values on ET4', function () {
         ->assertSee('a végén azért nevettünk egyet')
         ->assertDontSeeHtml('wire:click="showValue(3)"');
 
-    // A value taken out on ET3 leaves the pages.
+    // A value taken out on ET3 keeps its place there, struck through, and leaves the pages.
     $component->call('showValues')
         ->call('toggle', app(MirrorService::class)->groups($session)->firstWhere('name', 'Egyenesség')->key)
+        ->assertSeeHtml('line-through">Egyenesség</h3>')
         ->call('showValue', 1)
         ->assertSee('Játékosság · 1 / 1');
+
+    expect(app(MirrorService::class)->groups($session)->pluck('name')->all())->toBe(['Egyenesség', 'Játékosság']);
 });
