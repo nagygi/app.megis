@@ -189,11 +189,15 @@ class Result extends Component
 
     /**
      * "Elküldöm": the ticked questions go to the mégis by e-mail; a mirror
-     * sends three times in an hour.
+     * sends three times in an hour. Sent, the same ticks are not sent again.
      */
     public function sendInterest(MirrorService $mirrors): void
     {
         $this->ensureOwner();
+
+        if ($this->interestSent) {
+            return;
+        }
 
         if ($this->curiosity === []) {
             throw ValidationException::withMessages(['curiosity' => __('mirror.interest_required')]);

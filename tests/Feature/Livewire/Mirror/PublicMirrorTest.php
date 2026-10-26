@@ -543,8 +543,11 @@ it('mails the ticked questions to the configured address with "Elküldöm", the 
         ->set('curiosity', ['inner', 'gap'])
         ->call('sendInterest')
         ->assertHasNoErrors()
-        ->assertSee('Elküldtük. A mégis hamarosan jelentkezik ide: anna@example.com.');
+        ->assertSee('Elküldtük')
+        ->assertSee('A mégis hamarosan jelentkezik ide: anna@example.com.')
+        ->call('sendInterest');
 
+    Mail::assertQueued(MirrorInterestMail::class, 1);
     Mail::assertQueued(MirrorInterestMail::class, function (MirrorInterestMail $mail) {
         $mail->assertSeeInText('Hogyan jelennek meg a belső működésben?')
             ->assertSeeInText('Hol válik el a kettő?')
@@ -559,15 +562,13 @@ it('mails the questions of one mirror three times in an hour', function () {
     Mail::fake();
     $session = submitTextMirror();
 
-    $component = Livewire::test(Result::class, ['session' => $session])
-        ->call('showFull')
-        ->set('curiosity', ['outer']);
+    $component = Livewire::test(Result::class, ['session' => $session])->call('showFull');
 
-    foreach (range(1, 3) as $attempt) {
-        $component->call('sendInterest')->assertHasNoErrors();
+    foreach ([['outer'], ['outer', 'gap'], ['gap']] as $curiosity) {
+        $component->set('curiosity', $curiosity)->call('sendInterest')->assertHasNoErrors();
     }
 
-    $component->call('sendInterest')->assertSee('Ezt már elküldted. A mégis hamarosan jelentkezik.');
+    $component->set('curiosity', ['inner'])->call('sendInterest')->assertSee('Ezt már elküldted. A mégis hamarosan jelentkezik.');
 
     Mail::assertQueued(MirrorInterestMail::class, 3);
 });
