@@ -73,7 +73,7 @@
                     <span>{{ $reportMain->product_name }} · {{ $reportMain->published_at?->format('Y.m.d.') }}</span>
                     <span class="flex flex-wrap gap-1">
                         <x-ui.button tone="ghost" size="sm" icon-right="chevron-right" :href="route('client.report.show', [$organization, $reportMain->diagnosis])">{{ __('diagnosis.published_home.open') }}</x-ui.button>
-                        @if (Route::has('client.report.pdf'))
+                        @if (config('megis.pdf_downloads') && Route::has('client.report.pdf'))
                             <x-ui.button tone="ghost" size="sm" icon="document" :href="route('client.report.pdf', [$organization, $reportMain->diagnosis])">{{ __('diagnosis.published_home.pdf') }}</x-ui.button>
                         @endif
                     </span>

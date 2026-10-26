@@ -82,7 +82,7 @@
         @unless ($preview)
             <x-ui.link-row :href="route('client.mirror.record', $organization)" :title="__('takeaway.mirror_again')" />
             <div class="flex flex-wrap gap-2">
-                @if (Route::has('client.diagnosis.takeaway.pdf'))
+                @if (config('megis.pdf_downloads') && Route::has('client.diagnosis.takeaway.pdf'))
                     <x-ui.button tone="outline" size="sm" icon="document" :href="route('client.diagnosis.takeaway.pdf', [$organization, $diagnosis])">{{ __('takeaway.pdf') }}</x-ui.button>
                 @endif
                 <x-ui.button tone="ghost" size="sm" icon-right="chevron-right" :href="route('client.values', $organization)">{{ __('client.menu.value_library') }}</x-ui.button>

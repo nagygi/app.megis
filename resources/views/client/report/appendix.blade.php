@@ -119,8 +119,8 @@
             </details>
         </div>
 
-        @unless ($preview)
+        @if (! $preview && config('megis.pdf_downloads'))
             <x-ui.button size="sm" icon="document" class="self-start" :href="$url('pdf')">{{ __('report.closing.pdf') }}</x-ui.button>
-        @endunless
+        @endif
     </div>
 </x-layouts::client>

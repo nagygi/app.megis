@@ -158,6 +158,21 @@ it('downloads the report and the Útravaló as PDF from the snapshot (28 · 28.3
     Pdf::assertRespondedWithPdf(fn ($pdf) => $pdf->downloadName === 'megis-utravalo-'.today()->format('Y-m-d').'.pdf' && $pdf->viewName === 'pdf.takeaway');
 });
 
+it('shows the PDF buttons only when MEGIS_PDF_DOWNLOADS is on (28 · 28.3)', function (bool $enabled) {
+    config(['megis.pdf_downloads' => $enabled]);
+    [$setup, $main] = publishedReport();
+    $parameters = [$setup['organization'], $main->diagnosis];
+    $assertLink = fn ($response, string $href) => $enabled ? $response->assertSeeHtml($href) : $response->assertDontSeeHtml($href);
+
+    actingAsCustomer($setup['leader']);
+    foreach (['client.diagnosis.show', 'client.report.closing', 'client.report.appendix'] as $page) {
+        $assertLink($this->get(route($page, $parameters))->assertOk(), route('client.report.pdf', $parameters));
+    }
+
+    actingAsCustomer($setup['peers'][0]);
+    $assertLink($this->get(route('client.diagnosis.takeaway', $parameters))->assertOk(), route('client.diagnosis.takeaway.pdf', $parameters));
+})->with(['off' => false, 'on' => true]);
+
 it('shows the leader\'s home after publishing (26 · 26.3)', function () {
     [$setup, $main] = publishedReport();
     actingAsCustomer($setup['leader']);

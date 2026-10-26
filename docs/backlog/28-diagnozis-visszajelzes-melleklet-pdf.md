@@ -46,6 +46,7 @@ Három dolog, ami a riportot (27) körülveszi:
 - **Fájlnév:** `megis-diagnozis-{csapat}-{datum}.pdf`, illetve `megis-utravalo-{datum}.pdf`.
 - Az tölthet le, aki a lapot látja (27.1, 29).
 - A riport a felületen ugyanúgy néz ki, mint előtte; a PDF egy külön, nyomtatásra szánt nézet.
+- **Egyelőre ki van kapcsolva (2026-10-27):** a felhasználói oldalon nem látszik a „Letöltöm · PDF” (zárólap, Melléklet, Útravaló, a riportlista „PDF” gombja). Visszakapcsolás: `MEGIS_PDF_DOWNLOADS=true`. A letöltési címek közben is működnek.
 
 ## Nincs benne
 

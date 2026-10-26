@@ -61,9 +61,9 @@
         </div>
 
         <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-grey-700">
-            @unless ($preview)
+            @if (! $preview && config('megis.pdf_downloads'))
                 <a href="{{ $url('pdf') }}" class="inline-flex items-center gap-1.5 text-grey-700 no-underline hover:underline"><x-megis.icon name="document" />{{ __('report.closing.pdf') }}</a>
-            @endunless
+            @endif
             <span class="inline-flex items-center gap-1.5">{{ __('report.closing_page.share') }} <x-report.soon /></span>
             <a href="{{ $url('appendix') }}" class="inline-flex items-center gap-1.5 text-grey-700 no-underline hover:underline"><x-megis.icon name="document" />{{ __('report.appendix_link') }}</a>
         </div>

@@ -30,7 +30,7 @@ A noindex-et az `X-Robots-Tag` fejléc, a `robots.txt` és a lapok meta-tagje ad
 | Naptár (09) | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` (alap: `/naptar/google/visszahivas`); `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`, `MICROSOFT_REDIRECT_URI` (alap: `/naptar/microsoft/visszahivas`), `MICROSOFT_TENANT=common`. Kulcsok nélkül csak iCal link, ICS fájl és beszélgetés választható. |
 | Queue | `REDIS_QUEUE_RETRY_AFTER` / `DB_QUEUE_RETRY_AFTER` (alap: 330 másodperc, az AI-jobok 300 másodperces időkorlátja fölött) |
 | Diagnózis (18) | `DIAGNOSIS_RECALCULATION_DELAY` (alap: 20 másodperc): ennyit vár a fő diagnózis újraszámolása, így az egymás után érkező anyagok és megélések egyszer számolódnak |
-| PDF (28) | `LARAVEL_PDF_DRIVER=gotenberg`, `GOTENBERG_URL` (a Gotenberg konténer címe, például `http://gotenberg:3000`); Docker nélküli környezetben `LARAVEL_PDF_DRIVER=weasyprint` és `LARAVEL_PDF_WEASYPRINT_BINARY` (a bináris útvonala, például `/usr/local/bin/weasyprint`; nem lehet üres) |
+| PDF (28) | `LARAVEL_PDF_DRIVER=gotenberg`, `GOTENBERG_URL` (a Gotenberg konténer címe, például `http://gotenberg:3000`); Docker nélküli környezetben `LARAVEL_PDF_DRIVER=weasyprint` és `LARAVEL_PDF_WEASYPRINT_BINARY` (a bináris útvonala, például `/usr/local/bin/weasyprint`; nem lehet üres). A felhasználói oldal „Letöltöm · PDF” gombjai egyelőre rejtve: `MEGIS_PDF_DOWNLOADS=true` kapcsolja vissza |
 
 A titkok csak környezeti változóban vannak. AWS-en javasolt az AWS Secrets Manager vagy az SSM Parameter Store.
 
