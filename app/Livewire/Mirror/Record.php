@@ -29,8 +29,8 @@ use Livewire\WithFileUploads;
 
 /**
  * ET2 · the recording (06 · 6.1): spoken in the browser, typed, or a file.
- * Public, it asks for the e-mail and the accepted documents with it and is
- * protected by Turnstile and an IP limit; from the own menu (06 · 6.2) it
+ * Public, it asks for the e-mail and the accepted documents right before
+ * sending and is protected by Turnstile and an IP limit; from the own menu (06 · 6.2) it
  * belongs to the signed-in user and the active organization, and lists the
  * earlier mirrors.
  */
@@ -82,6 +82,21 @@ class Record extends Component
             $this->mode = $mode;
             $this->resetValidation();
         }
+    }
+
+    /**
+     * A recording is uploaded only once the rest is right (06 · 6.1): public, the
+     * e-mail and the accepted documents; from the own menu, the diagnosis it belongs to.
+     */
+    public function checkBeforeUpload(): bool
+    {
+        if ($this->organization === null) {
+            $this->validate($this->contactRules(), $this->contactMessages(), $this->contactAttributes());
+        } else {
+            $this->ensureDiagnosisChosen();
+        }
+
+        return true;
     }
 
     public function submitRecording(int $seconds, MaterialStore $materials, MirrorService $mirrors): void

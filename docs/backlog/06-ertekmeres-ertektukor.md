@@ -33,11 +33,15 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 - **Támogató kérdések:** ha a felhasználó felvétel közben 5 másodpercig hallgat, megjelenik egy támogató kérdés az admin által felvett listából (6.7). Egyszerre egy kérdés látszik, és amikor újra beszél, a kérdés halványan a helyén marad. A következő csendnél a következő kérdés jön.
 - Ha a felvétel egy percnél rövidebb, finoman jelezzük, de beküldhető.
 - **E-mail és elfogadás, a beküldés előtt** (a regisztráció első része, 2026.10.26.):
-  - A mód-választó fölött egy kártya: „Hova küldjük a tükröd?”, e-mail mező.
+  - Az oldal alján, a „Kész · mutasd a tükröt” gomb fölött egy kártya: „Hova küldjük a tükröd?”, e-mail mező. Előtte a felhasználó szabadon mesél vagy ír; az e-mailt és az elfogadást csak a beküldéshez kell megadnia (2026.10.26.).
   - Alatta jelölőnégyzet: **„Elfogadom az ÁSZF-et és az adatvédelmi szabályzatot”**.
     - A két dokumentumnév link a 05-ös jegyben feltöltött hatályos verzióra (ÁSZF, Adatkezelési tájékoztató). Ha egy dokumentum még nincs feltöltve, a neve link nélkül áll.
     - Alapból nincs bejelölve. Bejelölés és érvényes e-mail nélkül a tükör nem küldhető be.
     - Rögzítjük, mikor és melyik dokumentumverziót fogadta el. A fiókhoz a megerősítéskor kerül.
+  - Egy gomb van a három bemenethez, az oldal alján. Felvételnél:
+    - amíg nincs felvétel, a gomb tiltott, alatta: „Előbb vedd fel, amit mesélnél.”;
+    - felvétel közben megnyomva leállítja a felvételt, és beküldi;
+    - az e-mailt és az elfogadást a feltöltés előtt ellenőrizzük, így egy hosszú felvétel nem töltődik fel hiába.
   - A beküldéssel azonnal megy a megerősítő levél. Ha a cím már egy aktív fiókhoz tartozik, nem megy levél: a felhasználó az ET5-ön lép be.
 - Beküldés Turnstile-lal, IP-alapú rate limittel.
 - A feldolgozás alatt várakozó állapot látszik. Ha a feldolgozás nem sikerül, ez jelenik meg: „Nem tudtuk feldolgozni. Próbáld újra.”

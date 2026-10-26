@@ -3,6 +3,8 @@
  * ring filling up over the maximum length, an encouraging line that changes
  * with time, a warning before the end, and a supporting question after a
  * few seconds of silence. The finished recording is uploaded through Livewire.
+ * The page's own button (x-recorder-submit) follows the state and asks for
+ * the sending with "recorder-submit"; pressed during the recording, it stops it.
  */
 export default (config) => ({
     state: 'idle',
@@ -17,6 +19,11 @@ export default (config) => ({
     stream: null,
     timer: null,
     audioContext: null,
+    submitAfterStop: false,
+
+    init() {
+        this.$watch('state', (state) => this.$dispatch('recorder-state', state));
+    },
 
     get supported() {
         return !! (navigator.mediaDevices && window.MediaRecorder);
@@ -76,6 +83,11 @@ export default (config) => ({
             this.blob = new Blob(chunks, { type: this.recorder.mimeType || 'audio/webm' });
             this.state = 'recorded';
             this.release();
+
+            if (this.submitAfterStop) {
+                this.submitAfterStop = false;
+                this.submit();
+            }
         };
 
         this.recorder.start(1000);
@@ -104,6 +116,7 @@ export default (config) => ({
     },
 
     restart() {
+        this.submitAfterStop = false;
         this.blob = null;
         this.seconds = 0;
         this.notice = null;
@@ -163,12 +176,30 @@ export default (config) => ({
         this.audioContext = null;
     },
 
-    submit() {
-        if (! this.blob) {
+    async submit() {
+        // "Kész" during the recording: the recording goes once it is whole.
+        if (this.state === 'recording') {
+            this.submitAfterStop = true;
+            this.stop();
+
             return;
         }
 
+        if (! this.blob || this.state === 'uploading') {
+            return;
+        }
+
+        this.error = null;
+        this.uploadProgress = 0;
         this.state = 'uploading';
+
+        // The rest (the e-mail part) is checked first, so a long recording is not uploaded in vain.
+        if (config.check && (await this.$wire.$call(config.check)) !== true) {
+            this.state = 'recorded';
+
+            return;
+        }
+
         const extension = this.blob.type.includes('mp4') ? 'm4a' : 'webm';
         const file = new File([this.blob], `felvetel.${extension}`, { type: this.blob.type });
 

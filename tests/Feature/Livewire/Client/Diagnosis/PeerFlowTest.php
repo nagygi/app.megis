@@ -175,6 +175,8 @@ it('asks which diagnosis a mirror from the own menu belongs to when there are mo
 
     Livewire::test(Record::class, ['organization' => $setup['organization']])
         ->assertSee('Melyik diagnózishoz tartozzon?')
+        ->call('checkBeforeUpload')
+        ->assertHasErrors(['mainDiagnosisId'])
         ->set('mode', 'text')
         ->set('text', str_repeat('Kimondom, amit gondolok, akkor is, ha kényelmetlen. ', 3))
         ->call('submitText')

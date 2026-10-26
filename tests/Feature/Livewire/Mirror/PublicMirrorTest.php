@@ -131,11 +131,13 @@ it('asks for the e-mail and the accepted documents before the mirror is sent', f
     $terms = LegalDocumentVersion::factory()->ofType(LegalDocumentType::Terms)->create();
     $privacy = LegalDocumentVersion::factory()->ofType(LegalDocumentType::PrivacyPolicy)->create();
 
+    // Told or written first; the e-mail part comes last, right above the button.
     Livewire::test(Record::class)
-        ->assertSee('Hova küldjük a tükröd?')
+        ->assertSeeHtmlInOrder(['Elkezdem a felvételt', 'Hova küldjük a tükröd?', 'Kész · mutasd a tükröt'])
         ->assertSee(route('legal.show', $terms->type->value))
         ->assertSee(route('legal.show', $privacy->type->value))
         ->call('setMode', 'text')
+        ->assertSeeHtmlInOrder(['A helyzet, leírva', 'Hova küldjük a tükröd?', 'Kész · mutasd a tükröt'])
         ->set('text', str_repeat('Egy helyzet a hétről. ', 5))
         ->set('turnstileToken', 'token')
         ->call('submitText')
@@ -146,6 +148,21 @@ it('asks for the e-mail and the accepted documents before the mirror is sent', f
 
     expect(MirrorSession::query()->count())->toBe(0);
     Mail::assertNothingQueued();
+});
+
+it('checks the e-mail part before a recording is uploaded, keeping the Turnstile token', function () {
+    Livewire::test(Record::class)
+        ->set('turnstileToken', 'token')
+        ->call('checkBeforeUpload')
+        ->assertHasErrors(['email' => 'required', 'consent' => 'accepted'])
+        ->set('email', 'anna@example.com')
+        ->set('consent', true)
+        ->call('checkBeforeUpload')
+        ->assertHasNoErrors()
+        ->assertReturned(true)
+        ->assertSet('turnstileToken', 'token');
+
+    expect(MirrorSession::query()->count())->toBe(0);
 });
 
 it('asks for no e-mail from the own menu', function () {

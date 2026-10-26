@@ -2,8 +2,11 @@
     The browser recorder of the Értéktükör and of "Egy helyzet" (06 · 6.1, 12 · 12.3):
     a timer with a filling ring, encouraging lines, a supporting question after
     silence. The Livewire component has a "recording" upload and submitRecording(seconds).
+    Without the inline submit the page's own button (x-recorder-submit) sends it:
+    the recorder reports its state ("recorder-state") and sends on "recorder-submit".
+    "check" names the component's method that checks the rest before the upload.
 --}}
-@props(['questions' => []])
+@props(['questions' => [], 'check' => null, 'inlineSubmit' => true])
 
 @php
     $recorderConfig = [
@@ -12,6 +15,7 @@
         'recommended' => (int) config('megis.materials.recording_recommended_seconds'),
         'silence' => (int) config('megis.materials.silence_seconds'),
         'questions' => $questions,
+        'check' => $check,
         'texts' => [
             'start' => __('mirror.motivation.start'),
             'oneMinute' => __('mirror.motivation.one_minute'),
@@ -25,7 +29,7 @@
 @endphp
 
     {{-- @js is not compiled in a component's attribute, Js::from in an echo is --}}
-    <x-ui.card as="section" padding="lg" x-data="mirrorRecorder({{ \Illuminate\Support\Js::from($recorderConfig) }})" class="flex flex-col items-center gap-5" aria-live="polite">
+    <x-ui.card as="section" padding="lg" x-data="mirrorRecorder({{ \Illuminate\Support\Js::from($recorderConfig) }})" x-on:recorder-submit.window="submit()" class="flex flex-col items-center gap-5" aria-live="polite">
         <template x-if="! supported">
             <p class="text-center">{{ __('mirror.unsupported') }}</p>
         </template>
@@ -61,7 +65,9 @@
             <div class="flex flex-wrap justify-center gap-3">
                 <x-ui.button size="lg" icon="mic" x-show="state === 'idle'" x-on:click="start()">{{ __('mirror.record_start') }}</x-ui.button>
                 <x-ui.button size="lg" x-show="state === 'recording'" x-on:click="stop()">{{ __('mirror.record_stop') }}</x-ui.button>
-                <x-ui.button size="lg" x-show="state === 'recorded'" x-on:click="submit()">{{ __('mirror.submit') }}</x-ui.button>
+                @if ($inlineSubmit)
+                    <x-ui.button size="lg" x-show="state === 'recorded'" x-on:click="submit()">{{ __('mirror.submit') }}</x-ui.button>
+                @endif
                 <x-ui.button size="lg" tone="outline" x-show="state === 'recorded'" x-on:click="restart()">{{ __('mirror.restart') }}</x-ui.button>
                 <p x-show="state === 'uploading'" class="font-semibold">{{ __('mirror.uploading') }} <span x-text="uploadProgress + '%'"></span></p>
             </div>

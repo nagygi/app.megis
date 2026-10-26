@@ -36,6 +36,21 @@ it('walks the public Értéktükör from the opening through each value to the f
         ->assertNoAccessibilityIssues()
         ->assertNoJavaScriptErrors();
 
+    // The button under the e-mail part waits for a recording, and says why
+    $page->assertButtonDisabled('Kész · mutasd a tükröt')
+        ->assertSee('Előbb vedd fel, amit mesélnél.');
+
+    // A finished recording (set in place of the microphone) goes only once the e-mail part is right
+    $page->script("() => { const recorder = window.Alpine.\$data(document.querySelector('[x-data^=\"mirrorRecorder\"]')); recorder.blob = new Blob(['hang'], { type: 'audio/webm' }); recorder.seconds = 75; recorder.state = 'recorded'; }");
+    $page->assertButtonEnabled('Kész · mutasd a tükröt')
+        ->assertDontSee('Előbb vedd fel, amit mesélnél.');
+    $page->press('Kész · mutasd a tükröt');
+    $page->assertSee('A tükörhöz el kell fogadnod az ÁSZF-et és az adatvédelmi szabályzatot.')
+        ->assertVisible('#email-error')
+        ->assertDontSee('Feltöltés')
+        ->assertButtonEnabled('Kész · mutasd a tükröt')
+        ->assertNoJavaScriptErrors();
+
     $page->click('Inkább leírom');
     $page->fill('text', 'A héten inkább most mondom, mint csütörtökön, hogy csúszunk. A végén nevettünk egyet.');
     $page->fill('email', 'anna@example.com');
