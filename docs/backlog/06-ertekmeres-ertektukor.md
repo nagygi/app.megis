@@ -74,7 +74,7 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
   - A belépés részletei (Turnstile, rate limit, a kód érvényessége) a 14-es jegyben vannak.
 - **Ha nincs megadott vagy megerősített e-mail:**
   - Nem lesz diagnózis.
-  - Az eredmény 24 óráig él, utána törlődik.
+  - Az eredmény 24 óráig él, utána törlődik. A fiókkéréskor a 24 óra újraindul, így a tükör és a megerősítő link egyszerre jár le.
   - Csak a névtelen statisztika marad meg: a szabad értéknév és az illeszkedés, idézet nélkül.
 
 ### 6.2 Értéktükör a saját menüből

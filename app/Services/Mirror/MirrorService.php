@@ -174,6 +174,7 @@ class MirrorService
     /**
      * ET5 "Létrehozom a fiókot" or "Időpontot foglalok": a confirmation link for
      * a new address; an existing account signs in on the spot instead (06 · 6.1).
+     * The mirror's 24 hours start again with the link, so the two expire together.
      *
      * @param  list<string>  $curiosity
      */
@@ -203,7 +204,10 @@ class MirrorService
 
         Mail::to($email)->queue(new MirrorConfirmationMail($issued->plainToken));
 
-        $session->update(['status' => MirrorStatus::AwaitingConfirmation]);
+        $session->update([
+            'status' => MirrorStatus::AwaitingConfirmation,
+            'expires_at' => $issued->token->expires_at,
+        ]);
 
         return self::CONFIRMATION_SENT;
     }
@@ -384,7 +388,7 @@ class MirrorService
                         $this->materials->delete($session->material);
                     }
 
-                    $this->deletePendingAccount($session->email);
+                    $this->deletePendingAccount($session);
                     $session->delete();
                 });
 
@@ -394,13 +398,27 @@ class MirrorService
         return $count;
     }
 
-    private function deletePendingAccount(?string $email): void
+    /**
+     * A newer mirror may still wait on the same address; its link needs the account.
+     */
+    private function deletePendingAccount(MirrorSession $session): void
     {
-        if ($email === null) {
+        if ($session->email === null) {
             return;
         }
 
-        $user = User::query()->where('email', $email)->whereNull('activated_at')->whereNull('role')->first();
+        $stillWaiting = MirrorSession::query()
+            ->whereKeyNot($session->id)
+            ->where('email', $session->email)
+            ->whereNull('claimed_at')
+            ->where('expires_at', '>', now())
+            ->exists();
+
+        if ($stillWaiting) {
+            return;
+        }
+
+        $user = User::query()->where('email', $session->email)->whereNull('activated_at')->whereNull('role')->first();
 
         if ($user !== null && ! $user->memberships()->exists()) {
             $user->delete();

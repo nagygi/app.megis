@@ -321,6 +321,48 @@ it('does not use the confirmation link by opening it', function () {
     expect($issued->token->fresh()->isPending())->toBeTrue();
 });
 
+it('starts the 24 hours of the mirror again with the confirmation link', function () {
+    Mail::fake();
+    $session = submitTextMirror();
+    $this->travel(23)->hours();
+
+    Livewire::test(Result::class, ['session' => $session])
+        ->call('showFull')->set('email', 'kesei@example.com')->set('consent', true)->set('turnstileToken', 'token')->call('createAccount', false)
+        ->assertHasNoErrors();
+    $token = null;
+    Mail::assertQueued(MirrorConfirmationMail::class, function ($mail) use (&$token) {
+        $token = $mail->token;
+
+        return true;
+    });
+
+    $this->travel(23)->hours();
+
+    expect(app(MirrorService::class)->pruneExpired())->toBe(0);
+
+    $this->post(route('mirror.confirmation.store', $token), ['first_name' => 'Kata', 'last_name' => 'Kései'])->assertRedirect();
+
+    expect($session->fresh()->status)->toBe(MirrorStatus::Claimed);
+});
+
+it('keeps the pending account while a newer mirror waits on the same address', function () {
+    Mail::fake();
+    $mirrors = app(MirrorService::class);
+    $mirrors->requestAccount(MirrorSession::factory()->create(), 'ketszer@example.com', [], false);
+    $this->travel(12)->hours();
+    $mirrors->requestAccount(MirrorSession::factory()->create(), 'ketszer@example.com', [], false);
+
+    $this->travel(13)->hours();
+
+    expect($mirrors->pruneExpired())->toBe(1)
+        ->and(User::query()->where('email', 'ketszer@example.com')->exists())->toBeTrue();
+
+    $this->travel(12)->hours();
+
+    expect($mirrors->pruneExpired())->toBe(1)
+        ->and(User::query()->where('email', 'ketszer@example.com')->exists())->toBeFalse();
+});
+
 it('lets an existing account sign in on the spot with a code and keeps the mirror', function () {
     Mail::fake();
     $existing = customerOf();
