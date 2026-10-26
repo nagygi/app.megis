@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.28 · – · 2026-10-26
+## 1.28 · 46056a3 · 2026-10-26
 
 Értéktükör a prototípus szerint: ET4 elmélyülés, a teljes kép a fával, az e-mail a beküldés előtt (06, NM-06).
 
