@@ -24,6 +24,15 @@ class Show extends Component
         $this->mirror = $mirror;
     }
 
+    public function delete(MirrorService $mirrors): void
+    {
+        Gate::authorize('delete', $this->mirror);
+
+        $mirrors->delete($this->mirror);
+        session()->flash('status', __('admin.common.deleted'));
+        $this->redirectRoute('admin.mirrors.index', navigate: false);
+    }
+
     public function render(MirrorService $mirrors): View
     {
         $this->mirror->refresh()->load(['user', 'organization', 'material', 'diagnosis', 'insights']);

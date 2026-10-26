@@ -2,11 +2,19 @@
 
 use App\Enums\MaterialContext;
 use App\Enums\MirrorStatus;
+use App\Jobs\AnalyzeMaterial;
+use App\Jobs\DeepenMirrorValues;
+use App\Jobs\DetectCapabilities;
 use App\Livewire\Admin\Mirrors\Index;
+use App\Models\Diagnosis;
+use App\Models\InboxItem;
 use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\User;
+use App\Services\Mirror\MirrorService;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 /**
@@ -101,6 +109,51 @@ it('says when an unconfirmed mirror has expired but is not pruned yet', function
     MirrorSession::factory()->create(['email' => 'anna@example.com', 'confirmation_sent_at' => now()->subDay(), 'expires_at' => now()->subMinute()]);
 
     Livewire::test(Index::class)->assertSeeInOrder(['anna@example.com', 'lejárt']);
+});
+
+it('deletes a mirror waiting for the confirmation with its recording, its Beérkező rows and the pending account', function () {
+    Mail::fake();
+    Storage::fake(Material::DISK);
+    actingAsAdmin();
+    $mirrors = app(MirrorService::class);
+    $mirror = MirrorSession::factory()->create();
+    $mirrors->requestAccount($mirror, 'anna@example.com');
+    $mirrors->recordBooking($mirror->fresh());
+    (new AnalyzeMaterial($mirror->material))->failed(new RuntimeException('Nem sikerült.'));
+    $recording = $mirror->material->uuid.'/felvetel.webm';
+    Storage::disk(Material::DISK)->put($recording, 'hang');
+
+    Livewire::test(Index::class)
+        ->assertSee('A felvétel, az átirat és az értékek is törlődnek.')
+        ->call('delete', $mirror->id)
+        ->assertDontSee('anna@example.com');
+
+    expect(MirrorSession::query()->exists())->toBeFalse()
+        ->and(Material::query()->exists())->toBeFalse()
+        ->and(InboxItem::query()->exists())->toBeFalse()
+        ->and(User::query()->where('email', 'anna@example.com')->exists())->toBeFalse();
+    Storage::disk(Material::DISK)->assertMissing($recording);
+});
+
+it('deletes a mirror in an account but keeps its diagnosis with the material', function () {
+    Storage::fake(Material::DISK);
+    actingAsAdmin();
+    $owner = User::factory()->create();
+    $mirror = ownMenuMirror($owner);
+    $diagnosis = Diagnosis::factory()->forUser($owner, $mirror->organization)->ofType('mirror')->create(['material_id' => $mirror->material_id]);
+    $mirror->update(['diagnosis_id' => $diagnosis->id]);
+    // The Coach's row would look for the mirror; the capability row stays with the material.
+    (new DeepenMirrorValues($mirror))->failed(new RuntimeException('Nem válaszolt.'));
+    (new DetectCapabilities($mirror->material))->failed(new RuntimeException('Nem válaszolt.'));
+
+    Livewire::test(Index::class)
+        ->assertSee('A belőle készült diagnózis és az anyaga (átirat, hang) megmarad.')
+        ->call('delete', $mirror->id);
+
+    expect(MirrorSession::query()->exists())->toBeFalse()
+        ->and($diagnosis->fresh())->not->toBeNull()
+        ->and($mirror->material->fresh())->not->toBeNull()
+        ->and(InboxItem::query()->pluck('payload')->all())->toBe([['job' => 'capability_detection']]);
 });
 
 it('keeps the mirrors for the admins', function () {

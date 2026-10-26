@@ -107,6 +107,10 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
   - A meg nem erősített tükör is látszik, amíg él: az e-mail és a lejárat.
   - Szűrők: fiók (megerősítésre vár, belépésre vár, fiókban), feldolgozás, forrás. Keresni e-mailre vagy névre lehet.
   - Az adatlapon az értékek az idézetekkel (mint az ET3-on, a „nem az enyém” is), az ET4 definíciói és az ET5 kíváncsiság-kérdései. Innen nyílik az anyag (átirat, hang), a diagnózis és a felhasználó adatlapja.
+  - **Törlés** (2026.10.27.): egyenként, a lista sorában és az adatlapon, megerősítéssel.
+    - A tükörrel törlődnek az ET4-definíciók és a Beérkező-sorai (foglalás, feldolgozási hiba).
+    - Ha a tükörből még nem lett diagnózis, az anyaga is törlődik (hang, átirat, detektálás). Törlődik a soha meg nem erősített fiók is, ha ugyanarra a címre nem vár másik tükör. Névtelen statisztika nem marad.
+    - Ha már van belőle diagnózis, a diagnózis és az anyaga (átirat, hang, idézetek) megmarad. A Coach hibasora törlődik, mert az „Újra” a tükröt keresné.
 
 ### 6.2 Értéktükör a saját menüből
 

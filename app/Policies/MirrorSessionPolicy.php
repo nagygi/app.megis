@@ -6,7 +6,7 @@ use App\Models\MirrorSession;
 use App\Models\User;
 
 /**
- * Every admin and superadmin may look at the mirrors on the admin side (Értékmérések).
+ * Every admin and superadmin may look at the mirrors on the admin side (Értékmérések) and delete them.
  */
 class MirrorSessionPolicy
 {
@@ -16,6 +16,11 @@ class MirrorSessionPolicy
     }
 
     public function view(User $actor, MirrorSession $model): bool
+    {
+        return $actor->isAdmin();
+    }
+
+    public function delete(User $actor, MirrorSession $model): bool
     {
         return $actor->isAdmin();
     }

@@ -23,6 +23,16 @@
             <x-ui.badge :tone="$status === \App\Enums\MirrorStatus::Failed ? 'coral' : ($status->isDone() ? 'green' : 'yellow')">{{ $status->label() }}</x-ui.badge>
             <x-ui.badge :tone="$accountTones[$state]">{{ __('admin.mirrors.account_states.'.$state) }}</x-ui.badge>
         </x-slot:badges>
+        <x-slot:actions>
+            <x-ui.button
+                tone="danger"
+                size="sm"
+                wire:click="delete"
+                wire:confirm="{{ __($mirror->diagnosis_id ? 'admin.mirrors.confirm_delete_keeps_diagnosis' : 'admin.mirrors.confirm_delete') }}"
+                data-confirm-tone="danger"
+                :data-confirm-label="__('admin.common.delete')"
+            >{{ __('admin.common.delete') }}</x-ui.button>
+        </x-slot:actions>
     </x-admin.page-header>
 
     @if ($status === \App\Enums\MirrorStatus::Failed)

@@ -986,6 +986,9 @@ return [
         'expires' => 'Lejár',
         'expired' => 'lejárt',
         'empty' => 'Még nincs Értéktükör.',
+        'open' => 'Megnézem',
+        'confirm_delete' => 'Törlöd ezt az Értéktükröt? A felvétel, az átirat és az értékek is törlődnek. Nem vonható vissza.',
+        'confirm_delete_keeps_diagnosis' => 'Törlöd ezt az Értéktükröt? A belőle készült diagnózis és az anyaga (átirat, hang) megmarad. Nem vonható vissza.',
         'account_states' => [
             'claimed' => 'Fiókban',
             'awaiting_confirmation' => 'Megerősítésre vár',

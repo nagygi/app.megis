@@ -2,9 +2,11 @@
 
 use App\Enums\MirrorStatus;
 use App\Livewire\Admin\Mirrors\Show;
+use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\User;
 use App\Models\Value;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 it('shows the values of a mirror waiting for the e-mail confirmation, with their quotes', function () {
@@ -33,6 +35,18 @@ it('links the account that waits under the e-mail before the confirmation', func
 
     Livewire::test(Show::class, ['mirror' => $mirror])
         ->assertSee(route('admin.clients.show', $pending));
+});
+
+it('deletes the mirror from its datasheet and goes back to the list', function () {
+    Storage::fake(Material::DISK);
+    actingAsAdmin();
+    $mirror = MirrorSession::factory()->create();
+
+    Livewire::test(Show::class, ['mirror' => $mirror])
+        ->call('delete')
+        ->assertRedirect(route('admin.mirrors.index'));
+
+    expect(MirrorSession::query()->exists())->toBeFalse();
 });
 
 it('says the values are still being read while the mirror is processing', function () {

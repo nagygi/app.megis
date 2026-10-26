@@ -15,6 +15,7 @@ use App\Mail\MirrorInterestMail;
 use App\Models\AnonymousValueStat;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisType;
+use App\Models\InboxItem;
 use App\Models\LegalAcceptance;
 use App\Models\Material;
 use App\Models\Membership;
@@ -424,6 +425,34 @@ class MirrorService
             });
 
         return $count;
+    }
+
+    /**
+     * "Törlés" in the admin (Értékmérések): the mirror goes with its Beérkező
+     * rows. Without a diagnosis its material goes too, and an account started
+     * for it and never confirmed; a diagnosis stays with its material (the
+     * transcript, the audio, the quotes) until an admin deletes it.
+     */
+    public function delete(MirrorSession $session): void
+    {
+        DB::transaction(function () use ($session): void {
+            InboxItem::query()->whereMorphedTo('subject', $session)->delete();
+            $material = $session->material;
+
+            if ($material !== null && $session->diagnosis_id === null) {
+                InboxItem::query()->whereMorphedTo('subject', $material)->delete();
+                $this->materials->delete($material);
+            } elseif ($material !== null) {
+                // Its "Újra" would look for the mirror.
+                InboxItem::query()->where('dedupe_key', 'processing-error:'.$material->getMorphClass().':'.$material->getKey().':mirror_deepening')->delete();
+            }
+
+            if ($session->isAnonymous()) {
+                $this->deletePendingAccount($session);
+            }
+
+            $session->delete();
+        });
     }
 
     /**

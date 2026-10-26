@@ -6,6 +6,7 @@ use App\Enums\MaterialContext;
 use App\Enums\MirrorStatus;
 use App\Livewire\Admin\Concerns\WithDataTable;
 use App\Models\MirrorSession;
+use App\Services\Mirror\MirrorService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -22,6 +23,15 @@ class Index extends Component
     public function mount(): void
     {
         Gate::authorize('viewAny', MirrorSession::class);
+    }
+
+    public function delete(int $mirrorId, MirrorService $mirrors): void
+    {
+        $mirror = MirrorSession::query()->findOrFail($mirrorId);
+        Gate::authorize('delete', $mirror);
+
+        $mirrors->delete($mirror);
+        session()->flash('status', __('admin.common.deleted'));
     }
 
     public function render(): View
