@@ -43,6 +43,12 @@ A „Naptár összekötése” után a felhasználó választ:
   - Nincs folyamatos frissítés. Új fájl feltöltésével frissíthető, egyébként az új alkalmakat a feltöltő adja meg (12).
   - A megengedett formátum és a maximális méret ki van írva.
 
+**Admin betöltés:** ha a vezető nem tudja maga összekötni a naptárát (például nincs még meg a Google-ellenőrzés, vagy a céges IT nem hagyta jóvá), elküldheti a Coachnak a titkos iCal címét vagy az exportált .ics fájlt. Az admin a szervezet *Folyamatok* fülén (11 · 11.6) tölti be.
+- Csak futó diagnózisnál lehet, és mindig a diagnózis vezetőjének nevére kerül. Ugyanaz történik vele, mint a vezető saját összekötésével: detektálás, napi frissítés (iCal címnél), 90 napos metaadat, szétkötés az időablak végén.
+- Kötelező jelölőnégyzet: „{Név} kérte, és ő adta át a linket vagy a fájlt.”
+- A betöltés a vezető naplójába kerül (33 · 33.6). A Profilban a kapcsolat mellett ez áll: „a kérésedre a mégis töltötte be”, és a vezető ott szét is kötheti.
+- „Belépés a nevében” munkamenetben továbbra sem lehet naptárat összekötni (14 · 14.6).
+
 A hozzáférési adatokat (token, iCal cím) titkosítva tároljuk.
 
 A Google- és a Microsoft-alkalmazás a mégis céges fiókján van regisztrálva, a fejlesztő meghatalmazással kezeli, így a hozzájárulási ablakban a felhasználó a mégis nevét látja. A Google-ellenőrzést a fejlesztés elején el kell indítani; ehhez kell az adatkezelési tájékoztató linkje (05) és egy támogatási e-mail cím.

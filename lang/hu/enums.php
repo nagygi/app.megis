@@ -51,6 +51,7 @@ return [
         'account_deletion_requested' => 'Fióktörlés kérve',
         'account_deleted' => 'Fiók és adatok törölve',
         'recording_deleted' => 'Felvétel hangja törölve',
+        'calendar_connected_by_admin' => 'Naptár betöltve a nevében (admin)',
     ],
 
     'capability_level' => [

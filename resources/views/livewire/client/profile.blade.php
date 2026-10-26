@@ -115,6 +115,9 @@
                 <x-ui.card padding="sm" wire:key="calendar-{{ $calendar->id }}" class="flex flex-wrap items-center justify-between gap-3">
                     <span>
                         <span class="block font-semibold">{{ $calendar->providerLabel() }} · {{ __('calendar.profile.connected', ['date' => $calendar->connected_at->format('m.d.')]) }}</span>
+                        @if ($calendar->connected_by_id)
+                            <span class="block text-sm text-grey-700">{{ __('calendar.profile.by_megis') }}</span>
+                        @endif
                         <span class="block text-sm text-grey-700">{{ __('calendar.profile.metadata_until', ['date' => $calendar->metadata_expires_at->format('m.d.')]) }}</span>
                         @if ($calendar->status === \App\Models\CalendarConnection::BROKEN)
                             <span class="block text-sm font-semibold text-coral-ink" role="status">{{ __('calendar.profile.broken') }}</span>

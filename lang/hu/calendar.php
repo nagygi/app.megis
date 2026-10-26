@@ -68,6 +68,7 @@ return [
     'profile' => [
         'title' => 'Naptár',
         'connected' => 'Naptár összekötve · :date',
+        'by_megis' => 'a kérésedre a mégis töltötte be',
         'metadata_until' => 'a metaadat :date-ig él',
         'broken' => 'A naptárkapcsolat megszakadt. Kösd össze újra.',
         'none' => 'Nincs összekötött naptár.',

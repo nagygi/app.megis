@@ -45,6 +45,9 @@
             <x-ui.card bordered padding="none" wire:key="connection-{{ $connection->id }}" class="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
                 <span class="font-semibold">{{ $connection->providerLabel() }} · {{ $connection->user->name }}</span>
                 <span>{{ __('admin.processes.connected_since', ['date' => $connection->connected_at->format('Y.m.d.')]) }}</span>
+                @if ($connection->connectedBy)
+                    <span>{{ __('admin.processes.connected_by', ['name' => $connection->connectedBy->name]) }}</span>
+                @endif
                 <span>{{ __('processes.list.events', ['count' => $connection->event_count]) }}</span>
                 <span>{{ __('calendar.profile.metadata_until', ['date' => $connection->metadata_expires_at->format('Y.m.d.')]) }}</span>
                 <x-ui.badge :tone="$connection->status === 'active' ? 'green' : ($connection->status === 'broken' ? 'coral' : 'muted')">{{ __('calendar.statuses.'.$connection->status) }}</x-ui.badge>
@@ -55,6 +58,31 @@
         @empty
             <p class="text-sm text-grey-700">{{ __('admin.processes.no_calendar') }}</p>
         @endforelse
+
+        {{-- At the leader's request: their iCal link or exported file (09 · 9.2). --}}
+        @if ($calendarLeader)
+            <x-ui.card as="section" bordered padding="sm" class="flex flex-col gap-4" aria-labelledby="calendar-load">
+                <div class="flex flex-col gap-1">
+                    <h3 id="calendar-load" class="font-semibold">{{ __('admin.processes.load_title', ['name' => $calendarLeader->name]) }}</h3>
+                    <p class="text-sm text-grey-700">{{ __('admin.processes.load_help') }}</p>
+                </div>
+                <x-form.checkbox name="leaderAsked" wire:model="leaderAsked" :label="__('admin.processes.leader_asked', ['name' => $calendarLeader->name])" :help="__('admin.processes.leader_asked_help')" />
+                <div class="grid gap-4 lg:grid-cols-2">
+                    <form wire:submit="connectCalendarUrl" class="flex flex-col gap-3">
+                        <x-form.input name="icsUrl" type="url" wire:model="icsUrl" :label="__('calendar.ics_url')" :help="__('calendar.ics_url_help')" inputmode="url" />
+                        <div wire:loading wire:target="connectCalendarUrl" class="text-sm" role="status">{{ __('calendar.reading') }}</div>
+                        <x-ui.button type="submit" size="sm" class="self-start">{{ __('admin.processes.load_url') }}</x-ui.button>
+                    </form>
+                    <form wire:submit="connectCalendarFile" class="flex flex-col gap-3">
+                        <x-form.file name="icsFile" id="admin-ics-file" accept=".ics,text/calendar" wire:model="icsFile" :label="__('calendar.ics_file')" :help="__('calendar.ics_file_help', ['size' => $maxMegabytes])" />
+                        <div wire:loading wire:target="connectCalendarFile,icsFile" class="text-sm" role="status">{{ __('calendar.reading') }}</div>
+                        <x-ui.button type="submit" size="sm" class="self-start" wire:loading.attr="disabled" wire:target="icsFile">{{ __('admin.processes.load_file') }}</x-ui.button>
+                    </form>
+                </div>
+            </x-ui.card>
+        @else
+            <p class="text-sm text-grey-700">{{ __('admin.processes.no_running') }}</p>
+        @endif
     </section>
 
     @foreach (['main' => __('admin.processes.list'), 'review' => __('admin.processes.review')] as $block => $title)

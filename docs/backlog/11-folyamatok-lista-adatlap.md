@@ -108,7 +108,8 @@ A lista gépi javaslat, jóváhagyásra. Négy csoportja van: Erős minta · Biz
 - **Lista** az NFR listaszabályai szerint:
   - Oszlopok: név, szülő, forrás (naptár / beszélgetés / kézi), konfidencia, állapot, felelős, alkalmak száma, töréspont-jelölt (10).
   - A *Bizonytalan* és az *Egyéb* sorok külön blokkban látszanak, átnézésre.
-- **Naptár sor:** forrás, mióta van összekötve, eseményszám, „a metaadat {dátum}-ig él”, hibaállapot (09).
+- **Naptár sor:** forrás, mióta van összekötve, eseményszám, „a metaadat {dátum}-ig él”, hibaállapot (09). Ha admin töltötte be, ez is látszik: „betöltötte: {név}”.
+- **Naptár betöltése a vezető nevében** (09 · 9.2): futó diagnózisnál a sorok alatt az iCal cím és az .ics fájl betöltése, a „{Név} kérte, és ő adta át” jelölőnégyzettel. Futó diagnózis nélkül csak egy sor jelzi, hogy ilyenkor nem lehet betölteni.
 - **Szerkesztés:** az admin ugyanazokkal a szabályokkal szerkeszthet, vehet fel és zárhat ki folyamatot, mint a vezető. Az átnevezés nyoma itt is megmarad.
 - **A mégis javaslata:** opcionális szöveg, legfeljebb 255 karakter. A V6·f-en jelenik meg.
 

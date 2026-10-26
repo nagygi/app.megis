@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * metadata lives 90 days and goes at once on disconnecting (09 · 9.5).
  */
 #[Fillable([
-    'user_id', 'organization_id', 'main_diagnosis_id', 'provider', 'credentials', 'status', 'connected_at',
+    'user_id', 'organization_id', 'main_diagnosis_id', 'connected_by_id', 'provider', 'credentials', 'status', 'connected_at',
     'last_synced_at', 'disconnected_at', 'metadata_expires_at', 'error', 'event_count', 'one_off_count', 'unlinked_count',
 ])]
 #[Hidden(['credentials'])]
@@ -69,6 +69,16 @@ class CalendarConnection extends Model
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
+    }
+
+    /**
+     * The admin who loaded the file or link at the leader's request (09 · 9.2).
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function connectedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'connected_by_id');
     }
 
     /**

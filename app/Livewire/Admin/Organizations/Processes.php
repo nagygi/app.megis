@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Organizations;
 
+use App\Enums\AuditEventType;
 use App\Enums\MaterialContext;
 use App\Enums\MembershipStatus;
 use App\Enums\ProcessConfidence;
@@ -14,22 +15,31 @@ use App\Models\Material;
 use App\Models\Organization;
 use App\Models\Process;
 use App\Models\User;
+use App\Services\Audit\AuditLogger;
+use App\Services\Calendar\CalendarException;
+use App\Services\Calendar\CalendarService;
 use App\Services\Processes\OccasionService;
 use App\Services\Processes\ProcessService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 
 /**
  * The organization's "Folyamatok" tab (11 · 11.6): the same rules as for
  * the leader, the calendar row, uncertain and other rows apart for review,
  * "A mégis javaslata" for V6·f, and the materials waiting to be classified (12 · 12.6).
+ * The leader's iCal link or exported file can be loaded here at their request (09 · 9.2).
  */
 class Processes extends Component
 {
+    use WithFileUploads;
+
     public Organization $organization;
 
     public string $recommendation = '';
@@ -53,6 +63,13 @@ class Processes extends Component
      * @var array<string, array{process_id: ?string, date: string}>
      */
     public array $classify = [];
+
+    public string $icsUrl = '';
+
+    /** @var TemporaryUploadedFile|null */
+    public $icsFile = null;
+
+    public bool $leaderAsked = false;
 
     public function mount(Organization $organization): void
     {
@@ -173,6 +190,36 @@ class Processes extends Component
         session()->flash('status', __('admin.occasions.marked_other'));
     }
 
+    /**
+     * The leader's secret iCal address, loaded at their request (09 · 9.2).
+     */
+    public function connectCalendarUrl(CalendarService $calendars, AuditLogger $audit): void
+    {
+        $main = $this->calendarDiagnosis();
+        $this->validate([
+            'icsUrl' => ['required', 'string', 'max:2000', 'regex:/^(https|webcal):\/\//i'],
+            'leaderAsked' => ['accepted'],
+        ], ['leaderAsked.accepted' => __('admin.processes.leader_asked_required')], ['icsUrl' => __('calendar.ics_url')]);
+
+        $this->loadCalendar($main, 'icsUrl', $audit, fn (User $admin) => $calendars->connectIcsUrl($main->leader, $this->organization, $main, trim($this->icsUrl), $admin));
+    }
+
+    /**
+     * The leader's exported .ics file, loaded at their request (09 · 9.2).
+     */
+    public function connectCalendarFile(CalendarService $calendars, AuditLogger $audit): void
+    {
+        $main = $this->calendarDiagnosis();
+        $this->validate([
+            'icsFile' => ['required', 'file', 'max:'.config('megis.calendar.ics_max_kilobytes'), 'extensions:ics'],
+            'leaderAsked' => ['accepted'],
+        ], ['leaderAsked.accepted' => __('admin.processes.leader_asked_required')], ['icsFile' => __('calendar.ics_file')]);
+
+        $contents = (string) file_get_contents($this->icsFile->getRealPath());
+
+        $this->loadCalendar($main, 'icsFile', $audit, fn (User $admin) => $calendars->connectIcsFile($main->leader, $this->organization, $main, $contents, $admin));
+    }
+
     public function render(): View
     {
         $processes = Process::query()
@@ -198,10 +245,48 @@ class Processes extends Component
             'unclassified' => $unclassified,
             'main' => $processes->reject($isForReview)->values(),
             'review' => $processes->filter($isForReview)->values(),
-            'connections' => CalendarConnection::query()->whereBelongsTo($this->organization)->with('user')->latest('id')->get(),
+            'connections' => CalendarConnection::query()->whereBelongsTo($this->organization)->with(['user', 'connectedBy'])->latest('id')->get(),
+            'calendarLeader' => $this->runningDiagnosis()?->leader,
+            'maxMegabytes' => (int) (config('megis.calendar.ics_max_kilobytes') / 1024),
             'members' => $this->members(),
             'parents' => $processes->whereNull('parent_id')->values(),
         ])->layout('layouts::admin', ['organization' => $this->organization])->title($this->organization->name);
+    }
+
+    /**
+     * A calendar goes in the name of the running diagnosis' leader (09 · 9.2).
+     */
+    private function calendarDiagnosis(): MainDiagnosis
+    {
+        Gate::authorize('update', $this->organization);
+        $main = $this->runningDiagnosis();
+        abort_if($main?->leader === null, 403, __('admin.processes.no_running'));
+
+        return $main;
+    }
+
+    /**
+     * The leader sees it in the Profile, and the load goes to their log (33 · 33.6).
+     *
+     * @param  callable(User): CalendarConnection  $connect
+     */
+    private function loadCalendar(MainDiagnosis $main, string $field, AuditLogger $audit, callable $connect): void
+    {
+        $admin = auth('admin')->user();
+
+        try {
+            $connection = $connect($admin);
+        } catch (CalendarException $exception) {
+            throw ValidationException::withMessages([$field => $exception->getMessage()]);
+        }
+
+        $audit->record(AuditEventType::CalendarConnectedByAdmin, $main->leader, $admin, [
+            'provider' => $connection->provider,
+            'organization' => $this->organization->name,
+        ]);
+
+        $this->reset(['icsUrl', 'icsFile', 'leaderAsked']);
+        session()->flash('status', __('admin.processes.loaded'));
     }
 
     /**

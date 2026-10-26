@@ -19,6 +19,8 @@ enum AuditEventType: string
     case AccountDeleted = 'account_deleted';
     // Felvételeim: a recording's audio deleted (31 · 31.5).
     case RecordingDeleted = 'recording_deleted';
+    // An admin loaded the leader's calendar file or link at the leader's request (09 · 9.2).
+    case CalendarConnectedByAdmin = 'calendar_connected_by_admin';
 
     public function label(): string
     {

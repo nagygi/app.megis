@@ -30,23 +30,25 @@ class CalendarService
     ) {}
 
     /**
-     * The secret iCal address (09 · 9.2), fetched now and every day.
+     * The secret iCal address (09 · 9.2), fetched now and every day. An admin
+     * may load it in the leader's name at the leader's request ($connectedBy).
      */
-    public function connectIcsUrl(User $user, Organization $organization, ?MainDiagnosis $main, string $url): CalendarConnection
+    public function connectIcsUrl(User $user, Organization $organization, ?MainDiagnosis $main, string $url, ?User $connectedBy = null): CalendarConnection
     {
         $events = $this->ics->parse($this->download($url), ...$this->window(), ownerEmail: $user->email);
 
-        return $this->connect($user, $organization, $main, CalendarConnection::ICS_URL, ['url' => $url], $events);
+        return $this->connect($user, $organization, $main, CalendarConnection::ICS_URL, ['url' => $url], $events, $connectedBy);
     }
 
     /**
-     * A one-time export: no refresh; a new file refreshes it (09 · 9.2).
+     * A one-time export: no refresh; a new file refreshes it (09 · 9.2). An
+     * admin may load it in the leader's name at the leader's request ($connectedBy).
      */
-    public function connectIcsFile(User $user, Organization $organization, ?MainDiagnosis $main, string $contents): CalendarConnection
+    public function connectIcsFile(User $user, Organization $organization, ?MainDiagnosis $main, string $contents, ?User $connectedBy = null): CalendarConnection
     {
         $events = $this->ics->parse($contents, ...$this->window(), ownerEmail: $user->email);
 
-        return $this->connect($user, $organization, $main, CalendarConnection::ICS_FILE, null, $events);
+        return $this->connect($user, $organization, $main, CalendarConnection::ICS_FILE, null, $events, $connectedBy);
     }
 
     /**
@@ -145,9 +147,9 @@ class CalendarService
      * @param  array<string, mixed>|null  $credentials
      * @param  list<CalendarEventData>  $events
      */
-    private function connect(User $user, Organization $organization, ?MainDiagnosis $main, string $provider, ?array $credentials, array $events): CalendarConnection
+    private function connect(User $user, Organization $organization, ?MainDiagnosis $main, string $provider, ?array $credentials, array $events, ?User $connectedBy): CalendarConnection
     {
-        $connection = $this->newConnection($user, $organization, $main, $provider, $credentials);
+        $connection = $this->newConnection($user, $organization, $main, $provider, $credentials, $connectedBy);
         $this->import($connection, $events);
         $this->detector->detect($connection);
 
@@ -159,7 +161,7 @@ class CalendarService
      *
      * @param  array<string, mixed>|null  $credentials
      */
-    private function newConnection(User $user, Organization $organization, ?MainDiagnosis $main, string $provider, ?array $credentials): CalendarConnection
+    private function newConnection(User $user, Organization $organization, ?MainDiagnosis $main, string $provider, ?array $credentials, ?User $connectedBy = null): CalendarConnection
     {
         CalendarConnection::query()
             ->whereBelongsTo($user)
@@ -172,6 +174,7 @@ class CalendarService
             'user_id' => $user->id,
             'organization_id' => $organization->id,
             'main_diagnosis_id' => $main?->id,
+            'connected_by_id' => $connectedBy?->id,
             'provider' => $provider,
             'credentials' => $credentials,
             'status' => CalendarConnection::ACTIVE,
