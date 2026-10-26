@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.34 · HASH · 2026-10-27
+## 1.34 · b43746a · 2026-10-27
 
 A belépés utáni címlap az út előnézetével, és visszaút a kitöltött lépésekhez (26 · 26.4, prototípus: „A vezető útja”, „A csapat hangja”, B2).
 
