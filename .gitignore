@@ -33,7 +33,5 @@ docs/mvp-terv.md
 /megis_dev
 docs/teszt-forgatokonyvek.md
 .gitignore
-docs/teszt-forgatokonyvek/mintafajlok/t1-meeting-jegyzokonyv.txt
-docs/teszt-forgatokonyvek/mintafajlok/regi-formatum.doc
-docs/teszt-forgatokonyvek/01-egyeni-vallalkozo.md
-docs/teszt-forgatokonyvek/mintafajlok/ev-ugyfeljegyzet.txt
+docs/teszt-forgatokonyvek/*
+
