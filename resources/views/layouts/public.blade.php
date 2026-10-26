@@ -20,8 +20,7 @@
     @stack('head')
 </head>
 <body @class([
-    // Decorations may bleed past the content column; the viewport clips them.
-    'min-h-dvh overflow-x-clip text-charcoal',
+    'min-h-dvh text-charcoal',
     'bg-cream' => $tone === 'cream',
     'bg-coral' => $tone === 'coral',
 ])>
@@ -29,25 +28,32 @@
         {{ __('ui.skip_to_content') }}
     </a>
 
-    <header class="mx-auto flex max-w-5xl items-center px-4 py-5 sm:px-8">
-        <a href="{{ route('public.home') }}" class="inline-flex no-underline">
-            <x-megis.logo />
-        </a>
-    </header>
+    {{--
+        Decorations may bleed past the content column; this full-width box clips them.
+        Not the body: its overflow passes to the viewport, and Chrome on Android still
+        lets the page pan sideways over what the viewport hides.
+    --}}
+    <div class="overflow-x-clip">
+        <header class="mx-auto flex max-w-5xl items-center px-4 py-5 sm:px-8">
+            <a href="{{ route('public.home') }}" class="inline-flex no-underline">
+                <x-megis.logo />
+            </a>
+        </header>
 
-    <main id="main" class="mx-auto max-w-5xl px-4 pb-16 sm:px-8">
-        {{ $slot }}
-    </main>
+        <main id="main" class="mx-auto max-w-5xl px-4 pb-16 sm:px-8">
+            {{ $slot }}
+        </main>
 
-    @isset($footer)
-        <footer @class([
-            'mx-auto max-w-5xl border-t px-4 py-6 text-sm sm:px-8',
-            'border-grey-250 text-grey-600' => $tone === 'cream',
-            'border-black/20 text-black' => $tone === 'coral',
-        ])>
-            {{ $footer }}
-        </footer>
-    @endisset
+        @isset($footer)
+            <footer @class([
+                'mx-auto max-w-5xl border-t px-4 py-6 text-sm sm:px-8',
+                'border-grey-250 text-grey-600' => $tone === 'cream',
+                'border-black/20 text-black' => $tone === 'coral',
+            ])>
+                {{ $footer }}
+            </footer>
+        @endisset
+    </div>
 
     <x-ui.toasts />
     <x-ui.confirm-dialog />

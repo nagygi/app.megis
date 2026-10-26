@@ -28,6 +28,13 @@ function assertNoSidewaysScroll(mixed $page, array $paths): void
     }
 }
 
+it('fits the public pages on a phone: decorations bleeding off the edge are clipped', function () {
+    assertNoSidewaysScroll(visit('/'), [
+        route('public.home', absolute: false),
+        route('mirror.record', absolute: false),
+    ]);
+});
+
 it('fits the customer pages on a phone', function () {
     [$setup, $main] = publishedReport();
     $params = [$setup['organization'], $main->diagnosis];
