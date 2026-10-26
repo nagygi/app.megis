@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.29 · HASH · 2026-10-26
+## 1.29 · dfac402 · 2026-10-26
 
 Folyamatok: leírás, és felvétel szövegből vagy beszédből (11).
 
