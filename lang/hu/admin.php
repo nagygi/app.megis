@@ -170,6 +170,8 @@ return [
         'description' => 'Leírás',
         'users' => 'Felhasználók',
         'leaders' => 'Csapatvezető(k)',
+        'members_help' => 'A szervezet már felvett felhasználói közül választhatsz. Új felhasználót a csapat sorából hívhatsz meg.',
+        'no_members' => 'Még nincs felhasználó a szervezetben.',
         'invite' => 'Felhasználó meghívása a csapatba',
         'confirm_delete' => 'Biztosan törlöd a csapatot? A felhasználók a szervezetben maradnak, csak a csapathoz rendelésük szűnik meg.',
         'name_taken' => 'Ilyen nevű csapat már van a szervezetben.',

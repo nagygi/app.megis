@@ -9,7 +9,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * An admin put a user into a team (02 · 2.5).
+ * An admin put a user into a team (02 · 2.4, 2.5).
  */
 class TeamMemberAdded implements ShouldDispatchAfterCommit
 {

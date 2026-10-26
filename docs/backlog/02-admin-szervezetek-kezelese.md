@@ -65,7 +65,7 @@ Bal oldali menüpont: *Szervezetek*. A lista az NFR listaszabályai szerint műk
 A szervezet *Csapatok* fülén. Magánszemély típusnál ez a fül nem jelenik meg.
 
 - Lista oszlopai: név, leírás, felhasználók száma, csapatvezető(k).
-- Mezők: név (kötelező, a szervezeten belül egyedi), leírás (opcionális).
+- Mezők: név (kötelező, a szervezeten belül egyedi), leírás (opcionális), felhasználók (opcionális). A felhasználók a szervezet már felvett, nem inaktív felhasználói közül választhatók, és tagonként beállítható, hogy ő a csapat vezetője-e. Szerkesztéskor a jelenlegi tagok be vannak jelölve. Az időközben inaktívvá vált tag a csapatban marad, amíg ki nem veszik.
 - Csapat törlése megerősítéssel. A felhasználók a szervezetben maradnak, csak a csapathoz rendelésük szűnik meg.
 
 ### 2.5 Felhasználók és meghívás

@@ -17,6 +17,34 @@
         <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="mb-6 flex max-w-3xl flex-col gap-5">
             <x-form.input name="name" wire:model="name" :label="__('admin.teams.name')" required autofocus />
             <x-form.textarea name="description" wire:model="description" :label="__('admin.teams.description')" rows="3" />
+
+            <fieldset class="flex flex-col gap-2">
+                <legend class="mb-1 text-sm font-medium">{{ __('admin.teams.users') }}</legend>
+                @if ($members->isEmpty())
+                    <p class="text-sm text-grey-700">{{ __('admin.teams.no_members') }}</p>
+                @else
+                    <p class="text-sm text-grey-700">{{ __('admin.teams.members_help') }}</p>
+                    <div class="flex max-h-80 flex-col gap-2 overflow-y-auto">
+                        @foreach ($members as $member)
+                            <div class="flex flex-wrap items-start gap-x-6 gap-y-2" wire:key="team-user-option-{{ $member->user_id }}">
+                                <x-form.checkbox name="userIds" :id="'team-user-'.$member->user_id" :value="$member->user_id" wire:model.live="userIds">
+                                    {{ $member->user->name }}
+                                    @if ($member->user->name !== $member->user->email)
+                                        <span class="text-grey-700">· {{ $member->user->email }}</span>
+                                    @endif
+                                    @if ($member->status === \App\Enums\MembershipStatus::Inactive)
+                                        <span class="text-grey-700">· {{ $member->status->label() }}</span>
+                                    @endif
+                                </x-form.checkbox>
+                                @if (in_array($member->user_id, array_map('intval', $userIds), true))
+                                    <x-form.checkbox name="leaderUserIds" :id="'team-leader-'.$member->user_id" :value="$member->user_id" wire:model="leaderUserIds" :label="__('admin.members.team_leader')" />
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </fieldset>
+
             <div class="flex flex-wrap gap-3">
                 <x-ui.button type="submit">{{ __('admin.common.save') }}</x-ui.button>
                 <x-ui.button tone="outline" wire:click="cancel">{{ __('admin.common.cancel') }}</x-ui.button>

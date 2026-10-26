@@ -133,6 +133,28 @@ class MembershipService
     }
 
     /**
+     * The members of a team picked on its own form, from the users already in
+     * the organization (02 · 2.4).
+     *
+     * @param  array<int, bool>  $userLeaderFlags  user id => is the user its leader
+     */
+    public function syncTeamMembers(Team $team, array $userLeaderFlags): void
+    {
+        $organizationUserIds = Membership::query()->whereBelongsTo($team->organization)->pluck('user_id');
+
+        $selected = collect($userLeaderFlags)
+            ->filter(fn (bool $isLeader, int $userId): bool => $organizationUserIds->contains($userId))
+            ->mapWithKeys(fn (bool $isLeader, int $userId): array => [$userId => ['is_leader' => $isLeader]]);
+
+        $changes = $team->users()->sync($selected->all());
+
+        // A running diagnosis of the team takes the new member as a peer (17 · 17.2).
+        foreach ($changes['attached'] as $userId) {
+            TeamMemberAdded::dispatch($team, User::query()->findOrFail($userId));
+        }
+    }
+
+    /**
      * The user loses access; recorded diagnosis data stays (02 · 2.5).
      */
     public function deactivate(Membership $membership): void
