@@ -36,7 +36,8 @@ use Livewire\WithFileUploads;
  * The organization's "Folyamatok" tab (11 · 11.6): the same rules as for
  * the leader, the calendar row, uncertain and other rows apart for review,
  * "A mégis javaslata" for V6·f, and the materials waiting to be classified (12 · 12.6).
- * The leader's iCal link or exported file can be loaded here at their request (09 · 9.2).
+ * The leader's iCal link or exported file can be loaded here at their request (09 · 9.2);
+ * a superadmin may load one in any member's name, with or without a running diagnosis.
  * Several processes can be added at once from a written or spoken text.
  */
 class Processes extends Component
@@ -75,6 +76,9 @@ class Processes extends Component
     public $icsFile = null;
 
     public bool $leaderAsked = false;
+
+    /** Whose name a superadmin loads the calendar in. */
+    public ?int $calendarUserId = null;
 
     public function mount(Organization $organization): void
     {
@@ -206,13 +210,13 @@ class Processes extends Component
      */
     public function connectCalendarUrl(CalendarService $calendars, AuditLogger $audit): void
     {
-        $main = $this->calendarDiagnosis();
+        [$user, $main] = $this->calendarTarget();
         $this->validate([
             'icsUrl' => ['required', 'string', 'max:2000', 'regex:/^(https|webcal):\/\//i'],
             'leaderAsked' => ['accepted'],
         ], ['leaderAsked.accepted' => __('admin.processes.leader_asked_required')], ['icsUrl' => __('calendar.ics_url')]);
 
-        $this->loadCalendar($main, 'icsUrl', $audit, fn (User $admin) => $calendars->connectIcsUrl($main->leader, $this->organization, $main, trim($this->icsUrl), $admin));
+        $this->loadCalendar($user, 'icsUrl', $audit, fn (User $admin) => $calendars->connectIcsUrl($user, $this->organization, $main, trim($this->icsUrl), $admin));
     }
 
     /**
@@ -220,7 +224,7 @@ class Processes extends Component
      */
     public function connectCalendarFile(CalendarService $calendars, AuditLogger $audit): void
     {
-        $main = $this->calendarDiagnosis();
+        [$user, $main] = $this->calendarTarget();
         $this->validate([
             'icsFile' => ['required', 'file', 'max:'.config('megis.calendar.ics_max_kilobytes'), 'extensions:ics'],
             'leaderAsked' => ['accepted'],
@@ -228,7 +232,7 @@ class Processes extends Component
 
         $contents = (string) file_get_contents($this->icsFile->getRealPath());
 
-        $this->loadCalendar($main, 'icsFile', $audit, fn (User $admin) => $calendars->connectIcsFile($main->leader, $this->organization, $main, $contents, $admin));
+        $this->loadCalendar($user, 'icsFile', $audit, fn (User $admin) => $calendars->connectIcsFile($user, $this->organization, $main, $contents, $admin));
     }
 
     public function render(): View
@@ -247,6 +251,13 @@ class Processes extends Component
             || in_array($process->confidence, [ProcessConfidence::Medium, ProcessConfidence::Low], true);
 
         $unclassified = $this->unclassifiedMaterials()->with(['user', 'creator'])->get();
+        $members = $this->members();
+        $running = $this->runningDiagnosis();
+        $chooseCalendarUser = auth('admin')->user()->isSuperadmin();
+
+        if ($chooseCalendarUser) {
+            $this->calendarUserId ??= $running?->leader_id ?? $members->first()?->id;
+        }
 
         foreach ($unclassified as $material) {
             $this->classify[$material->uuid] ??= ['process_id' => null, 'date' => $material->placed_at->toDateString()];
@@ -257,9 +268,10 @@ class Processes extends Component
             'main' => $processes->reject($isForReview)->values(),
             'review' => $processes->filter($isForReview)->values(),
             'connections' => CalendarConnection::query()->whereBelongsTo($this->organization)->with(['user', 'connectedBy'])->latest('id')->get(),
-            'calendarLeader' => $this->runningDiagnosis()?->leader,
+            'calendarUser' => $chooseCalendarUser ? $members->firstWhere('id', $this->calendarUserId) : $running?->leader,
+            'chooseCalendarUser' => $chooseCalendarUser,
             'maxMegabytes' => (int) (config('megis.calendar.ics_max_kilobytes') / 1024),
-            'members' => $this->members(),
+            'members' => $members,
             'parents' => $processes->whereNull('parent_id')->values(),
         ])->layout('layouts::admin', ['organization' => $this->organization])->title($this->organization->name);
     }
@@ -290,15 +302,29 @@ class Processes extends Component
     }
 
     /**
-     * A calendar goes in the name of the running diagnosis' leader (09 · 9.2).
+     * A calendar goes in the name of the running diagnosis' leader (09 · 9.2);
+     * a superadmin picks any member, and the diagnosis goes along only for its leader.
+     *
+     * @return array{0: User, 1: ?MainDiagnosis}
      */
-    private function calendarDiagnosis(): MainDiagnosis
+    private function calendarTarget(): array
     {
         Gate::authorize('update', $this->organization);
         $main = $this->runningDiagnosis();
+
+        if (auth('admin')->user()->isSuperadmin()) {
+            $this->validate(
+                ['calendarUserId' => ['required', Rule::in($this->members()->modelKeys())]],
+                attributes: ['calendarUserId' => __('admin.processes.load_for')],
+            );
+            $user = User::query()->findOrFail($this->calendarUserId);
+
+            return [$user, $main?->leader_id === $user->id ? $main : null];
+        }
+
         abort_if($main?->leader === null, 403, __('admin.processes.no_running'));
 
-        return $main;
+        return [$main->leader, $main];
     }
 
     /**
@@ -306,7 +332,7 @@ class Processes extends Component
      *
      * @param  callable(User): CalendarConnection  $connect
      */
-    private function loadCalendar(MainDiagnosis $main, string $field, AuditLogger $audit, callable $connect): void
+    private function loadCalendar(User $user, string $field, AuditLogger $audit, callable $connect): void
     {
         $admin = auth('admin')->user();
 
@@ -316,7 +342,7 @@ class Processes extends Component
             throw ValidationException::withMessages([$field => $exception->getMessage()]);
         }
 
-        $audit->record(AuditEventType::CalendarConnectedByAdmin, $main->leader, $admin, [
+        $audit->record(AuditEventType::CalendarConnectedByAdmin, $user, $admin, [
             'provider' => $connection->provider,
             'organization' => $this->organization->name,
         ]);
