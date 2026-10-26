@@ -116,6 +116,17 @@
         text-decoration-color: var(--color-yellow);
     }
 
+    /*
+     * Tailwind v4 leaves buttons on the default arrow. A cursor utility
+     * (cursor-wait while loading, cursor-not-allowed) still wins over this.
+     */
+    button:not(:disabled),
+    [role='button']:not([aria-disabled='true']),
+    input:where([type='button'], [type='reset'], [type='submit']):not(:disabled),
+    ::file-selector-button {
+        cursor: pointer;
+    }
+
     ::selection {
         background-color: var(--color-yellow);
         color: var(--color-charcoal);
