@@ -266,6 +266,13 @@ img {
     float: unset;
 }
 
+/* Padding, not same-colour borders: Gmail's dark mode recolours borders and backgrounds differently. */
+
+.button-cell {
+    border-radius: 999px;
+    mso-padding-alt: 10px 22px;
+}
+
 .button {
     -webkit-text-size-adjust: none;
     border-radius: 999px;
@@ -273,34 +280,23 @@ img {
     display: inline-block;
     font-weight: 600;
     overflow: hidden;
+    padding: 10px 22px;
     text-decoration: none;
 }
 
 .button-blue,
 .button-primary {
     background-color: #38544f;
-    border-bottom: 10px solid #38544f;
-    border-left: 22px solid #38544f;
-    border-right: 22px solid #38544f;
-    border-top: 10px solid #38544f;
 }
 
 .button-green,
 .button-success {
     background-color: #38544f;
-    border-bottom: 10px solid #38544f;
-    border-left: 22px solid #38544f;
-    border-right: 22px solid #38544f;
-    border-top: 10px solid #38544f;
 }
 
 .button-red,
 .button-error {
     background-color: #ff4255;
-    border-bottom: 10px solid #ff4255;
-    border-left: 22px solid #ff4255;
-    border-right: 22px solid #ff4255;
-    border-top: 10px solid #ff4255;
 }
 
 /* Panels */
