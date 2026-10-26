@@ -19,7 +19,7 @@ Belső snapshotnál napos sávval (V10·b, V12·b). A belépés ide irányít (1
 - **Hol tartunk:** sáv a hetekkel (snapshotnál napokkal), alatta a lépések. Állapotuk: kész, most vagy később.
   - **Onboarding:** „értékek · folyamatok · a márkád alapja · {dátum}”. Koppintásra a lépéslista nyílik (23 · 3. kérdés).
   - **Társak** (csak Teljes, csak csapat): „{k} / {n} kitöltötte” és „Emlékeztető” gomb (lásd 2. kérdés). 3 kitöltő alatt: „Még {n} társ hangja kell, hogy lássátok a rést.”
-  - **Beszélgetések a mégisszel:** „{k} megtartva · következő: {dátum} {idő} · {admin}” (19.5).
+  - **Beszélgetések a mégissel:** „{k} megtartva · következő: {dátum} {idő} · {admin}” (19.5).
   - **Amit hozzátesztek:** „{n} felvétel · {k} dokumentum · {j} elmondott helyzet”. Koppintásra a saját helyzetei nyílnak meg (12 · 12.5).
   - **A mégis olvasata:** „{olvasat kezdete} → {publikálás előtti nap}” (17.2).
   - **A riport:** „{publikálás}”.

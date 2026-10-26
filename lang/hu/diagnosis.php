@@ -82,7 +82,7 @@ return [
     'home' => [
         'title' => 'A ti diagnózisotok',
         'subtitle' => ':product · :stage · :from – :to',
-        'conversations_title' => 'Beszélgetések a mégisszel',
+        'conversations_title' => 'Beszélgetések a mégissel',
         'ring' => 'Belső működés · :count mérőpont',
         'where' => 'Hol tartunk',
         'week_of' => ':current. hét / :count',

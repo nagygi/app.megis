@@ -40,6 +40,6 @@ A riport, és a társaknak az Útravaló.
 A riport a publikálás napjára fagy: bármikor visszajöhetsz hozzá.
 
 ## fire | Beszélünk róla · mégis és te
-Egy óra a mégisszel, időpontfoglalással.
+Egy óra a mégissel, időpontfoglalással.
 
 Átnézzük, mit kezdjetek az eredménnyel, és hol érdemes elkezdeni.

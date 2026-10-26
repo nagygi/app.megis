@@ -122,7 +122,7 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 
 - „Ez a ti diagnózisotok.” és „Bármikor visszajöhettek: a kezdőlapon és a menüben megtaláljátok.”
 - Csendes, nem kattintható összegzés: Belső működés {x}% · A legnagyobb rés: {érték}.
-- **Sárga blokk:** a mégis javaslata (18.3), alatta: „Egy óra a mégisszel: átnézzük, mit kezdjetek vele.”
+- **Sárga blokk:** a mégis javaslata (18.3), alatta: „Egy óra a mégissel: átnézzük, mit kezdjetek vele.”
 - Egyetlen gomb: „Időpontot foglalok”, a konfigurált naptárlinkre, új ablakban (06).
 - Alul halkan: PDF (28).
 

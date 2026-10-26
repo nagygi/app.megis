@@ -178,7 +178,7 @@
         </x-ui.card>
     </div>
 
-    {{-- Beszélgetések a mégisszel (19 · 19.5) --}}
+    {{-- Beszélgetések a mégissel (19 · 19.5) --}}
     <x-ui.card as="section" bordered class="flex flex-col gap-3" aria-labelledby="conversations-title">
         <h2 id="conversations-title" class="text-lg font-semibold">{{ __('admin.run.conversations.title') }}</h2>
         @if ($conversations->isEmpty())

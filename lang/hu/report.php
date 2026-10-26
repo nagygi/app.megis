@@ -107,7 +107,7 @@ return [
         'title' => 'Ez a ti diagnózisotok.',
         'lead' => 'Bármikor visszajöhettek: a kezdőlapon és a menüben megtaláljátok.',
         'quiet' => 'Belső működés :percent% · A legnagyobb rés: :label',
-        'hour' => 'Egy óra a mégisszel: átnézzük, mit kezdjetek vele.',
+        'hour' => 'Egy óra a mégissel: átnézzük, mit kezdjetek vele.',
         'book' => 'Időpontot foglalok',
         'pdf' => 'Letöltöm · PDF',
     ],

@@ -1527,7 +1527,7 @@ return [
             'below_text' => 'A vezetőn kívül :answered társ töltötte ki a megélést, még :missing kell. Publikálni akkor lehet, ha a küszöb teljesül, vagy ha csapat-szám nélkül megy.',
         ],
         'conversations' => [
-            'title' => 'Beszélgetések a mégisszel',
+            'title' => 'Beszélgetések a mégissel',
             'empty' => 'Még nincs rögzített beszélgetés.',
             'summary' => ':held megtartva',
             'held_at' => 'Időpont',

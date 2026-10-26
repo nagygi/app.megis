@@ -38,7 +38,7 @@ Számok és állapotok, válaszok nélkül:
 - **Folyamatok:** mért · bizonytalan · kizárt, link a szervezet *Folyamatok* fülére (11.6).
 - **Anyagok:** feltöltések és helyzetek száma; feldolgozás alatt, sikertelen és besorolatlan anyagok, link a Beérkezőre.
 - **Naptár:** állapot, „a metaadat {dátum}-ig él” (09).
-- **Beszélgetések a mégisszel:** 19.5.
+- **Beszélgetések a mégissel:** 19.5.
 - Magánszemélynél a társak sora nem jelenik meg.
 
 ### 19.4 Döntések és műveletek
@@ -52,12 +52,12 @@ Számok és állapotok, válaszok nélkül:
 - **Időablak módosítása:** a publikálás napja átírható; a vezető e-mailt kap.
 - **Olvasat indítása:** a szakasz „Olvasat” lesz (17.5). Ha van még feldolgozás alatti anyag, megerősítést kér.
 
-### 19.5 Beszélgetések a mégisszel
+### 19.5 Beszélgetések a mégissel
 
 - **Az admin rögzíti a beszélgetéseket:** időpont, kivel (vezető, társ vagy külsős név), ki vezeti (admin), megjegyzés.
 - **Előre megadott szám nincs:** az admin annyi beszélgetést vesz fel, amennyi lesz.
-- **Felvétel vagy leirat** a fő diagnózishoz kötve tölthető fel (17.4, 11. kérdés), „beszélgetés a mégisszel” forrással.
-- A vezető a V10-en ezt látja: „Beszélgetések a mégisszel · 2 megtartva · következő: 03.24. 10:00 · Luca”.
+- **Felvétel vagy leirat** a fő diagnózishoz kötve tölthető fel (17.4, 11. kérdés), „beszélgetés a mégissel” forrással.
+- A vezető a V10-en ezt látja: „Beszélgetések a mégissel · 2 megtartva · következő: 03.24. 10:00 · Luca”.
 
 ## E-mailek
 

@@ -24,7 +24,7 @@ it('shows the run of the diagnosis in numbers to the contact (19 · 19.3)', func
         ->assertSee('A vezető · '.$setup['leader']->name)
         ->assertSee('Társak')
         ->assertSee('A küszöbhöz még 3 kell.')
-        ->assertSee('Beszélgetések a mégisszel')
+        ->assertSee('Beszélgetések a mégissel')
         ->assertSee('Olvasat indítása');
 });
 
