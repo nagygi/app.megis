@@ -23,7 +23,7 @@ A noindex-et az `X-Robots-Tag` fejléc, a `robots.txt` és a lapok meta-tagje ad
 | Fájltár | `MATERIALS_DISK_DRIVER=s3`, `MATERIALS_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION=eu-central-1` |
 | Levél | `MAIL_MAILER`, `MAIL_*`, `MAIL_FROM_ADDRESS` |
 | Turnstile | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` (élesben nem lehet a tesztkulcs) |
-| mégis | `MEGIS_SUPPORT_EMAIL`, `MEGIS_BOOKING_URL`, `MEGIS_ALERT_RECIPIENTS`, `MEGIS_HEALTH_TOKEN`, `MEGIS_HEALTH_MIN_FREE_DISK_MB`, `MEGIS_MAIL_ALLOWLIST`, `MEGIS_STAGING_*` |
+| mégis | `MEGIS_SUPPORT_EMAIL`, `MEGIS_BOOKING_URL`, `MEGIS_INTEREST_EMAIL`, `MEGIS_ALERT_RECIPIENTS`, `MEGIS_HEALTH_TOKEN`, `MEGIS_HEALTH_MIN_FREE_DISK_MB`, `MEGIS_MAIL_ALLOWLIST`, `MEGIS_STAGING_*` |
 | Napló | `LOG_CHANNEL=stack`, `LOG_STACK=app`, `LOG_LEVEL`, `LOG_DAILY_DAYS` (helyi rotáció) |
 | AI (16) | `AI_DEFAULT_PROVIDER`, `AI_DEFAULT_MODEL`, `AI_SMALL_MODEL`, `AI_TRANSCRIPTION_PROVIDER`, `AI_TRANSCRIPTION_MODEL`; kulcsok: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` (`OPENAI_URL` alapból az EU-s `https://eu.api.openai.com/v1`), `GEMINI_API_KEY`; Claude EU-ban: Amazon Bedrock, `AWS_BEDROCK_REGION=eu-central-1` |
 | Értéktükör, anyagok (06) | `MEGIS_TRANSCRIBER=ai` (élesben kötelező), `FFPROBE_PATH`, `MEGIS_INDIVIDUAL_PRODUCT` (a regisztrált magánszemély szervezetének alap terméke), `MEGIS_BOOKING_URL` (az „Időpontot foglalok” naptára), `LIVEWIRE_TEMPORARY_FILE_UPLOAD_DISK=materials` (a nagy feltöltések közvetlenül az S3-ba mennek) |

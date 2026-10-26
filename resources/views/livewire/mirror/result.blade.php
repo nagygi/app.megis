@@ -193,6 +193,15 @@
             @endforeach
         </fieldset>
 
+        {{-- "Elküldöm": the ticked questions go to the mégis by e-mail --}}
+        <div class="-mt-2 flex flex-col items-start gap-2">
+            <x-ui.button :tone="$isPublic ? 'dark' : 'outline'" icon="mail" wire:click="sendInterest" :disabled="$curiosity === []">{{ __('mirror.send_interest') }}</x-ui.button>
+            <x-form.error name="curiosity" id="curiosity" role="alert" />
+            @if ($interestSent)
+                <p class="text-sm text-grey-700" role="status">{{ $interestEmail ? __('mirror.interest_sent', ['email' => $interestEmail]) : __('mirror.interest_sent_plain') }}</p>
+            @endif
+        </div>
+
         @if (! $isPublic)
             <div>
                 <x-ui.button size="lg" wire:click="finish">{{ __('mirror.finish') }}</x-ui.button>

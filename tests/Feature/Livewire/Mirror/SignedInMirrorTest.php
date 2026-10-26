@@ -3,10 +3,12 @@
 use App\Enums\MaterialContext;
 use App\Livewire\Mirror\Record;
 use App\Livewire\Mirror\Result;
+use App\Mail\MirrorInterestMail;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Services\Ai\AiGateway;
 use App\Services\Values\ValueService;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Ai\Responses\Data\Meta;
 use Laravel\Ai\Responses\Data\TextUsage;
 use Laravel\Ai\Responses\StructuredTextResponse;
@@ -69,6 +71,25 @@ it('shows no account step and no booking, and keeps the curiosity questions when
         ->assertRedirect(route('client.values', $organization));
 
     expect($session->fresh()->curiosity)->toBe(['gap']);
+});
+
+it('mails the questions in the user’s name, with a link to their datasheet', function () {
+    Mail::fake();
+    $organization = Organization::factory()->create();
+    $user = actingAsCustomer(customerOf($organization));
+    $session = signedInMirror($organization);
+
+    Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])
+        ->set('curiosity', ['capabilities'])
+        ->call('sendInterest')
+        ->assertHasNoErrors();
+
+    Mail::assertQueued(MirrorInterestMail::class, function (MirrorInterestMail $mail) use ($user) {
+        $mail->assertHasSubject('Érdeklődés az Értéktükörből: '.$user->name)
+            ->assertSeeInHtml(route('admin.clients.show', $user));
+
+        return $mail->hasReplyTo($user->email);
+    });
 });
 
 it('deepens the values from the own menu too (ET4)', function () {

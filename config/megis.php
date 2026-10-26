@@ -43,6 +43,9 @@ return [
     // External booking calendar used by "Időpontot foglalok" and "Beszéljünk róla" (06, 26, 27).
     'booking_url' => env('MEGIS_BOOKING_URL'),
 
+    // Receives the ET5 curiosity questions sent with "Elküldöm" (06 · 6.1).
+    'interest_email' => env('MEGIS_INTEREST_EMAIL', 'ng@exot.hu'),
+
     // The product of the private-person organization created from the Értéktükör
     // (06 · 6.1); the real product is chosen at the conversation.
     'individual_product' => env('MEGIS_INDIVIDUAL_PRODUCT', 'Snapshot · Belső'),

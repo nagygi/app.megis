@@ -12,6 +12,7 @@ use App\Livewire\Mirror\Record;
 use App\Livewire\Mirror\Result;
 use App\Mail\LoginCodeMail;
 use App\Mail\MirrorConfirmationMail;
+use App\Mail\MirrorInterestMail;
 use App\Models\InboxItem;
 use App\Models\LegalAcceptance;
 use App\Models\LegalDocumentVersion;
@@ -511,6 +512,47 @@ it('asks for no e-mail and offers no booking under the full picture, and keeps t
 
     expect($session->fresh()->curiosity)->toBe(['outer'])
         ->and(InboxItem::query()->count())->toBe(0);
+});
+
+it('mails the ticked questions to the configured address with "Elküldöm", the reply going to the user', function () {
+    config(['megis.interest_email' => 'erdeklodes@megis.example']);
+    Mail::fake();
+    $session = submitTextMirror();
+
+    Livewire::test(Result::class, ['session' => $session])
+        ->call('showFull')
+        ->call('sendInterest')
+        ->assertSee('Jelölj be legalább egy kérdést.')
+        ->set('curiosity', ['inner', 'gap'])
+        ->call('sendInterest')
+        ->assertHasNoErrors()
+        ->assertSee('Elküldtük. A mégis hamarosan jelentkezik ide: anna@example.com.');
+
+    Mail::assertQueued(MirrorInterestMail::class, function (MirrorInterestMail $mail) {
+        $mail->assertSeeInText('Hogyan jelennek meg a belső működésben?')
+            ->assertSeeInText('Hol válik el a kettő?')
+            ->assertDontSeeInText('Hogyan látszanak kívülről?')
+            ->assertSeeInText('Az értékei: Egyenesség');
+
+        return $mail->hasTo('erdeklodes@megis.example') && $mail->hasReplyTo('anna@example.com');
+    });
+});
+
+it('mails the questions of one mirror three times in an hour', function () {
+    Mail::fake();
+    $session = submitTextMirror();
+
+    $component = Livewire::test(Result::class, ['session' => $session])
+        ->call('showFull')
+        ->set('curiosity', ['outer']);
+
+    foreach (range(1, 3) as $attempt) {
+        $component->call('sendInterest')->assertHasNoErrors();
+    }
+
+    $component->call('sendInterest')->assertSee('Ezt már elküldted. A mégis hamarosan jelentkezik.');
+
+    Mail::assertQueued(MirrorInterestMail::class, 3);
 });
 
 it('marks a value not mine on ET3', function () {

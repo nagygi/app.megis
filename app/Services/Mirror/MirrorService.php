@@ -11,6 +11,7 @@ use App\Enums\TokenPurpose;
 use App\Enums\UserRole;
 use App\Mail\MirrorBookingMail;
 use App\Mail\MirrorConfirmationMail;
+use App\Mail\MirrorInterestMail;
 use App\Models\AnonymousValueStat;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisType;
@@ -337,6 +338,17 @@ class MirrorService
         }
 
         $session->update(['booking_requested_at' => now()]);
+    }
+
+    /**
+     * "Elküldöm" on ET5: the ticked questions and the kept values by e-mail to
+     * the mégis (megis.interest_email, 06 · 6.1).
+     */
+    public function sendInterest(MirrorSession $session): void
+    {
+        $values = $this->groups($session)->where('excluded', false)->pluck('name')->values()->all();
+
+        Mail::to(config('megis.interest_email'))->send(new MirrorInterestMail($session, $session->curiosity ?? [], $values));
     }
 
     /**

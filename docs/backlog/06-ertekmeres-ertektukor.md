@@ -66,6 +66,9 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 - Charcoal sáv a manifesztó sorával: „Kell egy vízió, ami a belső forrásodtól a hatásodig tart.”
 - A fa kilenc eleme egy körön a felhasználó értékei körül: gyökér, törzs, korona, árnyék, talaj, micélium, évgyűrűk, a kör, illat.
 - Négy kíváncsiság-kérdés jelölőnégyzettel, mindegyik mellett a hozzá tartozó elemek jele (belül: gyökér, törzs · kívül: korona, árnyék · a kettő között: micélium · képesség: tűz). A jelölés azonnal mentődik; az admin a felhasználó adatlapján (33) látja.
+- Alatta **„Elküldöm”** (2026.10.26.): a jelölt kérdések és a megtartott értékek e-mailben mennek a `MEGIS_INTEREST_EMAIL` címre (most: ng@exot.hu). A válasz a kitöltőnek megy; bejelentkezett felhasználónál a levélben link az adatlapjára (33).
+  - Jelölés nélkül a gomb tiltott. Elküldés után: „Elküldtük. A mégis hamarosan jelentkezik ide: {e-mail}.” Új jelölés után újra küldhető, tükrönként óránként háromszor.
+  - A saját menüben is megvan, a „Befejezem” mellett.
 - **E-mail mező és időpontfoglalás nincs** (2026.10.26.). A foglalás (Beérkező-sor, levél, adatlap-jelvény) a kódban megmarad, egyelőre nem hívja semmi.
 - Az alján:
   - megerősítésre vár: „Nézd meg a leveled”, a címmel, és hogy a megerősítés után a fiókban mi vár rá;

@@ -131,6 +131,13 @@ return [
         'subject' => 'Időpontot foglalna valaki',
         'action' => 'Értékmérések',
     ],
+    'mirror_interest' => [
+        'subject' => 'Érdeklődés az Értéktükörből: :name',
+        'intro' => ':name az Értéktükör után ezekre kíváncsi:',
+        'values' => 'Az értékei: :values',
+        'reply' => 'Erre a levélre válaszolva neki írsz: :email',
+        'action' => 'Az ügyfél adatlapja',
+    ],
 
     // Publishing (21 · E-mailek).
     'diagnosis_published' => [
