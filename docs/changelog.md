@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.33 · HASH · 2026-10-26
+## 1.33 · 6e020a2 · 2026-10-26
 
 Leírom · Elmondom · Feltöltöm: a hosszabb szöveges mezők fölött fülsor. A szöveg beírható, elmondható vagy fájlból tölthető.
 
