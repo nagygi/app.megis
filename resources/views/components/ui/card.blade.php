@@ -2,13 +2,14 @@
     Card: the flat surface of the identity, no shadow (elevation comes from
     contrast). Every white box of the app is one of these.
     - tone: white (default), paper, cream;
-    - bordered: the grey hairline, for cards on the admin's grey ground;
+    - bordered: the grey hairline, on by default: white on the cream ground
+      has no contrast of its own. Off only for a card with a border of its own;
     - padding: none, sm (16px, list items), md (20px, default), lg (24px, forms);
     - as: the element, e.g. section, li, article, form.
 --}}
 @props([
     'tone' => 'white',
-    'bordered' => false,
+    'bordered' => true,
     'padding' => 'md',
     'as' => 'div',
 ])

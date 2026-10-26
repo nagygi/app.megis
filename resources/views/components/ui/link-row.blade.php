@@ -14,7 +14,7 @@
 @php
     $classes = [
         'press flex w-full items-center justify-between gap-3 rounded-card px-5 py-4 text-left no-underline',
-        'bg-white text-charcoal hover:bg-paper' => $tone === 'white',
+        'border border-grey-250 bg-white text-charcoal hover:bg-paper' => $tone === 'white',
         'bg-yellow-pale text-charcoal hover:bg-yellow-light' => $tone === 'pale',
         'bg-yellow text-charcoal hover:bg-yellow-light' => $tone === 'yellow',
         'on-dark bg-green text-cream hover:bg-green-muted' => $tone === 'green',

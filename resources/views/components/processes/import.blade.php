@@ -6,7 +6,7 @@
 --}}
 @props(['rows', 'parents', 'canDictate' => false, 'pending' => false, 'bordered' => false])
 
-<x-ui.card as="section" :bordered="$bordered" :padding="$bordered ? 'lg' : 'md'" class="flex flex-col gap-4" aria-labelledby="import-title">
+<x-ui.card as="section" :padding="$bordered ? 'lg' : 'md'" class="flex flex-col gap-4" aria-labelledby="import-title">
     <div class="flex flex-col gap-1">
         <h3 id="import-title" class="text-lg font-semibold">{{ __('processes.import.title') }}</h3>
         <p class="text-sm text-grey-700" aria-live="polite">

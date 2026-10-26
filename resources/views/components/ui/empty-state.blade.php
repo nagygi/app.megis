@@ -5,7 +5,7 @@
 --}}
 @props(['symbol' => null, 'title' => null])
 
-<div {{ $attributes->class(['flex flex-col items-start gap-3 rounded-card bg-white p-6 text-charcoal']) }}>
+<div {{ $attributes->class(['flex flex-col items-start gap-3 rounded-card border border-grey-250 bg-white p-6 text-charcoal']) }}>
     @if ($symbol)
         <x-megis.symbol :name="$symbol" class="size-10" />
     @endif

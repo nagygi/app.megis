@@ -56,7 +56,7 @@
                             <span>{{ $row['name'] }}</span>
                             <span class="tabular-nums">{{ __('takeaway.row_numbers', ['start' => $whole($row['start']), 'situations' => $whole($row['situations']), 'others' => $whole($row['others'])]) }}</span>
                         </p>
-                        <div @class(['relative h-2 rounded-pill', 'bg-coral-light' => $row['lower'], 'bg-grey-100' => ! $row['lower']]) aria-hidden="true">
+                        <div @class(['relative h-2 rounded-pill', 'bg-coral-light' => $row['lower'], 'bg-grey-200' => ! $row['lower']]) aria-hidden="true">
                             @if ($row['start'] !== null)
                                 <span class="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-pill border-2 border-grey-350 bg-white" style="left: {{ $position($row['start']) }}%"></span>
                             @endif

@@ -25,12 +25,13 @@
     --color-yellow-dark: #ffc640;
     --color-yellow: #ffcf4b;
     --color-yellow-light: #ffea94;
-    --color-yellow-pale: #fff9e6;
+    /* Pale and paper are ours, not the brand's: dark enough to show on the cream ground and on a white card. */
+    --color-yellow-pale: #fff3c8;
     --color-green: #38544f;
     --color-green-muted: #5a7570;
     --color-green-soft: #eaf0ee;
     --color-cream: #fffef8;
-    --color-paper: #fbfbf6;
+    --color-paper: #f4f3ec;
     --color-charcoal: #3a3a3a;
 
     /* Greys used by the design system and the prototype. */

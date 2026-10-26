@@ -99,7 +99,7 @@
                 @endforeach
 
                 @unless ($isFull)
-                    <x-ui.card class="flex flex-col gap-4 border border-dashed border-grey-350">
+                    <x-ui.card :bordered="false" class="flex flex-col gap-4 border border-dashed border-grey-350">
                         <x-form.inline>
                             <x-form.select name="pickedValueId" wire:model="pickedValueId" :label="__('admin.value_sets.library')">
                                 <option value="">{{ __('admin.value_sets.library_select') }}</option>
