@@ -143,6 +143,12 @@
                                     <x-megis.logo :variant="$logo" class="h-7" />
                                     <span class="sr-only">{{ __('client.menu.home') }}</span>
                                 </a>
+                            @elseif (! $user)
+                                {{-- Guests have no menu: their logo stays on a desktop too and leads to the Értéktükör. --}}
+                                <a href="{{ route('public.home') }}" class="flex no-underline">
+                                    <x-megis.logo :variant="$logo" class="h-7" />
+                                    <span class="sr-only">{{ __('client.menu.home') }}</span>
+                                </a>
                             @else
                                 <span class="flex desktop:hidden">
                                     <x-megis.logo :variant="$logo" class="h-7" />

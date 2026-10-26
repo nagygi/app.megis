@@ -80,6 +80,17 @@ it('shows one logo on a desktop customer page, the menu\'s', function () {
     $page->assertNoJavaScriptErrors();
 });
 
+it('leads from the login page\'s logo to the public home, on a desktop too', function () {
+    $page = visit('/belepes');
+    $page->resize(1280, 800);
+    $page->navigate('/belepes');
+
+    // A hidden logo could not be clicked.
+    $page->click('header a:has(.megis-logo)');
+
+    $page->assertPathIs('/')->assertNoJavaScriptErrors();
+});
+
 it('opens the menu and the user menu on a phone, and logs the customer out', function () {
     $organization = Organization::factory()->create(['name' => 'Acme Kft.']);
     $customer = customerOf($organization);
