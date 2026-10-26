@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.30 · HASH · 2026-10-26
+## 1.30 · 9707836 · 2026-10-26
 
 Az önálló diagnózis riportja a felhasználónál, és előnézete publikálás előtt (04 · 4.6, 06 · 6.5).
 
