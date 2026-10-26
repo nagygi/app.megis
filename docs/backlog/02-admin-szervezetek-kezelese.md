@@ -55,7 +55,7 @@ Bal oldali menüpont: *Szervezetek*. A lista az NFR listaszabályai szerint műk
 
 **Megjelenés**
 
-- A szervezet oldala hat fülből áll: *Adatok · Csapatok · Felhasználók · Értékek · Folyamatok · Diagnózisok*. Az *Értékek* fül a 08-as, a *Folyamatok* fül a 11-es, a *Diagnózisok* fül a 17-es jegyben készül.
+- A szervezet oldala hat fülből áll: *Adatok · Felhasználók · Csapatok · Értékek · Folyamatok · Diagnózisok*. Az *Értékek* fül a 08-as, a *Folyamatok* fül a 11-es, a *Diagnózisok* fül a 17-es jegyben készül.
 - A szervezeten belül a fejléc a **„szervezet beállításai” színt** kapja, és mutatja a szervezet nevét. A Szervezetek lista még a globális admin színű.
 
 **Inaktiválás:** az inaktív szervezet felhasználói nem érik el a szervezet adatait. A szervezet nem törlődik, visszaaktiválható.

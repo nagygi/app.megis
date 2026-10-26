@@ -8,13 +8,13 @@
 @php
     $tabs = [
         ['route' => 'admin.organizations.edit', 'label' => __('admin.organizations.tabs.data')],
+        ['route' => 'admin.organizations.members', 'label' => __('admin.organizations.tabs.members')],
     ];
 
     if (! $organization->isIndividual()) {
         $tabs[] = ['route' => 'admin.organizations.teams', 'label' => __('admin.organizations.tabs.teams')];
     }
 
-    $tabs[] = ['route' => 'admin.organizations.members', 'label' => __('admin.organizations.tabs.members')];
     $tabs[] = ['route' => 'admin.organizations.values', 'label' => __('admin.organizations.tabs.values')];
     $tabs[] = ['route' => 'admin.organizations.processes', 'label' => __('admin.organizations.tabs.processes'), 'also' => ['admin.organizations.process-occasions']];
     $tabs[] = ['route' => 'admin.organizations.diagnoses', 'label' => __('admin.organizations.tabs.diagnoses'), 'also' => ['admin.diagnoses.show', 'admin.main-diagnoses.*']];
