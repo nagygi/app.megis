@@ -7,6 +7,7 @@ use App\Enums\ValueOrigin;
 use App\Livewire\Admin\Diagnoses\Show;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisRow;
+use App\Models\DiagnosisText;
 use App\Models\DiagnosisType;
 use App\Models\Organization;
 use App\Models\Value;
@@ -192,6 +193,52 @@ it('keeps the four brand base rows', function () {
         ->assertSee('A márkád alapja négy sora fix, nem törölhető.');
 
     expect($diagnosis->treeRows()->count())->toBe(4);
+});
+
+it('saves the mégis\' recommendation approved, and removes it when emptied (04 · 4.6)', function () {
+    $admin = actingAsAdmin();
+    $diagnosis = draftDiagnosis();
+
+    Livewire::test(Show::class, ['diagnosis' => $diagnosis])
+        ->assertSee(route('admin.diagnoses.preview', $diagnosis))
+        ->set('recommendation', "### Hol kezdjük\n\nA **nyíltsággal**.")
+        ->call('saveRecommendation')
+        ->assertSee('A javaslat mentve.');
+
+    $text = DiagnosisText::query()->where('diagnosis_id', $diagnosis->id)->where('key', 'recommendation')->sole();
+    expect($text->text)->toBe("### Hol kezdjük\n\nA **nyíltsággal**.")
+        ->and($text->approved_by)->toBe($admin->id)
+        ->and($text->isApproved())->toBeTrue();
+
+    Livewire::test(Show::class, ['diagnosis' => $diagnosis])
+        ->assertSet('recommendation', "### Hol kezdjük\n\nA **nyíltsággal**.")
+        ->set('recommendation', '  ')
+        ->call('saveRecommendation')
+        ->assertSee('A javaslat törölve.');
+
+    $this->assertModelMissing($text);
+});
+
+it('does not change the recommendation of a published diagnosis', function () {
+    actingAsAdmin();
+    $diagnosis = Diagnosis::factory()->published()->create();
+
+    Livewire::test(Show::class, ['diagnosis' => $diagnosis])
+        ->set('recommendation', 'Új javaslat')
+        ->call('saveRecommendation')
+        ->assertSee('A publikált diagnózis nem szerkeszthető.');
+
+    expect(DiagnosisText::query()->where('diagnosis_id', $diagnosis->id)->exists())->toBeFalse();
+});
+
+it('limits the length of the recommendation', function () {
+    actingAsAdmin();
+    $diagnosis = draftDiagnosis();
+
+    Livewire::test(Show::class, ['diagnosis' => $diagnosis])
+        ->set('recommendation', str_repeat('a', DiagnosisText::maxLength('recommendation') + 1))
+        ->call('saveRecommendation')
+        ->assertHasErrors(['recommendation' => 'max']);
 });
 
 it('does not show diagnoses to customers', function () {

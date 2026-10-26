@@ -1,15 +1,17 @@
-{{-- The report PDF (28, question 4): R0, R1, R1·b, the four chapters with their rows, the closing page and the Melléklet; the team view only. --}}
+{{-- The report PDF (28, question 4): R0, R1, R1·b, the four chapters with their rows, the closing page and the Melléklet; the team view only. A standalone diagnosis has no R1 (04 · 4.6). --}}
 @use('App\Services\Report\ReportText')
 @php
     $meta = $report['meta'];
     $ring = $report['ring'];
     $recommendation = $report['texts']['recommendation'] ?? null;
     $appendix = $report['appendix'];
+    $standalone = $meta['standalone'] ?? false;
+    $markdown = fn (string $text) => \Illuminate\Support\Str::markdown($text, ['html_input' => 'escape', 'allow_unsafe_links' => false]);
 @endphp
 <x-pdf-layout :title="$title">
     <section class="page">
         <p class="muted">{{ $meta['subject_name'] }} · {{ $meta['product'] }} · {{ __('report.frozen', ['date' => $date->format('m.d.')]) }}</p>
-        <h1>{{ __('report.question.answer') }}</h1>
+        <h1>{{ ReportText::copy('question.answer', $meta) }}</h1>
         <p class="big">{{ $ring['percent'] === null ? '–' : $ring['percent'].'%' }}</p>
         <p>{{ __('report.ring.label') }} · {{ __('report.ring.points', ['points' => $ring['points'], 'max' => $ring['max'], 'count' => $ring['measuring_points']]) }}</p>
         <p class="muted">{{ __('report.band', ['step' => $ring['step'] === null ? '–' : $ring['step'].' '.__('report.scale.'.$ring['step'])]) }}</p>
@@ -19,7 +21,7 @@
             @endforeach
         </table>
 
-        @unless ($meta['snapshot'])
+        @unless ($meta['snapshot'] || $standalone)
             <h2>{{ __('report.question.summary') }}</h2>
             @if ($report['biggest_gap'])
                 <div class="box charcoal">{{ __('report.biggest_gap_sentence', ['label' => $report['biggest_gap']['label'], 'sentence' => ReportText::gap($report['biggest_gap'], $meta) ?? '']) }}</div>
@@ -33,7 +35,7 @@
             @endforeach
         @endunless
         @if ($recommendation)
-            <div class="box yellow"><strong>{{ __('report.recommendation') }}</strong><br>{{ $recommendation['text'] }}
+            <div class="box yellow"><strong>{{ __('report.recommendation') }}</strong>{!! $markdown($recommendation['text']) !!}
                 @if ($recommendation['row'])<br>{{ __('report.recommendation_point', ['row' => $recommendation['row'], 'from' => $recommendation['from'] ?? '–', 'to' => $recommendation['to'] ?? '–']) }}@endif
             </div>
         @endif
@@ -42,7 +44,7 @@
     @foreach ($report['chapters'] as $key => $chapter)
         <section class="page">
             <h1>{{ __('report.chapters.'.$key) }}</h1>
-            <p class="muted">{{ __('report.question.'.$key) }}</p>
+            <p class="muted">{{ ReportText::copy('question.'.$key, $meta) }}</p>
             @if (filled($report['texts']['summary_'.($key === 'brand' ? 'brand' : $key)] ?? null))
                 <p>{{ $report['texts']['summary_'.($key === 'brand' ? 'brand' : $key)] }}</p>
             @endif
@@ -58,7 +60,7 @@
                     <p class="muted">{{ __('report.occasions', ['count' => $row['occasions']['count'], 'yes' => $row['occasions']['yes'] ?? 0, 'partial' => $row['occasions']['partial'] ?? 0, 'no' => $row['occasions']['no'] ?? 0]) }}</p>
                 @endif
                 @if ($row['definition'] && filled($row['definition']['meaning']))
-                    <p class="muted">{{ __('report.definition') }}: {{ $row['definition']['meaning'] }}</p>
+                    <p class="muted">{{ ReportText::copy('definition', $meta) }}: {{ $row['definition']['meaning'] }}</p>
                 @endif
                 @foreach ($row['claims'] as $claim)
                     <p><strong>{{ ReportText::claimKind($claim['kind'], $meta) }}:</strong> {{ $claim['text'] }}</p>
@@ -71,14 +73,14 @@
     @endforeach
 
     <section class="page">
-        <h1>{{ __('report.closing.title') }}</h1>
+        <h1>{{ ReportText::copy('closing.title', $meta) }}</h1>
         <p>{{ __('report.closing.quiet', ['percent' => $ring['percent'] ?? '–', 'label' => $report['biggest_gap']['label'] ?? '–']) }}</p>
         @if ($recommendation)
-            <div class="box yellow">{{ $recommendation['text'] }}<br>{{ __('report.closing.hour') }}</div>
+            <div class="box yellow">{!! $markdown($recommendation['text']) !!}{{ ReportText::copy('closing.hour', $meta) }}</div>
         @endif
 
         <h2>{{ __('appendix.pdf_title') }}</h2>
-        <p>{{ __('appendix.read_by_text', ['date' => $date->format('Y.m.d.')]) }} · {{ __('appendix.from_text', $appendix['sources']) }}</p>
+        <p>{{ __('appendix.read_by_text', ['date' => $date->format('Y.m.d.')]) }} · {{ $standalone ? ReportText::standaloneSource($appendix['source']) : __('appendix.from_text', $appendix['sources']) }}</p>
         <h3>{{ __('appendix.overrides') }}</h3>
         @forelse ($appendix['overrides'] as $override)
             <p>{{ $override['label'] }} · {{ ReportText::decimal($override['from']) }} → {{ ReportText::decimal($override['to']) }} · {{ $override['reason'] }} <span class="muted">({{ __('appendix.override_by', ['date' => \Illuminate\Support\Carbon::parse($override['date'])->format('Y.m.d.')]) }})</span></p>

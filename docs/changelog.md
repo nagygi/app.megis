@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.30 · HASH · 2026-10-26
+
+Az önálló diagnózis riportja a felhasználónál, és előnézete publikálás előtt (04 · 4.6, 06 · 6.5).
+
+- **Riport a felhasználónál (új):**
+  - A publikált önálló diagnózis (pl. Értéktükör, feltöltés, kézi vagy aggregált) a fő diagnózis riportjának nézeteivel jelenik meg: válasz, fejezetek a tételekkel és az idézetekkel, zárólap, Melléklet, PDF.
+  - A menü *Riportok* blokkjában található.
+  - Ki látja: felhasználói szinten csak az érintett; csapat szinten a csapat tagjai és a szervezet vezetői; szervezet és folyamat szinten a szervezet aktív tagjai.
+  - Felhasználói szinten „te” a megszólítás („A te diagnózisod”, „5-nek látod, 2-t mutatsz.”).
+  - Nincs benne összefoglaló, belső működés, összevetés, nézetváltó, állítás és visszajelzés. Az üres márkád alapja sorok kimaradnak.
+- **A mégis javaslata:** új mező a diagnózis admin oldalán, md-szerkesztővel. Az új Alcím gomb mellett félkövér, dőlt, felsorolás és link is van benne. A felhasználó a zárólapon formázva látja. A fő diagnózis zárólapja és PDF-je is formázva mutatja a javaslatot.
+- **Előnézet (új):** a diagnózis oldalán „Előnézet” gomb. Telefon vagy asztali keretben végigkattintható a felhasználó riportja publikálás előtt. Az oldal kiírja, ki látja majd, és ott a „Publikálom” gomb.
+- Nincs adatbázis-változás.
+
 ## 1.29 · dfac402 · 2026-10-26
 
 Folyamatok: leírás, és felvétel szövegből vagy beszédből (11).

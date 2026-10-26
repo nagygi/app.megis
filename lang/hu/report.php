@@ -132,9 +132,33 @@ return [
         'summary' => ':name · :chapter · :answer: :text',
     ],
     'appendix_link' => 'Honnan tudjuk?',
+    // A user's own standalone diagnosis speaks to one person (04 · 4.6).
+    'self' => [
+        'title' => 'A te diagnózisod',
+        'question' => [
+            'answer' => 'Mennyire lesz nálad az értékekből tett?',
+            'values' => 'Mennyire élnek nálad az értékeid?',
+            'processes' => 'Hol hordozzák a rutinjaid az értékeket?',
+            'areas' => 'Hogyan áll a működésed öt területen?',
+        ],
+        'gap_sentence' => ':experience látod, :score mutatsz.',
+        'closing' => [
+            'title' => 'Ez a te diagnózisod.',
+            'lead' => 'Bármikor visszajöhetsz: a menüben, a Riportok között megtalálod.',
+            'hour' => 'Egy óra a mégissel: átnézzük, mit kezdj vele.',
+        ],
+    ],
+    // A standalone diagnosis of a team, an organization or a process (04 · 4.6).
+    'standalone' => [
+        'definition' => 'Mit jelent?',
+        'closing' => [
+            'lead' => 'Bármikor visszajöhettek: a menüben, a Riportok között megtaláljátok.',
+        ],
+    ],
     'menu' => [
         'reports' => 'Riportok',
         'report_row' => ':product · :date · Belső :percent%',
+        'standalone_row' => ':name',
         'chapters' => 'Fejezetek',
         'internal' => 'Belső működés',
         'brand' => 'A márkád alapja',

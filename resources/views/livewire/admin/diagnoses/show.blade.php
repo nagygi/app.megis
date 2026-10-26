@@ -29,6 +29,10 @@
                     @if ($diagnosis->material_id !== null)
                         <x-ui.button tone="outline" size="sm" :href="route('admin.diagnoses.capabilities', $diagnosis)">{{ __('capabilities.review.title') }}</x-ui.button>
                     @endif
+                    {{-- The user's report, clickable, before publishing (4.6). --}}
+                    @if ($canChangeStatus)
+                        <x-ui.button tone="outline" size="sm" :href="route('admin.diagnoses.preview', $diagnosis)">{{ __('admin.diagnoses.preview.button') }}</x-ui.button>
+                    @endif
                     @foreach ($canChangeStatus ? $diagnosis->status->nextStatuses() : [] as $next)
                         @php
                             [$label, $tone] = match (true) {
@@ -371,6 +375,35 @@
 
             @include('livewire.admin.diagnoses.partials.rows-table', ['rows' => $treeRows, 'removable' => false])
         </section>
+    @endif
+
+    @if ($canChangeStatus)
+        {{-- A mégis javaslata: the end of the user's report (4.6) --}}
+        @php($recommendationMax = \App\Models\DiagnosisText::maxLength('recommendation'))
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-3" aria-labelledby="recommendation-title">
+            <div class="flex flex-col gap-1">
+                <h2 id="recommendation-title" class="text-lg font-semibold">{{ __('report.recommendation') }}</h2>
+                <p class="text-sm text-grey-700">{{ __('admin.diagnoses.recommendation.help') }}</p>
+            </div>
+            @if ($isEditable)
+                <form wire:submit="saveRecommendation" class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-1.5">
+                        <label for="recommendation" class="text-sm font-medium">{{ __('report.recommendation') }}</label>
+                        {{-- EasyMDE takes over the raw textarea (x-ref="input"), so it stays raw rather than an x-form.textarea. --}}
+                        <div wire:ignore x-data="markdownEditor({ max: {{ $recommendationMax }}, heading: true, labels: @js(__('admin.markdown_editor')) })">
+                            <textarea id="recommendation" x-ref="input" wire:model="recommendation" rows="4" aria-describedby="recommendation-help" @error('recommendation') aria-invalid="true" @enderror class="field w-full"></textarea>
+                        </div>
+                        <p id="recommendation-help" class="text-sm text-grey-700">{{ __('admin.reading.max_length', ['max' => $recommendationMax]) }}</p>
+                        <x-form.error name="recommendation" id="recommendation" />
+                    </div>
+                    <x-ui.button type="submit" size="sm" class="self-start">{{ __('admin.common.save') }}</x-ui.button>
+                </form>
+            @elseif (filled($recommendation))
+                <div class="prose-megis">{!! \Illuminate\Support\Str::markdown($recommendation, ['html_input' => 'escape', 'allow_unsafe_links' => false]) !!}</div>
+            @else
+                <p class="text-grey-700">–</p>
+            @endif
+        </x-ui.card>
     @endif
 
     {{-- Status log (04 · 4.3) --}}

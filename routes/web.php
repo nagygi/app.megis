@@ -109,6 +109,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('diagnozisok/{diagnosis}', Admin\Diagnoses\Show::class)->name('diagnoses.show');
         Route::livewire('diagnozisok/{diagnosis}/adatok', Admin\Diagnoses\Form::class)->name('diagnoses.edit');
         Route::livewire('diagnozisok/{diagnosis}/kepessegek', Admin\Diagnoses\Capabilities::class)->name('diagnoses.capabilities');
+        // The user's report of a standalone diagnosis before publishing (04 · 4.6).
+        Route::livewire('diagnozisok/{diagnosis}/felhasznaloi-nezet', Admin\Diagnoses\Preview::class)->name('diagnoses.preview');
         Route::livewire('diagnozisok/{diagnosis}/beallitas', Admin\MainDiagnoses\Form::class)->name('main-diagnoses.edit');
         Route::livewire('diagnozisok/{diagnosis}/reszdiagnozisok', Admin\MainDiagnoses\Subdiagnoses::class)->name('main-diagnoses.subdiagnoses');
         Route::livewire('diagnozisok/{diagnosis}/futas', Admin\MainDiagnoses\Run::class)->name('main-diagnoses.run');

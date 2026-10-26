@@ -34,9 +34,10 @@
                 }
             @endphp
             @php
-                // Riportok and Fejezetek after publishing (27 · 27.12).
+                // Riportok and Fejezetek after publishing (27 · 27.12); the published standalone diagnoses too (04 · 4.6).
                 $reports = app(\App\Services\Report\ReportService::class)->reportsFor($user, $currentOrganization);
                 $latestReport = $reports->first();
+                $standaloneReports = app(\App\Services\Report\ReportService::class)->standaloneReportsFor($user, $currentOrganization);
             @endphp
             @php($isHome = request()->routeIs('client.home'))
             <ul class="mb-4 flex flex-col gap-1">
@@ -52,7 +53,7 @@
                     >{{ __('client.menu.home') }}</a>
                 </li>
             </ul>
-            @if ($reports->isNotEmpty())
+            @if ($reports->isNotEmpty() || $standaloneReports->isNotEmpty())
                 <p class="px-4 pb-1 text-xs font-semibold uppercase tracking-wide text-grey-600">{{ __('report.menu.reports') }}</p>
                 <ul class="mb-4 flex flex-col gap-1">
                     @foreach ($reports as $reportMain)
@@ -62,7 +63,16 @@
                             </a>
                         </li>
                     @endforeach
+                    @foreach ($standaloneReports as $standaloneReport)
+                        <li>
+                            <a href="{{ route('client.report.show', [$currentOrganization, $standaloneReport]) }}" class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">
+                                {{ __('report.menu.standalone_row', ['name' => $standaloneReport->name]) }}
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
+            @endif
+            @if ($reports->isNotEmpty())
                 <ul class="mb-4 flex flex-col gap-1">
                     <li><a href="{{ route('client.report.appendix', [$currentOrganization, $latestReport->diagnosis]) }}" class="block rounded-field px-4 py-2 text-charcoal no-underline hover:bg-grey-100">{{ __('report.appendix_link') }}</a></li>
                 </ul>

@@ -10,7 +10,9 @@
     <div class="flex max-w-2xl flex-col gap-6">
         <h2 class="text-xl font-semibold">{{ __('report.question.item', ['score' => ReportText::score($item), 'label' => $item['label']]) }}</h2>
 
-        @include('client.report.partials.switch')
+        @unless ($report['meta']['standalone'] ?? false)
+            @include('client.report.partials.switch')
+        @endunless
 
         <x-ui.card as="section" class="flex flex-col gap-2" :aria-label="__('report.phi')">
             <p class="text-3xl font-extrabold tabular-nums">{{ ReportText::score($item) }}</p>
@@ -32,11 +34,11 @@
 
         @if ($item['definition'])
             <section class="flex flex-col gap-2" aria-labelledby="definition-title">
-                <h3 id="definition-title" class="font-semibold">{{ __('report.definition') }}</h3>
+                <h3 id="definition-title" class="font-semibold">{{ ReportText::copy('definition', $report['meta']) }}</h3>
                 @if (filled($item['definition']['meaning']))
                     <p>{{ $item['definition']['meaning'] }}</p>
                 @endif
-                <x-ui.card as="dl" padding="sm" class="grid gap-1 text-sm sm:grid-cols-[6rem_1fr]" :aria-label="__('report.definition')">
+                <x-ui.card as="dl" padding="sm" class="grid gap-1 text-sm sm:grid-cols-[6rem_1fr]" :aria-label="ReportText::copy('definition', $report['meta'])">
                     <dt class="font-semibold text-coral-ink">{{ __('report.definition_low') }}</dt>
                     <dd>{{ $item['definition']['low'] ?: '–' }}</dd>
                     <dt class="font-semibold text-green">{{ __('report.definition_high') }}</dt>

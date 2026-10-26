@@ -4,10 +4,12 @@
  * EasyMDE loads only on the pages that use it, not with the app bundle.
  * The buttons are drawn here (EasyMDE's own icons need Font Awesome); their
  * Hungarian names come from the view as "labels" (admin.markdown_editor).
+ * "heading" adds the subheading button, for texts shown as markdown only
+ * (the recommendation of a standalone diagnosis, 04 · 4.6).
  */
 const button = (name, action, title, icon) => ({ name, action, title, icon, className: `megis-md-${name}` });
 
-export default ({ max, labels = {} }) => ({
+export default ({ max, labels = {}, heading = false }) => ({
     editor: null,
 
     async init() {
@@ -29,6 +31,7 @@ export default ({ max, labels = {} }) => ({
             autoDownloadFontAwesome: false,
             minHeight: '5rem',
             toolbar: [
+                ...(heading ? [button('heading', EasyMDE.toggleHeading3, labels.heading ?? 'Heading', `<span aria-hidden="true">${labels.heading ?? 'Heading'}</span>`)] : []),
                 button('bold', EasyMDE.toggleBold, labels.bold ?? 'Bold', '<b aria-hidden="true">B</b>'),
                 button('italic', EasyMDE.toggleItalic, labels.italic ?? 'Italic', '<i aria-hidden="true">I</i>'),
                 button('unordered-list', EasyMDE.toggleUnorderedList, labels.list ?? 'List', '<span class="megis-mask megis-icon-bullet size-2.5" aria-hidden="true"></span>'),

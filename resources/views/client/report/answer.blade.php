@@ -1,8 +1,9 @@
-{{-- R0 · A válasz (27 · 27.2). --}}
+{{-- R0 · A válasz (27 · 27.2); a standalone diagnosis goes on to its chapters (04 · 4.6). --}}
+@use('App\Services\Report\ReportText')
 @php($ring = $report['ring'])
-<x-layouts::client :title="__('report.title')" color="light-yellow" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$homeUrl" :back-label="__('diagnosis.home_back')">
+<x-layouts::client :title="ReportText::copy('title', $report['meta'])" color="light-yellow" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$homeUrl" :back-label="__('diagnosis.home_back')">
     <div class="flex max-w-2xl flex-col gap-6">
-        <h2 class="text-xl font-semibold">{{ __('report.question.answer') }}</h2>
+        <h2 class="text-xl font-semibold">{{ ReportText::copy('question.answer', $report['meta']) }}</h2>
 
         <x-ui.card as="section" padding="lg" class="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left" aria-label="{{ __('report.ring.label') }}">
             <x-report.ring :percent="$ring['percent']" />
@@ -28,6 +29,10 @@
             @endforeach
         </ul>
 
-        <x-ui.page-nav :label="__('report.title')" :next="$url('summary')" :next-label="__('report.summary_link')" />
+        @if ($report['meta']['standalone'] ?? false)
+            @include('client.report.partials.footer', ['current' => null])
+        @else
+            <x-ui.page-nav :label="__('report.title')" :next="$url('summary')" :next-label="__('report.summary_link')" />
+        @endif
     </div>
 </x-layouts::client>

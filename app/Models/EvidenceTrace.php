@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\MaterialContext;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,6 +31,20 @@ class EvidenceTrace extends Model
     public const SOURCES = [self::SOURCE_CONVERSATION, self::SOURCE_RECORDING, self::SOURCE_NOTE, self::SOURCE_DOCUMENT, self::SOURCE_MIRROR, self::SOURCE_CALENDAR, self::SOURCE_EXPERIENCE];
 
     public const ROLES = ['leader', 'peer', 'external'];
+
+    /**
+     * Where a quote of the material comes from, never whose (18 · 18.2).
+     */
+    public static function sourceTypeFor(Material $material): string
+    {
+        return match (true) {
+            $material->context->isMirror() => self::SOURCE_MIRROR,
+            $material->is_situation => self::SOURCE_NOTE,
+            $material->context === MaterialContext::AdminUpload => self::SOURCE_CONVERSATION,
+            $material->source->hasAudio() => self::SOURCE_RECORDING,
+            default => self::SOURCE_DOCUMENT,
+        };
+    }
 
     public function isIncluded(): bool
     {

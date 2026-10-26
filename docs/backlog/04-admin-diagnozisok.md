@@ -116,6 +116,41 @@ Az előnézetben, és betöltés után a diagnózis oldalán is, egy doboz írja
 
 A leírás a diagnózissal együtt mentődik. Ha később változik az algoritmus, a régi diagnózisnál is az eredeti módszer olvasható.
 
+### 4.6 A felhasználó riportja és az előnézet
+
+Az önálló (nem fő- és nem rész-) diagnózis publikálás után riportként jelenik meg a felhasználónál, a fő diagnózis riportjának (27) nézeteivel: a válasz, aztán hol jelentkezik (a fejezetek), a márkád alapja, a végén a zárólap.
+
+**Ki látja**
+
+- Felhasználói szint: csak az érintett felhasználó.
+- Csapat szint: a csapat tagjai és a szervezet vezetői.
+- Szervezet és Folyamat szint: a szervezet aktív tagjai.
+- Draft és Jóváhagyásra vár státuszban senki. Visszavonáskor eltűnik.
+
+**Mit lát**
+
+- A menü *Riportok* blokkjában a diagnózis nevét, például „Értéktükör · 2026.10.26.”.
+- **Válasz:** a kör (%), a pontok, a lépcső és a fejezetek pontjai.
+- **Fejezetek:** a sorok mérőszáma, és ahol van saját megélés, a rés („5-nek látod, 2-t mutatsz.”). A tétel oldalán a definíció („Mit jelent?”), a sor idézetei és a forrásuk. Az üres sorok kimaradnak, így az üres márkád alapja fejezet is.
+- **Zárólap:** a mégis javaslata, időpontfoglalás, PDF és Melléklet.
+- **Melléklet:** kire, miből (az anyag, az aggregált felhasználói diagnózisok, vagy „a mégis rögzítette”), mikor, az idézetek és a mérőpontok.
+- Felhasználói szinten „te”, egyébként „ti” a megszólítás.
+- Nincs összefoglaló, belső működés, összevetés, nézetváltó, állítás és visszajelzés: ezek az Olvasatból jönnének.
+- A riport élőben épül, nincs fagyasztott változat: a publikált diagnózis nem szerkeszthető.
+
+**A mégis javaslata**
+
+- A diagnózis oldalán egy md-szerkesztős mező: alcím, félkövér, dőlt, felsorolás, link, előnézet.
+- Az admin írja, mentéskor jóváhagyott. Üresen mentve törlődik.
+- Csak Draft és Jóváhagyásra vár státuszban szerkeszthető.
+
+**Előnézet**
+
+- A diagnózis oldalán „Előnézet” gomb.
+- Az előnézet-oldalon telefon vagy asztali keretben a felhasználó riportja, végigkattintható, publikálás előtt is (mint a 21 · 21.1).
+- Kiírja, ki látja majd („Így látja: Kiss Anna.” vagy „Így látják: … · 5 fő.”).
+- Mellette a „Publikálom” gomb, ha a diagnózis Jóváhagyásra vár.
+
 **Figyelmeztetés kevés adatnál**
 
 - Soronként: ha **n < 3**, ez jelenik meg: „Kevés adat (2 felhasználó)”. A 3 a prototípus küszöbe a csapat-átlaghoz.
@@ -126,6 +161,6 @@ A leírás a diagnózissal együtt mentődik. Ha később változik az algoritmu
 
 - A márkád alapja további öt eleme (talaj, micélium, évgyűrűk, a kör, illat): [NM-14](../backlog_nem_MVP/NM-14-fa-tovabbi-ot-eleme.md).
 - A fő diagnózis (A1), a részdiagnózisok és a szakaszok: 17. A fő diagnózis tartalma és számítása: 18.
-- A diagnózisok megjelenítése a felhasználóknál: 26–29.
+- A fő diagnózis megjelenítése a felhasználóknál: 26–29. Az önálló diagnózisé: 4.6.
 - Automatikus diagnózis az Értéktükörből és feltöltésből: 06.
 - Súlyozás a diagnózisok frissessége szerint.

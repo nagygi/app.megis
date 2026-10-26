@@ -3,8 +3,9 @@
 @php
     $appendix = $report['appendix'];
     $date = fn (?string $value) => $value === null ? '–' : \Illuminate\Support\Carbon::parse($value)->format('Y.m.d.');
+    $standalone = $report['meta']['standalone'] ?? false;
 @endphp
-<x-layouts::client :title="__('appendix.title')" color="white" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$url('show')" :back-label="__('report.title')">
+<x-layouts::client :title="__('appendix.title')" color="white" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$url('show')" :back-label="ReportText::copy('title', $report['meta'])">
     <div class="flex max-w-2xl flex-col gap-6">
         <x-ui.card as="dl" class="grid gap-3 sm:grid-cols-[8rem_1fr]">
             <dt class="font-semibold">{{ __('appendix.who') }}</dt>
@@ -13,9 +14,13 @@
                 : __('appendix.who_alone', ['leader' => $appendix['who']['leader']]) }}</dd>
             <dt class="font-semibold">{{ __('appendix.from') }}</dt>
             <dd>
-                {{ __('appendix.from_text', $appendix['sources']) }}
-                @if ($appendix['sources']['calendar'])
-                    · {{ __('appendix.calendar') }}
+                @if ($standalone)
+                    {{ ReportText::standaloneSource($appendix['source']) }}
+                @else
+                    {{ __('appendix.from_text', $appendix['sources']) }}
+                    @if ($appendix['sources']['calendar'])
+                        · {{ __('appendix.calendar') }}
+                    @endif
                 @endif
             </dd>
             <dt class="font-semibold">{{ __('appendix.when') }}</dt>
@@ -34,16 +39,19 @@
             </div>
         </x-ui.disclosure>
 
-        <x-ui.disclosure :summary="__('appendix.claims', $appendix['claims']['counts'])">
-            <ul class="flex flex-col gap-2 text-sm">
-                @foreach ($appendix['claims']['list'] as $claim)
-                    <li>
-                        <span class="font-semibold">{{ ReportText::claimKind($claim['kind'], $report['meta']) }}</span> · {{ $claim['text'] }}
-                        <span class="block text-xs text-grey-700">{{ $claim['row'] }} · {{ trans_choice('report.evidence', $claim['traces'], ['count' => $claim['traces']]) }}</span>
-                    </li>
-                @endforeach
-            </ul>
-        </x-ui.disclosure>
+        {{-- A standalone diagnosis has no reading, so no claims (04 · 4.6). --}}
+        @unless ($standalone)
+            <x-ui.disclosure :summary="__('appendix.claims', $appendix['claims']['counts'])">
+                <ul class="flex flex-col gap-2 text-sm">
+                    @foreach ($appendix['claims']['list'] as $claim)
+                        <li>
+                            <span class="font-semibold">{{ ReportText::claimKind($claim['kind'], $report['meta']) }}</span> · {{ $claim['text'] }}
+                            <span class="block text-xs text-grey-700">{{ $claim['row'] }} · {{ trans_choice('report.evidence', $claim['traces'], ['count' => $claim['traces']]) }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </x-ui.disclosure>
+        @endunless
 
         <x-ui.disclosure :summary="__('appendix.rows', ['count' => count($appendix['rows'])])">
             <ul class="flex flex-col gap-1 text-sm">

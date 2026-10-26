@@ -1,4 +1,4 @@
-{{-- R2 · R3 · R4 · R5: a chapter of the internal working (27 · 27.5–27.8); S1·b for a snapshot's brand base. --}}
+{{-- R2 · R3 · R4 · R5: a chapter of the internal working (27 · 27.5–27.8); S1·b for a snapshot's brand base; a standalone diagnosis' chapter (04 · 4.6). --}}
 @use('App\Services\Report\ReportService')
 @use('App\Services\Report\ReportText')
 @php
@@ -7,18 +7,22 @@
     $kind = \App\Services\Report\ReportBuilder::CHAPTERS[$key]->value;
     $viewRows = $mode === 'csapat' ? null : ($mode === 'egyen' ? $individual : $organizationView)->where('kind', $kind)->values();
     $color = $key === 'brand' ? 'light-yellow' : 'green';
+    $standalone = $report['meta']['standalone'] ?? false;
+    $fromAnswer = $report['meta']['snapshot'] || $standalone;
 @endphp
-<x-layouts::client :title="__('report.chapters.'.$key)" :color="$color" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$url($report['meta']['snapshot'] ? 'show' : 'internal')" :back-label="$report['meta']['snapshot'] ? __('report.title') : __('report.question.internal')">
+<x-layouts::client :title="__('report.chapters.'.$key)" :color="$color" :subtitle="__('report.frozen', ['date' => \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('m.d.')])" :back="$url($fromAnswer ? 'show' : 'internal')" :back-label="$fromAnswer ? ReportText::copy('title', $report['meta']) : __('report.question.internal')">
     <div class="flex max-w-2xl flex-col gap-6">
         <div class="flex flex-col gap-2">
-            <h2 class="text-xl font-semibold">{{ __('report.question.'.$key) }}</h2>
+            <h2 class="text-xl font-semibold">{{ ReportText::copy('question.'.$key, $report['meta']) }}</h2>
             @include('client.report.partials.updated', ['chapterKey' => $key])
             @if (filled($report['texts']['summary_'.($key === 'brand' ? 'brand' : $key)] ?? null))
                 <p class="text-grey-700">{{ $report['texts']['summary_'.($key === 'brand' ? 'brand' : $key)] }}</p>
             @endif
         </div>
 
-        @include('client.report.partials.switch')
+        @unless ($standalone)
+            @include('client.report.partials.switch')
+        @endunless
 
         @if ($key === 'processes')
             {{-- The process map with chips (27 · 27.6) --}}
@@ -116,7 +120,7 @@
             </section>
         @endif
 
-        @if (! $report['meta']['snapshot'] && ! $preview)
+        @if (! $report['meta']['snapshot'] && ! $preview && $main !== null)
             <livewire:client.report.feedback :main="$main" :chapter="$key" :key="'feedback-'.$key" />
         @endif
 
@@ -126,7 +130,7 @@
         <x-ui.button tone="ghost" size="sm" icon="document" class="-ml-1.5 self-start" :href="$url('appendix')">{{ __('report.appendix_link') }}</x-ui.button>
 
         @if ($report['meta']['snapshot'])
-            <x-ui.page-nav :label="__('report.title')" :back="$url('show')" :back-label="__('report.title')" />
+            <x-ui.page-nav :label="ReportText::copy('title', $report['meta'])" :back="$url('show')" :back-label="ReportText::copy('title', $report['meta'])" />
         @else
             @include('client.report.partials.footer', ['current' => $key])
         @endif

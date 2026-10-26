@@ -2,6 +2,7 @@
 
 return [
     'markdown_editor' => [
+        'heading' => 'Alcím',
         'bold' => 'Félkövér',
         'italic' => 'Dőlt',
         'list' => 'Felsorolás',
@@ -769,6 +770,27 @@ return [
         'to_draft' => 'Vissza Draftba',
         'withdraw' => 'Visszavonom Draftba',
         'confirm_withdraw' => 'Biztosan visszavonod? A felhasználók addig nem látják, amíg újra nem publikálod.',
+        // The user's report of a standalone diagnosis and its preview (04 · 4.6).
+        'preview' => [
+            'button' => 'Előnézet',
+            'title' => 'Előnézet',
+            'back' => 'Vissza a diagnózishoz',
+            'frame' => 'A felhasználó riportja',
+            'viewers' => [
+                'user' => 'Így látja: :name.',
+                'team' => 'Így látják: a(z) :team csapat tagjai és a szervezet vezetői · :count fő.',
+                'organization' => 'Így látják: a(z) :organization aktív tagjai · :count fő.',
+            ],
+            'nobody' => 'Most senki sem látná: nincs olyan aktív tag, aki olvashatná.',
+            'not_published' => 'Még nincs publikálva, a felhasználó nem látja. Itt azt látod, amit publikálás után kap; minden végigkattintható.',
+            'published' => 'Publikálva: a menü Riportok blokkjában ezt látják.',
+        ],
+        'recommendation' => [
+            'help' => 'A felhasználó a riport végén, a zárólapon látja. Lehet benne alcím, félkövér, dőlt és link.',
+            'saved' => 'A javaslat mentve.',
+            'removed' => 'A javaslat törölve.',
+            'in_reading' => 'A fő diagnózis javaslata az Olvasatban készül.',
+        ],
         'history' => 'Státuszváltások',
         'created_status' => 'létrehozva: :status',
         'values_block' => 'Értékek',

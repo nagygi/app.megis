@@ -68,7 +68,7 @@ class ReportBuilder
         $rowData = $rows->map(fn (DiagnosisRow $row) => $this->row($row, $main, $definitions, $claims->get($row->id, collect()), $showsExperience, $gapRow, $processDiagnoses, $areas))->values();
 
         $chapters = collect(self::CHAPTERS)
-            ->map(fn (DiagnosisRowKind $kind, string $chapter) => $this->chapter($chapter, $rowData->where('kind', $kind->value)->values()))
+            ->map(fn (DiagnosisRowKind $kind, string $chapter) => self::chapter($chapter, $rowData->where('kind', $kind->value)->values()))
             // A diagnosis without processes or areas skips their chapter (27, question 2).
             ->filter(fn (array $chapter) => $chapter['rows'] !== [])
             ->all();
@@ -242,10 +242,12 @@ class ReportBuilder
     }
 
     /**
+     * A chapter of the report from its rows; the standalone report too.
+     *
      * @param  Collection<int, array<string, mixed>>  $rows
      * @return array<string, mixed>
      */
-    private function chapter(string $chapter, Collection $rows): array
+    public static function chapter(string $chapter, Collection $rows): array
     {
         $scores = $rows->pluck('score')->filter(fn ($score) => $score !== null)->values()->all();
 

@@ -7,7 +7,6 @@ use App\Enums\DiagnosisCreator;
 use App\Enums\DiagnosisLevel;
 use App\Enums\DiagnosisRowKind;
 use App\Enums\MainDiagnosisStage;
-use App\Enums\MaterialContext;
 use App\Enums\MaterialStatus;
 use App\Enums\ParticipantRole;
 use App\Enums\ScoreResultState;
@@ -550,7 +549,7 @@ class DiagnosisCalculator
                     'material_id' => $material->id,
                     'process_occasion_id' => $material->process_occasion_id,
                     'quote' => $detection->quote,
-                    'source_type' => $this->sourceType($material),
+                    'source_type' => EvidenceTrace::sourceTypeFor($material),
                     'role' => $this->roleOf($main, $material->user_id),
                     'user_id' => $material->user_id,
                     'recorded_on' => ($material->occasion?->occurred_at ?? $material->created_at)->toDateString(),
@@ -561,17 +560,6 @@ class DiagnosisCalculator
 
         // Traces added or chosen by hand stay (20 · 20.2).
         $row->traces()->whereNotNull('raw_detection_id')->whereNull('created_by')->whereNotIn('id', $keep)->delete();
-    }
-
-    private function sourceType(Material $material): string
-    {
-        return match (true) {
-            $material->context->isMirror() => EvidenceTrace::SOURCE_MIRROR,
-            $material->is_situation => EvidenceTrace::SOURCE_NOTE,
-            $material->context === MaterialContext::AdminUpload => EvidenceTrace::SOURCE_CONVERSATION,
-            $material->source->hasAudio() => EvidenceTrace::SOURCE_RECORDING,
-            default => EvidenceTrace::SOURCE_DOCUMENT,
-        };
     }
 
     private function roleOf(MainDiagnosis $main, ?int $userId): string

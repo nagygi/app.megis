@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Diagnosis;
 use App\Models\Organization;
 use App\Services\Report\ReportService;
+use App\Services\Report\StandaloneReportBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -22,15 +23,23 @@ class ReportPdfController extends Controller
 {
     public function __construct(private ReportService $reports) {}
 
-    public function report(Request $request, Organization $organization, Diagnosis $diagnosis): PdfBuilder
+    public function report(Request $request, Organization $organization, Diagnosis $diagnosis, StandaloneReportBuilder $standalone): PdfBuilder
     {
+        abort_if($diagnosis->organization_id !== $organization->id, 404);
         $main = $diagnosis->main;
-        abort_if($main === null || $diagnosis->organization_id !== $organization->id, 404);
-        abort_unless($this->reports->canView($request->user(), $main), 403);
-        $snapshot = $this->reports->snapshot($main);
-        abort_if($snapshot === null, 404);
 
-        $data = $snapshot->data;
+        if ($main === null) {
+            // A published standalone diagnosis (04 · 4.6).
+            abort_if($diagnosis->parent_id !== null, 404);
+            abort_unless($this->reports->canViewStandalone($request->user(), $diagnosis), 403);
+            $data = $standalone->build($diagnosis);
+        } else {
+            abort_unless($this->reports->canView($request->user(), $main), 403);
+            $snapshot = $this->reports->snapshot($main);
+            abort_if($snapshot === null, 404);
+            $data = $snapshot->data;
+        }
+
         $date = Carbon::parse($data['meta']['published_on']);
 
         return $this->pdf('pdf.report', ['report' => $data], $data['meta']['name'], $date, $data['meta']['subject_name'])

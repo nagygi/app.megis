@@ -9,6 +9,8 @@ return [
     'who_alone' => ':leader',
     'from' => 'Miből',
     'from_text' => ':conversations beszélgetés · :recordings felvétel · :documents dokumentum · :mirrors Értéktükör',
+    'from_aggregated' => ':count felhasználó publikált diagnózisa',
+    'from_manual' => 'a mégis rögzítette',
     'calendar' => 'naptár, 90 nap',
     'when' => 'Mikor',
     'read_by' => 'Ki olvasta',

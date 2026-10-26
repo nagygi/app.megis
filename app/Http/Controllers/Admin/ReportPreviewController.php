@@ -7,6 +7,7 @@ use App\Models\Diagnosis;
 use App\Models\User;
 use App\Services\Report\ReportBuilder;
 use App\Services\Report\ReportPages;
+use App\Services\Report\StandaloneReportBuilder;
 use App\Services\Report\TakeawayBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -14,15 +15,17 @@ use Illuminate\View\View;
 
 /**
  * The admin's preview of what goes out (21 · 21.1): the leader's report and
- * a peer's Útravaló, from the live data, in the same views, clickable.
+ * a peer's Útravaló, from the live data, in the same views, clickable; the
+ * report of a standalone diagnosis before publishing (04 · 4.6).
  */
 class ReportPreviewController extends Controller
 {
-    public function report(Request $request, Diagnosis $diagnosis, ReportBuilder $builder, ReportPages $pages, ?string $page = null, ?int $row = null): View
+    public function report(Request $request, Diagnosis $diagnosis, ReportBuilder $builder, StandaloneReportBuilder $standalone, ReportPages $pages, ?string $page = null, ?int $row = null): View
     {
         Gate::authorize('update', $diagnosis);
         $main = $diagnosis->main;
-        abort_if($main === null, 404);
+        // A subdiagnosis has no report of its own.
+        abort_if($main === null && $diagnosis->parent_id !== null, 404);
 
         // A chapter slug in place of a page name opens the chapter or one of its rows.
         [$name, $chapter] = match (true) {
@@ -33,13 +36,13 @@ class ReportPreviewController extends Controller
 
         return $pages->render(
             $name,
-            $main,
-            $builder->build($main),
+            $diagnosis,
+            $main === null ? $standalone->build($diagnosis) : $builder->build($main),
             $chapter,
             $row,
             fn (string $target, array $parameters = []) => $this->url($diagnosis, $target, $parameters),
             null,
-            $main->leader_id,
+            $main?->leader_id,
             $request->query('nezet'),
             preview: true,
         );

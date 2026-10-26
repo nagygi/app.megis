@@ -7,6 +7,7 @@ use App\Models\Diagnosis;
 use App\Models\Organization;
 use App\Services\Report\ReportPages;
 use App\Services\Report\ReportService;
+use App\Services\Report\StandaloneReportBuilder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -14,13 +15,15 @@ use Illuminate\View\View;
  * The report of a published main diagnosis (27): the answer, the summary,
  * the internal working, the four chapters with their deepening pages, the
  * comparison and the closing page; the snapshot product on one page (S1).
- * Every page reads the frozen snapshot (21 · 21.3).
+ * Every page reads the frozen snapshot (21 · 21.3). A published standalone
+ * diagnosis has the answer, its chapters and the closing page (04 · 4.6).
  */
 class ReportController extends Controller
 {
     public function __construct(
         private ReportService $reports,
         private ReportPages $pages,
+        private StandaloneReportBuilder $standalone,
     ) {}
 
     public function answer(Request $request, Organization $organization, Diagnosis $diagnosis): View
@@ -68,21 +71,31 @@ class ReportController extends Controller
 
     private function page(Request $request, Organization $organization, Diagnosis $diagnosis, string $page, ?string $chapter = null, ?int $row = null): View
     {
+        abort_if($diagnosis->organization_id !== $organization->id, 404);
         $main = $diagnosis->main;
-        abort_if($main === null || $diagnosis->organization_id !== $organization->id, 404);
-        abort_unless($this->reports->canView($request->user(), $main), 403);
 
-        $snapshot = $this->reports->snapshot($main);
-        abort_if($snapshot === null, 404);
+        if ($main === null) {
+            // A standalone diagnosis, built live: once published it no longer changes (04 · 4.6).
+            abort_if($diagnosis->parent_id !== null, 404);
+            abort_unless($this->reports->canViewStandalone($request->user(), $diagnosis), 403);
+            $data = $this->standalone->build($diagnosis);
+            $homeUrl = route('client.home', $organization);
+        } else {
+            abort_unless($this->reports->canView($request->user(), $main), 403);
+            $snapshot = $this->reports->snapshot($main);
+            abort_if($snapshot === null, 404);
+            $data = $snapshot->data;
+            $homeUrl = route('client.diagnosis.show', [$organization, $diagnosis]);
+        }
 
         return $this->pages->render(
             $page,
-            $main,
-            $snapshot->data,
+            $diagnosis,
+            $data,
             $chapter,
             $row,
             fn (string $name, array $parameters = []) => route('client.report.'.$name, [$organization, $diagnosis, ...$parameters]),
-            route('client.diagnosis.show', [$organization, $diagnosis]),
+            $homeUrl,
             $request->user()->id,
             $request->query('nezet'),
             preview: false,

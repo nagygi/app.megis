@@ -9,6 +9,7 @@ use App\Enums\ScoreState;
 use App\Exceptions\DiagnosisException;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisRow;
+use App\Models\DiagnosisText;
 use App\Models\Value;
 use App\Services\Diagnoses\DiagnosisAggregator;
 use App\Services\Diagnoses\DiagnosisService;
@@ -23,6 +24,8 @@ use Livewire\Component;
  * the status steps with their log (4.3) and the aggregated data (4.5). A
  * calculated one (13, 18) is written over with a reason, next to the
  * automatic value; a process diagnosis lists its occasions (13 · 13.5).
+ * A standalone one has the mégis' recommendation and a preview of the
+ * user's report (4.6).
  */
 class Show extends Component
 {
@@ -59,11 +62,31 @@ class Show extends Component
 
     public bool $showAggregationPreview = false;
 
+    public string $recommendation = '';
+
     public function mount(Diagnosis $diagnosis): void
     {
         Gate::authorize('view', $diagnosis);
 
         $this->diagnosis = $diagnosis;
+        $this->recommendation = (string) DiagnosisText::query()->where('diagnosis_id', $diagnosis->id)->where('key', 'recommendation')->value('text');
+    }
+
+    /**
+     * "A mégis javaslata": the end of the user's report (04 · 4.6).
+     */
+    public function saveRecommendation(DiagnosisService $diagnoses): void
+    {
+        Gate::authorize('update', $this->diagnosis);
+
+        $this->validate(['recommendation' => ['nullable', 'string', 'max:'.DiagnosisText::maxLength('recommendation')]], attributes: [
+            'recommendation' => __('report.recommendation'),
+        ]);
+
+        $this->attempt(function () use ($diagnoses): void {
+            $diagnoses->saveRecommendation($this->diagnosis, $this->recommendation, auth('admin')->user());
+            session()->flash('status', __(filled(trim($this->recommendation)) ? 'admin.diagnoses.recommendation.saved' : 'admin.diagnoses.recommendation.removed'));
+        });
     }
 
     public function changeStatus(string $status, DiagnosisService $diagnoses): void

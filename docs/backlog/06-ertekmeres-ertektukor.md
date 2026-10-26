@@ -192,7 +192,7 @@ Ebből látszik később, mely értékek térnek vissza, és mi hiányzik az Ér
 **Megjelenés a felhasználónál**
 
 - A tükörben (ET3–ET5) azonnal látja az eredményt.
-- A platformon a diagnózis csak admin publikálás után jelenik meg.
+- A platformon a diagnózis csak admin publikálás után jelenik meg, riportként a menü *Riportok* blokkjában (04 · 4.6).
 
 ### 6.6 Hangfelvételek tárolása
 

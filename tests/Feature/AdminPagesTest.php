@@ -72,6 +72,7 @@ it('renders every admin page for a superadmin with a page heading', function (Cl
     'diagnosis' => fn (array $models) => route('admin.diagnoses.show', $models['diagnosis']),
     'diagnosis data' => fn (array $models) => route('admin.diagnoses.edit', $models['diagnosis']),
     'diagnosis capabilities' => fn (array $models) => route('admin.diagnoses.capabilities', $models['diagnosis']),
+    'diagnosis preview' => fn (array $models) => route('admin.diagnoses.preview', $models['diagnosis']),
     'main diagnosis capabilities' => fn () => route('admin.diagnoses.capabilities', MainDiagnosis::factory()->create()->diagnosis),
     'upload' => fn () => route('admin.diagnoses.upload'),
     'material' => fn (array $models) => route('admin.materials.show', Material::factory()->transcribed([['speaker' => 'Beszélő 1', 'text' => 'Szöveg.']])->create(['organization_id' => $models['organization']->id, 'context' => 'admin_upload', 'status' => 'awaiting_speakers'])),

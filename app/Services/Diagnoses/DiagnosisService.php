@@ -15,6 +15,7 @@ use App\Exceptions\DiagnosisException;
 use App\Jobs\RecalculateMainDiagnosis;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisRow;
+use App\Models\DiagnosisText;
 use App\Models\User;
 use App\Models\Value;
 use App\Services\Values\ValueService;
@@ -93,6 +94,33 @@ class DiagnosisService
             $diagnosis->update(['status' => $to]);
             $this->logTransition($diagnosis, $from, $to);
         });
+    }
+
+    /**
+     * "A mégis javaslata" at the end of a standalone diagnosis' report
+     * (04 · 4.6); an admin writes it, so it is approved as it is saved.
+     */
+    public function saveRecommendation(Diagnosis $diagnosis, ?string $text, User $admin): void
+    {
+        $this->ensureEditable($diagnosis);
+
+        // A main diagnosis writes it in its reading (20 · 20.4).
+        if ($diagnosis->parent_id !== null || $diagnosis->main()->exists()) {
+            throw new DiagnosisException(__('admin.diagnoses.recommendation.in_reading'));
+        }
+
+        $text = trim((string) $text);
+
+        if ($text === '') {
+            DiagnosisText::query()->where('diagnosis_id', $diagnosis->id)->where('key', 'recommendation')->delete();
+
+            return;
+        }
+
+        DiagnosisText::query()->updateOrCreate(
+            ['diagnosis_id' => $diagnosis->id, 'key' => 'recommendation'],
+            ['text' => $text, 'meta' => null, 'status' => 'approved', 'ai_call_id' => null, 'approved_at' => now(), 'approved_by' => $admin->id],
+        );
     }
 
     /**

@@ -3,14 +3,15 @@
 namespace App\Services\Report;
 
 use App\Models\ChapterUpdate;
-use App\Models\MainDiagnosis;
+use App\Models\Diagnosis;
 use Closure;
 use Illuminate\View\View;
 
 /**
  * Renders a page of the report from its data (27): the client reads the
  * frozen snapshot, the admin's preview the live data (21 · 21.1). The same
- * views either way; only the links differ.
+ * views either way; only the links differ. A standalone diagnosis has no
+ * main diagnosis, so no summary, internal working or comparison (04 · 4.6).
  */
 class ReportPages
 {
@@ -20,11 +21,12 @@ class ReportPages
      * @param  array<string, mixed>  $data
      * @param  Closure(string, array<int, mixed>=): string  $url
      */
-    public function render(string $page, MainDiagnosis $main, array $data, ?string $chapter, ?int $row, Closure $url, ?string $homeUrl, ?int $viewerId, ?string $mode, bool $preview): View
+    public function render(string $page, Diagnosis $diagnosis, array $data, ?string $chapter, ?int $row, Closure $url, ?string $homeUrl, ?int $viewerId, ?string $mode, bool $preview): View
     {
         abort_unless(in_array($page, self::PAGES, true), 404);
+        $main = $diagnosis->main;
         $snapshot = $data['meta']['snapshot'];
-        abort_if($snapshot && in_array($page, ['summary', 'internal', 'compare'], true), 404);
+        abort_if(($snapshot || ($data['meta']['standalone'] ?? false)) && in_array($page, ['summary', 'internal', 'compare'], true), 404);
 
         $extra = [];
 
@@ -51,15 +53,16 @@ class ReportPages
             'url' => $url,
             'homeUrl' => $homeUrl,
             'preview' => $preview,
-            'organization' => $main->diagnosis->organization,
-            'diagnosis' => $main->diagnosis,
+            'organization' => $diagnosis->organization,
+            'diagnosis' => $diagnosis,
             'main' => $main,
             'report' => $data,
-            'mode' => in_array($mode, ['egyen', 'csapat', 'szervezet'], true) ? $mode : 'csapat',
+            // A standalone report has the one view only.
+            'mode' => in_array($mode, ['egyen', 'csapat', 'szervezet'], true) && ! ($data['meta']['standalone'] ?? false) ? $mode : 'csapat',
             'individual' => collect($data['views']['individual'][$viewerId] ?? []),
             'organizationView' => collect($data['views']['organization'] ?? []),
             'chapterKeys' => array_keys($data['chapters']),
-            'updates' => ChapterUpdate::query()->where('main_diagnosis_id', $main->id)->latest('id')->get()->unique('chapter')->keyBy('chapter'),
+            'updates' => $main === null ? collect() : ChapterUpdate::query()->where('main_diagnosis_id', $main->id)->latest('id')->get()->unique('chapter')->keyBy('chapter'),
             ...$extra,
         ]);
     }
