@@ -13,6 +13,8 @@ use App\Enums\MaterialStatus;
 use App\Enums\PatternOrigin;
 use App\Enums\PatternSubtype;
 use App\Enums\PreconditionValue;
+use App\Enums\TraceDirection;
+use App\Enums\TraceDirectness;
 use App\Exceptions\DiagnosisException;
 use App\Jobs\DetectCapabilities;
 use App\Livewire\Admin\Diagnoses\Capabilities;
@@ -30,11 +32,14 @@ use App\Models\Pattern;
 use App\Models\Precondition;
 use App\Models\User;
 use App\Services\Ai\AiGateway;
+use App\Services\Capabilities\CapabilityAssessmentService;
 use App\Services\Capabilities\CapabilityCatalog;
 use App\Services\Capabilities\CapabilityMeasurementPolicy;
 use App\Services\Capabilities\CapabilityReviewService;
 use App\Services\Capabilities\PatternCatalog;
 use App\Services\Capabilities\PatternStatistics;
+use App\Services\Materials\MaterialPipeline;
+use App\Services\Materials\MaterialStore;
 use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
 
@@ -353,4 +358,70 @@ it('never measures while the switch is off, so the value tests stay as they are 
         ->and(CapabilityTrace::query()->count())->toBe(0)
         ->and($diagnosis->preconditionAssessments()->count())->toBe(0)
         ->and(Precondition::query()->count())->toBe(9);
+});
+
+/**
+ * A situation of the Képességek step with a confirmed presence finding on an observed, raw trace.
+ */
+function presenceSituation(MainDiagnosis $main, User $user, array $library, string $quote): Material
+{
+    $material = app(MaterialStore::class)->fromTurns([
+        ['speaker' => 'mégis (kérdés)', 'text' => 'Mikor került valamibe nemrég ez az érték?'],
+        ['speaker' => 'Vezető', 'text' => $quote],
+    ], MaterialContext::CapabilityStory, $user, $main->diagnosis->organization);
+    $material->update(['parent_diagnosis_id' => $main->diagnosis_id, 'status' => MaterialStatus::Processed]);
+    $trace = CapabilityTrace::query()->create([
+        'organization_id' => $material->organization_id, 'material_id' => $material->id, 'speaker' => 'Vezető', 'speaker_role' => 'leader',
+        'quote' => $quote, 'subject_level' => CapabilityLevel::Team, 'direction' => TraceDirection::Positive,
+        'directness' => TraceDirectness::Observed, 'is_raw' => true,
+    ]);
+    CapabilityFinding::query()->create([
+        'organization_id' => $material->organization_id, 'material_id' => $material->id, 'capability_id' => $library['capability']->id,
+        'pattern_id' => $library['presence']->id, 'kind' => FindingKind::Pattern, 'subject_level' => CapabilityLevel::Team,
+        'status' => FindingStatus::Confirmed, 'machine_confidence' => CapabilityConfidence::Medium,
+    ])->traces()->attach($trace);
+
+    return $material;
+}
+
+it('reads a situation of the Képességek step for capabilities only, as self-report (NM-12)', function () {
+    measurementLibrary();
+    [$setup, $main] = runningDiagnosis();
+    $inputs = [];
+    fakeCapabilityAi($inputs);
+    $material = app(MaterialStore::class)->fromTurns([
+        ['speaker' => 'mégis (kérdés)', 'text' => 'Mikor került valamibe nemrég ez az érték?'],
+        ['speaker' => 'Vezető', 'text' => 'A heti alkalom fél éve fut, és minden héten döntünk a következő lépésről.'],
+    ], MaterialContext::CapabilityStory, $setup['leader'], $setup['organization']);
+    $material->update(['parent_diagnosis_id' => $main->diagnosis_id]);
+
+    app(MaterialPipeline::class)->start($material);
+
+    // No value measurement: only the two capability steps asked the AI.
+    expect($material->fresh()->status)->toBe(MaterialStatus::Processed)
+        ->and($material->fresh()->capability_status)->toBe(CapabilityMeasurementStatus::Processed)
+        ->and($material->scores()->count())->toBe(0)
+        ->and(collect($inputs)->every(fn (string $prompt) => str_starts_with($prompt, 'Anyag:') || str_starts_with($prompt, 'Nyomok:')))->toBeTrue()
+        ->and($inputs[0])->toStartWith('Anyag: Képesség-helyzet')
+        ->and($inputs[0])->toContain('a kitöltő saját leírása (önbevallás)')
+        ->and(CapabilityTrace::query()->where('material_id', $material->id)->pluck('quote')->all())
+        ->toBe(['A heti alkalom fél éve fut, és minden héten döntünk a következő lépésről.']);
+});
+
+it('counts the situations one person told as one source, another person\'s as another (KO-02)', function () {
+    $library = measurementLibrary();
+    [$setup, $main] = runningDiagnosis();
+    $assessments = app(CapabilityAssessmentService::class);
+    $confidence = fn () => CapabilityAssessment::query()->where('diagnosis_id', $main->diagnosis_id)->where('capability_id', $library['capability']->id)->sole()->automatic_confidence;
+
+    presenceSituation($main, $setup['leader'], $library, 'Kedden mindenki elmondta, mi akadt el.');
+    presenceSituation($main, $setup['leader'], $library, 'Pénteken a retrón is sorra vettük, mi csúszott.');
+    $assessments->refresh($main->diagnosis);
+
+    expect($confidence())->toBe(CapabilityConfidence::Low);
+
+    presenceSituation($main, $setup['peers'][0], $library, 'Szerdán az akadály-körön én is elmondtam a csúszást.');
+    $assessments->refresh($main->diagnosis);
+
+    expect($confidence())->toBe(CapabilityConfidence::Medium);
 });

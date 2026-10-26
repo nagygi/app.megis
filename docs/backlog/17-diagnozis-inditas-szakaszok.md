@@ -61,6 +61,7 @@ A lépések a V1 sorrendjében.
 | 2 · A szervezet értékei | ✅ | – (a saját értékekből, 08) | ✅ | – |
 | 3 · A márkád alapja | ✅ | ✅ | ✅ | ✅ |
 | 4 · A megélésed | ✅ | ✅ | ✅ | ✅ |
+| Képességek (NM-12) | ✅ 1 helyzet | ✅ 1 helyzet | ✅ 3 helyzet | ✅ 3 helyzet |
 | 5 · Folyamatok | ✅ | ✅ | ✅ | ✅ |
 | 8 · Ki lát mit | ✅ | ✅ | ✅ | ✅ |
 
@@ -69,6 +70,7 @@ A lépések a V1 sorrendjében.
 - Ha a vezető nem „szervezet vezetője”, a 2. és a 3. lépés csak olvasható (23).
 - Egy ember a cég értékeivel (17.2): a csapat lépései, a 7. lépés nélkül.
 - A táblázat konfigurációban van; az A1 előnézete és a V1 ugyanebből olvas.
+- A Képességek lépés csak akkor van ott, ha a képességmérés be van kapcsolva, globálisan és a terméknél is (1.32). Kihagyható, mint a Folyamatok.
 
 ### 17.4 Részdiagnózisok
 

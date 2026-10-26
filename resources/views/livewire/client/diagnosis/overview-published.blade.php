@@ -43,6 +43,11 @@
         </div>
     @endif
 
+    {{-- Képesség (NM-12): what to build on and what is missing, once the mégis approved them --}}
+    @if ($capabilities['rows'] !== [])
+        <x-report.capability-card :overview="$capabilities" :href="route('client.capabilities', $organization)" />
+    @endif
+
     {{-- Mélyítés, live (26 · 26.3) --}}
     <ul class="flex flex-col gap-2">
         <li>

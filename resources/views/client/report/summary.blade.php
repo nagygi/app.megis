@@ -67,7 +67,7 @@
             <p class="text-sm leading-snug text-grey-700">{{ __('report.brand_report.text') }}</p>
         </section>
 
-        <x-report.capability-card framed>
+        <x-report.capability-card framed :overview="$capabilities" :href="$capabilities ? route('client.capabilities', $organization) : null">
             @if ($recommendation)
                 <span class="font-semibold">{{ __('report.summary_page.where_to_start') }}</span> {!! \Illuminate\Support\Str::inlineMarkdown(\Illuminate\Support\Str::of($recommendation['text'])->replaceMatches('/^#+\s*/m', '')->squish(), ['html_input' => 'escape', 'allow_unsafe_links' => false]) !!}
                 @if ($recommendation['row'])

@@ -217,6 +217,7 @@ Route::middleware('customer')->name('client.')->group(function () {
                 Route::livewire('ertektar', Client\ValueLibrary::class)->name('values');
                 Route::livewire('tarak/folyamatok', Client\ProcessLibrary::class)->name('processes');
                 Route::livewire('tarak/folyamatok/{process}', Client\ProcessSheet::class)->whereNumber('process')->name('processes.show');
+                Route::livewire('tarak/kepessegek', Client\CapabilityLibrary::class)->name('capabilities');
                 Route::livewire('ertektukor', Mirror\Record::class)->name('mirror.record');
                 Route::livewire('ertektukor/{session}', Mirror\Result::class)->name('mirror.result');
 
@@ -226,6 +227,7 @@ Route::middleware('customer')->name('client.')->group(function () {
                 Route::livewire('diagnozis/{diagnosis}/szervezet-ertekei', Client\Diagnosis\OrganizationValues::class)->name('diagnosis.szervezet-ertekei');
                 Route::livewire('diagnozis/{diagnosis}/markad-alapja', Client\Diagnosis\Brand::class)->name('diagnosis.markad-alapja');
                 Route::livewire('diagnozis/{diagnosis}/megeles', Client\Diagnosis\Experience::class)->name('diagnosis.megeles');
+                Route::livewire('diagnozis/{diagnosis}/kepessegek', Client\Diagnosis\Capabilities::class)->name('diagnosis.kepessegek');
                 Route::livewire('diagnozis/{diagnosis}/folyamatok', Client\Diagnosis\Processes::class)->name('diagnosis.folyamatok');
                 Route::livewire('diagnozis/{diagnosis}/folyamatok/naptar', Client\Diagnosis\ProcessCalendar::class)->name('diagnosis.process-calendar');
                 Route::get('diagnozis/{diagnosis}/folyamatok/naptar/{provider}', [CalendarOAuthController::class, 'redirect'])

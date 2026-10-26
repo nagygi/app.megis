@@ -33,14 +33,15 @@ return [
 
     // The leader's steps by subject, in the order of V1 (17 · 17.3). A private
     // person has no "A szervezet értékei": they come from the own values (08).
+    // "capabilities" is left out while the capability measurement is off (NM-12).
     'steps' => [
-        'team' => ['own_values', 'organization_values', 'brand', 'experience', 'processes', 'visibility'],
-        'person' => ['own_values', 'organization_values', 'brand', 'experience', 'processes', 'visibility'],
-        'individual' => ['own_values', 'brand', 'experience', 'processes', 'visibility'],
+        'team' => ['own_values', 'organization_values', 'brand', 'experience', 'capabilities', 'processes', 'visibility'],
+        'person' => ['own_values', 'organization_values', 'brand', 'experience', 'capabilities', 'processes', 'visibility'],
+        'individual' => ['own_values', 'brand', 'experience', 'capabilities', 'processes', 'visibility'],
     ],
 
     // A peer's steps now; "Hozzáteszel" runs while the diagnosis runs (25 · 25.3).
-    'peer_steps' => ['own_values', 'experience'],
+    'peer_steps' => ['own_values', 'experience', 'capabilities'],
 
     // Estimated minutes per step (23, question 1); a read-only step takes one minute.
     'minutes' => [
@@ -48,12 +49,31 @@ return [
         'organization_values' => 3,
         'brand' => 2,
         'experience' => 3,
+        'capabilities' => 3,
         'processes' => 2,
         'visibility' => 1,
     ],
+
+    // Képességek (NM-12): the situations suggested on the step, by product and
+    // for a peer; at most "max", and an answer counts from "min_characters".
+    'capability_stories' => [
+        'full' => 3,
+        'snapshot_internal' => 1,
+        'peer' => 1,
+        'max' => 5,
+        'min_characters' => 40,
+    ],
+
+    // What the leader sees after publishing (V12, M3): at most this many
+    // strengths and as many missing capabilities on the home card.
+    'capability_card' => [
+        'full' => 3,
+        'snapshot_internal' => 1,
+    ],
     'readonly_step_minutes' => 1,
 
-    // The minutes in the peer invitation and on T1 (25 · 25.2).
+    // The minutes in the peer invitation and on T1 (25 · 25.2), without
+    // Képességek; MainDiagnosis::peerMinutes() adds it when the step is on.
     'peer_minutes' => 8,
 
     // Reading starts this many days before publishing; the leader sees it only for information (17 · 17.2).

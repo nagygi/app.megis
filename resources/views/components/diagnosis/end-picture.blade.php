@@ -1,7 +1,8 @@
 {{--
     "A végén": what the diagnosis gives, grey and not clickable (23, question 2;
-    25 · 25.3). Without Brand and capability in the MVP: one ring, the
-    biggest gap and the chapters; for a peer the Útravaló.
+    25 · 25.3). Without Brand in the MVP: one ring, the biggest gap, the
+    chapters, and the capabilities while they are measured (NM-12); for a
+    peer the Útravaló.
 --}}
 @props(['main', 'peer' => false])
 
@@ -31,5 +32,11 @@
                 <p class="text-sm">{{ __('diagnosis.end.chapters_help') }}</p>
             @endunless
         </div>
+        @if ($main->measuresCapabilities())
+            <div class="flex flex-col gap-1">
+                <p class="font-semibold">{{ __('diagnosis.end.capabilities') }}</p>
+                <p class="text-sm">{{ __('diagnosis.end.capabilities_help') }}</p>
+            </div>
+        @endif
     @endif
 </section>

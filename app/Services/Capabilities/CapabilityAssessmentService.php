@@ -85,11 +85,8 @@ class CapabilityAssessmentService
             return;
         }
 
+        // Without materials the written rows still follow: a situation may have been taken off (NM-12).
         $materials = $this->materialsFor($diagnosis);
-
-        if ($materials->isEmpty()) {
-            return;
-        }
 
         $findings = CapabilityFinding::query()
             ->whereIn('material_id', $materials->pluck('id'))
@@ -258,13 +255,26 @@ class CapabilityAssessmentService
             id: $trace->id,
             personKey: $this->personKey($trace, $material),
             method: $material === null ? 'unknown' : $this->method($material),
-            occasionKey: $material?->process_occasion_id !== null ? 'occasion:'.$material->process_occasion_id : 'material:'.$trace->material_id,
+            occasionKey: $this->occasionKey($trace, $material),
             isRaw: $trace->is_raw,
             directness: $trace->directness,
             direction: $trace->direction,
             flags: $trace->flags,
             externalVoice: $trace->speaker_role === 'external',
         );
+    }
+
+    /**
+     * The occasion of a trace: the occasion of a process, or the material. The
+     * situations one person told on the Képességek step are one occasion (KO-02).
+     */
+    private function occasionKey(CapabilityTrace $trace, ?Material $material): string
+    {
+        return match (true) {
+            $material?->process_occasion_id !== null => 'occasion:'.$material->process_occasion_id,
+            $material?->context === MaterialContext::CapabilityStory => 'stories:'.$material->parent_diagnosis_id.':'.$material->user_id,
+            default => 'material:'.$trace->material_id,
+        };
     }
 
     /**
@@ -287,6 +297,7 @@ class CapabilityAssessmentService
         return match (true) {
             $material->context->isMirror() => 'mirror',
             $material->is_situation => 'note',
+            $material->context === MaterialContext::CapabilityStory => 'story',
             $material->context === MaterialContext::AdminUpload => 'conversation',
             $material->source->hasAudio() => 'recording',
             default => 'document',

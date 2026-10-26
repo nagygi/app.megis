@@ -143,6 +143,14 @@ class MainDiagnosis extends Model
     }
 
     /**
+     * @return HasMany<CapabilityStory, $this>
+     */
+    public function capabilityStories(): HasMany
+    {
+        return $this->hasMany(CapabilityStory::class);
+    }
+
+    /**
      * @return HasMany<Consent, $this>
      */
     public function consents(): HasMany
@@ -208,10 +216,7 @@ class MainDiagnosis extends Model
      */
     public function leaderSteps(): array
     {
-        return array_map(
-            fn (string $step) => DiagnosisStep::from($step),
-            config('diagnosis.steps.'.$this->subject->value),
-        );
+        return self::stepsFor($this->subject, $this->product_key);
     }
 
     /**
@@ -219,7 +224,55 @@ class MainDiagnosis extends Model
      */
     public function peerSteps(): array
     {
-        return array_map(fn (string $step) => DiagnosisStep::from($step), config('diagnosis.peer_steps'));
+        return self::filterSteps(config('diagnosis.peer_steps'), $this->product_key);
+    }
+
+    /**
+     * The leader's steps of a subject and product; the A1 preview reads the same (17 · 17.3).
+     *
+     * @return list<DiagnosisStep>
+     */
+    public static function stepsFor(MainDiagnosisSubject $subject, ?string $productKey): array
+    {
+        return self::filterSteps(config('diagnosis.steps.'.$subject->value), $productKey);
+    }
+
+    /**
+     * Whether the capability measurement reads the materials of this product (NM-12):
+     * the global switch and the product's own.
+     */
+    public static function measuresCapabilitiesFor(?string $productKey): bool
+    {
+        return (bool) config('megis.capabilities.measurement.enabled')
+            && (bool) config('diagnosis.products.'.$productKey.'.capability_measurement', false);
+    }
+
+    public function measuresCapabilities(): bool
+    {
+        return self::measuresCapabilitiesFor($this->product_key);
+    }
+
+    /**
+     * The minutes in the peer invitation and on T1 (25 · 25.2), with Képességek when it is on.
+     */
+    public function peerMinutes(): int
+    {
+        return (int) config('diagnosis.peer_minutes')
+            + ($this->measuresCapabilities() ? DiagnosisStep::Capabilities->minutes() : 0);
+    }
+
+    /**
+     * @param  list<string>  $keys
+     * @return list<DiagnosisStep>
+     */
+    private static function filterSteps(array $keys, ?string $productKey): array
+    {
+        $steps = array_map(fn (string $step) => DiagnosisStep::from($step), $keys);
+
+        return array_values(array_filter(
+            $steps,
+            fn (DiagnosisStep $step) => $step !== DiagnosisStep::Capabilities || self::measuresCapabilitiesFor($productKey),
+        ));
     }
 
     /**

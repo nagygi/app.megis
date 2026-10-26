@@ -19,6 +19,11 @@ use Throwable;
  */
 class DetectCapabilities extends AiTaskJob
 {
+    /**
+     * A situation taken off the Képességek step takes its material with it: nothing is left to measure.
+     */
+    public bool $deleteWhenMissingModels = true;
+
     public function __construct(public Material $material, public bool $force = false)
     {
         parent::__construct();

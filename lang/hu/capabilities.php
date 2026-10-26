@@ -1,8 +1,76 @@
 <?php
 
-// Képességmérés (NM-12): the admin's review of the capabilities of a diagnosis.
+// Képességmérés (NM-12): the admin's review of the capabilities of a diagnosis,
+// the Képességek step of the filling, the home card (V12) and the Képességtár (M3).
 return [
     'failure_summary' => 'A képességmérés nem futott le: :name.',
+
+    // Képességek, the step after the Megélés (NM-12).
+    'step' => [
+        'question' => 'Hol lesz az értékeitekből tett?',
+        'count' => '{1} :count helyzet · leírva vagy elmondva|[2,*] :count helyzet · leírva vagy elmondva',
+        'lead' => 'Egy érték akkor képesség, ha nem kell kérni érte. Mesélj el egy-egy friss helyzetet: nem pontozod, a helyzetekből olvassuk ki, mire építhettek, és mi hiányzik.',
+        'lead_peer' => 'Egy érték akkor képesség, ha nem kell kérni érte. Mesélj el egy friss helyzetet a csapatból: nem pontozod, a helyzetekből olvassuk ki. A vezető nem látja, mit írtál.',
+        'questions' => [
+            'tested' => 'Mikor került valamibe nemrég ez az érték? Mi történt, ki mit tett, és mi lett belőle?',
+            'missed' => 'Mikor kellett volna nemrég ez az érték, és nem úgy ment? Mi történt, és mi lett utána?',
+            'own' => 'Mikor tartottad magad nemrég ehhez az értékhez, akkor is, ha kényelmetlen volt? Mi történt, és ki látta rajtad kívül?',
+        ],
+        'source' => [
+            'organization' => 'a szervezeté',
+            'own' => 'a tiéd',
+            'yours_too' => 'a tiéd is',
+        ],
+        'placeholder' => 'Mikor, hol, ki mit tett, és mi lett belőle…',
+        'other_value' => 'Másik értékről mesélnék',
+        'value_label' => 'Melyik értékről?',
+        'add' => 'Még egy helyzet',
+        'remove' => ':name helyzetének törlése',
+        'remove_confirm' => 'Törlöd ezt a helyzetet? Amit írtál, elvész.',
+        'remove_yes' => 'Törlöm',
+        'privacy' => 'Pár mondat elég, legalább :count karakter. Név helyett szerepet írj (pl. „a projektvezető”). Egészségről, magánéletről ne írj.',
+        'one_needed' => 'Legalább egy helyzetet mesélj el, legalább :count karakterben, vagy hagyd ki a lépést.',
+        'submit' => 'Tovább',
+        'skip' => 'Kihagyom',
+        // The material the measurement reads: the question is the mégis', the answer the user's.
+        'speaker_question' => 'mégis (kérdés)',
+        'speaker_leader' => 'Vezető',
+        'speaker_peer' => 'Társ',
+        'engine_note' => 'Helyzet a Képességek lépésről: a kitöltő saját leírása (önbevallás), a „mégis (kérdés)” sor a mégis kérdése, abból nem lehet nyom.',
+    ],
+
+    // V10: the situations told while it runs, numbers only.
+    'home' => [
+        'title' => 'Képességek',
+        'count' => '{0} Még nincs elmondott helyzet|{1} :count helyzet elmondva|[2,*] :count helyzet elmondva',
+        'count_with_peers' => ':total helyzet elmondva · ebből :peers a társaktól',
+    ],
+
+    // V12, R0, R1: the Képesség card with the approved capabilities.
+    'card' => [
+        'strengths' => 'Amire építhettek',
+        'gaps' => 'Ami hiányzik',
+        'maturity_later' => 'Érettségi szint a második diagnózistól.',
+        'library' => 'Képességtár',
+    ],
+
+    // Tárak → Képességtár (M3).
+    'library' => [
+        'title' => 'Képességtár',
+        'question' => 'Melyik képesség van meg, melyik hiányzik?',
+        'note' => '{1} :count képesség a :date-i diagnózis alapján|[2,*] :count képesség a :date-i diagnózis alapján',
+        'empty' => 'A diagnózis után itt látod, melyik képesség van meg nálatok, és melyik hiányzik. A képességeket a mégis nézi át a publikálás előtt.',
+        'traces' => '{1} :count nyom|[2,*] :count nyom',
+        'little_data' => 'kevés még az adat',
+        'uneven' => 'egyenetlen',
+        'blocker' => 'Akadály: :name. Ez nem a csapaton múlik.',
+        'meaning' => 'Mit jelent',
+        'statement' => 'Ha megy, így néz ki',
+        'more_data' => 'Biztosabbá tenné több alkalom, több ember helyzete és egy közös alkalom felvétele.',
+        'maturity_later' => 'Érettségi szint a második diagnózistól.',
+        'quote_you' => 'te',
+        'quote_peer' => 'társ',
+    ],
 
     'inbox' => [
         'review' => 'Képesség-javaslatok várnak átnézésre: :diagnosis.',

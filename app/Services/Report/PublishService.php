@@ -2,10 +2,12 @@
 
 namespace App\Services\Report;
 
+use App\Enums\CapabilityState;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\MaterialContext;
 use App\Exceptions\DiagnosisException;
 use App\Mail\DiagnosisNoticeMail;
+use App\Models\CapabilityAssessment;
 use App\Models\ChapterUpdate;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
@@ -37,7 +39,8 @@ class PublishService
 
     /**
      * Four rows; a missing one leads to its place (21 · 21.2). The threshold
-     * row is not there without peers (21, question 5).
+     * row is not there without peers (21, question 5), the capability row not
+     * without a capability to show (NM-12).
      *
      * @return array<string, bool>
      */
@@ -56,7 +59,25 @@ class PublishService
                 ->whereNull('classified_other_at')
                 ->exists(),
             'threshold' => $main->hasPeers() ? ($this->threshold->isMet($main) || $this->threshold->isOverridden($main)) : null,
+            'capabilities' => $this->capabilitiesReviewed($main),
         ], fn ($value) => $value !== null);
+    }
+
+    /**
+     * The customer sees only approved capabilities (NM-12, NY-26): every
+     * "jelen lehet" and "hiányzik" row waits for an admin. Null without such rows.
+     */
+    private function capabilitiesReviewed(MainDiagnosis $main): ?bool
+    {
+        $rows = CapabilityAssessment::query()
+            ->where('diagnosis_id', $main->diagnosis_id)
+            ->whereIn('state', [CapabilityState::Present, CapabilityState::Absent]);
+
+        if (! (clone $rows)->exists()) {
+            return null;
+        }
+
+        return ! $rows->whereNull('approved_at')->exists();
     }
 
     public function canPublish(MainDiagnosis $main): bool

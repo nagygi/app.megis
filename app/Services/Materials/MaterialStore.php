@@ -42,6 +42,40 @@ class MaterialStore
     }
 
     /**
+     * A written exchange, one segment per speaker turn (e.g. the question and the answer of a situation, NM-12).
+     *
+     * @param  list<array{speaker: string, text: string}>  $turns
+     */
+    public function fromTurns(array $turns, MaterialContext $context, ?User $owner = null, ?Organization $organization = null): Material
+    {
+        return Material::create([
+            'context' => $context,
+            'source' => MaterialSource::Text,
+            'user_id' => $owner?->id,
+            'organization_id' => $organization?->id,
+            ...self::turnAttributes($turns),
+            'status' => MaterialStatus::Pending,
+            'created_by' => auth()->id(),
+        ]);
+    }
+
+    /**
+     * The text and the segments of a written exchange.
+     *
+     * @param  list<array{speaker: string, text: string}>  $turns
+     * @return array{text: string, segments: list<array{speaker: string, start: null, end: null, text: string}>}
+     */
+    public static function turnAttributes(array $turns): array
+    {
+        $segments = array_map(fn (array $turn) => ['speaker' => $turn['speaker'], 'start' => null, 'end' => null, 'text' => trim($turn['text'])], $turns);
+
+        return [
+            'text' => implode("\n", array_map(fn (array $segment) => $segment['speaker'].': '.$segment['text'], $segments)),
+            'segments' => $segments,
+        ];
+    }
+
+    /**
      * An audio file: kept as uploaded, measured with ffprobe when available.
      */
     public function fromAudio(UploadedFile $file, MaterialContext $context, MaterialSource $source, ?User $owner = null, ?Organization $organization = null): Material

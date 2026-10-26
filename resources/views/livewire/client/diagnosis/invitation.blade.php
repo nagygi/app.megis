@@ -5,7 +5,7 @@
 <div class="flex max-w-xl flex-col gap-6">
     <x-ui.flash />
 
-    <p class="text-lg">{{ __('diagnosis.invitation.lead', ['leader' => $leaderName, 'subject' => $main->subjectName(), 'minutes' => config('diagnosis.peer_minutes')]) }}</p>
+    <p class="text-lg">{{ __('diagnosis.invitation.lead', ['leader' => $leaderName, 'subject' => $main->subjectName(), 'minutes' => $main->peerMinutes()]) }}</p>
 
     @if (! $main->acceptsInput())
         <x-ui.notice>{{ __('diagnosis.invitation.closed') }}</x-ui.notice>

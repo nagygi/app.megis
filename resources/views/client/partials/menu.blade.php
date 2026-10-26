@@ -32,6 +32,13 @@
         $valueCount = $currentOrganization->valueSet()->withCount('items')->first()?->items_count ?? 0;
         $valuesActive = request()->routeIs('client.values');
         $processesActive = request()->routeIs('client.processes*');
+        // Képességtár once a report the user reads has approved capabilities (M3, NM-12).
+        $showsCapabilities = $reports->isNotEmpty() && \App\Models\CapabilityAssessment::query()
+            ->whereIn('diagnosis_id', $reports->pluck('diagnosis_id'))
+            ->whereNotNull('approved_at')
+            ->whereIn('state', [\App\Enums\CapabilityState::Present, \App\Enums\CapabilityState::Absent])
+            ->exists();
+        $capabilitiesActive = request()->routeIs('client.capabilities');
 
         if ($showsProcesses) {
             $routines = \App\Models\Process::query()
@@ -45,7 +52,7 @@
         $reportRowActive = fn ($diagnosisId) => $onReport($diagnosisId) && ! $internalActive && ! $brandActive;
         // The group holding the page opens; Riportok also when none does, as in the prototype.
         $chaptersOpen = $internalActive || $brandActive;
-        $librariesOpen = $showsProcesses && ($valuesActive || $processesActive);
+        $librariesOpen = ($showsProcesses || $showsCapabilities) && ($valuesActive || $processesActive || $capabilitiesActive);
         $reportsOpen = ! $chaptersOpen && ! $librariesOpen;
 
         $reportsMeta = collect([
@@ -111,10 +118,20 @@
                 @endif
 
                 @php($valuesMeta = $valueCount > 0 ? __('client.menu.value_library_meta', ['count' => $valueCount]) : __('client.menu.value_library_browse'))
-                @if ($showsProcesses)
-                    <x-client.menu-group :title="__('client.menu.libraries')" :meta="__('client.menu.value_library').' · '.__('client.menu.processes')" symbol="fruit" :open="$librariesOpen">
+                @if ($showsProcesses || $showsCapabilities)
+                    <x-client.menu-group
+                        :title="__('client.menu.libraries')"
+                        :meta="collect([__('client.menu.value_library'), $showsCapabilities ? __('client.menu.capabilities') : null, $showsProcesses ? __('client.menu.processes') : null])->filter()->implode(' · ')"
+                        symbol="fruit"
+                        :open="$librariesOpen"
+                    >
                         <x-client.menu-link nested :href="route('client.values', $currentOrganization)" :title="__('client.menu.value_library')" :meta="$valuesMeta" :active="$valuesActive" />
-                        <x-client.menu-link nested :href="route('client.processes', $currentOrganization)" :title="__('client.menu.processes')" :meta="__('client.menu.processes_meta', ['count' => $routineCount, 'calendar' => $calendarCount])" :active="$processesActive" />
+                        @if ($showsCapabilities)
+                            <x-client.menu-link nested :href="route('client.capabilities', $currentOrganization)" :title="__('client.menu.capabilities')" :meta="__('client.menu.capabilities_meta')" :active="$capabilitiesActive" />
+                        @endif
+                        @if ($showsProcesses)
+                            <x-client.menu-link nested :href="route('client.processes', $currentOrganization)" :title="__('client.menu.processes')" :meta="__('client.menu.processes_meta', ['count' => $routineCount, 'calendar' => $calendarCount])" :active="$processesActive" />
+                        @endif
                     </x-client.menu-group>
                 @else
                     <x-client.menu-link :href="route('client.values', $currentOrganization)" :title="__('client.menu.value_library')" :meta="$valuesMeta" symbol="fruit" :active="$valuesActive" />

@@ -499,8 +499,7 @@ class Form extends Component
         $isOrganizationLeader = $subject === MainDiagnosisSubject::Individual
             || ($leader !== null && $mainDiagnoses->isOrganizationLeader($organization, $leader));
 
-        return array_map(function (string $key) use ($isOrganizationLeader): array {
-            $step = DiagnosisStep::from($key);
+        return array_map(function (DiagnosisStep $step) use ($isOrganizationLeader): array {
             $readonly = ! $isOrganizationLeader && in_array($step, [DiagnosisStep::OrganizationValues, DiagnosisStep::Brand], true);
 
             return [
@@ -508,7 +507,7 @@ class Form extends Component
                 'minutes' => $readonly ? (int) config('diagnosis.readonly_step_minutes') : $step->minutes(),
                 'readonly' => $readonly,
             ];
-        }, config('diagnosis.steps.'.$subject->value));
+        }, MainDiagnosis::stepsFor($subject, $organization->product?->key));
     }
 
     /**

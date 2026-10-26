@@ -4,6 +4,9 @@ namespace App\Services\Report;
 
 use App\Models\ChapterUpdate;
 use App\Models\Diagnosis;
+use App\Models\MainDiagnosis;
+use App\Models\User;
+use App\Services\Capabilities\CapabilityOverview;
 use Closure;
 use Illuminate\View\View;
 
@@ -84,9 +87,27 @@ class ReportPages
             'chapterKeys' => array_keys($data['chapters']),
             'updates' => $main === null ? collect() : ChapterUpdate::query()->where('main_diagnosis_id', $main->id)->latest('id')->get()->unique('chapter')->keyBy('chapter'),
             'dots' => $current === null ? null : $this->dots($data, $url, $current, $hasSummary),
+            // The Képesség card of R0 and R1 lists the approved capabilities of a published diagnosis (NM-12).
+            'capabilities' => $this->capabilities($main, $viewerId, $preview),
             'nav' => $this->nav($page, $data, $url, $key, $extra, $hasSummary),
             ...$extra,
         ]);
+    }
+
+    /**
+     * @return array{rows: list<array<string, mixed>>, strengths: list<array<string, mixed>>, gaps: list<array<string, mixed>>}|null
+     */
+    private function capabilities(?MainDiagnosis $main, ?int $viewerId, bool $preview): ?array
+    {
+        $viewer = $viewerId === null ? null : User::query()->find($viewerId);
+
+        if ($main === null || $preview || $viewer === null) {
+            return null;
+        }
+
+        $overview = app(CapabilityOverview::class)->for($main, $viewer);
+
+        return $overview['rows'] === [] ? null : $overview;
     }
 
     /**

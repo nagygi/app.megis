@@ -8,7 +8,6 @@ use App\Models\Diagnosis;
 use App\Models\Organization;
 use App\Models\Version;
 use App\Services\MainDiagnoses\ExperienceService;
-use App\Services\MainDiagnoses\StepProgress;
 use App\Services\Organizations\OrganizationValueSetService;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -30,7 +29,7 @@ class Experience extends Component
 
     public ?string $openKey = null;
 
-    public function mount(Organization $organization, Diagnosis $diagnosis, StepProgress $progress): void
+    public function mount(Organization $organization, Diagnosis $diagnosis, ExperienceService $experiences): void
     {
         $this->bootDiagnosis($organization, $diagnosis);
 
@@ -40,9 +39,7 @@ class Experience extends Component
             return;
         }
 
-        $sent = $progress->experienceDiagnosis($this->main(), $this->user());
-        $this->answers = $this->participant()->experience_draft
-            ?? ($sent === null ? [] : $this->answersOf($sent));
+        $this->answers = $experiences->answersFor($this->main(), $this->user(), $this->participant()->experience_draft);
     }
 
     public function updatedAnswers(): void
@@ -137,26 +134,5 @@ class Experience extends Component
     private function workingSnapshot(): array
     {
         return app(OrganizationValueSetService::class)->forOrganization($this->organization)->versionSnapshot();
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function answersOf(Diagnosis $diagnosis): array
-    {
-        $answers = [];
-        $snapshot = $diagnosis->valueSetVersion?->snapshot ?? [];
-        $keysByValue = collect($snapshot['values'] ?? [])->pluck('key', 'value_id');
-
-        foreach ($diagnosis->rows()->get() as $row) {
-            $key = $row->tree_element !== null ? 'tree:'.$row->tree_element->value : 'value:'.$keysByValue->get($row->value_id);
-            $answers[$key] = match ($row->experience_state?->value) {
-                'dont_know' => ExperienceService::DONT_KNOW,
-                'answered' => (string) (int) $row->experience,
-                default => null,
-            };
-        }
-
-        return array_filter($answers);
     }
 }

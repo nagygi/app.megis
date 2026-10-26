@@ -296,6 +296,7 @@ return [
         'admin_upload' => 'Admin feltöltés',
         'dictation' => 'Elmondott mező',
         'occasion' => 'Alkalom anyaga',
+        'capability_story' => 'Képesség-helyzet',
     ],
 
     'material_source' => [
@@ -387,6 +388,7 @@ return [
         'organization_values' => 'A szervezet értékei',
         'brand' => 'A márkád alapja',
         'experience' => 'A megélésed',
+        'capabilities' => 'Képességek',
         'processes' => 'Folyamatok',
         'visibility' => 'Ki lát mit',
     ],

@@ -9,6 +9,7 @@ use App\Enums\CapabilityConfidence;
 use App\Enums\CapabilityLevel;
 use App\Enums\FindingKind;
 use App\Enums\FindingStatus;
+use App\Enums\MaterialContext;
 use App\Enums\TraceCandidate;
 use App\Enums\TraceDirection;
 use App\Enums\TraceDirectness;
@@ -278,11 +279,13 @@ class CapabilityDetectionEngine
 
     private function header(Material $material): string
     {
-        return implode("\n", [
+        return implode("\n", array_filter([
             'Anyag: '.$material->context->label().($material->is_situation ? ' (helyzet-jegyzet)' : ''),
             'Forrás: '.($material->source->hasAudio() ? 'gépi átirat; a beszélő-címkék gépiek, tartalom alapján ellenőrizd' : 'leírt szöveg'),
+            // A situation told on the Képességek step: self-report, the question is the mégis' (NM-12).
+            $material->context === MaterialContext::CapabilityStory ? __('capabilities.step.engine_note') : null,
             'Dátum: '.($this->recordedOn($material) ?? 'nem ismert'),
-        ]);
+        ]));
     }
 
     private function recordedOn(Material $material): ?string

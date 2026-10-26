@@ -6,6 +6,7 @@ A vezető útja az első belépéstől az „Indul a diagnózis” gombig: a lé
 
 - saját értékek: 24;
 - a szervezet értékei, a márkád alapja, a megélés: 08;
+- képességek: [NM-12](../backlog_nem_MVP/NM-12-kepessegmeres.md) (1.32);
 - folyamatok: 09–11.
 
 **Ki használja:** a fő diagnózis vezetője (17). A társ útja: 25.
@@ -34,7 +35,7 @@ A vezető útja az első belépéstől az „Indul a diagnózis” gombig: a lé
 - **Fejléc** (15 · 15.2): vissza nyíl, a lap neve, lépésszámláló („3 / 6”), avatár. Cream szín (bevitel).
 - **Navigáció:** minden lépés a végén a következőre visz, a fejléc nyila az előzőre.
 - **Mentés:** mező elhagyásakor automatikus, „Mentve” visszajelzéssel (15 · 15.8).
-- **Mikor kész egy lépés:** amikor a saját jegye szerint teljes (pl. 08: 3–5 érték, mind a négy elem, minden megélés-sor). A Folyamatok lépés „Kihagyom”-mal is kész (11 · 11.1).
+- **Mikor kész egy lépés:** amikor a saját jegye szerint teljes (pl. 08: 3–5 érték, mind a négy elem, minden megélés-sor). A Folyamatok (11 · 11.1) és a Képességek lépés „Kihagyom”-mal is kész.
 - **Csak olvasható lépés** (17.3: a vezető nem „szervezet vezetője”):
   - a lap a szervezet meglévő értékeit, illetve a márkád alapját mutatja, „A szervezet értékeit {Név} adta meg” sorral;
   - egyetlen gombja: „Tovább”;

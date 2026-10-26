@@ -4,7 +4,8 @@ namespace App\Enums;
 
 /**
  * The steps of the filling (17 · 17.3, 23). The numbers follow V1; step 6
- * (channels) and 7 (peers) are not in the MVP.
+ * (channels) and 7 (peers) are not in the MVP. Képességek is there only
+ * while the capability measurement runs (NM-12).
  */
 enum DiagnosisStep: string
 {
@@ -12,6 +13,7 @@ enum DiagnosisStep: string
     case OrganizationValues = 'organization_values';
     case Brand = 'brand';
     case Experience = 'experience';
+    case Capabilities = 'capabilities';
     case Processes = 'processes';
     case Visibility = 'visibility';
 
@@ -30,6 +32,7 @@ enum DiagnosisStep: string
             self::OrganizationValues => 'szervezet-ertekei',
             self::Brand => 'markad-alapja',
             self::Experience => 'megeles',
+            self::Capabilities => 'kepessegek',
             self::Processes => 'folyamatok',
             self::Visibility => 'ki-lat-mit',
         };

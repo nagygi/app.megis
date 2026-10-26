@@ -1318,6 +1318,7 @@ return [
             'claims' => 'Minden állítás és szöveg jóváhagyva',
             'classified' => 'Nincs besorolatlan anyag',
             'threshold' => 'A küszöb rendben, vagy tudatosan felülírva',
+            'capabilities' => 'Minden megmutatott képesség jóváhagyva (Képességek fül)',
         ],
         'publish' => 'Publikálom',
         'confirm' => 'A vezető e-mailt kap, a társak az Útravalójukat. A riport a mai napra fagy. Publikálod?',

@@ -5,6 +5,7 @@
         'claims' => route('admin.main-diagnoses.reading', $diagnosis).'#claims-title',
         'classified' => route('admin.organizations.processes', $diagnosis->organization),
         'threshold' => route('admin.main-diagnoses.run', $diagnosis),
+        'capabilities' => route('admin.diagnoses.capabilities', $diagnosis),
     ];
 @endphp
 

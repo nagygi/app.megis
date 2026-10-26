@@ -37,7 +37,7 @@ return [
     'progress' => 'Lépés: :current / :total',
     'unsaved' => 'A válaszaid még nincsenek elküldve. Biztosan elmész?',
     'peer_link' => 'A(z) :subject diagnózisában társ vagy',
-    'peer_steps_lead' => 'Két lépés most, egy, amíg fut.',
+    'peer_steps_lead' => '{2} Két lépés most, egy, amíg fut.|{3} Három lépés most, egy, amíg fut.|[4,*] :count lépés most, egy, amíg fut.',
     'peer_add' => 'Hozzáteszel',
     'peer_add_help' => 'amíg fut · egy-egy helyzet',
 
@@ -55,6 +55,8 @@ return [
         'chapters' => 'Négy fejezet',
         'chapters_help' => 'értékek · folyamatok · területek · a márkád alapja',
         'one_page' => 'Egy lap',
+        'capabilities' => 'Képességek',
+        'capabilities_help' => 'amire építhettek, és ami hiányzik',
         'takeaway' => 'Útravaló · a te értékeid',
         'takeaway_help' => 'a megélésed az elején, a helyzeteidben, és a többieké',
     ],

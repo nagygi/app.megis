@@ -59,7 +59,7 @@
             @endforeach
         </x-report.group>
 
-        <x-report.capability-card />
+        <x-report.capability-card :overview="$capabilities" :href="$capabilities ? route('client.capabilities', $organization) : null" />
 
         <x-report.footer :status="$nav['status']" :next="$nav['next']" :next-label="$nav['nextLabel']" />
     </div>

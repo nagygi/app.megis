@@ -177,6 +177,8 @@ class DemoDiagnosisSeeder extends Seeder
         // "Kész" on V6·f: what the diagnosis measures is recorded.
         $processes->syncDiagnosisProcesses($main);
         $main->stepMarks()->create(['user_id' => $leader->id, 'step' => DiagnosisStep::Processes, 'mark' => StepMark::Viewed]);
+        // Képességek, when the capability measurement is on (NM-12): skipped in the demo.
+        $main->stepMarks()->create(['user_id' => $leader->id, 'step' => DiagnosisStep::Capabilities, 'mark' => StepMark::Skipped]);
 
         $service->start($main->refresh(), $leader);
         $main->refresh();

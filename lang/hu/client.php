@@ -24,6 +24,8 @@ return [
         'value_library_browse' => 'böngészhető értékek',
         'processes' => 'Folyamatok',
         'processes_meta' => ':count rutin · :calendar a naptárban',
+        'capabilities' => 'Képességtár',
+        'capabilities_meta' => 'mire építhettek, mi hiányzik',
         'wisdom_meta' => 'folyamat · küldetésfa · öt terület · % és pontok',
     ],
 

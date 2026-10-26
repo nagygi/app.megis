@@ -318,7 +318,7 @@ class ReportBuilder
             'sources' => [
                 'conversations' => $main->conversations()->where('held_at', '<=', now())->count(),
                 'recordings' => $materials->filter(fn (Material $material) => $material->source->hasAudio() && ! $material->context->isMirror())->count(),
-                'documents' => $materials->filter(fn (Material $material) => ! $material->source->hasAudio() && ! $material->context->isMirror() && $material->context !== MaterialContext::Dictation)->count(),
+                'documents' => $materials->filter(fn (Material $material) => ! $material->source->hasAudio() && ! $material->context->isMirror() && ! in_array($material->context, [MaterialContext::Dictation, MaterialContext::CapabilityStory], true))->count(),
                 'mirrors' => $materials->filter(fn (Material $material) => $material->context->isMirror())->count(),
                 'calendar' => $main->diagnosis->organization->processes()->where('source', ProcessSource::Calendar)->exists(),
             ],

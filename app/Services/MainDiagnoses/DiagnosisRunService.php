@@ -121,7 +121,7 @@ class DiagnosisRunService
 
             $this->send($main, $peer->user, ReminderDispatch::PEER, $admin, new DiagnosisNoticeMail(
                 __('mail.diagnosis_reminder.peer_subject', ['leader' => $main->leader->name]),
-                __('mail.diagnosis_reminder.peer_body', ['leader' => $main->leader->name, 'minutes' => (int) config('diagnosis.peer_minutes')]),
+                __('mail.diagnosis_reminder.peer_body', ['leader' => $main->leader->name, 'minutes' => $main->peerMinutes()]),
                 __('mail.diagnosis_reminder.peer_action'),
                 route('client.diagnosis.show', [$diagnosis->organization, $diagnosis]),
             ));
@@ -148,7 +148,7 @@ class DiagnosisRunService
 
         $this->send($main, $participant->user, ReminderDispatch::PEER, $admin, new DiagnosisNoticeMail(
             __('mail.diagnosis_reminder.peer_subject', ['leader' => $main->leader->name]),
-            __('mail.diagnosis_reminder.peer_body', ['leader' => $main->leader->name, 'minutes' => (int) config('diagnosis.peer_minutes')]),
+            __('mail.diagnosis_reminder.peer_body', ['leader' => $main->leader->name, 'minutes' => $main->peerMinutes()]),
             __('mail.diagnosis_reminder.peer_action'),
             route('client.diagnosis.show', [$diagnosis->organization, $diagnosis]),
         ));

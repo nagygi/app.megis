@@ -2,6 +2,38 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.32 · HASH · 2026-10-26
+
+Képességmérés a vezető és a társ útjában: kitöltés, futás, kész (NM-12; 17 · 17.3, 23, 25, 26).
+
+- **Képességek lépés (új):**
+  - A vezetőnél a Megélés után, a Folyamatok előtt jön, 3 perc. A társnál a T4 után.
+  - Csak akkor látszik, ha a képességmérés be van kapcsolva: globálisan (`CAPABILITY_MEASUREMENT`) és a terméknél is. A V1, az A1 előnézete, a lépésszámláló és a meghívók percei ehhez igazodnak.
+  - A user nem pontoz, hanem friss helyzeteket mesél el az értékeihez, leírva vagy elmondva. A diktálás átirata a mezőbe kerül, javítható.
+  - Kártyánként: az érték a saját szavaival, címkével (a szervezeté, a tiéd, a tiéd is) és egy kérdés:
+    - próba: „Mikor került valamibe nemrég ez az érték?”;
+    - elakadás: „Mikor kellett volna nemrég ez az érték, és nem úgy ment?”;
+    - saját érték: „…és ki látta rajtad kívül?”.
+  - **Javasolt kártyák:**
+    - Teljes: a megélésben legjobb és legrosszabb szervezeti érték, meg egy saját érték;
+    - Snapshot és társ: 1 kártya, a legrosszabbul megélt érték.
+  - Másik érték választható, legfeljebb 5 kártya lehet. Egy helyzethez legalább 40 karakter kell.
+  - A lépés „Kihagyom”-mal is kész. Az olvasatig javítható, utána csak olvasható.
+- **Mérés:**
+  - A beküldött helyzet új anyagtípus: *Képesség-helyzet*. A kérdés a mégis sora, a válasz a kitöltőé.
+  - Értékmérés nem fut rajta, csak a képességmérés. A javított helyzetet újraméri, a törölt helyzet a nyomait is viszi.
+  - Az AI tudja, hogy önbevallás, és hogy a kérdésből nem lehet nyom.
+  - Egy ember helyzetei egy forrásnak számítanak (KO-02), a társé külön forrás.
+- **Fut (V10):** új sor „Képességek · 3 helyzet elmondva · ebből 1 a társaktól”. Csak szám, válasz nem; az olvasatig a lépésre visz.
+- **Kész:**
+  - **V12:** Képesség-kártya, legfeljebb 3 erősség és 3 hiány (Snapshotban 1 + 1), konfidenciával, „Érettségi szint a második diagnózistól.”, és link a Képességtárra. A riport R0 és R1 kártyája is ezt mutatja, ha van adat; az R7 és a Bridge továbbra is NM-15.
+  - **Tárak → Képességtár (M3, új):** „Jelen lehet · közepes · 4 nyom”. Lenyitva: mit jelent, „Ha megy, így néz ki”, akadály, és egy idézet. A saját helyzet idézete mindig látszik; társé csak bekapcsolt társ-idézetekkel és a társ hozzájárulásával, név nélkül.
+  - Csak az admin által jóváhagyott „jelen lehet” és „hiányzik” sor jelenik meg. RC-kód és lépcső nincs. Csábító tétel kevés adattal nem kerül a hiányok közé.
+  - Ki látja: aki a riportot. A menü Tárak csoportjában akkor jelenik meg, ha van mit mutatni.
+- **Publikálás:** új tétel az ellenőrzőlistán, „Minden megmutatott képesség jóváhagyva”. A Képességek fülre visz, és csak akkor van ott, ha van ilyen sor.
+- **V1 és V6:** a vég képén „Képességek · amire építhettek, és ami hiányzik”; az „Amit utána mérünk” blokkban „Képességek · folyamat- és emberoldal · állapot”.
+- **Adatbázis:** új tábla, `capability_stories`.
+
 ## 1.31 · ba261de · 2026-10-26
 
 A riport a prototípus szerint („2 · Riport”: R0–R9, RM, S1), a fő és az önálló diagnózisnál is (27, 28, 04 · 4.6).

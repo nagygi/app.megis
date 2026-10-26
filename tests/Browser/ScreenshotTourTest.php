@@ -1,6 +1,11 @@
 <?php
 
+use App\Enums\CapabilityConfidence;
+use App\Enums\CapabilityLevel;
+use App\Enums\CapabilityState;
 use App\Enums\DiagnosisRowKind;
+use App\Models\Capability;
+use App\Models\CapabilityAssessment;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisRow;
 use App\Models\DiagnosisText;
@@ -82,6 +87,39 @@ it('tours the leader\'s steps before the diagnosis starts', function () {
         'leader-07-visibility' => route('client.diagnosis.ki-lat-mit', $params, false),
         'leader-08-profile' => route('client.profile', $setup['organization'], false),
     ]);
+})->group('screenshots');
+
+it('tours the capabilities step (NM-12)', function () {
+    config(['megis.capabilities.measurement.enabled' => true]);
+    $setup = diagnosisTeam(peers: 1);
+    $main = startMainDiagnosis($setup);
+    confirmOwnValues($setup['leader']);
+    $params = [$setup['organization'], $main->diagnosis];
+
+    $page = loginInBrowser($setup['leader']);
+    tourShot($page, 'capability-01-what-awaits');
+    tourPages($page, ['capability-02-step' => route('client.diagnosis.kepessegek', $params, false)]);
+})->group('screenshots');
+
+it('tours the capabilities after publishing: the home card and the Képességtár (NM-12)', function () {
+    [$published, $report] = publishedReport();
+
+    foreach ([['Működési ritmus', CapabilityState::Present, CapabilityConfidence::Medium], ['Döntési jog és mandátum tisztázása', CapabilityState::Absent, CapabilityConfidence::Low]] as [$name, $state, $confidence]) {
+        CapabilityAssessment::query()->create([
+            'diagnosis_id' => $report->diagnosis_id,
+            'capability_id' => Capability::factory()->create(['name' => $name, 'definition' => 'A csapat úgy dolgozik, hogy ezt nem kell kérni.'])->id,
+            'subject_level' => CapabilityLevel::Team,
+            'automatic_state' => $state,
+            'automatic_basis' => ['basis' => [], 'counts' => ['positive' => 3, 'negative' => 1]],
+            'state' => $state,
+            'confidence' => $confidence,
+            'approved_at' => now(),
+        ]);
+    }
+
+    $page = loginInBrowser($published['leader']);
+    tourShot($page, 'capability-03-home-card');
+    tourPages($page, ['capability-04-library' => route('client.capabilities', $published['organization'], false)]);
 })->group('screenshots');
 
 it('tours a running diagnosis as the leader and as a peer', function () {

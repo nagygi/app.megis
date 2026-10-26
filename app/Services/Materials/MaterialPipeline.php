@@ -60,6 +60,14 @@ class MaterialPipeline
             return;
         }
 
+        // A situation of the Képességek step is read for capabilities only, not for values (NM-12).
+        if ($material->context === MaterialContext::CapabilityStory) {
+            $material->update(['status' => MaterialStatus::Processed, 'processed_at' => now()]);
+            $this->measureCapabilities($material);
+
+            return;
+        }
+
         $material->update(['status' => MaterialStatus::Pending]);
         AnalyzeMaterial::dispatch($material);
     }
@@ -80,7 +88,7 @@ class MaterialPipeline
             MaterialContext::PublicMirror => $this->finishPublicMirror($material),
             MaterialContext::Mirror => $this->finishSignedInMirror($material),
             MaterialContext::AdminUpload => $this->buildUploadDiagnoses($material),
-            MaterialContext::Dictation, MaterialContext::Occasion => null,
+            MaterialContext::Dictation, MaterialContext::Occasion, MaterialContext::CapabilityStory => null,
         };
 
         // ET4 · the mégis Coach's suggestions, in a job of their own (NM-06).
@@ -94,9 +102,18 @@ class MaterialPipeline
         $this->recalculateParent($material);
 
         // Then its capabilities, in a job of their own (NM-12).
+        $this->measureCapabilities($material);
+    }
+
+    /**
+     * The capability measurement of a material, in a job of its own (NM-12),
+     * when the switches let it; again from scratch when the text changed.
+     */
+    public function measureCapabilities(Material $material, bool $force = false): void
+    {
         if (app(CapabilityMeasurementPolicy::class)->appliesTo($material)) {
             $material->update(['capability_status' => CapabilityMeasurementStatus::Pending]);
-            DetectCapabilities::dispatch($material);
+            DetectCapabilities::dispatch($material, $force);
         }
     }
 

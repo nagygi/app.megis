@@ -262,6 +262,8 @@ function runningDiagnosis(bool $showQuotes = true): array
     $rows = app(ExperienceService::class)->rows($version->snapshot);
     app(ExperienceService::class)->submit($main, $setup['leader'], $version, collect($rows)->mapWithKeys(fn ($row) => [$row['key'] => '4'])->all());
     $main->stepMarks()->create(['user_id' => $setup['leader']->id, 'step' => 'processes', 'mark' => StepMark::Skipped]);
+    // Képességek counts only while the capability measurement is on (NM-12).
+    $main->stepMarks()->create(['user_id' => $setup['leader']->id, 'step' => 'capabilities', 'mark' => StepMark::Skipped]);
     app(MainDiagnosisService::class)->start($main->refresh(), $setup['leader']);
 
     return [$setup, $main->refresh()];

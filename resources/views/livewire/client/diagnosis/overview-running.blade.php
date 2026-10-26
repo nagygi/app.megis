@@ -85,6 +85,23 @@
                 />
             </li>
 
+            {{-- Képességek: how many situations were told; open to more until the reading (NM-12) --}}
+            @if ($home['capabilities'] !== null)
+                @php($capabilityMeta = $main->hasPeers()
+                    ? __('capabilities.home.count_with_peers', $home['capabilities'])
+                    : trans_choice('capabilities.home.count', $home['capabilities']['total'], ['count' => $home['capabilities']['total']]))
+                @if ($main->acceptsInput())
+                    <li>
+                        <x-ui.link-row :href="route('client.diagnosis.kepessegek', [$main->diagnosis->organization, $main->diagnosis])" :title="__('capabilities.home.title')" :meta="$capabilityMeta" />
+                    </li>
+                @else
+                    <x-ui.card as="li" padding="none" class="px-5 py-4">
+                        <span class="block font-semibold">{{ __('capabilities.home.title') }}</span>
+                        <span class="block text-sm text-grey-700">{{ $capabilityMeta }}</span>
+                    </x-ui.card>
+                @endif
+            @endif
+
             <x-ui.card as="li" padding="none" class="flex items-center justify-between gap-3 px-5 py-4">
                 <span>
                     <span class="block font-semibold">{{ __('diagnosis.home.reading') }}</span>

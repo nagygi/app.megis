@@ -20,6 +20,8 @@ return [
         'measured_title' => 'Amit utána mérünk',
         'measured_identity' => 'Értékazonosság folyamatonként',
         'measured_identity_help' => 'mennyire hordozza a rutin az értékeiteket · 1–6',
+        'measured_capabilities' => 'Képességek',
+        'measured_capabilities_help' => 'folyamat- és emberoldal · állapot',
         'measured_own' => 'Saját mérőszámok',
         'measured_own_help' => 'amit ti néztek ezen a rutinon · opcionális',
         'sample_title' => 'Így néz ki egy kész rutin',

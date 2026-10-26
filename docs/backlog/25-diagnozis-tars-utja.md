@@ -31,10 +31,11 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
 
 ### 25.3 Mi vár rád (T2)
 
-- „Két lépés most, egy, amíg fut. Kb. 5 perc.”
+- „Két lépés most, egy, amíg fut. Kb. 5 perc.” Képességméréssel: „Három lépés most…”.
 - Lépések:
   - Saját értékek · 2 perc (24);
   - A megélésed · 2–3 perc (25.4);
+  - Képességek · 3 perc, egy helyzet, csak ha a képességmérés be van kapcsolva (NM-12, 1.32). A vezető csak a számát látja;
   - Hozzáteszel · amíg fut, egy-egy helyzet (12).
 - **Gombok:** „Kezdjük”, és „Bővebben” a Bölcsességtárba (BT6, 32).
 - **A vég képe:** alatta szürkén, a publikálás dátumával: „Útravaló · a te értékeid”.

@@ -42,7 +42,7 @@ class DiagnosisPeerInvitationMail extends Mailable implements ShouldQueue
                 'intro' => __('mail.diagnosis_peer.body', [
                     'leader' => $this->main->leader->name,
                     'subject' => $this->main->subjectName(),
-                    'minutes' => (int) config('diagnosis.peer_minutes'),
+                    'minutes' => $this->main->peerMinutes(),
                 ]),
                 'url' => $this->token === null
                     ? route('client.diagnosis.show', [$diagnosis->organization, $diagnosis])

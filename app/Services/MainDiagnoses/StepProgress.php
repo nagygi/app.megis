@@ -16,8 +16,8 @@ use App\Models\Version;
 
 /**
  * Which steps are done (23 · 23.3). A step is done when its own ticket says
- * it is complete; only "viewed" (read-only steps) and "skipped" (processes)
- * are marks the user leaves (plan 5).
+ * it is complete; only "viewed" (read-only steps) and "skipped" (processes,
+ * capabilities) are marks the user leaves (plan 5).
  */
 class StepProgress
 {
@@ -42,9 +42,11 @@ class StepProgress
      */
     public function forPeer(MainDiagnosis $main, User $user): StepList
     {
+        $marks = $this->marks($main, $user);
+
         return new StepList(array_map(fn (DiagnosisStep $step) => new StepState(
             step: $step,
-            done: $this->isDone($main, $user, $step, false, []),
+            done: $this->isDone($main, $user, $step, false, $marks),
             readonly: false,
             minutes: $step->minutes(),
         ), $main->peerSteps()));
@@ -191,6 +193,9 @@ class StepProgress
             DiagnosisStep::Brand => $this->brandComplete($this->latestOrganizationVersion($main)),
             DiagnosisStep::Experience => ($diagnosis = $this->experienceDiagnosis($main, $user)) !== null
                 && $diagnosis->value_set_version_id === $this->expectedValueSetVersionId($main),
+            // At least one situation sent, or "Kihagyom" (NM-12).
+            DiagnosisStep::Capabilities => isset($marks[$step->value])
+                || $main->capabilityStories()->where('user_id', $user->id)->whereNotNull('submitted_at')->exists(),
             DiagnosisStep::Processes => isset($marks[$step->value]),
             DiagnosisStep::Visibility => ! $main->stage->isBeforeRunning(),
         };

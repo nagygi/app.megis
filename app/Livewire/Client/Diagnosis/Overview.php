@@ -16,6 +16,8 @@ use App\Models\Material;
 use App\Models\Organization;
 use App\Models\PersonalValueSet;
 use App\Services\Audit\AuditLogger;
+use App\Services\Capabilities\CapabilityOverview;
+use App\Services\Capabilities\CapabilityStoryService;
 use App\Services\Diagnoses\ThresholdPolicy;
 use App\Services\MainDiagnoses\DiagnosisRunService;
 use App\Services\MainDiagnoses\MainDiagnosisService;
@@ -157,6 +159,8 @@ class Overview extends Component
             'leaderName' => $main->leader->name,
             'otherRoles' => $this->otherRoles(),
             'home' => $view === 'livewire.client.diagnosis.overview-running' ? $this->runningHome($main, $steps) : null,
+            // V12 · the Képesség card from the approved rows (NM-12).
+            'capabilities' => $view === 'livewire.client.diagnosis.overview-published' ? app(CapabilityOverview::class)->for($main, $this->user()) : null,
             'report' => $snapshot?->data,
             'reports' => $snapshot === null ? collect() : app(ReportService::class)->reportsFor($this->user(), $this->organization),
             // The Útravaló row lives from publishing (29 · 29.2).
@@ -213,7 +217,7 @@ class Overview extends Component
         return [
             'label' => __('client.header.first_visit'),
             'symbol' => 'spiral',
-            'subtitle' => __('diagnosis.peer_steps_lead'),
+            'subtitle' => trans_choice('diagnosis.peer_steps_lead', $steps->count(), ['count' => $steps->count()]),
             'note' => __('diagnosis.minutes_about', ['minutes' => $steps->totalMinutes()]),
         ];
     }
@@ -269,9 +273,11 @@ class Overview extends Component
             'conversations' => ['held' => $conversations->filter(fn ($conversation) => $conversation->held_at->isPast())->count(), 'next' => $next],
             'contributions' => [
                 'recordings' => $materials->filter(fn (Material $material) => ! $material->is_situation && $material->source->hasAudio())->count(),
-                'documents' => $materials->filter(fn (Material $material) => ! $material->is_situation && ! $material->source->hasAudio() && $material->context !== MaterialContext::Dictation)->count(),
+                'documents' => $materials->filter(fn (Material $material) => ! $material->is_situation && ! $material->source->hasAudio() && ! in_array($material->context, [MaterialContext::Dictation, MaterialContext::CapabilityStory], true))->count(),
                 'situations' => $materials->where('is_situation', true)->count(),
             ],
+            // Képességek: the situations told, the peers' among them; numbers only (NM-12).
+            'capabilities' => $main->measuresCapabilities() ? app(CapabilityStoryService::class)->counts($main) : null,
             'reading' => ['state' => $reading ? 'now' : 'later', 'from' => $main->readingStartsOn(), 'to' => $main->publishes_on->copy()->subDay()],
             // Withdrawn after publishing, the mégis corrects it (21 · 21.5).
             'correcting' => $reading && $main->published_at !== null,

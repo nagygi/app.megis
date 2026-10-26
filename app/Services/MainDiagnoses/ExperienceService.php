@@ -133,6 +133,45 @@ class ExperienceService
     }
 
     /**
+     * The answers of a sent Megélés by row key, as the page keeps them.
+     *
+     * @return array<string, string>
+     */
+    public function answersOf(Diagnosis $diagnosis): array
+    {
+        $answers = [];
+        $snapshot = $diagnosis->valueSetVersion?->snapshot ?? [];
+        $keysByValue = collect($snapshot['values'] ?? [])->pluck('key', 'value_id');
+
+        foreach ($diagnosis->rows()->get() as $row) {
+            $key = $row->tree_element !== null ? 'tree:'.$row->tree_element->value : 'value:'.$keysByValue->get($row->value_id);
+            $answers[$key] = match ($row->experience_state?->value) {
+                'dont_know' => self::DONT_KNOW,
+                'answered' => (string) (int) $row->experience,
+                default => null,
+            };
+        }
+
+        return array_filter($answers);
+    }
+
+    /**
+     * The user's answers: the unsent draft, else the sent Megélés (08 · 8.3).
+     *
+     * @return array<string, string>
+     */
+    public function answersFor(MainDiagnosis $main, User $user, ?array $draft): array
+    {
+        if ($draft !== null) {
+            return $draft;
+        }
+
+        $sent = $this->progress->experienceDiagnosis($main, $user);
+
+        return $sent === null ? [] : $this->answersOf($sent);
+    }
+
+    /**
      * @return array{experience: ?float, experience_state: ExperienceState}
      */
     private function experienceAttributes(?string $answer): array

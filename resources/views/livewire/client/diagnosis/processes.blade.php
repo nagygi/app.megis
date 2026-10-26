@@ -20,6 +20,9 @@
     <x-ui.card as="section" tone="cream" bordered class="flex flex-col gap-2" aria-labelledby="measured-title">
         <h3 id="measured-title" class="font-semibold">{{ __('processes.entry.measured_title') }}</h3>
         <p><span class="font-semibold">{{ __('processes.entry.measured_identity') }}</span> · <span class="text-sm text-grey-700">{{ __('processes.entry.measured_identity_help') }}</span></p>
+        @if ($main->measuresCapabilities())
+            <p><span class="font-semibold">{{ __('processes.entry.measured_capabilities') }}</span> · <span class="text-sm text-grey-700">{{ __('processes.entry.measured_capabilities_help') }}</span></p>
+        @endif
         <p><span class="font-semibold">{{ __('processes.entry.measured_own') }}</span> · <span class="text-sm text-grey-700">{{ __('processes.entry.measured_own_help') }}</span></p>
     </x-ui.card>
 
