@@ -2,6 +2,13 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.42 · HASH · 2026-10-27
+
+A szervezet értékeinél az admin és az ügyfél felülete ugyanazokkal a szabályokkal működik (08 · 8.1, 8.5).
+
+- **Admin › Szervezet › Értékek:** a márkád alapja három szöveges eleme (Purpose, Értékajánlat, Impact) kötelező, ahogy az ügyfél V4 lapján. Eddig az admin üresen is elmenthette őket.
+- **5 érték után:** a hozzáadó doboz nem tűnik el, hanem szürke lesz (választó, mező, gombok), alatta: „Legfeljebb 5 érték lehet.” Így működik az ügyfél V3 lapján és az admin *Értékek* fülén is. Ha egy értéket kivesznek, a doboz újra használható.
+
 ## 1.41 · bcb5b08 · 2026-10-27
 
 A belépés három rése bezárult (14 · 14.2), és a Publikálás ellenőrzőlistája nem visz 403-ra (21 · 21.2).

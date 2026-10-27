@@ -141,9 +141,10 @@ class Values extends Component
             'items.*.low_example' => ['required', 'string', 'max:500'],
             'items.*.high_example' => ['required', 'string', 'max:500'],
             'items.*.example' => ['nullable', 'string', 'max:500'],
-            'purpose' => ['nullable', 'string', 'max:500'],
-            'value_proposition' => ['nullable', 'string', 'max:500'],
-            'impact' => ['nullable', 'string', 'max:500'],
+            // All four brand base elements are required, as on the customer side (08 · 8.2).
+            'purpose' => ['required', 'string', 'max:500'],
+            'value_proposition' => ['required', 'string', 'max:500'],
+            'impact' => ['required', 'string', 'max:500'],
         ], [
             'items.min' => __('admin.value_sets.too_few', ['min' => OrganizationValueSet::MIN_VALUES]),
             'items.max' => __('admin.value_sets.too_many', ['max' => OrganizationValueSet::MAX_VALUES]),

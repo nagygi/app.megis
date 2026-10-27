@@ -74,21 +74,25 @@
         @endforeach
     </ul>
 
-    @if ($canEdit && ! $isFull)
+    @if ($canEdit)
+        {{-- At five values the adding stays in place, greyed out with the reason (08 · 8.1). --}}
         <x-ui.card class="grid gap-4 sm:grid-cols-2">
             <form wire:submit="addFromLibrary" class="flex flex-col gap-2">
-                <x-form.select name="pickedValueId" wire:model="pickedValueId" :label="__('diagnosis.organization_values.library')">
+                <x-form.select name="pickedValueId" wire:model="pickedValueId" :label="__('diagnosis.organization_values.library')" :disabled="$isFull">
                     <option value="">{{ __('diagnosis.organization_values.library_select') }}</option>
                     @foreach ($library as $value)
                         <option value="{{ $value->id }}">{{ $value->name }}</option>
                     @endforeach
                 </x-form.select>
-                <x-ui.button type="submit" tone="outline" size="sm" icon="plus" class="self-start">{{ __('diagnosis.organization_values.add') }}</x-ui.button>
+                <x-ui.button type="submit" tone="outline" size="sm" icon="plus" class="self-start" :disabled="$isFull">{{ __('diagnosis.organization_values.add') }}</x-ui.button>
             </form>
             <form wire:submit="addNew" class="flex flex-col gap-2">
-                <x-form.input name="newValueName" wire:model="newValueName" :label="__('diagnosis.organization_values.new_value')" />
-                <x-ui.button type="submit" tone="outline" size="sm" icon="plus" class="self-start">{{ __('diagnosis.organization_values.add') }}</x-ui.button>
+                <x-form.input name="newValueName" wire:model="newValueName" :label="__('diagnosis.organization_values.new_value')" :disabled="$isFull" />
+                <x-ui.button type="submit" tone="outline" size="sm" icon="plus" class="self-start" :disabled="$isFull">{{ __('diagnosis.organization_values.add') }}</x-ui.button>
             </form>
+            @if ($isFull)
+                <p class="text-sm text-grey-700 sm:col-span-2">{{ __('diagnosis.organization_values.too_many', ['max' => \App\Models\OrganizationValueSet::MAX_VALUES]) }}</p>
+            @endif
         </x-ui.card>
     @endif
 

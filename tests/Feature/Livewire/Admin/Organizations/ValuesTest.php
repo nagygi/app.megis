@@ -18,13 +18,16 @@ function libraryValue(string $name): Value
     ]);
 }
 
-function threeValueSet(mixed $component): mixed
+function completeValueSet(mixed $component): mixed
 {
     foreach (['Bátorság', 'Nyíltság', 'Felelősség'] as $name) {
         $component->set('pickedValueId', libraryValue($name)->id)->call('addFromLibrary');
     }
 
-    return $component;
+    return $component
+        ->set('purpose', 'Hogy a csapat merjen.')
+        ->set('value_proposition', 'Egy bátrabb csapatot.')
+        ->set('impact', 'Kimondott mondatok.');
 }
 
 it('prefills a value from the Értéktár with the first item of each list', function () {
@@ -55,7 +58,7 @@ it('requires three to five values with both scale ends', function () {
         ->call('save')
         ->assertHasErrors(['items' => 'min']);
 
-    threeValueSet(Livewire::test(Values::class, ['organization' => $organization]))
+    completeValueSet(Livewire::test(Values::class, ['organization' => $organization]))
         ->set('items.0.low_example', '')
         ->call('save')
         ->assertHasErrors(['items.0.low_example' => 'required']);
@@ -63,23 +66,41 @@ it('requires three to five values with both scale ends', function () {
     expect(OrganizationValueSet::query()->count())->toBe(0);
 });
 
-it('stops adding at five values', function () {
+it('requires all of the brand base, as on the customer side', function () {
     actingAsAdmin();
     $organization = Organization::factory()->create();
-    $component = threeValueSet(Livewire::test(Values::class, ['organization' => $organization]));
+
+    completeValueSet(Livewire::test(Values::class, ['organization' => $organization]))
+        ->set('purpose', '')
+        ->set('value_proposition', '')
+        ->set('impact', ' ')
+        ->call('save')
+        ->assertHasErrors(['purpose' => 'required', 'value_proposition' => 'required', 'impact' => 'required']);
+
+    expect(OrganizationValueSet::query()->count())->toBe(0);
+});
+
+it('stops adding at five values and greys out the adding', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $component = completeValueSet(Livewire::test(Values::class, ['organization' => $organization]))
+        ->assertDontSee('Legfeljebb 5 érték lehet.');
 
     foreach (['Kíváncsiság', 'Gondoskodás', 'Játékosság'] as $name) {
         $component->set('pickedValueId', libraryValue($name)->id)->call('addFromLibrary');
     }
 
     expect($component->get('items'))->toHaveCount(5);
+    $component->assertSee('Legfeljebb 5 érték lehet.')
+        ->assertSeeHtml('wire:click="addNew" disabled="disabled"')
+        ->assertSeeHtml('wire:click="addFromLibrary" disabled="disabled"');
 });
 
 it('saves the set as a version and keeps the Értéktár value as it was', function () {
     $admin = actingAsAdmin();
     $organization = Organization::factory()->create();
 
-    threeValueSet(Livewire::test(Values::class, ['organization' => $organization]))
+    completeValueSet(Livewire::test(Values::class, ['organization' => $organization]))
         ->set('items.0.meaning', 'Nálunk ez azt jelenti, hogy kimondjuk.')
         ->set('purpose', 'Hogy a csapat merjen.')
         ->call('save')
@@ -97,7 +118,7 @@ it('saves the set as a version and keeps the Értéktár value as it was', funct
 it('warns that new diagnoses use the new values after a change', function () {
     actingAsAdmin();
     $organization = Organization::factory()->create();
-    threeValueSet(Livewire::test(Values::class, ['organization' => $organization]))->call('save');
+    completeValueSet(Livewire::test(Values::class, ['organization' => $organization]))->call('save');
 
     Livewire::test(Values::class, ['organization' => $organization])
         ->assertSee('A korábbi értékek nem törlődnek. Az új diagnózisok az új értékek szerint futnak.')
@@ -114,7 +135,7 @@ it('adds a new value to the Értéktár as found by the organization', function 
     actingAsAdmin();
     $organization = Organization::factory()->create();
 
-    $component = threeValueSet(Livewire::test(Values::class, ['organization' => $organization]))
+    $component = completeValueSet(Livewire::test(Values::class, ['organization' => $organization]))
         ->set('newValueName', 'Lendület')
         ->call('addNew')
         ->set('items.3.low_example', 'Megállunk az első akadálynál.')
@@ -157,7 +178,7 @@ it('offers only values the organization may choose', function () {
 it('opens a saved version read-only', function () {
     actingAsAdmin();
     $organization = Organization::factory()->create();
-    threeValueSet(Livewire::test(Values::class, ['organization' => $organization]))->set('purpose', 'Első cél.')->call('save');
+    completeValueSet(Livewire::test(Values::class, ['organization' => $organization]))->set('purpose', 'Első cél.')->call('save');
 
     Livewire::test(Values::class, ['organization' => $organization])
         ->set('purpose', 'Második cél.')

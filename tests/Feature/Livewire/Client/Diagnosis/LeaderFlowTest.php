@@ -276,6 +276,28 @@ it('edits the organization values with 3–5 values and records the version on "
         ->and(app(StepProgress::class)->forLeader($main->refresh(), $setup['leader'])->get(DiagnosisStep::OrganizationValues)->done)->toBeTrue();
 });
 
+it('greys out the adding of organization values at five', function () {
+    $setup = diagnosisTeam(withValues: false);
+    $main = startMainDiagnosis($setup, invite: false);
+    $main->update(['stage' => MainDiagnosisStage::Invited]);
+    $values = collect(range(1, 6))->map(fn ($index) => app(ValueService::class)->create([
+        'name' => 'Közös '.$index, 'meanings' => ['M'], 'low_examples' => ['Alig'], 'high_examples' => ['Nagyon'],
+    ]));
+    actingAsCustomer($setup['leader']);
+
+    $component = Livewire::test(OrganizationValues::class, leaderParams($setup, $main))
+        ->assertDontSee('Legfeljebb 5 érték lehet.');
+
+    foreach ($values as $value) {
+        $component->set('pickedValueId', $value->id)->call('addFromLibrary');
+    }
+
+    $component->assertSet('items', fn ($items) => count($items) === 5)
+        ->assertSee('Az Értéktárból választom')
+        ->assertSee('Legfeljebb 5 érték lehet.')
+        ->assertSeeHtml('wire:model="newValueName" disabled="disabled"');
+});
+
 it('saves the brand base boxes and needs all four for "Tovább"', function () {
     $setup = diagnosisTeam(withValues: false);
     organizationValues($setup['organization'], withBrand: false);

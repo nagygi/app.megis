@@ -98,28 +98,30 @@
                     </x-ui.card>
                 @endforeach
 
-                @unless ($isFull)
-                    <x-ui.card :bordered="false" class="flex flex-col gap-4 border border-dashed border-grey-350">
-                        <x-form.inline>
-                            <x-form.select name="pickedValueId" wire:model="pickedValueId" :label="__('admin.value_sets.library')">
-                                <option value="">{{ __('admin.value_sets.library_select') }}</option>
-                                @foreach ($libraryValues as $libraryValue)
-                                    <option value="{{ $libraryValue->id }}">{{ $libraryValue->name }}</option>
-                                @endforeach
-                            </x-form.select>
-                            <x-slot:actions>
-                                <x-ui.button tone="outline" size="sm" icon="plus" wire:click="addFromLibrary">{{ __('admin.value_sets.add') }}</x-ui.button>
-                            </x-slot:actions>
-                        </x-form.inline>
-                        <x-form.inline>
-                            <x-form.input name="newValueName" wire:model="newValueName" :label="__('admin.value_sets.new_value')" />
-                            <x-slot:actions>
-                                <x-ui.button tone="outline" size="sm" icon="plus" wire:click="addNew">{{ __('admin.value_sets.add_new') }}</x-ui.button>
-                            </x-slot:actions>
-                        </x-form.inline>
-                        <p class="text-sm text-grey-700">{{ __('admin.value_sets.add_help') }}</p>
-                    </x-ui.card>
-                @endunless
+                {{-- At five values the adding stays in place, greyed out with the reason (08 · 8.1). --}}
+                <x-ui.card :bordered="false" class="flex flex-col gap-4 border border-dashed border-grey-350">
+                    <x-form.inline>
+                        <x-form.select name="pickedValueId" wire:model="pickedValueId" :label="__('admin.value_sets.library')" :disabled="$isFull">
+                            <option value="">{{ __('admin.value_sets.library_select') }}</option>
+                            @foreach ($libraryValues as $libraryValue)
+                                <option value="{{ $libraryValue->id }}">{{ $libraryValue->name }}</option>
+                            @endforeach
+                        </x-form.select>
+                        <x-slot:actions>
+                            <x-ui.button tone="outline" size="sm" icon="plus" wire:click="addFromLibrary" :disabled="$isFull">{{ __('admin.value_sets.add') }}</x-ui.button>
+                        </x-slot:actions>
+                    </x-form.inline>
+                    <x-form.inline>
+                        <x-form.input name="newValueName" wire:model="newValueName" :label="__('admin.value_sets.new_value')" :disabled="$isFull" />
+                        <x-slot:actions>
+                            <x-ui.button tone="outline" size="sm" icon="plus" wire:click="addNew" :disabled="$isFull">{{ __('admin.value_sets.add_new') }}</x-ui.button>
+                        </x-slot:actions>
+                    </x-form.inline>
+                    @if ($isFull)
+                        <p class="text-sm text-grey-700">{{ __('admin.value_sets.too_many', ['max' => \App\Models\OrganizationValueSet::MAX_VALUES]) }}</p>
+                    @endif
+                    <p class="text-sm text-grey-700">{{ __('admin.value_sets.add_help') }}</p>
+                </x-ui.card>
             </section>
 
             {{-- The brand base (08 · 8.2) --}}
@@ -140,6 +142,7 @@
                                 :name="$field"
                                 wire:model="{{ $field }}"
                                 :label="__('admin.value_sets.brand_questions.'.$field)"
+                                required
                                 rows="3"
                                 maxlength="500"
                                 :help="__('admin.value_sets.brand_help')"
