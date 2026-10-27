@@ -19,8 +19,4 @@
             <x-ui.button size="lg" tone="cream" :href="route('client.login')">{{ __('mirror.have_account') }}</x-ui.button>
         </div>
     </section>
-
-    <x-slot:footer>
-        <x-public.legal-links />
-    </x-slot:footer>
 </x-layouts::public>

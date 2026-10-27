@@ -64,7 +64,7 @@ class InvitationController extends Controller
         $validated = $request->validate([
             'last_name' => ['required', 'string', 'max:255'],
             'first_name' => ['required', 'string', 'max:255'],
-            'password' => ['nullable', 'string', 'confirmed', PasswordRules::for(null)],
+            'password' => ['nullable', 'string', 'confirmed', PasswordRules::rule()],
             'accept' => ['accepted'],
             Turnstile::FIELD => [new Turnstile],
         ], [

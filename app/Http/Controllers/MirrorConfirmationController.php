@@ -42,7 +42,7 @@ class MirrorConfirmationController extends Controller
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'password' => ['nullable', 'confirmed', PasswordRules::for(null)],
+            'password' => ['nullable', 'confirmed', PasswordRules::rule()],
         ], attributes: [
             'first_name' => __('auth_ui.registration.first_name'),
             'last_name' => __('auth_ui.registration.last_name'),

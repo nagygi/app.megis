@@ -47,13 +47,23 @@ it('sets the password, activates the account and logs the admin in', function ()
         ->and($admin->tokens()->sole()->consumed_at)->not->toBeNull();
 });
 
-it('requires at least 12 characters for an admin password', function () {
+it('requires at least 8 characters for an admin password, as for a customer', function () {
     fakeTurnstile();
     $admin = User::factory()->admin()->invited()->create();
 
-    $response = postPasswordSetup(adminLink($admin), 'short-pass1');
+    $response = postPasswordSetup(adminLink($admin), 'short-1');
 
-    $response->assertSessionHasErrors(['password' => 'A(z) jelszó legalább 12 karakter kell legyen.']);
+    $response->assertSessionHasErrors(['password' => 'A(z) jelszó legalább 8 karakter kell legyen.']);
+});
+
+it('accepts an 8 character admin password', function () {
+    fakeTurnstile();
+    $admin = User::factory()->admin()->invited()->create();
+
+    $response = postPasswordSetup(adminLink($admin), 'mx7-qa2z');
+
+    $response->assertRedirect(route('admin.dashboard'));
+    expect(Hash::check('mx7-qa2z', $admin->refresh()->password))->toBeTrue();
 });
 
 it('shows the invalid page for an expired link', function () {

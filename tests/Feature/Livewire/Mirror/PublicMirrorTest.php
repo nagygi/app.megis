@@ -125,6 +125,16 @@ it('reads a written situation and shows the values with quotes in the same brows
     $this->get(route('mirror.result', $session))->assertNotFound();
 });
 
+it('shows the legal footer under the public result', function () {
+    LegalDocumentVersion::factory()->ofType(LegalDocumentType::CookiePolicy)->create();
+    $session = submitTextMirror();
+
+    $this->get(route('mirror.result', $session))
+        ->assertOk()
+        ->assertSee('aria-label="Jogi dokumentumok"', escape: false)
+        ->assertSee('/cookie-tajekoztato', escape: false);
+});
+
 it('asks for the e-mail and the accepted documents before the mirror is sent', function () {
     Mail::fake();
     fakeTurnstile();

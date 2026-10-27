@@ -22,7 +22,7 @@
             type="password"
             x-model="password"
             :label="__('auth_ui.registration.password_optional')"
-            :help="__('auth_ui.registration.password_optional_help').' '.\App\Support\PasswordRules::hintFor(null)"
+            :help="__('auth_ui.registration.password_optional_help').' '.\App\Support\PasswordRules::hint()"
             autocomplete="new-password"
         />
         {{-- The password is optional, so its repeat shows only once there is one. --}}
@@ -31,14 +31,16 @@
         </div>
 
         <x-form.checkbox name="accept" x-model="accepted" :checked="(bool) old('accept')">
-            @if ($terms && $privacy)
-                {!! __('auth_ui.registration.accept', [
-                    'terms' => '<a href="'.e(route('legal.show', 'aszf')).'" target="_blank" rel="noopener" class="font-semibold text-charcoal">'.e(__('auth_ui.registration.accept_terms')).'<span class="sr-only"> ('.e(__('ui.new_tab')).')</span></a>',
-                    'privacy' => '<a href="'.e(route('legal.show', 'adatkezelesi-tajekoztato')).'" target="_blank" rel="noopener" class="font-semibold text-charcoal">'.e(__('auth_ui.registration.accept_privacy')).'<span class="sr-only"> ('.e(__('ui.new_tab')).')</span></a>',
-                ]) !!}
-            @else
-                {{ __('auth_ui.registration.accept_without_documents') }}
-            @endif
+            {{-- Each document is a link once uploaded, plain text until then (05 · 5.2). --}}
+            @php
+                $documentLink = fn ($version, string $slug, string $label) => $version
+                    ? '<a href="'.e(route('legal.show', $slug)).'" target="_blank" rel="noopener" class="font-semibold text-charcoal">'.e($label).'<span class="sr-only"> ('.e(__('ui.new_tab')).')</span></a>'
+                    : e($label);
+            @endphp
+            {!! __('auth_ui.registration.accept', [
+                'terms' => $documentLink($terms, 'aszf', __('auth_ui.registration.accept_terms')),
+                'privacy' => $documentLink($privacy, 'adatkezelesi-tajekoztato', __('auth_ui.registration.accept_privacy')),
+            ]) !!}
         </x-form.checkbox>
 
         <x-turnstile />

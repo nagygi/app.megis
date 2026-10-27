@@ -69,7 +69,6 @@ return [
         'accept' => 'Elfogadom az :terms és az :privacy.',
         'accept_terms' => 'ÁSZF-et',
         'accept_privacy' => 'adatkezelési tájékoztatót',
-        'accept_without_documents' => 'Elfogadom az ÁSZF-et és az adatkezelési tájékoztatót.',
         'accept_needed' => 'A regisztrációhoz fogadd el az ÁSZF-et és az adatkezelési tájékoztatót.',
         'button' => 'Regisztrálok',
         'expired_title' => 'Ez a meghívó már lejárt',

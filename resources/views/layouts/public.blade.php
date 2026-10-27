@@ -44,15 +44,7 @@
             {{ $slot }}
         </main>
 
-        @isset($footer)
-            <footer @class([
-                'mx-auto max-w-5xl border-t px-4 py-6 text-sm sm:px-8',
-                'border-grey-250 text-grey-600' => $tone === 'cream',
-                'border-black/20 text-black' => $tone === 'coral',
-            ])>
-                {{ $footer }}
-            </footer>
-        @endisset
+        <x-public.legal-links :tone="$tone" />
     </div>
 
     <x-ui.toasts />

@@ -14,7 +14,7 @@
             type="password"
             x-model="password"
             :label="__('auth_ui.registration.password_optional')"
-            :help="__('auth_ui.registration.password_optional_help').' '.\App\Support\PasswordRules::hintFor(null)"
+            :help="__('auth_ui.registration.password_optional_help').' '.\App\Support\PasswordRules::hint()"
             autocomplete="new-password"
         />
         {{-- The password is optional, so its repeat shows only once there is one. --}}

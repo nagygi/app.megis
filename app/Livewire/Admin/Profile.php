@@ -69,7 +69,7 @@ class Profile extends Component
 
         $validated = $this->validate([
             'current_password' => ['required', 'string', 'current_password:'.GuardSession::ADMIN],
-            'password' => ['required', 'string', 'confirmed', PasswordRules::admin()],
+            'password' => ['required', 'string', 'confirmed', PasswordRules::rule()],
         ]);
 
         $admin->forceFill(['password' => $validated['password']])->save();

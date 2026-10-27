@@ -31,3 +31,19 @@ it('links only the uploaded documents in the public footer', function () {
 
     $response->assertSee('/adatkezelesi-tajekoztato', escape: false)->assertDontSee('/cookie-tajekoztato', escape: false);
 });
+
+it('shows the legal footer on the public Értéktükör recording too', function () {
+    LegalDocumentVersion::factory()->ofType(LegalDocumentType::CookiePolicy)->create();
+
+    $response = $this->get(route('mirror.record'));
+
+    $response->assertOk()
+        ->assertSee('aria-label="Jogi dokumentumok"', escape: false)
+        ->assertSee('/cookie-tajekoztato', escape: false);
+});
+
+it('has no footer while no document is uploaded', function () {
+    $response = $this->get(route('public.home'));
+
+    $response->assertOk()->assertDontSee('<footer', escape: false);
+});

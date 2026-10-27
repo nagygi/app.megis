@@ -9,7 +9,7 @@
             name="password"
             type="password"
             :label="__('auth_ui.new_password')"
-            :help="\App\Support\PasswordRules::hintFor($user)"
+            :help="\App\Support\PasswordRules::hint()"
             autocomplete="new-password"
             required
         />

@@ -47,7 +47,7 @@ Az admin ugyanolyan felhasználó, mint az ügyfelek, csak Admin vagy Szuperadmi
 - Nincs „Emlékezz rám”.
 - Rate limit: 5 próbálkozás percenként, e-mail + IP alapján.
 - Fiókzárolás: 10 egymást követő sikertelen próbálkozás után a fiók zárolódik. Ezt a felület ki is írja: „A fiókod zárolva van. Kérd egy szuperadmin segítségét.” Feloldani csak konzolból lehet (`megis:admin:unlock`). Sikeres belépés után a számláló nullázódik.
-- Jelszó policy: legalább 12 karakter, és ismert kiszivárgott jelszó nem használható. Ugyanez érvényes a jelszó beállításakor és cseréjekor is.
+- Jelszó policy: legalább 8 karakter, mint az ügyfeleknél (14 · 14.3), és ismert kiszivárgott jelszó nem használható. Ugyanez érvényes a jelszó beállításakor és cseréjekor is.
 - Session: 6 óra inaktivitás után lejár.
 - Jelszócsere, reset vagy inaktiválás után a futó sessionök megszűnnek.
 - Nem admin felhasználó az `/admin/*` útvonalakon „Nincs jogosultságod” oldalt kap.

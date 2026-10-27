@@ -37,7 +37,7 @@ class AdminPasswordSetupController extends Controller
         }
 
         $validated = $request->validate([
-            'password' => ['required', 'string', 'confirmed', PasswordRules::admin()],
+            'password' => ['required', 'string', 'confirmed', PasswordRules::rule()],
             Turnstile::FIELD => [new Turnstile],
         ]);
 

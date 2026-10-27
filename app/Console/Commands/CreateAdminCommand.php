@@ -78,12 +78,12 @@ class CreateAdminCommand extends Command
     private function askForPassword(): string
     {
         while (true) {
-            $plainPassword = password(label: __('console.admin_create.password'), required: true, hint: PasswordRules::hintFor(new User(['role' => UserRole::Admin])));
+            $plainPassword = password(label: __('console.admin_create.password'), required: true, hint: PasswordRules::hint());
             $confirmation = password(label: __('console.admin_create.password_confirmation'), required: true);
 
             $validator = Validator::make(
                 ['password' => $plainPassword, 'password_confirmation' => $confirmation],
-                ['password' => ['confirmed', PasswordRules::admin()]],
+                ['password' => ['confirmed', PasswordRules::rule()]],
             );
 
             if ($validator->passes()) {

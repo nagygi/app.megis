@@ -74,6 +74,18 @@ it('registers the customer, records both legal acceptances and logs in', functio
     expect($user->id)->toBeInt()->and(LegalAcceptance::query()->count())->toBe(2);
 });
 
+it('links each uploaded document in the acceptance, even if the other is missing', function () {
+    LegalDocumentVersion::factory()->ofType(LegalDocumentType::PrivacyPolicy)->create();
+    [, $token] = invitedMembership();
+
+    $response = $this->get(route('client.invitation.show', $token));
+
+    $response->assertOk()
+        ->assertSee('href="'.route('legal.show', 'adatkezelesi-tajekoztato').'"', escape: false)
+        ->assertDontSee('href="'.route('legal.show', 'aszf').'"', escape: false)
+        ->assertSee('Elfogadom az ÁSZF-et és az');
+});
+
 it('stores an optional password with the customer rule', function () {
     fakeTurnstile();
     [$membership, $token] = invitedMembership();

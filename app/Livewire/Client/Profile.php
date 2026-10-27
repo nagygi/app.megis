@@ -120,7 +120,7 @@ class Profile extends Component
         $this->validate([
             'current_password' => $hasPassword ? ['required', 'string', 'current_password:'.GuardSession::WEB] : [],
             'code' => $hasPassword ? [] : ['required', 'string'],
-            'password' => ['required', 'string', 'confirmed', PasswordRules::for($user)],
+            'password' => ['required', 'string', 'confirmed', PasswordRules::rule()],
         ]);
 
         if (! $hasPassword) {

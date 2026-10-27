@@ -21,7 +21,7 @@ Bal oldali menüpont: *Beállítások → Jogi dokumentumok*. Egy lap, dokumentu
   - egy „Megnyitás” link.
 - „Új verzió feltöltése” gomb:
   - Csak PDF tölthető fel, legfeljebb 10 MB. A szabály ki van írva (NFR).
-  - Meg kell adni a hatályba lépés dátumát (alapból a mai nap, jövőbeli is lehet).
+  - Meg kell adni a hatályba lépés dátumát (alapból a mai nap; jövőbeli és múltbeli is lehet).
   - Jövőbeli dátumnál a dátumig a régi verzió marad hatályos.
   - „Újra el kell fogadni” kapcsoló, alapból kikapcsolva. Ha be van kapcsolva, a hatálybalépés után a felhasználóknak újra el kell fogadniuk a dokumentumot (14 · 14.5). A Cookie tájékoztatónál nincs ilyen kapcsoló.
 - Korábbi verziók listája: dátum, fájl, ki töltötte fel. Csak olvasható, nem törölhető, mert vita esetén tudni kell, melyik szöveg volt hatályos.
@@ -34,12 +34,12 @@ Bal oldali menüpont: *Beállítások → Jogi dokumentumok*. Egy lap, dokumentu
   - `/aszf`
   - `/cookie-tajekoztato`
 - Ezekre linkelnek:
-  - az Értéktükör ET5 lapja (06),
-  - a publikus oldalak lábléce,
+  - az Értéktükör ET2 lapja (06),
+  - minden publikus oldal lábléce: a kezdőlap és az Értéktükör nyilvános lapjai,
   - a regisztráció (14).
-- Ha a dokumentum még nincs feltöltve, a link nem jelenik meg.
+- Ha a dokumentum még nincs feltöltve, a link nem jelenik meg. Ha egy sincs feltöltve, lábléc sincs. A regisztrációnál a feltöltött dokumentum linkje akkor is megjelenik, ha a másik még hiányzik; a hiányzó neve link nélkül áll.
 
 ## Nincs benne
 
 - Cookie hozzájárulás-kezelő (banner).
-- Annak rögzítése, melyik felhasználó melyik verziót fogadta el: az ET5-ön a 06-os, egyébként a 14-es jegyben.
+- Annak rögzítése, melyik felhasználó melyik verziót fogadta el: az ET2-n a 06-os, egyébként a 14-es jegyben.

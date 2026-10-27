@@ -43,7 +43,7 @@ A seeder a három terméket hozza létre (Snapshot · Külső, Snapshot · Bels�
 php artisan megis:admin:create
 ```
 
-- A parancs bekéri a nevet, az e-mail címet és kétszer a jelszót (rejtve, legalább 12 karakter, nem szerepelhet ismert adatszivárgásban). Az első admin alapból szuperadmin.
+- A parancs bekéri a nevet, az e-mail címet és kétszer a jelszót (rejtve, legalább 8 karakter, nem szerepelhet ismert adatszivárgásban). Az első admin alapból szuperadmin.
 - `--role=admin`: sima admint hoz létre.
 - `--invite`: jelszó helyett meghívó e-mailt küld (24 óráig él). Ehhez fusson a queue worker.
 - Ha az e-mail cím már létezik (pl. ügyfélként), a parancs megkérdezi, megkapja-e a fiók a szerepkört.
