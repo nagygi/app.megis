@@ -2,6 +2,16 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.43 · HASH · 2026-10-27
+
+Jegyek az oldalon: a tesztelők és a megrendelő a stagingen az oldal egy elemét kijelölve rögzíthetnek hibát, módosítási kérést vagy kérdést (`exot/onsite-comment` 0.7, a DestinationX-ben már fut).
+
+- **Csak local és staging:** productionben a csomag semmit nem regisztrál (route, middleware, migráció, ütemezés). A tesztekben sem kapcsol be.
+- **Bekapcsolás:** az admin menü alján, a verziószám alatt „Jegyek bekapcsolása az oldalon” link, az adminoknak és a szuperadminoknak. Meghívó nélkül bekapcsolja a widgetet, és visszavisz ugyanarra az oldalra. A tesztelők és a megrendelő személyes linket kapnak (`php artisan onsite-comment:invite`).
+- **Adatok:** külön SQLite fájlban (`storage/onsite-comment/`), a `megis_dev`-hez nem nyúl. A jegykulcs `MEGIS-12` formájú.
+- **Telepítés:** a csomag privát GitHub-repóból jön, a szerveren egy csak olvasó deploy key kell hozzá (docs/deploy.md, Telepítés). Az env-kulcsok az `.env.example`-ben vannak; helyben: docs/install.md.
+- **Verzió:** az admin menü alján és a `/health`-ben a verzió 1.27-en maradt; most újra a changeloggal egyezik.
+
 ## 1.42 · b1b7888 · 2026-10-27
 
 A szervezet értékeinél az admin és az ügyfél felülete ugyanazokkal a szabályokkal működik (08 · 8.1, 8.5).

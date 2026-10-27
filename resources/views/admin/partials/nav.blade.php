@@ -1,4 +1,7 @@
-{{-- Left menu of the admin; the app version sits at the bottom (NFR · 2, 01 · 1.5). --}}
+{{--
+    Left menu of the admin; the app version sits at the bottom (NFR · 2, 01 · 1.5),
+    under it the on-page tickets switch (exot/onsite-comment, local and staging only).
+--}}
 @php
     $inbox = app(\App\Services\Inbox\InboxService::class);
 
@@ -152,5 +155,8 @@
         @endforeach
     </nav>
 
-    <p class="px-3 text-xs text-grey-600">{{ __('admin.version', ['version' => config('megis.version')]) }}</p>
+    <div class="px-3 text-xs text-grey-600">
+        <p>{{ __('admin.version', ['version' => config('megis.version')]) }}</p>
+        @onsiteCommentAdminLink(request()->fullUrl(), 'mt-1 inline-block text-grey-700 hover:text-charcoal')
+    </div>
 </div>

@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
+        "exot/onsite-comment": "^0.7",
         "laravel/ai": "^1.2",
         "laravel/framework": "^13.17",
         "laravel/socialite": "^5.31",
@@ -92,7 +93,10 @@
     },
     "config": {
         "optimize-autoloader": true,
-        "preferred-install": "dist",
+        "preferred-install": {
+            "exot/onsite-comment": "source",
+            "*": "dist"
+        },
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
@@ -100,5 +104,11 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": {
+        "onsite-comment": {
+            "type": "vcs",
+            "url": "https://github.com/EXOT-Labs-Kft/exot-onsite-comment.git"
+        }
+    }
 }

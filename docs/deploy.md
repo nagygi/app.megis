@@ -30,6 +30,7 @@ A noindex-et az `X-Robots-Tag` fejléc, a `robots.txt` és a lapok meta-tagje ad
 | Naptár (09) | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` (alap: `/naptar/google/visszahivas`); `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`, `MICROSOFT_REDIRECT_URI` (alap: `/naptar/microsoft/visszahivas`), `MICROSOFT_TENANT=common`. Kulcsok nélkül csak iCal link, ICS fájl és beszélgetés választható. |
 | Queue | `REDIS_QUEUE_RETRY_AFTER` / `DB_QUEUE_RETRY_AFTER` (alap: 330 másodperc, az AI-jobok 300 másodperces időkorlátja fölött) |
 | Diagnózis (18) | `DIAGNOSIS_RECALCULATION_DELAY` (alap: 20 másodperc): ennyit vár a fő diagnózis újraszámolása, így az egymás után érkező anyagok és megélések egyszer számolódnak |
+| Jegyek az oldalon | `ONSITE_COMMENT_PROJECT_KEY=MEGIS`, `ONSITE_COMMENT_LOCALE=hu`, `ONSITE_COMMENT_ADMIN_GUARD=admin`, `ONSITE_COMMENT_ADMIN_ROLES="superadmin\|admin"`, `ONSITE_COMMENT_ADMIN_LOGIN_URL=/admin/belepes`; Trello: `ONSITE_COMMENT_TRELLO_KEY`, `ONSITE_COMMENT_TRELLO_TOKEN`, `ONSITE_COMMENT_TRELLO_SECRET`. Az `exot/onsite-comment` csak local és staging környezetben kapcsol be, productionben semmit nem regisztrál (lásd lent, Telepítés). |
 | PDF (28) | `LARAVEL_PDF_DRIVER=gotenberg`, `GOTENBERG_URL` (a Gotenberg konténer címe, például `http://gotenberg:3000`); Docker nélküli környezetben `LARAVEL_PDF_DRIVER=weasyprint` és `LARAVEL_PDF_WEASYPRINT_BINARY` (a bináris útvonala, például `/usr/local/bin/weasyprint`; nem lehet üres). A felhasználói oldal „Letöltöm · PDF” gombjait a `MEGIS_PDF_DOWNLOADS=false` rejti el (alapból látszanak) |
 
 A titkok csak környezeti változóban vannak. AWS-en javasolt az AWS Secrets Manager vagy az SSM Parameter Store.
@@ -78,6 +79,39 @@ php artisan migrate --force
 php artisan optimize          # config, route, view és event cache
 php artisan queue:restart
 ```
+
+**Jegyek az oldalon (`exot/onsite-comment`).** A tesztelők és a megrendelő az oldal egy elemét kijelölve rögzítenek hibát, módosítási kérést vagy kérdést. A csomag csak `local` és `staging` környezetben kapcsol be, a stagingen ezért `APP_ENV=staging` kell. Az adatai a saját SQLite fájljában vannak (`storage/onsite-comment/`), a `megis_dev`-hez nem nyúl. A `php artisan migrate` után a saját migrációit is lefuttatja, így a deployhoz nem kell új lépés. A route-jai a `/_onsite` előtag alatt, a `web` csoporton kívül futnak, ezért a `ProtectStaging` basic authja rájuk nem vonatkozik: a meghívó linket és a Trello webhookot a token, illetve az aláírás védi. Az oldalakra, és így a widgetre, a basic auth továbbra is kell. Részletek: `vendor/exot/onsite-comment/README.md` és `docs/integration.md`.
+
+A csomag privát GitHub-repóból jön (`EXOT-Labs-Kft/exot-onsite-comment`). A `composer.json` szerint a Composer git clone-nal telepíti (`preferred-install: source`), SSH-n, ezért a szerveren egy csak olvasó deploy key kell. Az első `composer install` előtt, a deploy felhasználóval:
+
+```bash
+ssh-keygen -t ed25519 -N "" -f ~/.ssh/exot_onsite_comment -C "megis $(hostname): exot-onsite-comment"
+cat ~/.ssh/exot_onsite_comment.pub   # GitHub: EXOT-Labs-Kft/exot-onsite-comment → Settings → Deploy keys, írási jog nélkül
+
+cat >> ~/.ssh/config <<'EOF'
+Host github-onsite-comment
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/exot_onsite_comment
+    IdentitiesOnly yes
+EOF
+chmod 600 ~/.ssh/config
+git config --global url."git@github-onsite-comment:EXOT-Labs-Kft/exot-onsite-comment.git".insteadOf "git@github.com:EXOT-Labs-Kft/exot-onsite-comment.git"
+
+ssh-keyscan github.com >> ~/.ssh/known_hosts
+git ls-remote git@github.com:EXOT-Labs-Kft/exot-onsite-comment.git   # a tageket kell kiírnia
+```
+
+Az alias és az `insteadOf` azért kell, mert egy deploy key csak egy repóhoz tartozhat: így ez a kulcs csak ehhez a repóhoz kerül elő, és nem akad össze a szerver többi GitHub-kulcsával. Ha a szerveren már be van állítva (például egy másik projekt miatt), ez a lépés kimarad.
+
+Az első telepítés után a stagingen:
+
+```bash
+php artisan onsite-comment:doctor
+php artisan onsite-comment:invite "Teszt Elek" elek@example.com --role=tester   # a link csak egyszer jelenik meg
+```
+
+Az adminok az admin menü alján, a verziószám alatti „Jegyek bekapcsolása az oldalon” linkkel kapcsolják be a widgetet, meghívó nélkül. Trellóhoz: `php artisan onsite-comment:trello:setup --board=<board link>`, majd `php artisan onsite-comment:trello:sync --push`.
 
 ### Utána
 

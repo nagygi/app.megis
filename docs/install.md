@@ -134,6 +134,18 @@ Az ügyféloldali belépés és a meghívó elfogadása a három jogi PDF-et ké
 
 Fejlesztés közben a `composer run dev` egyszerre indítja a szervert, a Vite-ot, a queue workert és a naplót.
 
+## Jegyek az oldalon (`exot/onsite-comment`)
+
+A tesztelők és a megrendelő az oldal egy elemét kijelölve rögzítenek hibát, módosítási kérést vagy kérdést. A csomag csak `local` és `staging` környezetben kapcsol be, a tesztekben (`testing`) nem. Az adatai a `storage/onsite-comment/onsite-comment.sqlite` fájlban vannak, nem a `megis_dev`-ben.
+
+1. A `composer install` a privát GitHub-repóból klónozza (`EXOT-Labs-Kft/exot-onsite-comment`), ehhez olvasási jog kell a repóhoz.
+2. A `.env`-be az `.env.example` `ONSITE_COMMENT_*` kulcsai kerülnek. Helyben az `ONSITE_COMMENT_TRELLO_QUEUE_CONNECTION=sync` is kell, mert a helyi queue a stagingével közös adatbázis, és a staging workere vinné el a Trello-pusht.
+3. `php artisan onsite-comment:install`: létrehozza az SQLite fájlt, lefuttatja a csomag migrációit és a `doctor` ellenőrzést.
+4. Belépés az adminba, majd a menü alján a „Jegyek bekapcsolása az oldalon” link. A widget a jobb alsó sarokban jelenik meg. Admin nélkül: `php artisan onsite-comment:invite "Név" email --role=tester`.
+5. Claude Code-hoz a helyi MCP szerver: `php artisan mcp:start onsite-comment` (a `.mcp.json`-ban `"command": "php", "args": ["artisan", "mcp:start", "onsite-comment"]`). Módosítani az `ONSITE_COMMENT_MCP_LOCAL_EMAIL` fejlesztő nevében tud.
+
+A `php artisan serve` párhuzamos kérések nélkül a képernyőképet elhagyhatja; indítsd több workerrel: `$env:PHP_CLI_SERVER_WORKERS=4; php artisan serve`. Minden más: `vendor/exot/onsite-comment/README.md`.
+
 ## Háttérfolyamatok helyben
 
 - Queue worker: `php artisan queue:work`
