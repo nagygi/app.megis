@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.35 · HASH · 2026-10-27
+## 1.35 · 218174c · 2026-10-27
 
 A kitöltés és a kezdőlapok fejlécei, gombjai és szövegei a prototípus szerint („1 · Belépés és kitöltés”: V1–V6, V10–V11, T1–T6).
 
