@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.36 · HASH · 2026-10-27
+## 1.36 · 698ea1a · 2026-10-27
 
 A lépéslista a prototípus idővonala (V1, V1·b, T2), a Kezdőlapon az indulás napja, és az adminban látszik, mi viszi tovább a szakaszt.
 
