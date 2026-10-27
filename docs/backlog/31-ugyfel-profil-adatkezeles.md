@@ -44,6 +44,7 @@ Ha nincs teendő, a blokk nem jelenik meg.
 - „{n} társ · {k} kitöltötte”, és alatta a szabály: „névvel csak ők és a mégis látják · összesítve 3 kitöltő fölött”.
 - „Emlékeztető” gomb, a 26 · 26.1 szabályával.
 - Csak Teljes, csak csapat.
+- A vezető a társak névsorát látja, mert a csapatot az admin vele egyeztetve állítja össze. Azt viszont nem, hogy ki töltötte ki és ki nem, csak a számot.
 
 ### 31.5 Beállítások és adatok
 
@@ -63,6 +64,7 @@ Ha nincs teendő, a blokk nem jelenik meg.
   - utána a 25 · 25.6 szerint kerül ki a diagnózisból.
 - **Ha csak az idézetekről szólót vonja vissza:** a válaszai a diagnózisban maradnak, csak az idézetei nem jelennek meg a vezetőnek. Az olvasatban ezek a nyomok kikerülnek (20).
 - Rögzítjük, ki és mikor vonta vissza.
+- **Ugyanabba a diagnózisba nem tér vissza:** az adatai már kikerültek, a kitöltése lezárult.
 
 ### 31.7 Adataim törlése
 
@@ -71,10 +73,14 @@ Ha nincs teendő, a blokk nem jelenik meg.
   - a felhasználó a jelszavával vagy egy frissen kért kóddal erősít meg (14 · 14.3).
 - **Mi törlődik:** a fiók és minden személyes adat: felvételek, átiratok, saját értékek, megélések, Értéktükrök.
 - **Mi marad:** a publikált diagnózisok összesített számai (átlagok). A szó szerinti idézetei kikerülnek a riportból, és a fejezeten „frissítve” jelzés áll (21.4). Az összesített szám már nem személyes adat, az idézet viszont az lehet.
+- **Vezető és magánszemély:**
+  - A vezető törlésekor a szervezet adatai (értékszett, folyamatok, publikált diagnózis) maradnak, mert a szervezeté. A neve helyén „Törölt felhasználó · #{azonosító}” áll.
+  - Magánszemélynél a szervezete is a fiókkal együtt törlődik, mert egyfős.
 - A szabály az adatkezelési tájékoztatóba (05) kerül, a szövegét jogásszal érdemes megerősíteni.
 - **Mi történik a törlés után:**
   - a fiók azonnal inaktív lesz, a felhasználó kijelentkezik;
-  - a végleges törlés ütemezett feladatként fut (`cron.md`);
+  - a végleges törlés óránkénti ütemezett feladatként fut (`cron.md`), így legkésőbb 24 órán belül lefut;
+  - türelmi idő nincs, a véletlen törlés ellen az erős megerősítés (jelszó vagy kód) véd;
   - a mentésekben az adat még legfeljebb 30 napig megvan ([docs/uzemeltetes.md](../docs/uzemeltetes.md) · 6), ezt az adatkezelési tájékoztató (05) tartalmazza.
 - **Napló:** rögzül, ki, mikor és mit törölt. Az admin a felhasználó adatlapján (33) csak a naplót látja.
 - **Admin a felhasználó nevében:** a fiók és az adatok törlése, valamint a hozzájárulás megadása vagy visszavonása nem érhető el (14 · 14.6).
@@ -91,22 +97,6 @@ Ha nincs teendő, a blokk nem jelenik meg.
 - Értesítési beállítások.
 - Számlázási adatok: [NM-02](../backlog_nem_MVP/NM-02-szamlazas.md).
 
-## Nyitott kérdések
+## Hátravan
 
-1. **Mi legyen a vezető és a magánszemély fiókjával?**
-
-   **Javaslat:**
-   - A vezető törlésekor a szervezet adatai (értékszett, folyamatok, publikált diagnózis) maradnak, mert a szervezeté. A neve helyén „korábbi vezető” áll.
-   - Magánszemélynél a szervezete is a fiókkal együtt törlődik, mert egyfős.
-
-2. **Látja-e a vezető a társak névsorát?** A prototípus szerint „névvel csak ők és a mégis”, a vezető számokat lát.
-
-   **Javaslat:** a névsort látja, mert a csapatot az admin vele egyeztetve állítja össze. Azt viszont nem, hogy ki töltötte ki és ki nem, csak a számot.
-
-3. **Türelmi idő a törlésnél.** Visszavonható-e a törlés néhány napig?
-
-   **Javaslat:** nem. A fiók azonnal inaktív lesz, a végleges törlés legkésőbb 24 órán belül lefut. Türelmi idő helyett az erős megerősítés (jelszó vagy kód) véd a véletlen törlés ellen.
-
-4. **Visszatérhet-e a társ a visszavonás után?**
-
-   **Javaslat:** ugyanabba a diagnózisba nem, mert az adatai már kikerültek. Ha mégis kérné, az admin a Futás lapon (19) újra társnak jelölheti, és új meghívót kap, üres lappal.
+- **Újra társ a visszavonás után:** ha a társ mégis kérné, az admin a Futás lapon (19) újra társnak jelölné, és új meghívót kapna, üres lappal. Ez most nem működik: a társak szinkronja a régi résztvevő-sort használja újra, új meghívó nem megy ki, és a társ visszavont állapotban marad.

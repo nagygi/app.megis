@@ -15,6 +15,8 @@ A fő diagnózis *Publikálás* füle (19.1).
 - **Balra a vezető nézete**, telefon-szélességben, kattintható: a kezdőlap (V12, snapshotnál V12·b) és a riport.
 - **Jobbra a társak Útravalója** (T6), egy választóval társanként.
 - Az előnézet ugyanaz a nézet, ami publikáláskor kimegy, nem másolat.
+- Mindkét előnézet fölött telefon · asztali váltó.
+- Ha nincs Útravalót kapó társ (belső snapshot, magánszemély), ugyanez a fül nyílik, a jobb oldali Útravaló-rész nélkül.
 
 ### 21.2 Ellenőrzőlista
 
@@ -23,14 +25,14 @@ Négy sor. Amíg nincs meg mind, a „Publikálom” gomb szürke, és a hiányz
 - minden mérőpont jóváhagyva (20);
 - minden állítás és szöveg jóváhagyva (20);
 - nincs besorolatlan anyag a diagnózisban (22);
-- a küszöb rendben van, vagy tudatosan felül van írva (19.4).
+- a küszöb rendben van, vagy tudatosan felül van írva (19.4). Magánszemélynél és társ nélküli terméknél ez a sor nem jelenik meg.
 
 ### 21.3 Publikálás
 
 - „Publikálom” gomb, megerősítéssel.
 - A fő diagnózis és minden részdiagnózisa „Publikált” lesz, a szakasz „Publikálva” (17.5). Rögzül, ki és mikor publikálta.
 - A riport a publikálás napjára fagy („diagnózis-nézet · 04.18.”).
-- E-mail megy a vezetőnek, és a társaknak az Útravalóval.
+- E-mail megy a vezetőnek, és az Útravalóval azoknak a társaknak, akik kitöltötték a T4-et, és nem vonták vissza a hozzájárulásukat. A többi társ nem kap e-mailt.
 - Ami ettől kezdve csak olvasható:
   - a saját értékek és a megélés (V2, V5, T3, T4);
   - a helyzetek és a feltöltések (12 · 12.5);
@@ -50,6 +52,7 @@ Négy sor. Amíg nincs meg mind, a „Publikálom” gomb szürke, és a hiányz
 - A publikált fő diagnózis visszavonható (04), megerősítéssel és kötelező indoklással. Rögzül, ki, mikor és miért vonta vissza.
 - A fő diagnózis és a részdiagnózisai Draftba kerülnek, a szakasz „Olvasat” lesz (17.5). A jóváhagyások megmaradnak, a sorok újranyithatók (20).
 - A vezető és a társak elől eltűnik a riport és az Útravaló, a kezdőlap az olvasat állapotát mutatja (26).
+- A visszavonásról nem megy e-mail. A vezető kezdőlapján egy sor áll: „A mégis javítja a diagnózisotokat. Hamarosan újra elérhető.” Ha a javítás érdemi, a kapcsolattartó személyesen szól.
 - A 21.3 zárolásai érvényben maradnak: a vezető és a társak nem kezdenek újra kitölteni.
 - Újrapublikáláskor nem megy ki újra e-mail.
 
@@ -60,27 +63,5 @@ Négy sor. Amíg nincs meg mind, a „Publikálom” gomb szürke, és a hiányz
 
 ## Nincs benne
 
-- Ütemezett publikálás (lásd 3. kérdés).
+- Ütemezett publikálás: a publikálás napja (A1) csak tájékoztató. Ha elmúlt, és a diagnózis még nincs publikálva, a Beérkezőben (22) sor jelenik meg.
 - A kezdőlap, a riport, az Útravaló és a PDF: 26–29.
-
-## Nyitott kérdések
-
-1. **Értesüljön-e a vezető a visszavonásról?**
-
-   **Javaslat:** e-mail ne menjen. A kezdőlapon (26) egy sor jelenik meg: „A mégis javítja a diagnózisotokat. Hamarosan újra elérhető.” Ha a javítás érdemi, a kapcsolattartó személyesen szól.
-
-2. **Ki kap Útravalót?** A prototípus szerint az Útravaló a publikálással megy ki. Kap-e Útravalót az a társ, aki nem töltötte ki a megélését, vagy visszavonta a hozzájárulását?
-
-   **Javaslat:** csak az kap, aki kitöltötte a T4-et és nem vonta vissza a hozzájárulását. A többiek nem kapnak e-mailt.
-
-3. **Ütemezett publikálás.** A publikálás napja az A1-ben meg van adva.
-
-   **Javaslat:** nincs automatikus publikálás, a dátum csak tájékoztató. Ha a nap elmúlt, és a diagnózis még nincs publikálva, a Beérkezőben (22) sor jelenik meg.
-
-4. **Asztali előnézet.** A 15 asztali nézetet is kér.
-
-   **Javaslat:** az előnézetben legyen egy telefon · asztali váltó.
-
-5. **Belső snapshot és magánszemély.** A snapshot riportja egy lap (S1), és társ nélkül nincs Útravaló.
-
-   **Javaslat:** ugyanez a fül, a jobb oldali Útravaló-rész nélkül. Az ellenőrzőlista küszöb-sora magánszemélynél és társ nélküli terméknél nem jelenik meg.

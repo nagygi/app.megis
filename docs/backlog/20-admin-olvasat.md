@@ -36,7 +36,7 @@ A fő diagnózis *Olvasat* füle (19.1), három oszloppal, balról jobbra:
 - **Nyomok:**
   - egy nyom kivehető a riportból, a nyers detektálás ettől megmarad;
   - egy nyom kiemelhető, ez jelenik meg elsőként a fejezet-lapon;
-  - új nyom kézzel is felvehető: szöveg, forrás-anyag, dátum, szerep.
+  - új nyom kézzel is felvehető: szöveg, forrás-anyag választóból, dátum, szerep.
 - **Nincs elég adat:** a sor PHI nélkül, ezzel a jelöléssel kerül a riportba.
 - **Területek és a fa:** nincs automatikus érték (18.4). Az admin adja meg a PHI-t, és a diagnózis nyomai közül választja ki a bizonyítékot (blokkra, forrásra és szóra szűrhetően). Itt nem kell indoklás, mert nincs mit felülírni.
 - A jóváhagyott sor a publikálásig újranyitható.
@@ -52,12 +52,15 @@ A fő diagnózis *Olvasat* füle (19.1), három oszloppal, balról jobbra:
 - **A legnagyobb rés** (18.3): elfogadható, vagy másik sor választható helyette.
 - **Szövegek:** vezetői összefoglaló, a márkád alapjának olvasata, a mégis javaslata (18.3). AI-vázlatként érkeznek (16), az admin átírja.
 - md szerkesztővel írhatók (NFR).
+- A riportot telefonon olvassák, ezért az állítás és az olvasat szövegei legfeljebb 160, a márkád alapjának olvasata legfeljebb 600 karakter.
 
 ### 20.5 Jóváhagyás és napló
 
 - Minden jóváhagyás, átírás és visszanyitás rögzül: ki, mikor, mit.
 - Az olvasat alatt a fő diagnózis 04-es státusza „Jóváhagyásra vár” (17.5).
-- Ha minden sor, állítás és szöveg jóvá van hagyva, a *Publikálás* fül (21) aktív lesz.
+- Ha minden sor, állítás és szöveg jóvá van hagyva, a *Publikálás* fül (21) aktív lesz. Más játékos elem (telő évgyűrű, „felragyogó” fül) nincs.
+- Több admin dolgozhat egyszerre ugyanazon az olvasaton, zárolás nélkül. Soronként látszik, ki hagyta jóvá. Ütközésnél az utolsó mentés nyer, a napló mindkét lépést mutatja.
+- Ha egy társ visszavonja a hozzájárulását (T1, M6), az automatikus nyomai kikerülnek, és a sorok újraszámolódnak (18.6). A jóváhagyott sor, amelynek az automatikus értéke ettől változik, visszaesik „vár” állapotba, és a napló jelzi.
 - A részdiagnózisok (17.4) innen megnyithatók, de nem kell őket külön jóváhagyni.
 
 ## Nincs benne
@@ -65,25 +68,8 @@ A fő diagnózis *Olvasat* füle (19.1), három oszloppal, balról jobbra:
 - A képesség-jelöltek és a lépcső jóváhagyása: [NM-15](../backlog_nem_MVP/NM-15-kepesseg-es-bridge.md).
 - A visszajelzések beépítése: 22.
 - A számítás és az AI-vázlat: 18.
+- Nyom kijelölése az átiratból („Nyomként felveszem”).
 
-## Nyitott kérdések
+## Hátravan
 
-1. **Kézi nyom felvétele.** Kell-e, hogy az admin az átiratból szöveget jelöljön ki nyomnak („Nyomként felveszem”)?
-
-   **Javaslat:** MVP-ben kézi beírás legyen: idézet, forrás-anyag választóból, dátum. A kijelölés később jöhet.
-
-2. **Több admin egyszerre.** Dolgozhat-e két admin egyszerre ugyanazon az olvasaton?
-
-   **Javaslat:** igen, zárolás nélkül. Soronként látszik, ki hagyta jóvá. Ütközésnél az utolsó mentés nyer, és a napló mindkét lépést mutatja.
-
-3. **Játékosság.** A prototípusban az évgyűrű telik, és ha minden zöld, a Publikálás fül „felragyog”.
-
-   **Javaslat:** MVP-ben csak a „14 / 19 jóváhagyva” számláló és a fül aktiválódása legyen.
-
-4. **Szöveghossz.**
-
-   **Javaslat:** a mobilos riport miatt az állítás és a javaslat legfeljebb 160, az olvasat-szöveg legfeljebb 600 karakter. A prototípus mondatai ennél rövidebbek.
-
-5. **Visszavont hozzájárulás az olvasat alatt.** Ha egy társ visszavonja a hozzájárulását (T1, M6), a nyomai az olvasatból is eltűnjenek?
-
-   **Javaslat:** igen, automatikusan kikerülnek, és a sorok újraszámolódnak (18.6). A már jóváhagyott, érintett sor visszaesik „vár” állapotba, és a napló jelzi, miért.
+- **Visszavont hozzájárulás az olvasat alatt:** a napló sora általános okot ír („az automatikus érték változott”), nem a visszavonást. A társ kézzel felvett nyomai bent maradnak. Az érintett, jóváhagyott sor jóváhagyva marad, ha az automatikus értéke nem változik.

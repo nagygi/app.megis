@@ -19,7 +19,7 @@ Szuperadmin és Admin egyaránt használhatja (01).
 - **Adatok:** név, e-mail, állapot (02), utolsó belépés.
 - Ha a felhasználónak küldött levél nem kézbesíthető, ez is látszik: „A levél nem kézbesíthető” (`docs/uzemeltetes.md`).
 - **Műveletek** a 02 · 2.5 szabályaival:
-  - szerkesztés;
+  - szerkesztés: a nevet bármelyik admin, az e-mail címet csak szuperadmin írhatja át, ahogy az adminoknál (01 · 1.5). E-mail-módosításkor a felhasználó a régi és az új címére is értesítést kap;
   - meghívó küldése vagy újraküldése;
   - inaktiválás vagy aktiválás;
   - belépés a nevében (14 · 14.6).
@@ -53,10 +53,13 @@ Időrendben, csak olvasható:
 - felvétel törlése (31.5), hozzájárulás visszavonása (31.6), e-mail cím módosítása (31);
 - fióktörlés (31.7).
 
+A napló üzleti adat, nem log: a technikai logok 365 napos szabálya (NFR) nem vonatkozik rá.
+
 ### 33.7 Törölt felhasználó
 
 - A törlés után (31.7) az adatlap csak a naplót mutatja, név és e-mail nélkül: „Törölt felhasználó · {belső azonosító} · {dátum}”.
-- A szervezetekben és a diagnózisokban a helyén „korábbi vezető”, illetve „korábbi társ” áll (31 · 1. kérdés).
+- A napló sorai megmaradnak, mert vita esetén tudni kell, mi történt és mikor (ahogy a jogi dokumentumok verzióinál, 05). A személyes adat (név, e-mail) kikerül belőlük, a felhasználót csak a belső azonosító jelöli.
+- A szervezetekben és a diagnózisokban a helyén „Törölt felhasználó · #{belső azonosító}” áll (31.7).
 
 ### 33.8 Ügyfelek lista
 
@@ -68,24 +71,8 @@ Időrendben, csak olvasható:
 ## Nincs benne
 
 - Globális audit-napló az adminban (01).
-- A felhasználó válaszainak kiírása a lapon: a részdiagnózisok linkjein érhetők el (lásd 1. kérdés).
+- A felhasználó válaszainak (megélés, saját értékek) kiírása a lapon: a részdiagnózisok linkjein érhetők el (17.4). Így az adatlap áttekintő marad, a tartalom pedig ott látszik, ahol a diagnózis összefüggésében érthető.
 
-## Nyitott kérdések
+## Hátravan
 
-1. **Mennyit mutasson a lap a felhasználó válaszaiból?** A mégis mindent lát, névvel (V9).
-
-   **Javaslat:** a lap ne írja ki a válaszokat (megélés, saját értékek), csak linkeljen a részdiagnózisokra (17.4). Így az adatlap áttekintő marad, a tartalom pedig ott látszik, ahol a diagnózis összefüggésében érthető.
-
-2. **Szerkesztheti-e az admin a nevet és az e-mail címet?** A 02 csak a pozíciót, a címkéket és a csapatokat sorolja fel.
-
-   **Javaslat:**
-   - A nevet bármelyik admin szerkesztheti.
-   - Az e-mail címet csak szuperadmin, ahogy az adminoknál (01 · 1.5). A felhasználó a régi és az új címére is értesítést kap.
-
-3. **Mi marad a naplóban a fiók törlése után?**
-
-   **Javaslat:** a napló sorai megmaradnak, mert vita esetén tudni kell, mi történt és mikor (ahogy a jogi dokumentumok verzióinál, 05). A személyes adat (név, e-mail) kikerül belőlük, a felhasználót csak a belső azonosító jelöli.
-
-4. **Meddig őrizzük a naplót?**
-
-   **Javaslat:** amíg a szervezet létezik, a fiók törlése után anonimizálva. A technikai logok 365 napos szabálya (NFR) erre nem vonatkozik, mert ez üzleti adat, nem log.
+- **A napló őrzési ideje:** a napló addig maradna meg, amíg a szervezet létezik. Most soha nem törlődik, és nincs a szervezethez kötve, így a magánszemély törölt szervezete után is megmarad.

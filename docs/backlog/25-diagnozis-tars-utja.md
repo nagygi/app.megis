@@ -14,7 +14,8 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
   - Ha a csapatban „Felvéve” állapotú (02), ez a regisztrációs meghívója (14).
   - Ha már aktív, belépő linket kap.
 - **Új társ futás közben:** ha az admin a futás alatt új embert rendel a csapathoz, ő azonnal megkapja a meghívót, az olvasat indításáig.
-- **Újraküldés:** az admin a Futás lapról (19) vagy a Beérkezőből (22) küldhet újat.
+- **Újraküldés:** az admin a Beérkező (22) „Új meghívó” gombjával küldhet újat. A Futás lapon (19) emlékeztető küldhető.
+- **Ha nem nyitja meg:** 5 nap után sor jelenik meg a Beérkezőben (22), 14 nap után lejárt meghívóként. Automatikus emlékeztető nincs ([NM-20](../backlog_nem_MVP/NM-20-automatikus-emlekeztetok.md)).
 - A link (14 · B2) után a T1 lap nyílik.
 
 ### 25.2 A meghívó lapja és a hozzájárulás (T1)
@@ -65,9 +66,10 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
 
 - A publikálásig a társ a Profiljában visszavonhatja a hozzájárulását (31 · 31.6).
 - Ekkor:
-  - az adatai kikerülnek a diagnózisból (18.6, 20 · 5. kérdés);
+  - az adatai kikerülnek a diagnózisból, és az olvasat sorai újraszámolódnak (18.6, 20);
   - a kitöltése lezárul, Útravalót nem kap;
   - a vezető csak a számot látja: „5 társ · 4 kitöltötte”, név és magyarázat nélkül.
+- **Inaktivált társ** (02, a futás alatt): ez nem visszavonás. A beküldött adatai a diagnózisban maradnak, de új anyagot nem küldhet, mert a szervezet lapjai aktív tagságot kérnek.
 
 ### 25.7 Több diagnózis, több szerep
 
@@ -89,19 +91,7 @@ Egy ember lehet az egyik diagnózisban vezető, egy másikban társ, vagy két c
 - Az Útravaló: 29.
 - A Coach sora a T5-ön: [NM-18](../backlog_nem_MVP/NM-18-coach.md).
 
-## Nyitott kérdések
+## Hátravan
 
-1. **Mikor menjen ki a társak meghívója?**
-   - a) automatikusan, amikor a vezető elindítja a diagnózist (23.4);
-   - b) az admin küldi a Futás lapról (19);
-   - c) az A1 „Meghívó küldése” gombjával, a vezetővel együtt.
-
-   **Javaslat:** a). A prototípusban is a vezető kitöltése után mennek ki, és így a társ már egy élő diagnózisba érkezik. A b) újraküldésre megmarad.
-
-2. **Mi van, ha a társ nem kezd bele?** A „Nem most” után a meghívó megmarad.
-
-   **Javaslat:** a Futás lapon (19) „meghívva, nem kezdte el” állapotban látszik, és 5 nap után sor jelenik meg a Beérkezőben (22). Automatikus emlékeztető MVP-ben nincs ([NM-20](../backlog_nem_MVP/NM-20-automatikus-emlekeztetok.md)).
-
-3. **Inaktivált társ.** Ha az admin a futás alatt inaktiválja a társat (02), az adatai a 02 szerint megmaradnak. Ez más, mint a visszavonás.
-
-   **Javaslat:** az inaktivált társ beküldött adatai a diagnózisban maradnak, de új anyagot nem küldhet, és Útravalót nem kap.
+- **„Nem most” után:** a Futás lapon (19) nincs „meghívva, nem kezdte el” állapot, csak meghívva, belépett és kitöltötte. Az 5 napos Beérkező-sor (22) csak a meg nem nyitott meghívónál jön, így arról, aki megnyitotta a T1-et és a „Nem most”-ot nyomta, nem jön sor.
+- **Inaktivált társ Útravalója:** az inaktivált társnak is készül Útravaló, és a publikáláskor e-mailt kap róla. Megnyitni már nem tudja, mert a tagsága inaktív.

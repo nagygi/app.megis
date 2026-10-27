@@ -18,7 +18,8 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 - **Egy fejezet, egy kérdés:** minden lap tetején a kérdés áll, a vezető nyelvén.
 - **A szám soha nem áll egyedül:** mellette a lépcső, a rés vagy a nyíl oda, ahonnan jött.
 - **Mélyülés minden fejezetben ugyanígy:** gyűrű → csoport → tétel → bizonyíték.
-- **A lap alján** a fejezet-lépegető: „{k} / {n} · {fejezet}”, és a következő fejezet.
+- **A lap tetején** kilenc fejezet-pötty (R0–R8), link a meglévő lapokra. A Brand riport, a Képesség és a Bridge pöttye szaggatott, „hamarosan” (1.31).
+- **A lap alján** a fejezet-lépegető: „{k} / 8 · {fejezet}” (pl. „2 / 8 · Értékek”), és a következő lap. A márkád alapja után a zárólap jön.
 - **A mélyítő lapon** „diagnózis-nézet · {publikálás dátuma}” címke áll: a lap a publikálás napjára fagyott (21.3).
 - **Fejlécszín** (15 · 15.2): zöld a Belső működés lapjain, világossárga a válasznál, az összefoglalónál és a márkád alapjánál.
 - **Jelölések:**
@@ -49,7 +50,7 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 ### 27.4 Belső működés (R1·b)
 
 - Minden belső mérőpont egy lapon, csoportonként csökkenő PHI-sorrendben: értékek · folyamatok · területek · a fa négy eleme.
-- A sorok jelzései: „a legnagyobb rés”, „repedés”.
+- A sorok jelzései: „a legnagyobb rés”, „repedés”. A „repedés” akkor jelenik meg, ha a sorhoz van jóváhagyott repedés-állítás (18.3). Számszabály nincs, mert a repedés a mégis olvasata. Így van a fejezetek soraiban is.
 - Egy erősség és egy repedés, egy-egy idézettel.
 - Nézetváltó és „összevetés ›” (27.9).
 
@@ -78,6 +79,7 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
   - „Mit nézünk ebben a rutinban” (18.2);
   - a nyomok az alkalmakból.
 - A 11 · 11.3 adatlap „A folyamat lapja” linkje ide visz.
+- **Ha a vezető kihagyta a folyamatokat** (11 · 11.1 „Kihagyom”), a fejezet kimarad: a lépegető átugorja, és az R0 bontásában sem jelenik meg. A számláló a helyeket megtartja („/ 8”), a Folyamatok pöttye szaggatott, link nélkül.
 
 ### 27.7 Területek (R4, R4·b)
 
@@ -87,7 +89,8 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 ### 27.8 A márkád alapja (R5, R5·b)
 
 - Kérdés: „Mit mond a fa belülről?”
-- A fa a négy elemmel, és a fa PHI-je.
+- A fa kilenc eleme egy körön, a prototípus szerint (1.31), és a fa PHI-je. A nem mért elem szaggatott kör „–”-vel: a „nincs elég adat” elem és a még nem mért öt elem is.
+- Két elem között coral vonal, ha legalább két fokkal eltérnek.
 - A fa olvasata (18.3) „A mégis olvasata” címmel (a prototípusban „A Coach olvasata”), „a mégis átnézte” jelöléssel.
 - **Elemenként lenyitható sor:** egy bekezdés PHI-vel, 1–2 bizonyíték, és „Az elem összes bizonyítéka ›” (R5·b).
 - A kívül-oldal nem jelenik meg (18.4).
@@ -101,7 +104,7 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 - **Összevetés (R1·c):**
   - három oszlop („Te · Csapat · Szerv.”) az értékekre, a folyamatokra és a területekre;
   - coral a szám, ahol a csapat legalább két fokkal eltér tőled;
-  - egy összegző mondat (lásd 4. kérdés);
+  - egy összegző mondat, sablonból, nem AI-val és nem kézzel: „Te {a} · a csapat {b} · a szervezet {c}. A legnagyobb eltérés: {X} (te {m}, a csapat {n}).” A második mondat csak akkor jelenik meg, ha valahol legalább két fok az eltérés;
   - a lábléc az R1·b-re visz vissza.
 
 ### 27.10 Belső snapshot (S1, S1·b)
@@ -116,7 +119,7 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
   - „A márkád alapjának belső oldala ›” (S1·b);
   - „Magatokra ismertek?” egyszer, a lap végén (28).
 - **S1·b:** a fa négy eleme, a PHI, az olvasat és lenyitható sorok, kívül-oldal nélkül.
-- A „Mélyebben: Snapshot · Külső” sor helyett: lásd 5. kérdés.
+- A „Mélyebben” sor a prototípus szerint a „Snapshot · Külső”-t mutatja, „hamarosan” jelzéssel. Fölötte „Beszéljünk róla” gomb a naptárlinkre, ha a foglalási link be van állítva.
 
 ### 27.11 Zárólap (R9)
 
@@ -124,7 +127,7 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 - Csendes, nem kattintható összegzés: Belső működés {x}% · A legnagyobb rés: {érték}.
 - **Sárga blokk:** a mégis javaslata (18.3), alatta: „Egy óra a mégissel: átnézzük, mit kezdjetek vele.”
 - Egyetlen gomb: „Időpontot foglalok”, a konfigurált naptárlinkre, új ablakban (06).
-- Alul halkan: PDF (28).
+- Alul halkan: PDF (28). Mellette a „Megosztás” inaktív, „hamarosan” felirattal: a link egy kollégának új jogosultsági kérdés, és a társ a riportot nem láthatja (V9).
 
 ### 27.12 Riportok a menüben
 
@@ -138,33 +141,3 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 - A képesség-fejezet (R7), a Bridge to Purpose (R8): [NM-15](../backlog_nem_MVP/NM-15-kepesseg-es-bridge.md).
 - A Coach belépői („Miért lett ez így?”): [NM-18](../backlog_nem_MVP/NM-18-coach.md).
 - A visszajelzés, a Melléklet és a PDF: 28.
-
-## Nyitott kérdések
-
-1. **Hány fejezet marad Brand és képesség nélkül?**
-
-   **Javaslat:** a válasz (R0) · az összefoglaló (R1) · a Belső működés kapuja (R1·b) · 1 Értékek · 2 Folyamatok · 3 Területek · 4 A márkád alapja · zárólap. A lépegető „{k} / 4”-et mutat.
-
-2. **Ha a vezető kihagyta a folyamatokat** (11 · 11.1 „Kihagyom”), nincs folyamat-mérőpont.
-
-   **Javaslat:** a Folyamatok fejezet kimarad, a lépegető átugorja, és az R0 bontásában sem jelenik meg. A lépegető ilyenkor „{k} / 3”-at mutat.
-
-3. **A fa rajza négy elemmel.** A prototípus R5 lapja kilenc elemet rajzol körbe.
-
-   **Javaslat:** az S1·b mintáját követjük: a fa rajza a négy elemmel. A „nincs elég adat” elem szaggatott körrel látszik.
-
-4. **Az összevetés (R1·c) összegző mondata.** A prototípusban: „Te 3,6 · a csapat 2,6 · a szervezet 2,8. A Nyíltságnál válik el a legjobban: te 4-et látsz, a csapat 2-t él.”
-
-   **Javaslat:** sablonból számoljuk, nem AI-val és nem kézzel. „Te {a} · a csapat {b} · a szervezet {c}. A legnagyobb eltérés: {X} (te {m}, a csapat {n}).” Ha nincs legalább két fok eltérés, a második mondat elmarad.
-
-5. **A snapshot „Mélyebben” sora.** A prototípus a Külső snapshotra hív, ami egyeztetés alatt áll.
-
-   **Javaslat:** helyette „A Teljes diagnózis · belül, társakkal, négy fejezetben · Beszéljünk róla” sor, a naptárlinkkel. Ha ez nem kell, a sor elmarad.
-
-6. **Megosztás a zárólapon.** A prototípus „PDF · Megosztás” gombokat mutat.
-
-   **Javaslat:** MVP-ben csak PDF. A megosztás (pl. link egy kollégának) új jogosultsági kérdés, és a társ a riportot nem láthatja (V9).
-
-7. **Mikor számít egy érték „repedésnek” a listában?** A prototípus az R1·b-n „repedés” jelzést tesz egyes sorokra.
-
-   **Javaslat:** akkor, ha van hozzá jóváhagyott repedés-állítás (18.3). Számszabályt nem vezetünk be, mert a repedés a mégis olvasata.

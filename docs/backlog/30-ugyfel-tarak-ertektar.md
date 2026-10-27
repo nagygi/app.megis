@@ -34,8 +34,9 @@ Ez az ET5 ígérete is: „részletesen az Értéktárban, és még {n} érték 
 - **Soronként:**
   - a név és a „Mit jelent” mondat;
   - az 1 és a 6 egy-egy rövid mondatban („Az 1: a folyosón mondjuk. A 6: a körben.”);
-  - a pont a legutóbbi publikált fő diagnózisból (lásd 1. kérdés), nyíllal az érték fejezet-lapjára (27 · R2·b).
-- **Ki látja a pontot:** csak az, aki a riportot látja (27.1). A társ és a partner pont nélkül látja ugyanezt a listát.
+  - a pont a néző legutóbbi publikált fő diagnózisából, Csapat nézetben, a dátummal („04.18-i diagnózis”), nyíllal az érték fejezet-lapjára (27 · R2·b). A szervezet vezetője a szervezet legutóbbi publikált fő diagnózisát látja.
+- **Ha a definíció a diagnózis óta változott:** a lista fölött egy halk sor jelzi: „A {dátum}-i diagnózis a korábbi definícióval mért.” A nyíl a fejezet-lapra visz, ahol a rögzített definíció látszik.
+- **Ki látja a pontot:** csak az, aki a riportot látja (27.1). A társ és a partner pont nélkül látja ugyanezt a listát, az 1-es és a 6-os mondattal együtt. A T4 megéléshez is ez kell (25.4).
 - **Lenyitva:** Mit jelent · Mit nem jelent · 1 · 6 · Példa.
 - **„Szerkesztem” gomb:** csak a „szervezet vezetője” címkéjű felhasználónak, a 08 szabályaival. Mindenki más csak olvassa.
 
@@ -52,27 +53,10 @@ Ez az ET5 ígérete is: „részletesen az Értéktárban, és még {n} érték 
 - **Soronként:** a név és a definíció; definíció nélkül az első „Mit jelent” mondat.
 - **Egy érték lapja:** Mit jelent · Mit nem jelent · 1 · 6 · Példák, az aktuális verzióból. A hamis pozitívok, az átfedések, a szakirodalom és a minősítések az adminé (03 · 3.2).
 - **„Hozzáadom a sajátjaimhoz”:** a 24 · 24.3 űrlapja nyílik, előre kitöltve.
+- A szervezet értékeinek lépése (V3, 08 · 8.1) nem ezt a böngészőt használja. Saját választója van: „Az Értéktárból választom”, „Hozzáadom” gombbal.
 
 ## Nincs benne
 
 - A szervezet értékeinek szerkesztése: 08.
 - A Képességtár (M3): [NM-15](../backlog_nem_MVP/NM-15-kepesseg-es-bridge.md).
 - A Folyamatok tár (M4): 11 · 11.5.
-
-## Nyitott kérdések
-
-1. **Melyik diagnózis pontja látszik?** Egy szervezetnek több fő diagnózisa is lehet (17.6).
-
-   **Javaslat:** a néző legutóbbi publikált fő diagnózisáé, Csapat nézetben, a dátummal („04.18-i diagnózis”). A szervezet vezetője, aki egyik diagnózisban sem vezető, a szervezet legutóbbi publikált fő diagnózisát látja.
-
-2. **Mi van, ha a definíció a diagnózis óta változott?** A pont a diagnózisban rögzített definícióhoz tartozik (08 · 8.4), a lap viszont az aktuálisat mutatja.
-
-   **Javaslat:** ha a verzió eltér, a pont mellett halk szöveg jelzi: „A {dátum}-i diagnózis a korábbi definícióval mért.” A nyíl a fejezet-lapra visz, ahol a rögzített definíció látszik.
-
-3. **Látja-e a társ a szervezet értékeinek 1-es és 6-os mondatát?** A prototípus szerint „a társ Értéktára ugyanez, pont nélkül”.
-
-   **Javaslat:** igen, mindent lát a pont kivételével. A T4 megéléshez is ez kell neki (25.4).
-
-4. **Az Értéktár-blokk a szervezet értékeinek „+ Új érték” útjához.** A szervezet vezetője a 08 · 8.1-ben is az Értéktárból választ.
-
-   **Javaslat:** a 30.4 böngészője és a 08 választója ugyanaz a komponens legyen, csak más gombbal: „Hozzáadom a sajátjaimhoz”, illetve „Hozzáadom a szervezet értékeihez”.

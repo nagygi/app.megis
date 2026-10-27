@@ -228,4 +228,4 @@ Menü: *Diagnózisok → Támogató kérdések*. Lista, „+ Új kérdés” gom
 
 ## Nyitott kérdések
 
-1. Melyik szolgáltatás készítse az átiratot beszélő-felismeréssel? A döntést a 12-es jegy PoC-ja (12.7) készíti elő.
+1. Melyik szolgáltatás készítse az átiratot beszélő-felismeréssel? A döntést a 12-es jegy PoC-ja (12.7) készíti elő. A mégis „Beszéd leiratozó szolgáltató választása” kártyáján (https://trello.com/c/nG7ddIBX) a javaslat: előbb a leirat-feltöltés, utána a hangfelvétel Speechmatics átírással.

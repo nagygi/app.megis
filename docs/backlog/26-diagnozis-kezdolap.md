@@ -17,10 +17,12 @@ Belső snapshotnál napos sávval (V10·b, V12·b). A belépés ide irányít (1
 - **Fejléc** (charcoal): „A ti diagnózisotok”, kísérősor: „{Termék} · fut · {kezdés} → {publikálás}”.
 - **A gyűrű helyén** a publikálás dátuma és „Belső működés · {n} mérőpont”.
 - **Hol tartunk:** sáv a hetekkel (snapshotnál napokkal), alatta a lépések. Állapotuk: kész, most vagy később.
-  - **Onboarding:** „értékek · folyamatok · a márkád alapja · {dátum}”. Koppintásra a lépéslista nyílik (23 · 3. kérdés).
-  - **Társak** (csak Teljes, csak csapat): „{k} / {n} kitöltötte” és „Emlékeztető” gomb (lásd 2. kérdés). 3 kitöltő alatt: „Még {n} társ hangja kell, hogy lássátok a rést.”
+  - **Onboarding:** „értékek · folyamatok · a márkád alapja · {dátum}”. Koppintásra a lépéslista nyílik. A lépések az olvasat indításáig javíthatók (23.2).
+  - **Társak** (csak Teljes, csak csapat): „{k} / {n} kitöltötte” és „Emlékeztető” gomb. 3 kitöltő alatt: „Még {n} társ hangja kell, hogy lássátok a rést.”
+    - A vezető a számot mindig látja, neveket nem (V9: „névvel csak ők és a mégis”), 3 kitöltő alatt sem. A szám nem fedi fel, ki mit válaszolt.
+    - Az „Emlékeztető” minden olyan társnak e-mailt küld, aki még nem töltötte ki a T4-et. Ugyanaz a szöveg és a 48 órás korlát, mint az admin emlékeztetőjénél (19.4). A vezető nem látja, kinek ment ki.
   - **Beszélgetések a mégissel:** „{k} megtartva · következő: {dátum} {idő} · {admin}” (19.5).
-  - **Amit hozzátesztek:** „{n} felvétel · {k} dokumentum · {j} elmondott helyzet”. Koppintásra a saját helyzetei nyílnak meg (12 · 12.5).
+  - **Amit hozzátesztek:** „{n} felvétel · {k} dokumentum · {j} elmondott helyzet”, az egész csapat száma, név nélkül. Koppintásra csak a saját helyzetei nyílnak meg (12 · 12.5).
   - **A mégis olvasata:** „{olvasat kezdete} → {publikálás előtti nap}” (17.2).
   - **A riport:** „{publikálás}”.
 - **Mélyítés** (szürke, nem kattintható): „Belső működés · értékek · folyamatok · területek · a márkád alapja · {publikálás}”.
@@ -64,21 +66,3 @@ Egy ember lehet az egyik diagnózisban vezető, egy másikban társ (25.7), és 
 - A „Képesség és 90 nap” sor: [NM-15](../backlog_nem_MVP/NM-15-kepesseg-es-bridge.md).
 - A Coach belépője: [NM-18](../backlog_nem_MVP/NM-18-coach.md).
 - A riport lapjai: 27.
-
-## Nyitott kérdések
-
-1. **Hány kitöltőt lát a vezető?** A prototípus „Társak 4 / 6 kitöltötte” sort mutat.
-
-   **Javaslat:** a számot mindig látja, neveket nem (V9: „névvel csak ők és a mégis”). Ez akkor is igaz, ha 3 alatt van, mert a szám nem fedi fel, ki mit válaszolt.
-
-2. **Vezetői emlékeztető.**
-
-   **Javaslat:** egy gomb, ami minden olyan társnak e-mailt küld, aki még nem töltötte ki a T4-et. Ugyanaz a szöveg és ugyanaz a 48 órás korlát, mint az admin emlékeztetőjénél (19.4). A vezető nem látja, kinek ment ki.
-
-3. **„Amit hozzátesztek” számai.** A prototípus egy összesített számot mutat („7 felvétel · 5 dokumentum · 1 átirat”).
-
-   **Javaslat:** a vezető az egész csapat számát látja név nélkül. A koppintás csak a saját helyzeteit nyitja meg (12 · 12.5: a feltöltő csak a sajátjait látja).
-
-4. **Kell-e az Értékmérés-teaser az MVP-ben?** Ez nem funkció, hanem ajánlat.
-
-   **Javaslat:** igen, statikus szövegként és naptárlinkkel. Olcsó, és ez az egyetlen hely, ahol a diagnózis után továbbvezetünk.

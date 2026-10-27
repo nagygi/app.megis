@@ -10,11 +10,13 @@ A mégis módszertana egy helyen (BT1–BT6). A felületen nincs magyarázó sz�
 - a V1 és a T2 „Bővebben” linkje a BT6-ra (23, 25);
 - a riportból és a kezdőlapról: „Mit jelent a % és a pontok?” (BT4), „Mi a küldetésfa?” (BT2), a területek fejezete (BT3) (26, 27).
 
+**Ki látja:** minden belépett felhasználó: vezető, társ, és aki csak Értéktükröt csinált. Csak belépve érhető el. A nyilvános változat a megis.hu weboldal része lehet, ami nem ennek az appnak a dolga (15 · 15.1).
+
 ## Alfeladatok
 
 ### 32.1 Nyitó (BT1)
 
-- Fejléc: „Bölcsességtár”, a kérdés: „Miből dolgozunk?”, kísérősor: „a mégis módszertana”.
+- Fejléc: cream, mint a tárak, évgyűrű-jellel. „Bölcsességtár”, a kérdés: „Miből dolgozunk?”, kísérősor: „a mégis módszertana”.
 - **Négy téma**, egy érintésre:
   - A diagnózis folyamata (BT6);
   - A küldetésfa · a márkád alapja (BT2);
@@ -25,7 +27,7 @@ A mégis módszertana egy helyen (BT1–BT6). A felületen nincs magyarázó sz�
 ### 32.2 Egy téma lapja
 
 - **Ugyanaz a sor-anatómia minden lapon:** szimbólum, név, egy mondat. Lenyitva a leírás, és a „Hol találkozol vele ›” nyíl a saját riport-fejezetre.
-- **„Nálatok:” sor:** ha a szervezetnek van megfelelő adata, a tétel alatt ez is megjelenik. Például a gyökérnél a szervezet értékei, a törzsnél a vezető Purpose-válasza (V4).
+- **„Nálatok:” sor:** a küldetésfa (BT2) tételei alatt, ha a szervezetnek van megfelelő adata: a gyökérnél a szervezet értékei, a törzsnél, a koronánál és az árnyéknál a márkád alapja szövegei (V4). A szervezet minden tagja látja.
 - A lap alján lépegető: „{k} / 4 · {téma}”, és a következő téma.
 
 ### 32.3 A témák
@@ -48,7 +50,15 @@ A mégis módszertana egy helyen (BT1–BT6). A felületen nincs magyarázó sz�
   - a megélés és a rés;
   - egy kiszámolt példa;
   - „A ti %-otok · Belső működés {x}% · {dátum}” sor, ha a néző látja a riportot (27.1).
-- **A diagnózis folyamata (BT6):** az út lépésenként, mindegyiknél, ki csinálja (te · társak · mégis). Az MVP-s lépéseket lásd 1. kérdés. Dátum és idővonal nincs: ez leírás, nem állapot.
+- **A diagnózis folyamata (BT6):** az út lépésenként, mindegyiknél, ki csinálja (te · társak · mégis). Dátum és idővonal nincs: ez leírás, nem állapot. Nyolc lépés (a prototípus csatorna- és Bridge-lépése nélkül):
+  1. Beállítjuk (mégis): kit nézünk, termék, időablak.
+  2. Belenézel a tükörbe (te): az Értéktükör.
+  3. Kitöltöd (te): saját és szervezeti értékek, a márkád alapja, megélés, folyamatok.
+  4. Ők is elmondják (társak, csak Teljes): a saját értékeik és a megélésük.
+  5. Hozzátesztek (te és a társak): helyzetek, feltöltések, megélés.
+  6. Olvasunk és beszélgetünk (mégis): interjúk, a nyomok összerakása, és utána publikálás.
+  7. Megkapod a diagnózist (te), a társak az Útravalót.
+  8. Beszélünk róla (mégis és te): egy óra, időpontfoglalással.
 
 ### 32.4 Tartalom
 
@@ -63,29 +73,3 @@ A mégis módszertana egy helyen (BT1–BT6). A felületen nincs magyarázó sz�
 - A „Kérdezd a Coachot” sor: [NM-18](../backlog_nem_MVP/NM-18-coach.md).
 - A fa további öt eleme a BT2-n: [NM-14](../backlog_nem_MVP/NM-14-fa-tovabbi-ot-eleme.md).
 - Tartalomszerkesztő az adminban.
-
-## Nyitott kérdések
-
-1. **A diagnózis folyamatának lépései (BT6) MVP-ben.** A prototípus tíz lépése között szerepelnek a csatornák és a Bridge is.
-
-   **Javaslat:** nyolc lépés.
-   1. Beállítjuk (mégis): kit nézünk, termék, időablak.
-   2. Belenézel a tükörbe (te): az Értéktükör.
-   3. Kitöltöd (te): saját és szervezeti értékek, a márkád alapja, megélés, folyamatok.
-   4. Ők is elmondják (társak, csak Teljes): a saját értékeik és a megélésük.
-   5. Hozzátesztek (te és a társak): helyzetek, feltöltések, megélés.
-   6. Olvasunk és beszélgetünk (mégis): interjúk, a nyomok összerakása, és utána publikálás.
-   7. Megkapod a diagnózist (te), a társak az Útravalót.
-   8. Beszélünk róla (mégis és te): egy óra, időpontfoglalással.
-
-2. **Ki látja a Bölcsességtárat?**
-
-   **Javaslat:** minden belépett felhasználó: vezető, társ, és aki csak Értéktükröt csinált. A „Nálatok:” sorok annak jelennek meg, aki a szervezet értékeit látja (30.2). „A ti %-otok” csak annak, aki a riportot látja (27.1).
-
-3. **Legyen-e nyilvános?** A Bölcsességtár szövege belépés nélkül is jó tartalom lehetne (SEO, megis.hu).
-
-   **Javaslat:** MVP-ben csak belépve érhető el. A nyilvános változat a megis.hu weboldal része lehet, ami nem ennek az appnak a dolga (15 · 15.1).
-
-4. **Fejlécszín.** A 15 · 15.2 táblázata nem sorolja be a Bölcsességtárat.
-
-   **Javaslat:** cream, mint a tárak, mert ez is „tár”. A prototípus évgyűrű-jele a menüben marad.

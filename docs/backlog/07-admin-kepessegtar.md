@@ -40,6 +40,8 @@ Bal oldali menüpont: *Képességtár*. Almenük: *Képességek*, *Csoportok*. A
 
 A listák az Értéktár lista-szerkesztőjével működnek (03 · 3.2), de egy elem legfeljebb 1000 karakter lehet, mert a mégis szövegei több mondatosak.
 
+Az adminban csak sürgős javítás történik, mert a Sheet a mester. A betöltött képesség adatlapja jelzi, hogy a következő betöltés felülírja az itt végzett módosítást. A régi szöveg a verziótörténetben megmarad.
+
 ### 7.3 Verziók
 
 Ugyanúgy működik, mint az Értéktárban (03 · 3.3):
@@ -55,6 +57,7 @@ Ugyanúgy működik, mint az Értéktárban (03 · 3.3):
 Almenü: *Képességtár → Csoportok*. Saját lista, nem azonos az Értéktár kategóriáival.
 
 - Mezők: név magyarul (kötelező, egyedi), név angolul, leírás (opcionális).
+- A mégis anyagai angol csoportneveket használnak. A felületen a magyar név áll, az angol mellette: a Csoportok listáján külön oszlopban, a képesség űrlapjának választójában „magyar (angol)” alakban.
 - Egy képesség egy csoportba tartozik. A csoport bemutatásra és szűrésre való, nem pontozzuk.
 - Törölni csak olyan csoportot lehet, amelyikhez nem tartozik képesség.
 - Kezdő adatok: a mégis 12 munkacsoportja:
@@ -97,16 +100,7 @@ Ugyanúgy működik, mint az Értéktárban (03 · 3.5): az archivált képessé
 - Másodlagos csoport: a mégisnél még megerősítendő.
 - Visszaírás a Sheetbe.
 
-## Nyitott kérdések
+## Hátravan
 
-1. **Hol a mester?** A mégis a Sheetben építi a tárat, és az hetente bővül. Ha az adminban is szerkesztenek, a következő betöltés felülírja.
-
-   **Javaslat:** a Sheet a mester. Az adminban csak sürgős javítás történik, és az adatlap jelzi, hogy a következő betöltés felülírja. A régi szöveg a verziótörténetben megmarad.
-
-2. **Mikor és milyen formában adja át a mégis?** A mégis Építési tervének utolsó lépése egy `kepessegtar-75.json`, de az csak a teljes kutatás és a tesztek után készül el.
-
-   **Javaslat:** a Sheet xlsx-exportja, mert már most elérhető, és később is így frissíthető.
-
-3. **Csoportnevek.** A mégis anyagai angol csoportneveket használnak, a fenti magyar nevek a prototípus JSON-jából jönnek.
-
-   **Javaslat:** a felületen a magyar név, az angol mellette. A magyar neveket a mégis nézze át.
+- **Csoportnevek a listán:** a Képességek lista csoport-oszlopa és csoport-szűrője csak a magyar nevet mutatja, az angolt nem.
+- **A magyar csoportnevek átnézése:** a fenti magyar nevek a prototípus JSON-jából jönnek. A mégis még nem nézte át őket.

@@ -27,7 +27,7 @@ Szuperadmin és Admin egyaránt használhatja (01).
 
 ### 19.3 Futás lap
 
-Számok és állapotok, válaszok nélkül:
+Számok és állapotok, válaszok nélkül, ahogy a vezető is látja. A válaszok névvel a részdiagnózisok oldalán érhetők el (17.4).
 
 - **Időablak:** sáv a kezdéstől a publikálásig, a mai nap jelölve.
 - **A vezető:** a lépései (17.3) állapottal (kész · most · hátra), utolsó belépés, a beküldött helyzetek száma.
@@ -70,9 +70,3 @@ Számok és állapotok, válaszok nélkül:
 
 - Automatikus emlékeztetők: [NM-20](../backlog_nem_MVP/NM-20-automatikus-emlekeztetok.md).
 - Időpontfoglalás külső naptárból.
-
-## Nyitott kérdések
-
-1. **Lát-e válaszokat az admin a Futás lapon?** A prototípus szerint „Válaszokat nem, csak számokat, ahogy a vezető is”. A V9 szerint viszont a mégis mindent lát, névvel.
-
-   **Javaslat:** a Futás lap csak számokat mutat. A válaszok a részdiagnózisok oldalán (17.4) érhetők el, névvel.
