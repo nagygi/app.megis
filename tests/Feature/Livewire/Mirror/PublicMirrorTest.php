@@ -16,6 +16,7 @@ use App\Mail\MirrorInterestMail;
 use App\Models\InboxItem;
 use App\Models\LegalAcceptance;
 use App\Models\LegalDocumentVersion;
+use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\User;
@@ -197,6 +198,37 @@ it('requires Turnstile and limits public submissions per IP', function () {
     expect(MirrorSession::query()->count())->toBe(0);
 });
 
+it('gives a few free mirrors a day per e-mail address, checked before a recording is uploaded', function () {
+    config(['megis.mirror.daily_per_email' => 1]);
+    submitTextMirror('anna@example.com');
+
+    Livewire::test(Record::class)
+        ->call('setMode', 'text')
+        ->set('text', str_repeat('Egy helyzet a hétről. ', 5))
+        ->set('email', 'Anna@Example.com')
+        ->set('consent', true)
+        ->set('turnstileToken', 'token')
+        ->call('submitText')
+        ->assertHasErrors(['email'])
+        ->assertSee('Erre az e-mail címre ma már elkészült a napi 1 ingyenes tükör.')
+        ->assertSet('turnstileToken', 'token')
+        ->call('checkBeforeUpload')
+        ->assertHasErrors(['email'])
+        ->set('email', 'bela@example.com')
+        ->call('checkBeforeUpload')
+        ->assertHasNoErrors();
+
+    expect(MirrorSession::query()->count())->toBe(1);
+
+    $this->travel(1)->days();
+
+    Livewire::test(Record::class)
+        ->set('email', 'anna@example.com')
+        ->set('consent', true)
+        ->call('checkBeforeUpload')
+        ->assertHasNoErrors();
+});
+
 it('asks the widget for a new token once a token has been checked', function () {
     fakeTurnstile(false);
 
@@ -245,6 +277,28 @@ it('asks for at least a few sentences when typing', function () {
         ->set('text', 'Rövid.')
         ->call('submitText')
         ->assertHasErrors(['text' => 'min']);
+});
+
+it('takes no more text than about ten minutes of speech, typed or in a file', function () {
+    fakeTurnstile();
+    config(['megis.mirror.text_max_characters' => 100]);
+
+    Livewire::test(Record::class)
+        ->call('setMode', 'text')
+        ->set('text', str_repeat('a', 101))
+        ->set('email', 'anna@example.com')
+        ->set('consent', true)
+        ->set('turnstileToken', 'token')
+        ->call('submitText')
+        ->assertHasErrors(['text' => 'max'])
+        ->call('setMode', 'file')
+        ->set('file', UploadedFile::fake()->createWithContent('helyzet.txt', str_repeat('Egy helyzet. ', 10)))
+        ->call('submitFile')
+        ->assertHasErrors(['file'])
+        ->assertSee('A fájl szövege legfeljebb 100 karakter lehet');
+
+    expect(Material::query()->count())->toBe(0)
+        ->and(MirrorSession::query()->count())->toBe(0);
 });
 
 it('refuses a .doc file and asks for docx', function () {

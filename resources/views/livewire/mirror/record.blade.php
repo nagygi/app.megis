@@ -30,7 +30,7 @@
     @if ($mode === 'record')
         <x-recorder :questions="$questions" check="checkBeforeUpload" :inline-submit="false" />
     @elseif ($mode === 'text')
-        <x-form.textarea name="text" wire:model="text" rows="10" :label="__('mirror.text_label')" :help="__('mirror.text_help')" maxlength="{{ config('megis.materials.text_max_characters') }}" required />
+        <x-form.textarea name="text" wire:model="text" rows="10" :label="__('mirror.text_label')" :help="__('mirror.text_help')" maxlength="{{ config('megis.mirror.text_max_characters') }}" required />
     @else
         {{-- Framed like the recorder, so the three read as tabs of one panel. --}}
         <x-ui.card padding="lg">

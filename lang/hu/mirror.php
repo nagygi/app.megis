@@ -36,9 +36,9 @@ return [
     'unsupported' => 'Ez a böngésző nem tud hangot felvenni. Írd le inkább, vagy tölts fel fájlt.',
     'uploading' => 'Feltöltés…',
     'text_label' => 'A helyzet, leírva',
-    'text_help' => 'Legalább néhány mondat. Minél konkrétabb, annál pontosabb a tükör.',
+    'text_help' => 'Legalább néhány mondat, legfeljebb nagyjából 10 percnyi beszéd. Minél konkrétabb, annál pontosabb a tükör.',
     'file_label' => 'Fájl',
-    'file_help' => 'Formátum: :formats · legfeljebb :size MB. A .doc fájlt mentsd docx-ként.',
+    'file_help' => 'Formátum: :formats · legfeljebb :size MB, :characters karakter. A .doc fájlt mentsd docx-ként.',
     'submit' => 'Kész · mutasd a tükröt',
     'contact_title' => 'Hova küldjük a tükröd?',
     'contact_lead' => 'Az e-mail címedre küldünk egy megerősítő linket. Ha megerősíted, a tükröd megmarad a fiókodban, és bármikor visszanézheted.',
@@ -49,6 +49,7 @@ return [
     'consent_privacy' => 'adatvédelmi szabályzatot',
     'consent_required' => 'A tükörhöz el kell fogadnod az ÁSZF-et és az adatvédelmi szabályzatot.',
     'throttled' => 'Most túl sok tükör készült erről a hálózatról. Próbáld újra egy óra múlva.',
+    'daily_limit' => 'Erre az e-mail címre ma már elkészült a napi :count ingyenes tükör. Holnap újra belenézhetsz.',
     'recording_missing' => 'Előbb vedd fel, amit mesélnél.',
 
     // Feldolgozás

@@ -22,9 +22,9 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 **ET2 · felvétel**
 
 - Három bemenet:
-  - böngészős hangfelvétel számlálóval, legfeljebb 10 percig (8 percnél figyelmeztet);
-  - „Inkább leírom” szöveges bevitel;
-  - fájl feltöltése: txt, md, doc vagy docx. A megengedett formátumok és a maximális méret ki van írva (NFR).
+  - böngészős hangfelvétel számlálóval, legfeljebb 10 percig (8 percnél figyelmeztet, 10 percnél megáll, háttérbe tett fülön is);
+  - „Inkább leírom” szöveges bevitel, legfeljebb 10 000 karakter (nagyjából 10 perc beszéd, 2026.10.27.);
+  - fájl feltöltése: txt, md, doc vagy docx. A megengedett formátumok, a maximális méret és a karakterkorlát ki van írva (NFR). A fájl szövegére is a 10 000 karakter vonatkozik.
 - Ösztönzés és több instrukció a bevitelnél: „Legalább egy percig mesélj, ha teheted, többet.”
 - **Motiváló elem felvétel közben:** egy idővel telő kör vagy sáv, mellette rövid biztató szöveg, ami az idővel változik. Például:
   - 0–1 perc: „Mesélj tovább…”
@@ -43,7 +43,8 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
     - felvétel közben megnyomva leállítja a felvételt, és beküldi;
     - az e-mailt és az elfogadást a feltöltés előtt ellenőrizzük, így egy hosszú felvétel nem töltődik fel hiába.
   - A beküldéssel azonnal megy a megerősítő levél. Ha a cím már egy aktív fiókhoz tartozik, nem megy levél: a felhasználó az ET5-ön lép be.
-- Beküldés Turnstile-lal, IP-alapú rate limittel.
+- Beküldés Turnstile-lal, IP-alapú rate limittel (óránként 5).
+- E-mail címenként naponta 10 ingyenes tükör készülhet (2026.10.27.); éjfélkor nullázódik. A 11.-nél az e-mail mező alatt: „Erre az e-mail címre ma már elkészült a napi 10 ingyenes tükör. Holnap újra belenézhetsz.” Felvételnél ezt is a feltöltés előtt ellenőrizzük. A belépett ügyfél saját menüs tükrét nem korlátozza.
 - A feldolgozás alatt várakozó állapot látszik. Ha a feldolgozás nem sikerül, ez jelenik meg: „Nem tudtuk feldolgozni. Próbáld újra.”
 
 **ET3 · az értékeid**

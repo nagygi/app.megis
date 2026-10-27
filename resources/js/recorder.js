@@ -18,6 +18,7 @@ export default (config) => ({
     recorder: null,
     stream: null,
     timer: null,
+    startedAt: null,
     audioContext: null,
     submitAfterStop: false,
 
@@ -78,7 +79,13 @@ export default (config) => ({
         this.recorder = new MediaRecorder(this.stream, mimeType ? { mimeType } : undefined);
         const chunks = [];
 
-        this.recorder.ondataavailable = (event) => event.data.size > 0 && chunks.push(event.data);
+        this.recorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                chunks.push(event.data);
+            }
+
+            this.tick();
+        };
         this.recorder.onstop = () => {
             this.blob = new Blob(chunks, { type: this.recorder.mimeType || 'audio/webm' });
             this.state = 'recorded';
@@ -92,19 +99,32 @@ export default (config) => ({
 
         this.recorder.start(1000);
         this.state = 'recording';
+        this.startedAt = Date.now();
         this.seconds = 0;
         this.questionIndex = -1;
         this.speaking = true;
-        this.timer = setInterval(() => {
-            this.seconds++;
-
-            if (this.seconds >= config.max) {
-                this.notice = config.texts.maxReached;
-                this.stop();
-            }
-        }, 1000);
+        this.timer = setInterval(() => this.tick(), 1000);
 
         this.watchSilence();
+    },
+
+    /**
+     * The time comes from the clock, not from counting: a background tab's
+     * timer is slowed down to once a minute, the recording is not. The
+     * recorder's own data, every second, checks it too, so the recording
+     * stops at the maximum in a background tab as well.
+     */
+    tick() {
+        if (this.state !== 'recording') {
+            return;
+        }
+
+        this.seconds = Math.min(config.max, Math.floor((Date.now() - this.startedAt) / 1000));
+
+        if (this.seconds >= config.max) {
+            this.notice = config.texts.maxReached;
+            this.stop();
+        }
     },
 
     stop() {

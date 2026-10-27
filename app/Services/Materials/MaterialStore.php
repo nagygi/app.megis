@@ -102,11 +102,16 @@ class MaterialStore
 
     /**
      * A transcript or document: read now, with its speaker labels kept (06 · 6.3).
+     * With a limit, a longer text is refused before anything is kept (the Értéktükör).
      */
-    public function fromTextFile(UploadedFile $file, MaterialContext $context, ?User $owner = null, ?Organization $organization = null): Material
+    public function fromTextFile(UploadedFile $file, MaterialContext $context, ?User $owner = null, ?Organization $organization = null, ?int $maxCharacters = null): Material
     {
         $extension = strtolower($file->getClientOriginalExtension());
         $text = $this->extractor->extract($file->getRealPath() ?: '', $extension);
+
+        if ($maxCharacters !== null && mb_strlen($text) > $maxCharacters) {
+            throw new UnreadableMaterialException(__('materials.text_too_long', ['characters' => number_format($maxCharacters, 0, ',', ' ')]));
+        }
 
         return Material::create([
             'context' => $context,

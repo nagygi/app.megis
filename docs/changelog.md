@@ -2,6 +2,14 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.38 · HASH · 2026-10-27
+
+Az ingyenes Értéktükör korlátai (06 · ET2): e-mail címenként napi 10 tükör, a beszéd legfeljebb 10 perc, a szöveg ehhez igazodik.
+
+- **Napi limit:** a publikus Értéktükörből e-mail címenként naponta 10 tükör készülhet, éjfélkor nullázódik (`megis.mirror.daily_per_email`). Csak az elindult tükör számít. Felvételnél a feltöltés előtt ellenőrizzük, így a hosszú felvétel nem megy fel hiába. Az IP-címenkénti óránkénti 5 marad. A saját menüs tükröt nem korlátozza.
+- **Felvétel:** a 10 perces korlát eddig is megvolt, de háttérbe tett fülön a számláló lelassult, és a felvétel túlfuthatott. Most az idő az órából számolódik, a felvétel így háttérben is 10 percnél áll meg (az „Egy helyzet” felvevőjében is).
+- **Szöveg:** a leírt és a feltöltött fájlból kinyert szöveg legfeljebb 10 000 karakter, ami nagyjából 10 perc beszéd (`megis.mirror.text_max_characters`; eddig 20 000 volt, a fájlnak csak mérete volt). A fájl súgója kiírja a korlátot.
+
 ## 1.37 · 1bd9315 · 2026-10-27
 
 Az ügyfél adatlapja (33) teljes: linkek a diagnózisokból, a Beérkezőből és a Futásról, szűrő, lapozott és olvasható napló, amely a szervezetével él. A menüben a futó diagnózis is látszik (15.4).

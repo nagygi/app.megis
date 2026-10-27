@@ -8,6 +8,7 @@ return [
     'unreadable' => 'Nem tudtuk beolvasni a fájlt.',
     'empty' => 'A fájlban nincs szöveg.',
     'too_long' => 'A hangfájl legfeljebb :minutes perces lehet.',
+    'text_too_long' => 'A fájl szövege legfeljebb :characters karakter lehet (nagyjából 10 perc beszéd). Rövidítsd, vagy írd le a lényegét.',
     'failure_summary' => 'Nem tudtuk feldolgozni: :name',
 
 ];

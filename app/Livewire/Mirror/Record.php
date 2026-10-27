@@ -20,6 +20,7 @@ use App\Services\Mirror\MirrorService;
 use App\Services\Mirror\MirrorValueGroup;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Attributes\Url;
@@ -92,6 +93,7 @@ class Record extends Component
     {
         if ($this->organization === null) {
             $this->validate($this->contactRules(), $this->contactMessages(), $this->contactAttributes());
+            $this->ensureDailyLimit();
         } else {
             $this->ensureDiagnosisChosen();
         }
@@ -125,7 +127,7 @@ class Record extends Component
     public function submitText(MaterialStore $materials, MirrorService $mirrors): void
     {
         $this->validate(
-            ['text' => ['required', 'string', 'min:50', 'max:'.config('megis.materials.text_max_characters')], ...$this->contactRules()],
+            ['text' => ['required', 'string', 'min:50', 'max:'.config('megis.mirror.text_max_characters')], ...$this->contactRules()],
             $this->contactMessages(),
             ['text' => __('mirror.text_label'), ...$this->contactAttributes()],
         );
@@ -143,7 +145,7 @@ class Record extends Component
         $this->guard();
 
         try {
-            $material = $materials->fromTextFile($this->file, $this->context(), $this->user(), $this->organization);
+            $material = $materials->fromTextFile($this->file, $this->context(), $this->user(), $this->organization, (int) config('megis.mirror.text_max_characters'));
         } catch (UnreadableMaterialException $exception) {
             throw ValidationException::withMessages(['file' => $exception->getMessage()]);
         }
@@ -155,7 +157,11 @@ class Record extends Component
     {
         $view = view('livewire.mirror.record', [
             'questions' => SupportQuestion::query()->forRecording()->pluck('text')->all(),
-            'textRules' => ['formats' => implode(', ', config('megis.materials.text_extensions')), 'size' => (int) (config('megis.materials.text_max_kilobytes') / 1024)],
+            'textRules' => [
+                'formats' => implode(', ', config('megis.materials.text_extensions')),
+                'size' => (int) (config('megis.materials.text_max_kilobytes') / 1024),
+                'characters' => number_format((int) config('megis.mirror.text_max_characters'), 0, ',', ' '),
+            ],
             'isPublic' => $this->organization === null,
             'diagnosisOptions' => $this->diagnosisOptions(),
             'termsUrl' => $legalDocuments->current(LegalDocumentType::Terms) ? route('legal.show', LegalDocumentType::Terms->value) : null,
@@ -169,7 +175,8 @@ class Record extends Component
     }
 
     /**
-     * Public submissions: Turnstile and at most a few per IP address and hour.
+     * Public submissions: Turnstile, at most a few per IP address and hour,
+     * and the free mirrors of the day per e-mail address.
      */
     private function guard(): void
     {
@@ -179,6 +186,8 @@ class Record extends Component
             return;
         }
 
+        // Before Turnstile, so the token stays for another address.
+        $this->ensureDailyLimit();
         $this->checkTurnstile();
 
         $key = 'mirror-submit:'.request()->ip();
@@ -188,6 +197,28 @@ class Record extends Component
         }
 
         RateLimiter::hit($key, 3600);
+    }
+
+    /**
+     * The free public mirrors of a calendar day per e-mail address; only a
+     * mirror that started counts (begin).
+     */
+    private function ensureDailyLimit(): void
+    {
+        $limit = (int) config('megis.mirror.daily_per_email');
+
+        if (RateLimiter::tooManyAttempts($this->dailyKey(), $limit)) {
+            throw ValidationException::withMessages(['email' => __('mirror.daily_limit', ['count' => $limit])]);
+        }
+    }
+
+    /**
+     * The day is in the key, so the count starts again at midnight; the
+     * address is hashed, so the cache holds no e-mail.
+     */
+    private function dailyKey(): string
+    {
+        return 'mirror-daily:'.today()->toDateString().':'.sha1(Str::lower(trim($this->email)));
     }
 
     private function begin(Material $material, MirrorService $mirrors): void
@@ -201,6 +232,7 @@ class Record extends Component
 
         // The confirmation link goes out now; the mirror is read meanwhile (06 · 6.1).
         if ($this->organization === null) {
+            RateLimiter::hit($this->dailyKey(), 86400);
             $mirrors->requestAccount($session, $this->email);
         }
 

@@ -33,7 +33,8 @@ function signedInMirror(Organization $organization): MirrorSession
     return MirrorSession::query()->sole();
 }
 
-it('needs no Turnstile and goes to the active organization from the own menu', function () {
+it('needs no Turnstile, has no daily limit and goes to the active organization from the own menu', function () {
+    config(['megis.mirror.daily_per_email' => 0]);
     $organization = Organization::factory()->create();
     $user = actingAsCustomer(customerOf($organization));
 
