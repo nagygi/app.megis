@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.39 · HASH · 2026-10-27
+## 1.39 · 718c419 · 2026-10-27
 
 Az Értéktár a Képességtárhoz hasonlóan felületről is betölthető: *Értéktár → Érték Import* (03 · 3.6). A betöltés csak szuperadminnal működik.
 
