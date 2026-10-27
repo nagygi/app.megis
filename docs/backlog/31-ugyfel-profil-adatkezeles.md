@@ -44,7 +44,7 @@ Ha nincs teendő, a blokk nem jelenik meg.
 - „{n} társ · {k} kitöltötte”, és alatta a szabály: „névvel csak ők és a mégis látják · összesítve 3 kitöltő fölött”.
 - „Emlékeztető” gomb, a 26 · 26.1 szabályával.
 - Csak Teljes, csak csapat.
-- A vezető a társak névsorát látja, mert a csapatot az admin vele egyeztetve állítja össze. Azt viszont nem, hogy ki töltötte ki és ki nem, csak a számot.
+- A vezető a társak névsorát láthatja, mert a csapatot az admin vele egyeztetve állítja össze. Azt viszont nem, hogy ki töltötte ki és ki nem, csak a számot. Most a névsor csak a címlapon látszik, amíg a diagnózis nem indult el („A csapat hangja”, 26).
 
 ### 31.5 Beállítások és adatok
 
@@ -99,4 +99,5 @@ Ha nincs teendő, a blokk nem jelenik meg.
 
 ## Hátravan
 
+- **Névsor az Emberek blokkban:** a blokk csak a számot és a szabályt mutatja, a társak nevét nem.
 - **Újra társ a visszavonás után:** ha a társ mégis kérné, az admin a Futás lapon (19) újra társnak jelölné, és új meghívót kapna, üres lappal. Ez most nem működik: a társak szinkronja a régi résztvevő-sort használja újra, új meghívó nem megy ki, és a társ visszavont állapotban marad.
