@@ -67,7 +67,9 @@ Egy szint, lenyitható csoportokkal.
 
 ### 15.4 Szervezetválasztó
 
-- Az ügyfél-sor a menü alján: a szervezet neve, alatta az aktuális diagnózis (pl. „Teljes diagnózis · 04.18.”).
+- Az ügyfél-sor a menü alján: a szervezet neve, alatta az aktuális diagnózis:
+  - amíg fut (a meghívástól az olvasatig), a termék és az időablak: „Teljes · 03.02. – 04.18.”;
+  - utána a legutóbb publikált riport: „Teljes · 04.18.”. A társnál ez a sor üres, mert a riportot nem látja.
 - Ha a felhasználónak több aktív szervezete van, a sor lenyílik, és a listából vált. Váltás után a választott szervezetnél a 14.4 szerinti lapra érkezik.
 - Az inaktív szervezet nem jelenik meg a listában.
 - A rendszer felhasználónként megjegyzi a legutóbb használt szervezetet. Belépéskor ez nyílik meg.

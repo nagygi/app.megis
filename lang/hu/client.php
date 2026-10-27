@@ -14,6 +14,8 @@ return [
         'profile' => 'Profil',
         'logout' => 'Kijelentkezem',
         'switch_organization' => 'Szervezet váltása',
+        // Under the organization's name while a diagnosis runs (15 · 15.4).
+        'diagnosis_window' => ':product · :from – :to',
         // M1: the menu's question and the line under each item.
         'heading' => 'Mit akarsz megérteni?',
         'mirror' => 'Értéktükör',

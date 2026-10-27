@@ -59,6 +59,18 @@
             ...$reports->map(fn ($main) => collect([$main->product_name, $main->published_at?->format('m.d.')])->filter()->implode(' · ')),
             ...$standaloneReports->map(fn ($diagnosis) => $diagnosis->name),
         ])->take(2)->implode(' · ');
+
+        // The organization row: the running diagnosis with its time window, else the latest report (15 · 15.4).
+        $currentMain = app(\App\Services\Auth\LandingResolver::class)->diagnosisFor($user, $currentOrganization);
+        $organizationMeta = match (true) {
+            $currentMain !== null && ! $currentMain->stage->isFinished() => __('client.menu.diagnosis_window', [
+                'product' => $currentMain->product_name,
+                'from' => ($currentMain->running_at ?? $currentMain->starts_on)?->format('m.d.') ?? '–',
+                'to' => $currentMain->publishes_on->format('m.d.'),
+            ]),
+            $latestReport !== null => collect([$latestReport->product_name, $latestReport->published_at?->format('m.d.')])->filter()->implode(' · '),
+            default => null,
+        };
     }
 @endphp
 
@@ -156,7 +168,6 @@
 
     <div class="flex flex-col gap-1 border-t border-grey-700 px-6 pt-3 pb-5" @if ($currentOrganization && $organizations->count() > 1) x-data="{ open: false }" @endif>
         @if ($currentOrganization)
-            @php($organizationMeta = $latestReport ? collect([$latestReport->product_name, $latestReport->published_at?->format('m.d.')])->filter()->implode(' · ') : null)
             <div class="flex items-center justify-between gap-3">
                 @if ($organizations->count() > 1)
                     <button

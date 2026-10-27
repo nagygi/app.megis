@@ -122,6 +122,25 @@ it('shows the leader\'s home while it runs, with the coral plus, and without it 
         ->assertDontSeeHtml('href="'.route('client.diagnosis.contribute', $parameters).'"');
 });
 
+it('shows the running diagnosis under the organization in the menu, the report once published (15 · 15.4)', function () {
+    Queue::fake();
+    [$setup, $main] = runningDiagnosis();
+    $window = 'Teljes · '.$main->running_at->format('m.d.').' – '.$main->publishes_on->format('m.d.');
+
+    actingAsCustomer($setup['leader']);
+    $this->get(route('client.values', $setup['organization']))->assertOk()->assertSee($window);
+
+    actingAsCustomer($setup['peers'][0]);
+    $this->get(route('client.values', $setup['organization']))->assertOk()->assertSee($window);
+
+    [$published, $report] = publishedReport();
+    actingAsCustomer($published['leader']);
+    $this->get(route('client.values', $published['organization']))
+        ->assertOk()
+        ->assertSee('Teljes · '.$report->published_at->format('m.d.'))
+        ->assertDontSee('Teljes · '.$report->running_at->format('m.d.').' – ');
+});
+
 it('counts the points to be measured while it runs and the measured ones in the reading (V10)', function () {
     Queue::fake();
     [$setup, $main] = runningDiagnosis();
