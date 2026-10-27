@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.44 · HASH · 2026-10-27
+## 1.44 · 9a93b28 · 2026-10-27
 
 Az `update.sh` nem akad el a szerveren kézzel telepített dev csomagokon (a DestinationX-es javítás átvétele).
 
