@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.38 · HASH · 2026-10-27
+## 1.38 · 168d4cf · 2026-10-27
 
 Az ingyenes Értéktükör korlátai (06 · ET2): e-mail címenként napi 10 tükör, a beszéd legfeljebb 10 perc, a szöveg ehhez igazodik.
 
