@@ -2,6 +2,13 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.44 · HASH · 2026-10-27
+
+Az `update.sh` nem akad el a szerveren kézzel telepített dev csomagokon (a DestinationX-es javítás átvétele).
+
+- **Dev csomagok a vendor-ban:** egy kézi `composer install` vagy `composer update` `--no-dev` nélkül a dev csomagokat is telepíti. Ha utána a `composer.lock` nem változott, a skript csak `dump-autoload --no-dev`-et futtatott: ez a dev csomagokat kihagyja az osztálytérképből, a Laravel viszont betöltené a providerüket, így a deploy `Class "Laravel\Boost\BoostServiceProvider" not found` hibával állt meg, és az oldal karbantartó módban maradt. Most ilyenkor `composer install --no-dev` fut, amely eltávolítja őket.
+- **Helyben módosult `composer.json` / `composer.lock`:** a skript a karbantartó mód előtt megáll, és kiírja, hogyan állítható vissza a gitben lévő változat.
+
 ## 1.43 · 098f142 · 2026-10-27
 
 Jegyek az oldalon: a tesztelők és a megrendelő a stagingen az oldal egy elemét kijelölve rögzíthetnek hibát, módosítási kérést vagy kérdést (`exot/onsite-comment` 0.7, a DestinationX-ben már fut).

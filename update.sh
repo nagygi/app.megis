@@ -67,6 +67,15 @@ changed() {
   [ -n "$(git diff --name-only "$BEFORE" "$AFTER" -- "$@")" ]
 }
 
+# Igaz, ha a vendor-ban dev csomagok is vannak: valaki kézzel futtatott egy
+# `composer install`-t vagy `composer update`-et --no-dev nélkül. Ilyenkor a
+# `dump-autoload --no-dev` kihagyja őket az osztálytérképből, a Laravel
+# csomagfelderítése viszont az installed.json alapján betöltené a providerüket
+# (Laravel\Boost\BoostServiceProvider), és az artisan el sem indul.
+vendor_has_dev() {
+  "$PHP" -r 'exit((json_decode((string) @file_get_contents("vendor/composer/installed.json"), true)["dev"] ?? false) ? 0 : 1);'
+}
+
 # A teljes törzs egy függvényben van, a hívása a fájl legvégén. Így a bash a
 # futtatás megkezdése előtt beolvassa és értelmezi az egész fájlt, és a `git pull`
 # nem tudja a saját lába alól kirántani a szőnyeget azzal, hogy menet közben
@@ -79,6 +88,13 @@ main() {
   fi
   if [ ! -f .env ]; then
     echo "HIBA: nincs .env — az első telepítés a docs/install.md szerint megy, nem ezzel." >&2
+    exit 1
+  fi
+  # A csomagok a gitben lévő composer.lock szerint települnek. Egy kézi
+  # `composer update` a szerveren átírja: a git pull elakadhat rajta, és a
+  # szerveren más csomagverziók futnak, mint amit a tesztek lefedtek.
+  if [ -n "$(git status --porcelain -- composer.json composer.lock)" ]; then
+    echo "HIBA: a composer.json / composer.lock helyben módosult (kézi composer update?). A gitben lévő változat: git checkout -- composer.json composer.lock" >&2
     exit 1
   fi
 
@@ -102,6 +118,9 @@ main() {
 
   log "PHP függőségek (éles, dev nélkül)"
   if [ ! -d vendor ] || changed composer.lock composer.json; then
+    composer install --no-dev --optimize-autoloader --no-interaction
+  elif vendor_has_dev; then
+    warn "A vendor-ban dev csomagok is vannak (kézi composer install/update) — eltávolítom őket."
     composer install --no-dev --optimize-autoloader --no-interaction
   else
     # A lockfile áll, tehát a csomagokat nem kell újratelepíteni — de jöhettek új
