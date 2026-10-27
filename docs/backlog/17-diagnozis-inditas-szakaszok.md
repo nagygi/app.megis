@@ -32,6 +32,7 @@ Egy lap, a prototípus A1-e szerint:
 - **Csapat** (csapatnál kötelező): a szervezet csapatai közül, vagy „+ Új csapat” névvel.
 - **Vezető** (kötelező):
   - csapatnál a szervezet egy felhasználója, vagy új (név, e-mail), a 02 meghívási szabályaival; a csapatnál „csapat vezető” címkét kap (02 · 2.6);
+  - csapatnál alapból a szervezet „szervezet vezetője” címkéjű felhasználója. Ha más lesz a vezető, kis figyelmeztetés jelzi, hogy a szervezet értékeit és a márkád alapját csak olvassa (17.3);
   - magánszemélynél a szervezet egyetlen felhasználója, nem választható;
   - egy embernél maga a diagnosztizált felhasználó.
 - **Társak** (csak Teljes, csak csapat):
@@ -116,7 +117,10 @@ Szabályok:
 ### 17.7 Módosítás a meghívó után
 
 - Az olvasat indításáig módosítható az időablak, a társak listája és az idézetek láthatósága.
-- A vezető megerősítéssel cserélhető: a régi vezető kitöltése megmarad, az új e-mailt kap.
+- A vezető megerősítéssel cserélhető, a vezető melletti „Szerkesztem” gombbal:
+  - a régi vezető kitöltése megmarad;
+  - az új vezető nem kap automatikusan e-mailt. A meghívót a csere után az „Elküldöm a meghívót az új vezetőnek” gomb küldi el;
+  - ha az új vezető nem „szervezet vezetője”, ugyanaz a figyelmeztetés jelenik meg, mint az indításnál.
 - A csapat és a szervezet nem módosítható: ilyenkor a diagnózist le kell zárni, és újat indítani.
 
 ### 17.8 Diagnózisok fül a szervezeten

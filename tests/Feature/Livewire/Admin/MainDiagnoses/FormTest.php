@@ -193,19 +193,47 @@ it('changes the time window and the peers after the invitation, but not the team
         ->and($main->peers()->pluck('user_id')->all())->toBe([$setup['peers'][1]->id]);
 });
 
-it('replaces the leader and closes the diagnosis', function () {
+it('picks the organization leader as the leader of a team (17 · 17.2)', function () {
+    $setup = diagnosisTeam();
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Form::class)
+        ->set('organization_id', $setup['organization']->id)
+        ->assertSet('leader_id', $setup['leader']->id)
+        ->assertDontSee('a szervezet értékeit és a márkád alapját csak olvassa')
+        ->set('leader_id', $setup['peers'][0]->id)
+        ->assertSee('a szervezet értékeit és a márkád alapját csak olvassa')
+        ->set('subject', 'person')
+        ->assertSet('leader_id', null);
+});
+
+it('replaces the leader behind its edit button, without an e-mail, and invites them on request', function () {
     $setup = diagnosisTeam(peers: 1);
     $main = startMainDiagnosis($setup);
+    $newLeader = $setup['peers'][0];
     actingAsAdmin($setup['admin']);
 
     Livewire::test(Form::class, ['diagnosis' => $main->diagnosis])
-        ->set('replacementLeaderId', $setup['peers'][0]->id)
+        ->assertDontSee('Lecserélem a vezetőt')
+        ->assertDontSee('Elküldöm a meghívót az új vezetőnek')
+        ->set('changingLeader', true)
+        ->set('replacementLeaderId', $newLeader->id)
+        ->assertSee('a szervezet értékeit és a márkád alapját csak olvassa')
         ->call('changeLeader')
         ->assertHasNoErrors();
 
-    expect($main->refresh()->leader_id)->toBe($setup['peers'][0]->id);
+    expect($main->refresh()->leader_id)->toBe($newLeader->id);
+    Mail::assertNotQueued(DiagnosisLeaderInvitationMail::class, fn ($mail) => $mail->hasTo($newLeader->email));
 
-    Livewire::test(Form::class, ['diagnosis' => $main->diagnosis])->call('close');
+    Livewire::test(Form::class, ['diagnosis' => $main->diagnosis])
+        ->assertSee('Elküldöm a meghívót az új vezetőnek')
+        ->call('inviteLeader');
+
+    Mail::assertQueued(DiagnosisLeaderInvitationMail::class, fn ($mail) => $mail->hasTo($newLeader->email));
+
+    Livewire::test(Form::class, ['diagnosis' => $main->refresh()->diagnosis])
+        ->assertDontSee('Elküldöm a meghívót az új vezetőnek')
+        ->call('close');
 
     expect($main->refresh()->stage)->toBe(MainDiagnosisStage::Closed);
 });

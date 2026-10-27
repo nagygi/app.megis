@@ -182,19 +182,20 @@ it('makes a new team member a peer while the diagnosis runs, until reading start
     expect($main->participants()->where('user_id', $late->id)->exists())->toBeFalse();
 });
 
-it('replaces the leader and keeps the old leader\'s row', function () {
+it('replaces the leader without an e-mail and keeps the old leader\'s row', function () {
     $setup = diagnosisTeam(peers: 2);
     $main = startMainDiagnosis($setup);
     $newLeader = $setup['peers'][0];
 
-    app(MainDiagnosisService::class)->changeLeader($main, $newLeader, $setup['admin']);
+    app(MainDiagnosisService::class)->changeLeader($main, $newLeader);
 
     $main->refresh();
     expect($main->leader_id)->toBe($newLeader->id)
         ->and($main->participants()->where('user_id', $setup['leader']->id)->whereNotNull('replaced_at')->exists())->toBeTrue()
-        ->and($main->peers()->where('user_id', $newLeader->id)->exists())->toBeFalse();
+        ->and($main->peers()->where('user_id', $newLeader->id)->exists())->toBeFalse()
+        ->and($main->leaderParticipant()->invited_at)->toBeNull();
 
-    Mail::assertQueued(DiagnosisLeaderInvitationMail::class, fn ($mail) => $mail->hasTo($newLeader->email));
+    Mail::assertNotQueued(DiagnosisLeaderInvitationMail::class, fn ($mail) => $mail->hasTo($newLeader->email));
 });
 
 it('closes from any stage and a diagnosis closed before reading stays a draft', function () {

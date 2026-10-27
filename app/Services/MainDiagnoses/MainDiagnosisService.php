@@ -204,9 +204,10 @@ class MainDiagnosisService
 
     /**
      * The leader is replaced with a confirmation; the old leader's answers
-     * stay, the new one gets the invitation (17 · 17.7).
+     * stay. No e-mail goes out: A1 sends the new leader's invitation on its
+     * own button (17 · 17.7).
      */
-    public function changeLeader(MainDiagnosis $main, User $newLeader, User $actor): void
+    public function changeLeader(MainDiagnosis $main, User $newLeader): void
     {
         if (! $main->acceptsInput() && $main->stage !== MainDiagnosisStage::Draft) {
             throw new DiagnosisException(__('admin.main_diagnoses.locked_after_reading'));
@@ -216,7 +217,7 @@ class MainDiagnosisService
             return;
         }
 
-        DB::transaction(function () use ($main, $newLeader, $actor): void {
+        DB::transaction(function () use ($main, $newLeader): void {
             $main->participants()
                 ->where('role', ParticipantRole::Leader)
                 ->whereNull('replaced_at')
@@ -227,7 +228,7 @@ class MainDiagnosisService
 
             $main->participants()->updateOrCreate(
                 ['user_id' => $newLeader->id, 'role' => ParticipantRole::Leader],
-                ['replaced_at' => null, 'excluded_at' => null, 'opened_at' => null],
+                ['replaced_at' => null, 'excluded_at' => null, 'opened_at' => null, 'invited_at' => null],
             );
             $main->update(['leader_id' => $newLeader->id]);
 
@@ -239,10 +240,6 @@ class MainDiagnosisService
 
             if ($main->subject === MainDiagnosisSubject::Person) {
                 $diagnosis->update(['user_id' => $newLeader->id]);
-            }
-
-            if ($main->stage !== MainDiagnosisStage::Draft) {
-                $this->sendLeaderInvitation($main->refresh(), $actor);
             }
         });
 

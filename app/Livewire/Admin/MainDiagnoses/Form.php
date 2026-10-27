@@ -27,9 +27,10 @@ use Livewire\Component;
 
 /**
  * A1 · starting a main diagnosis (17 · 17.2), with the live preview of what
- * the leader sees first (V1). After the invitation only the time window,
+ * the leader sees first (V1). A team's leader is the organization's leader
+ * unless A1 picks someone else. After the invitation only the time window,
  * the peers and the quote visibility change; the leader can be replaced
- * with a confirmation (17 · 17.7).
+ * with a confirmation, without an e-mail (17 · 17.7).
  */
 class Form extends Component
 {
@@ -72,6 +73,8 @@ class Form extends Component
     public bool $show_peer_quotes = true;
 
     public string $name = '';
+
+    public bool $changingLeader = false;
 
     public ?int $replacementLeaderId = null;
 
@@ -126,11 +129,13 @@ class Form extends Component
         $this->contact_admin_id = $organization?->contact_admin_id;
         $this->subject = $organization?->isIndividual() ? MainDiagnosisSubject::Individual->value : MainDiagnosisSubject::Team->value;
         $this->publishes_on = $this->defaultPublishesOn();
+        $this->leader_id = $this->defaultLeaderId();
     }
 
     public function updatedSubject(): void
     {
         $this->reset(['team_id', 'leader_id', 'peers', 'newLeader']);
+        $this->leader_id = $this->defaultLeaderId();
     }
 
     public function updatedTeamId(): void
@@ -198,7 +203,7 @@ class Form extends Component
         ], attributes: ['replacementLeaderId' => __('admin.main_diagnoses.new_leader')]);
 
         try {
-            $mainDiagnoses->changeLeader($this->main, User::query()->findOrFail($this->replacementLeaderId), auth('admin')->user());
+            $mainDiagnoses->changeLeader($this->main, User::query()->findOrFail($this->replacementLeaderId));
         } catch (DiagnosisException $exception) {
             session()->flash('error', $exception->getMessage());
 
@@ -206,6 +211,31 @@ class Form extends Component
         }
 
         session()->flash('status', __('admin.main_diagnoses.leader_changed'));
+        $this->redirectRoute('admin.main-diagnoses.edit', $this->main->diagnosis, navigate: false);
+    }
+
+    public function cancelLeaderChange(): void
+    {
+        $this->reset(['changingLeader', 'replacementLeaderId']);
+        $this->resetValidation('replacementLeaderId');
+    }
+
+    /**
+     * The replaced leader's invitation, sent when A1 decides (17 · 17.7).
+     */
+    public function inviteLeader(MainDiagnosisService $mainDiagnoses): void
+    {
+        Gate::authorize('update', $this->main->diagnosis);
+
+        $participant = $this->main->leaderParticipant();
+
+        if (! $this->leaderAwaitsInvitation() || $participant === null) {
+            return;
+        }
+
+        $mainDiagnoses->resendInvitation($participant->setRelation('mainDiagnosis', $this->main), auth('admin')->user());
+
+        session()->flash('status', __('admin.main_diagnoses.invited', ['name' => $this->main->leader->name]));
         $this->redirectRoute('admin.main-diagnoses.edit', $this->main->diagnosis, navigate: false);
     }
 
@@ -237,6 +267,7 @@ class Form extends Component
         $settings = $productKey === null ? null : config('diagnosis.products.'.$productKey);
         $hasPeers = $subject === MainDiagnosisSubject::Team && ($settings['has_peers'] ?? false);
         $title = $this->main ? __('admin.main_diagnoses.edit_title') : __('admin.main_diagnoses.create_title');
+        $organizationLeaderIds = $this->organizationLeaderIds();
 
         return view('livewire.admin.main-diagnoses.form', [
             'title' => $title,
@@ -249,6 +280,12 @@ class Form extends Component
             'hasPeers' => $hasPeers,
             'teams' => $organization?->teams()->orderBy('name')->get(['id', 'name']) ?? collect(),
             'leaderOptions' => $this->leaderOptions(),
+            // A leader who is not the organization's only reads its values and brand (17 · 17.3).
+            'leaderNotOrganizationLeader' => $this->main === null
+                && $subject === MainDiagnosisSubject::Team
+                && ($this->isNewLeader() || ($this->leader_id !== null && ! $organizationLeaderIds->contains($this->leader_id))),
+            'replacementNotOrganizationLeader' => $this->replacementLeaderId !== null && ! $organizationLeaderIds->contains($this->replacementLeaderId),
+            'leaderAwaitsInvitation' => $this->leaderAwaitsInvitation(),
             'peerCandidates' => $hasPeers && $team !== null ? $mainDiagnoses->teamPeerCandidates($team, $leader?->id) : collect(),
             'preview' => $this->preview($organization, $subject, $leader, $mainDiagnoses),
             'blockers' => $this->blockers($organization, $subject, $leader, $hasFlow, $mainDiagnoses),
@@ -434,6 +471,49 @@ class Form extends Component
             ->orderBy('last_name')
             ->orderBy('first_name')
             ->get();
+    }
+
+    /**
+     * Users with the "szervezet vezetője" tag who are not inactive (02).
+     *
+     * @return Collection<int, int>
+     */
+    private function organizationLeaderIds(): Collection
+    {
+        if ($this->organization_id === null) {
+            return collect();
+        }
+
+        return Membership::query()
+            ->where('organization_id', $this->organization_id)
+            ->where('status', '!=', MembershipStatus::Inactive)
+            ->where('is_organization_leader', true)
+            ->pluck('user_id');
+    }
+
+    /**
+     * A team's leader is the organization's leader until A1 picks someone else.
+     */
+    private function defaultLeaderId(): ?int
+    {
+        if ($this->subject !== MainDiagnosisSubject::Team->value || $this->organization()?->isIndividual()) {
+            return null;
+        }
+
+        $organizationLeaderIds = $this->organizationLeaderIds();
+
+        return $this->leaderOptions()->first(fn (User $user) => $organizationLeaderIds->contains($user->id))?->id;
+    }
+
+    /**
+     * A replaced leader gets no e-mail; their invitation waits for A1 (17 · 17.7).
+     */
+    private function leaderAwaitsInvitation(): bool
+    {
+        // A draft's leader is invited by "Elküldöm a meghívót".
+        return $this->main !== null
+            && $this->main->acceptsInput()
+            && $this->main->leaderParticipant()?->invited_at === null;
     }
 
     private function leader(): ?User

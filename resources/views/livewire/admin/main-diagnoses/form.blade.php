@@ -109,10 +109,22 @@
                     @if ($organization->isIndividual())
                         <p>{{ $organization->users()->first()?->name }}</p>
                     @elseif ($main)
-                        <p>{{ $main->leader->name }} · {{ $main->leader->email }}</p>
-                        @if ($canEditSettings)
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <p>{{ $main->leader->name }} · {{ $main->leader->email }}</p>
+                            @if ($canEditSettings && ! $changingLeader)
+                                <x-ui.button tone="ghost" size="sm" wire:click="$set('changingLeader', true)">{{ __('admin.common.edit') }}</x-ui.button>
+                            @endif
+                        </div>
+                        {{-- A replaced leader gets no e-mail: A1 sends the invitation here (17 · 17.7). --}}
+                        @if ($leaderAwaitsInvitation)
+                            <div class="flex flex-col items-start gap-2">
+                                <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.leader_not_invited', ['name' => $main->leader->name]) }}</p>
+                                <x-ui.button size="sm" icon="mail" wire:click="inviteLeader">{{ __('admin.main_diagnoses.invite_new_leader') }}</x-ui.button>
+                            </div>
+                        @endif
+                        @if ($canEditSettings && $changingLeader)
                             <x-form.inline class="rounded-field bg-grey-100 p-4">
-                                <x-form.select name="replacementLeaderId" wire:model="replacementLeaderId" :label="__('admin.main_diagnoses.new_leader')" :help="__('admin.main_diagnoses.change_leader_help')">
+                                <x-form.select name="replacementLeaderId" wire:model.live="replacementLeaderId" :label="__('admin.main_diagnoses.new_leader')" :help="__('admin.main_diagnoses.change_leader_help')">
                                     <option value="">{{ __('admin.diagnoses.user_select') }}</option>
                                     @foreach ($leaderOptions as $option)
                                         @continue($option->id === $main->leader_id)
@@ -121,8 +133,12 @@
                                 </x-form.select>
                                 <x-slot:actions>
                                     <x-ui.button tone="outline" wire:click="changeLeader" wire:confirm="{{ __('admin.main_diagnoses.change_leader_confirm') }}">{{ __('admin.main_diagnoses.change_leader') }}</x-ui.button>
+                                    <x-ui.button tone="ghost" wire:click="cancelLeaderChange">{{ __('admin.common.cancel') }}</x-ui.button>
                                 </x-slot:actions>
                             </x-form.inline>
+                            @if ($replacementNotOrganizationLeader)
+                                <x-ui.notice tone="warning" role="status">{{ __('admin.main_diagnoses.leader_not_organization_leader') }}</x-ui.notice>
+                            @endif
                         @endif
                     @else
                         @if (! $newLeader || $subjectEnum !== \App\Enums\MainDiagnosisSubject::Team)
@@ -138,6 +154,9 @@
                                 <x-form.input name="leader_first_name" wire:model="leader_first_name" :label="__('admin.members.first_name')" required />
                             </div>
                             <x-form.input name="leader_email" type="email" wire:model="leader_email" :label="__('admin.members.email')" :help="__('admin.main_diagnoses.new_leader_help')" required />
+                        @endif
+                        @if ($leaderNotOrganizationLeader)
+                            <x-ui.notice tone="warning" role="status">{{ __('admin.main_diagnoses.leader_not_organization_leader') }}</x-ui.notice>
                         @endif
                         @if ($subjectEnum === \App\Enums\MainDiagnosisSubject::Team)
                             <x-ui.button tone="ghost" size="sm" :icon="$newLeader ? null : 'plus'" class="-ml-1.5 self-start" wire:click="$toggle('newLeader')">
