@@ -31,9 +31,8 @@ Szuperadmin és Admin egyaránt használhatja (01).
 | Kitöltés | a vezető a kezdés napjáig nem fejezte be a kitöltést (17) | Emlékeztetem · Megnézem |
 | Küszöb | a küszöb veszélyben van (19.4) | → Futás |
 | Publikálás | a publikálás napja elmúlt (21) | → Olvasat |
-| Értéktükör-foglalás | ET5 „Időpontot foglalok” (06), a jelölt kíváncsiság-kérdésekkel | Megnézem · Kész |
 
-- **Értékmérések:** az Értéktükör sorai (a foglalás és az Értéktükör-felvétel feldolgozási hibája) nem a *Beérkező*ben vannak, hanem külön menücsoportban: *Értékmérések › Beérkező*. Ugyanazok a szűrők és gombok, saját számláló. A reggeli összefoglalóba nem kerülnek bele, a foglalásról azonnali e-mail megy, mert az időérzékeny (az ET5-ön most nincs foglalás, 1.28). A csoport első pontja az *Értéktükrök* lista (06 · 6.1). A foglalás „Megnézem” gombja a tükör adatlapjára visz.
+- **Értékmérések:** az Értéktükör sorai (az Értéktükör-felvétel feldolgozási hibája) nem a *Beérkező*ben vannak, hanem külön menücsoportban: *Értékmérések › Beérkező*. Ugyanazok a szűrők és gombok, saját számláló. A reggeli összefoglalóba nem kerülnek bele. A csoport első pontja az *Értéktükrök* lista (06 · 6.1).
 - **Besorolás:** a 12 · 12.6 „Besorolásra vár” sorai itt is megjelennek. Ha bármelyik helyen besorolják, mindkettőből eltűnik. Csak az „Egyikhez sem” anyagok jönnek ide; az alacsony konfidenciájú helyzet nem, mert a 12 nem bírálja felül, amit a felhasználó választott.
 - **Meghívó:** 5 nap megnyitás nélkül, vagy ha a meghívó lejárt (14 nap, 14 · 14.1). A sor akkor is megjelenik, ha a vezető a V10-en vagy az M6-on maga küldött emlékeztetőt.
 - **Kitöltés:** ha a vezető a kezdés napjáig nem nyomta meg az „Indul a diagnózis” gombot (17.5). A sor magától lezárul, amikor a vezető elindítja a diagnózist, vagy az admin zárja le.
@@ -47,3 +46,4 @@ Szuperadmin és Admin egyaránt használhatja (01).
 
 - A Coach továbbadott kérdései: [NM-18](../backlog_nem_MVP/NM-18-coach.md).
 - A visszajelzések és a Coach-témák összesítése diagnózisokon át (a prototípus munkaterve P2-re teszi).
+- Az Értéktükör-foglalás sora és azonnali levele: [NM-22](../backlog_nem_MVP/NM-22-idopontfoglalas.md).

@@ -69,4 +69,4 @@ Számok és állapotok, válaszok nélkül, ahogy a vezető is látja. A válasz
 ## Nincs benne
 
 - Automatikus emlékeztetők: [NM-20](../backlog_nem_MVP/NM-20-automatikus-emlekeztetok.md).
-- Időpontfoglalás külső naptárból.
+- Időpontfoglalás: [NM-22](../backlog_nem_MVP/NM-22-idopontfoglalas.md).

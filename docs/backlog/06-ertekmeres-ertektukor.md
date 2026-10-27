@@ -73,7 +73,7 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 - Alatta **„Elküldöm”** (2026.10.26.): a jelölt kérdések és a megtartott értékek e-mailben mennek a `MEGIS_INTEREST_EMAIL` címre (most: ng@exot.hu). A válasz a kitöltőnek megy; bejelentkezett felhasználónál a levélben link az adatlapjára (33).
   - Jelölés nélkül a gomb tiltott. Tükrönként egyszer küldhető (2026.10.26.): elküldés után a gomb helyén charcoal kártya évgyűrű-jellel: „Hamarosan · Elküldtük a kérdéseidet, a mégis ide jelentkezik: {e-mail}.” Új jelölés vagy újranyitott oldal után sem küldhető újra. A jelölés ezután is mentődik.
   - A saját menüben is megvan, a „Befejezem” mellett.
-- **E-mail mező és időpontfoglalás nincs** (2026.10.26.). A foglalás (Beérkező-sor, levél, adatlap-jelvény) a kódban megmarad, egyelőre nem hívja semmi.
+- **E-mail mező és időpontfoglalás nincs** (2026.10.26.). A foglalás (Beérkező-sor, levél, adatlap-jelvény) a kódban megmarad, egyelőre nem hívja semmi: [NM-22](../backlog_nem_MVP/NM-22-idopontfoglalas.md).
 - Az alján:
   - megerősítésre vár: „Nézd meg a leveled”, a címmel, és hogy a megerősítés után a fiókban mi vár rá;
   - a cím egy meglévő fiókhoz tartozik: belépés helyben (lásd lent);

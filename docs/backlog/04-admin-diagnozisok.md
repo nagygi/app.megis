@@ -132,7 +132,7 @@ Az önálló (nem fő- és nem rész-) diagnózis publikálás után riportként
 - A menü *Riportok* blokkjában a diagnózis nevét, például „Értéktükör · 2026.10.26.”.
 - **Válasz:** a kör (%), a pontok, a lépcső és a fejezetek pontjai.
 - **Fejezetek:** a sorok mérőszáma, és ahol van saját megélés, a rés („5-nek látod, 2-t mutatsz.”). A tétel oldalán a definíció („Mit jelent?”), a sor idézetei és a forrásuk. Az üres sorok kimaradnak, így az üres márkád alapja fejezet is.
-- **Zárólap:** a mégis javaslata, időpontfoglalás, PDF és Melléklet.
+- **Zárólap:** a mégis javaslata, PDF és Melléklet.
 - **Melléklet:** kire, miből (az anyag, az aggregált felhasználói diagnózisok, vagy „a mégis rögzítette”), mikor, az idézetek és a mérőpontok.
 - Felhasználói szinten „te”, egyébként „ti” a megszólítás.
 - Nincs összefoglaló, belső működés, összevetés, nézetváltó, állítás és visszajelzés: ezek az Olvasatból jönnének.
@@ -164,3 +164,4 @@ Az önálló (nem fő- és nem rész-) diagnózis publikálás után riportként
 - A fő diagnózis megjelenítése a felhasználóknál: 26–29. Az önálló diagnózisé: 4.6.
 - Automatikus diagnózis az Értéktükörből és feltöltésből: 06.
 - Súlyozás a diagnózisok frissessége szerint.
+- Időpontfoglalás: [NM-22](../backlog_nem_MVP/NM-22-idopontfoglalas.md).

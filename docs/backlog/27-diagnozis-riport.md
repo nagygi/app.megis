@@ -119,14 +119,13 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
   - „A márkád alapjának belső oldala ›” (S1·b);
   - „Magatokra ismertek?” egyszer, a lap végén (28).
 - **S1·b:** a fa négy eleme, a PHI, az olvasat és lenyitható sorok, kívül-oldal nélkül.
-- A „Mélyebben” sor a prototípus szerint a „Snapshot · Külső”-t mutatja, „hamarosan” jelzéssel. Fölötte „Beszéljünk róla” gomb a naptárlinkre, ha a foglalási link be van állítva.
+- A „Mélyebben” sor a prototípus szerint a „Snapshot · Külső”-t mutatja, „hamarosan” jelzéssel.
 
 ### 27.11 Zárólap (R9)
 
 - „Ez a ti diagnózisotok.” és „Bármikor visszajöhettek: a kezdőlapon és a menüben megtaláljátok.”
 - Csendes, nem kattintható összegzés: Belső működés {x}% · A legnagyobb rés: {érték}.
 - **Sárga blokk:** a mégis javaslata (18.3), alatta: „Egy óra a mégissel: átnézzük, mit kezdjetek vele.”
-- Egyetlen gomb: „Időpontot foglalok”, a konfigurált naptárlinkre, új ablakban (06).
 - Alul halkan: PDF (28). Mellette a „Megosztás” inaktív, „hamarosan” felirattal: a link egy kollégának új jogosultsági kérdés, és a társ a riportot nem láthatja (V9).
 
 ### 27.12 Riportok a menüben
@@ -141,3 +140,4 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 - A képesség-fejezet (R7), a Bridge to Purpose (R8): [NM-15](../backlog_nem_MVP/NM-15-kepesseg-es-bridge.md).
 - A Coach belépői („Miért lett ez így?”): [NM-18](../backlog_nem_MVP/NM-18-coach.md).
 - A visszajelzés, a Melléklet és a PDF: 28.
+- A „Beszéljünk róla” (S1) és az „Időpontot foglalok” (R9) gomb: [NM-22](../backlog_nem_MVP/NM-22-idopontfoglalas.md).

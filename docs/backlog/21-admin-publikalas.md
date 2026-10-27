@@ -63,10 +63,11 @@ Négy sor. Amíg nincs meg mind, a „Publikálom” gomb szürke, és a hiányz
 
 ## E-mailek
 
-- **Vezető:** „Elkészült a {Csapat} diagnózisa. [Megnézem] Ha átbeszélnéd velünk: [Időpontot foglalok]”
+- **Vezető:** „Elkészült a {Csapat} diagnózisa. [Megnézem]”
 - **Társ:** „Elkészült a {Csapat} diagnózisa, és vele az Útravalód: a te értékeid, ahogy a helyzeteidben látszanak. [Megnézem]”
 
 ## Nincs benne
 
 - Ütemezett publikálás: a publikálás napja (A1) csak tájékoztató. Ha elmúlt, és a diagnózis még nincs publikálva, a Beérkezőben (22) sor jelenik meg.
 - A kezdőlap, a riport, az Útravaló és a PDF: 26–29.
+- Az „Időpontot foglalok” a vezető levelében: [NM-22](../backlog_nem_MVP/NM-22-idopontfoglalas.md).

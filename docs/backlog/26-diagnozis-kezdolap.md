@@ -48,7 +48,7 @@ Belső snapshotnál napos sávval (V10·b, V12·b). A belépés ide irányít (1
   - „Belső működés · értékek · folyamatok · területek”, a 27 · R1·b lapra visz;
   - „A márkád alapja · gyökér · törzs · korona · árnyék”, az R5-re, snapshotnál az S1·b-re visz.
 - **Riportok:** a vezető publikált fő diagnózisai, soronként: „{Termék} · {dátum} · Megnyitom · PDF” (28).
-- **Értékmérés-teaser:** „Értékmérés · a diagnózis után kapcsolható be. Az értékalapú működés nyomás alatt és hosszabb távon jobban tart.” Gomb: „Beszéljünk róla”, a konfigurált naptárlinkre, új ablakban (06).
+- **Értékmérés-teaser:** „Értékmérés · a diagnózis után kapcsolható be. Az értékalapú működés nyomás alatt és hosszabb távon jobban tart.”
 
 ### 26.4 Több diagnózis, több szerep
 
@@ -66,3 +66,4 @@ Egy ember lehet az egyik diagnózisban vezető, egy másikban társ (25.7), és 
 - A „Képesség és 90 nap” sor: [NM-15](../backlog_nem_MVP/NM-15-kepesseg-es-bridge.md).
 - A Coach belépője: [NM-18](../backlog_nem_MVP/NM-18-coach.md).
 - A riport lapjai: 27.
+- Az Értékmérés-teaser „Beszéljünk róla” gombja: [NM-22](../backlog_nem_MVP/NM-22-idopontfoglalas.md).
