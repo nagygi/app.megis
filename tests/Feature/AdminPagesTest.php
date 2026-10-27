@@ -84,6 +84,7 @@ it('renders every admin page for a superadmin with a page heading', function (Cl
     'new value' => fn () => route('admin.values.create'),
     'edit value' => fn (array $models) => route('admin.values.edit', $models['value']),
     'value versions' => fn (array $models) => route('admin.values.versions', $models['value']),
+    'value import' => fn () => route('admin.values.import'),
     'value categories' => fn () => route('admin.value-categories.index'),
     'new value category' => fn () => route('admin.value-categories.create'),
     'edit value category' => fn (array $models) => route('admin.value-categories.edit', $models['category']),

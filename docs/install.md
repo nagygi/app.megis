@@ -57,7 +57,8 @@ php artisan megis:values:import "docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx" --dry-run
 php artisan megis:values:import "docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx"
 ```
 
-- A mégis táblázata: `docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx` (58 érték). Minta: `docs/ertektar-import-minta.xlsx` (három példaérték, a második munkalapon útmutató).
+- Ugyanez a felületen: *Értéktár → Érték Import* (`/admin/ertektar/frissites`), előnézettel. Csak szuperadmin tölthet be.
+- A mégis táblázata: `docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx` (58 érték). Minta: `docs/ertektar-import-minta.xlsx` (három példaérték, a második munkalapon útmutató). Az Érték Import oldal ezt adja letöltésre, ezért a helyén kell maradnia.
 - xlsx vagy csv, az első munkalap számít. Az első sor a fejléc, soronként egy érték.
 - Oszlopok. A sorrend mindegy; a kis- és nagybetű, az ékezet és az írásjel nem számít. A minta fejléce és a mégis táblázatáé is jó:
 

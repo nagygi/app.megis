@@ -7,6 +7,7 @@ use App\Enums\ValueOrigin;
 use App\Enums\ValueSvsStatus;
 use App\Models\Value;
 use App\Models\ValueCategory;
+use App\Models\ValueImport;
 use App\Services\Import\SpreadsheetReader;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,8 @@ use Throwable;
  * lines of a cell or separated by " · ". A value is matched by its code, then
  * by its name; a change is a new version with a note. The file is the source
  * only for the columns it has. When any row is invalid, nothing is loaded.
+ * The dry run makes the same load and rolls it back, so the preview of the
+ * Érték Import shows exactly what the load does.
  */
 class ValueImporter
 {
@@ -95,7 +98,10 @@ class ValueImporter
         private ValueService $values,
     ) {}
 
-    public function import(string $path, bool $dryRun = false): ValueImportResult
+    /**
+     * @param  string|null  $fileName  the name the admin uploaded, for the note and the log
+     */
+    public function import(string $path, bool $dryRun = false, ?string $fileName = null): ValueImportResult
     {
         $sheet = $this->reader->read($path);
         $result = new ValueImportResult;
@@ -117,14 +123,27 @@ class ValueImporter
             return $result;
         }
 
-        $note = mb_substr(__('console.values_import.version_note', ['file' => basename($path), 'date' => now()->format('Y.m.d.')]), 0, 500);
+        $fileName ??= basename($path);
+        $note = mb_substr(__('console.values_import.version_note', ['file' => $fileName, 'date' => now()->format('Y.m.d.')]), 0, 500);
 
         DB::beginTransaction();
 
         try {
             $this->write($entries, $targets, $this->saveCategories($categories, $sourced, $result), $sourced, $note, $result);
 
-            $dryRun ? DB::rollBack() : DB::commit();
+            if ($dryRun) {
+                DB::rollBack();
+            } else {
+                ValueImport::query()->create([
+                    'file_name' => mb_substr($fileName, 0, 255),
+                    'created_count' => count($result->created),
+                    'updated_count' => count($result->updated),
+                    'unchanged_count' => count($result->unchanged),
+                    'categories_created_count' => count($result->createdCategories),
+                    'created_by' => auth()->id(),
+                ]);
+                DB::commit();
+            }
         } catch (Throwable $exception) {
             DB::rollBack();
 

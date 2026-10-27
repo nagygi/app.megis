@@ -9,6 +9,7 @@
 
     <x-admin.page-header :title="__('admin.values.title')">
         <x-slot:actions>
+            <x-ui.button tone="outline" :href="route('admin.values.import')">{{ __('admin.values.import.title') }}</x-ui.button>
             <x-ui.button icon="plus" :href="route('admin.values.create')">{{ __('admin.values.create') }}</x-ui.button>
         </x-slot:actions>
     </x-admin.page-header>

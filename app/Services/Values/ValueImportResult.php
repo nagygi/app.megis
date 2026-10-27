@@ -38,4 +38,18 @@ class ValueImportResult
     {
         return $this->errors !== [];
     }
+
+    public function hasChanges(): bool
+    {
+        return $this->created !== [] || $this->updated !== [] || $this->reviewed !== []
+            || $this->createdCategories !== [] || $this->updatedCategories !== [];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return [...get_object_vars($this), 'hasChanges' => $this->hasChanges()];
+    }
 }

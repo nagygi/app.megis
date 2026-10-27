@@ -29,6 +29,8 @@
         {{ $attributes->class([
             'w-full text-sm text-grey-700',
             'file:mr-3 file:min-h-10 file:cursor-pointer file:rounded-pill file:border-[1.5px] file:border-charcoal file:bg-transparent file:px-4 file:text-sm file:font-semibold file:text-charcoal hover:file:bg-yellow-pale',
+            // Disabled as the disabled button: grey, no clicks.
+            'disabled:cursor-not-allowed disabled:file:cursor-not-allowed disabled:file:border-grey-300 disabled:file:bg-grey-300 disabled:file:text-grey-600',
         ]) }}
     >
 

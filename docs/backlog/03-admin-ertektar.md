@@ -83,6 +83,9 @@ Almenü: *Értéktár → Kategóriák*. Lista, „+ Új kategória” gomb, sze
 
 - A mégis átadta az 58 értéket, az Oszi által bővített Schwartz-féle rendszer szerint, a kategóriákkal és a felsőbb szintekkel együtt: `docs/data/ÉRTÉKEK KITÖLTÖTT.xlsx`. Oszloponként a fenti mezők; a formátum a `docs/install.md`-ben.
 - Az új értékek v1-ként kerülnek be. Az újratöltés az azonosító (ennek hiányában a név) alapján frissít: változásnál új verzió készül megjegyzéssel, a változatlan érték változatlan marad.
+- **Feltöltés:** *Értéktár → Érték Import* (xlsx vagy csv). Az előnézet megmutatja, hány új, változott és változatlan érték van, értékenként a változott mezőkkel; utána jön a „Betöltöm”. Ha egy sor hibás, semmi nem kerül be. Alatta a korábbi betöltések látszanak, a parancssoriak is.
+- **Csak szuperadmin tölthet be.** Az admin is megnyitja az oldalt, de nála a feltöltés inaktív.
+- A mintafájl az oldalról letölthető: három példaérték, a második munkalapon az oszlopok leírása.
 
 ### 3.7 Máshonnan felvett értékek
 

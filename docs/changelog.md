@@ -2,6 +2,21 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.39 · HASH · 2026-10-27
+
+Az Értéktár a Képességtárhoz hasonlóan felületről is betölthető: *Értéktár → Érték Import* (03 · 3.6). A betöltés csak szuperadminnal működik.
+
+- **Érték Import:**
+  - A mégis értéktáblázatát lehet feltölteni, xlsx-ben vagy csv-ben. Ugyanaz a betöltés fut, mint a `megis:values:import` parancsnál.
+  - Az előnézet megmutatja, hány új, változott és változatlan érték van, értékenként a változott mezőkkel. Azt is mutatja, melyik érték lesz átnézett, melyik kategória új vagy frissül, és melyik oszlop nem jön be. Utána jön a „Betöltöm”.
+  - Ha egy sor hibás, semmi nem kerül be: az előnézet felsorolja a hibás sorokat, és nincs „Betöltöm” gomb.
+  - A verzió megjegyzésében a feltöltött fájl neve áll.
+- **Jogosultság:** betölteni csak szuperadmin tud. Az admin is látja a menüpontot és az oldalt, de nála a fájlválasztó és a gomb szürke, „A betöltéshez szuperadmin jog kell.” felirattal, és a szerver is elutasítja a kérést.
+- **Mintafájl:** az oldalról letölthető a `docs/ertektar-import-minta.xlsx` (három példaérték, a második munkalapon az oszlopok leírása). Minden admin letöltheti.
+- **Korábbi betöltések:** ki, mikor, melyik fájlból, mennyi új, változott és változatlan érték lett, és hány új kategória. A parancssori betöltés is ide kerül, „rendszer” névvel.
+- Az Értékek listán az „Érték Import” gomb a „+ Új érték” mellett áll.
+- **Adatbázis:** `value_imports`.
+
 ## 1.38 · 168d4cf · 2026-10-27
 
 Az ingyenes Értéktükör korlátai (06 · ET2): e-mail címenként napi 10 tükör, a beszéd legfeljebb 10 perc, a szöveg ehhez igazodik.

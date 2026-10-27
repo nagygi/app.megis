@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\MaterialAudioController;
 use App\Http\Controllers\Admin\OpenMainDiagnosisController;
 use App\Http\Controllers\Admin\ReportPreviewController;
 use App\Http\Controllers\Admin\UploadedReportPdfController;
+use App\Http\Controllers\Admin\ValueImportSampleController;
 use App\Http\Controllers\Client\CalendarOAuthController;
 use App\Http\Controllers\Client\CustomerLoginController;
 use App\Http\Controllers\Client\CustomerLogoutController;
@@ -130,6 +131,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('ertektar/ertekek/uj', Admin\Values\Form::class)->name('values.create');
         Route::livewire('ertektar/ertekek/{value}', Admin\Values\Form::class)->name('values.edit');
         Route::livewire('ertektar/ertekek/{value}/verziok', Admin\Values\Versions::class)->name('values.versions');
+        Route::livewire('ertektar/frissites', Admin\Values\Import::class)->name('values.import');
+        Route::get('ertektar/frissites/minta', ValueImportSampleController::class)->name('values.import.sample');
         Route::livewire('ertektar/kategoriak', Admin\ValueCategories\Index::class)->name('value-categories.index');
         Route::livewire('ertektar/kategoriak/uj', Admin\ValueCategories\Form::class)->name('value-categories.create');
         Route::livewire('ertektar/kategoriak/{category}/szerkesztes', Admin\ValueCategories\Form::class)->name('value-categories.edit');

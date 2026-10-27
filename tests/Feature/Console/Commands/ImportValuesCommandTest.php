@@ -5,6 +5,7 @@ use App\Enums\ValueOrigin;
 use App\Enums\ValueSvsStatus;
 use App\Models\Value;
 use App\Models\ValueCategory;
+use App\Models\ValueImport;
 use App\Services\Values\ValueService;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Writer;
@@ -356,6 +357,22 @@ it('loads the sample file in docs', function () {
         ->false_positives->toBe(['Merev szabálykövetés, amely mögött félelem áll', 'Változásellenesség'])
         ->svs_status->toBe(ValueSvsStatus::ToVerify)
         ->and(Value::query()->firstWhere('name', 'Biztonság')->category->higher_order)->toBe('Megőrzés (Conservation)');
+});
+
+it('logs a load for the Érték Import, but not a dry run', function () {
+    $path = valuesSpreadsheet([megisValuesHeader(), megisValuesRow()]);
+
+    $this->artisan('megis:values:import', ['file' => $path, '--dry-run' => true])->assertSuccessful();
+
+    expect(ValueImport::query()->count())->toBe(0);
+
+    $this->artisan('megis:values:import', ['file' => $path])->assertSuccessful();
+
+    expect(ValueImport::query()->sole())
+        ->file_name->toBe(basename($path))
+        ->created_count->toBe(1)
+        ->categories_created_count->toBe(1)
+        ->created_by->toBeNull();
 });
 
 it('refuses a file without the name column', function () {

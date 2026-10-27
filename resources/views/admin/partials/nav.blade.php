@@ -34,8 +34,9 @@
         [
             'label' => __('admin.nav.value_library'),
             'items' => [
-                ['route' => 'admin.values.index', 'active' => 'admin.values.*', 'label' => __('admin.nav.values')],
+                ['route' => 'admin.values.index', 'active' => ['admin.values.index', 'admin.values.create', 'admin.values.edit', 'admin.values.versions'], 'label' => __('admin.nav.values')],
                 ['route' => 'admin.value-categories.index', 'active' => 'admin.value-categories.*', 'label' => __('admin.nav.value_categories')],
+                ['route' => 'admin.values.import', 'active' => 'admin.values.import', 'label' => __('admin.nav.value_import')],
             ],
         ],
         [

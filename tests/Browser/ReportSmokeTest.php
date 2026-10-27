@@ -59,6 +59,7 @@ it('opens the reading, the publishing, the Képességtár and the lists of the a
         route('admin.diagnoses.capabilities', $main->diagnosis, false),
         route('admin.capabilities.index', [], false),
         route('admin.capabilities.import', [], false),
+        route('admin.values.import', [], false),
         route('admin.capability-groups.index', [], false),
         route('admin.patterns.index', [], false),
         route('admin.capability-rules.index', [], false),
