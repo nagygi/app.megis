@@ -238,7 +238,7 @@ it('records the experience of an occasion, or its skipping (V11·c)', function (
     $params = [...occasionParams($setup, $main), 'material' => $material];
 
     Livewire::test(OccasionExperienceForm::class, $params)
-        ->assertSee('Hogyan élted meg ezt a helyzetet?')
+        ->assertSee('Az értékek · ezen az alkalmon')
         ->call('skip')
         // Back to the home afterwards (prototype V11·c → V10).
         ->assertRedirect(route('client.diagnosis.show', [$setup['organization'], $main->diagnosis]));

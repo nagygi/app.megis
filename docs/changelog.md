@@ -2,6 +2,45 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.35 · HASH · 2026-10-27
+
+A kitöltés és a kezdőlapok fejlécei, gombjai és szövegei a prototípus szerint („1 · Belépés és kitöltés”: V1–V6, V10–V11, T1–T6).
+
+- **Lépéslapok fejléce (V2–V9, T3–T4):**
+  - A lépés szimbóluma a cím előtt: gyökér (V2, V3, V5), fa (V4), talaj (V6), spirál (V6·c), micélium (V9), gyűrűk (T4).
+  - A lépés kérdése alcímként a fejlécben, nem a lap törzsében. Az élő számlálók („3 / 4 kész”, „9 / 9 megválaszolva”) a törzsben maradnak.
+  - Az első lépés vissza-linkje „Diagnózis” (eddig „Mi vár rád”).
+  - A Tovább a következő lépés nevét viseli („A szervezet értékei”, „A márkád alapja”, „A megélésed”); ahol a kezdőlapra visz, „Tovább” marad.
+- **Saját értékek (V2, V2·b, V2·c; T3):** a három állapot saját címet kap (`?lap=honnan`, `?lap=uj`), így a fejléc is követi őket.
+  - V2·b: vissza „Honnan”, alcím „Ha továbblépsz, ezek lesznek a saját értékeid.”
+  - V2·c: cím „Érték hozzáadása”, alcím „Mit jelent számodra?”, vissza a listára.
+  - A tükör dátuma a sor jobb szélén. „egy helyzet a hétről · 2 perc”; „az Értéktükörből · 3 helyzetedből 3-ban”. A „3 érték elég.” kikerült.
+- **V1, T2:** a lépésszám betűvel („Hét lépés, és indul a diagnózis.”, „Két lépés most, egy amíg fut.”). A T2-n a Hozzáteszel a lépéssor folytatása, nem külön kártya.
+- **V4:** a gyökér dobozán is van „Szerkesztem”, a szervezet értékeihez visz.
+- **Folyamatok:**
+  - V6·b: „soha” jelzés a két kizárt tételen; az „Ami továbbmegy” címke–érték párokban.
+  - V6·d: a fő gomb „5 folyamat elfogadása”, elfogad és továbbvisz az összegzésre. A „Később folytatom” a V6-ra visz.
+  - V6·e: a diagnózisban „Kész” gomb az összegzésre, és „A folyamat lapja” link a Tárak → Folyamatokba.
+  - V6·f: a termék limitje a fejlécben; új „Folyamat” (vissza a listára) és „Később” (a kezdőlapra).
+- **V10:**
+  - Fejléc: gyűrűk, „Teljes · fut · 03.02. → 04.18.”, alatta „3. hét a 7-ből” (snapshotnál „8. nap a 14-ből”).
+  - „Hol tartunk” mellett „3 / 7 hét”. Minden sor elején állapotjel: kész, most, később.
+  - „Beszélgetések a mégisszel · 2 / 3 · következő: …”; „7 felvétel · 5 dokumentum · 1 átirat”, az elmondott helyzetek külön; „04.14. → 04.17.”.
+  - Mélyítés: cím, „Belső működés” a publikálás napjával, és a Brand szaggatottan, „hamarosan”.
+- **T5:**
+  - Fejléc: gyűrűk, „{csapat} · Teljes · fut”, alatta „3. hét a 7-ből · publikálás: 04.18.”, és a hét-sáv. A V10 és a T5 ugyanúgy számolja a heteket.
+  - A Helyzetek az „Amit eddig behoztál” alatt: „2 elmondva · 1 dokumentum · mindegyikhez a megélésed” (vagy „1 megélés hiányzik”), a darabszámmal.
+  - „az elején · 03.05. · öt érték”, „a csapat öt értéke, definícióval”. A Coach helye szaggatottan, „hamarosan”.
+- **Feltöltés (V11, V11·b, V11·c, T5·b):**
+  - V11: cím „Feltöltés”, gyümölcs-szimbólum, „Nem kell eldöntened, hová tartozik.”, „Teljes · fut · 3. hét”. Az Értéktükör sora: „elmondod · 2 perc · legutóbb 03.04.”. Új szaggatott sor: „Megjelenés · kifelé · poszt, hírlevél, ajánlat”, „hamarosan”. A feltöltőmező: „Ide húzhatsz bármit”, „Fájl kiválasztása”. A naptár „Integráció” cím alatt, saját sorként. Folyamatban: „a rutin megvan · a megélés nyitva”.
+  - V11·b: cím „Feltöltés”, alcím „Melyik rutinhoz kötődik?”, alatta a fájl neve vagy „elmondva · 0:42”. A rutinoknál ritmus · felelős · létszám. „Egyikhez sem · a mégis sorolja be”, a nem mért folyamatok a végén, új „Mégse” gomb.
+  - V11·c: alcím „Hogyan élted meg ezt a helyzetet?”, alatta „Retró · 03.14. · jegyzet feltöltve”; a blokkok „Az értékek · ezen az alkalmon” és „A fa négy eleme”.
+  - T5·b: címke „Helyzetek”, alcím „3 helyzet · 2 megéléssel”, pipa a megadott megélésnél, „03.18.”-as dátumok.
+- **T1:** „{vezető} meghívott a(z) {csapat} diagnózisába. 8 perc.”
+- **T6:** az „Ahogy az elején megélted…” az alcím, a dátum alatta; a sorokban a név és a mondat egyben („Együttműködés: a helyzeteidben 6 · 3 helyzetből”), „a csapat öt értékén túl”.
+- **Nem került bele:** a V11·c megjegyzésénél az Elmondom alapértelmezése (JS-változás kellene hozzá); a 3. mérföldkő funkciói (V4·b, V2·c-javaslatok, V10·b, V1·c, T6-címkék, B1) külön jönnek.
+- Nincs adatbázis-változás.
+
 ## 1.34 · b43746a · 2026-10-27
 
 A belépés utáni címlap az út előnézetével, és visszaút a kitöltött lépésekhez (26 · 26.4, prototípus: „A vezető útja”, „A csapat hangja”, B2).

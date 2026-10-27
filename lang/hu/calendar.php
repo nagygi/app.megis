@@ -22,16 +22,24 @@ return [
     'we_never' => 'Amit soha',
     'never' => [
         'attachments' => 'Csatolmányok',
-        'attachments_help' => 'dokumentumot a naptárból soha nem nyitunk meg',
+        'attachments_help' => 'dokumentumot a naptárból nem nyitunk meg',
         'private' => 'Magánjelölt bejegyzések',
+        'tag' => 'soha',
     ],
 
     'goes_on' => 'Ami továbbmegy',
+    // Label and value side by side (prototype V6·b).
     'goes_on_lines' => [
-        'metadata' => 'A naptár-metaadat 90 napig él.',
-        'excluded' => 'A csatolmányok és a magánjelölt bejegyzések ki vannak zárva.',
-        'disconnect' => 'Szétkötéskor a metaadat törlődik.',
-        'stays' => 'A folyamat és az alkalmak dátuma megmarad.',
+        'metadata' => 'Naptár-metaadat',
+        'excluded' => 'Csatolmány, magánjelölt',
+        'disconnect' => 'Szétkötéskor',
+        'stays' => 'Megmarad',
+    ],
+    'goes_on_values' => [
+        'metadata' => '90 nap',
+        'excluded' => 'kizárva',
+        'disconnect' => 'a metaadat törlődik',
+        'stays' => 'a rutin és az alkalmak dátuma',
     ],
 
     'connect' => 'Összekötöm a naptárat',

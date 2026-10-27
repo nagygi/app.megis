@@ -100,8 +100,11 @@ class ProcessConversation extends Component
             'extracting' => collect(Conversation::QUESTIONS)->contains(fn (int $question) => $conversation->isExtracting($question)),
             'editable' => $this->acceptsInput(),
         ])->layout('layouts::client', [
-            ...$this->stepLayout(DiagnosisStep::Processes),
+            ...$this->stepLayout(DiagnosisStep::Processes, __('processes.conversation.lead')),
             'title' => __('processes.conversation.title'),
+            // The conversation is the spiral way of V6 (prototype V6·c).
+            'symbol' => 'spiral',
+            'note' => __('processes.conversation.duration'),
             'back' => route('client.diagnosis.folyamatok', [$this->organization, $this->diagnosis]),
             'backLabel' => DiagnosisStep::Processes->label(),
         ])->title(__('processes.conversation.title'));

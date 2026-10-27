@@ -175,6 +175,8 @@ class ProcessSheet extends Component
             'teams' => $this->organization->teams()->orderBy('name')->get(['id', 'name']),
             'occasionCount' => $this->process->occasions()->count(),
             'backUrl' => $this->backUrl(),
+            // Inside the diagnosis "Kész" goes on to the summary (prototype V6·e → V6·f).
+            'doneUrl' => $this->diagnosis ? route('client.diagnosis.process-summary', [$this->organization, $this->diagnosis]) : null,
         ])->layout('layouts::client', [
             'title' => $this->process->name,
             'subtitle' => __('processes.sheet.lead'),

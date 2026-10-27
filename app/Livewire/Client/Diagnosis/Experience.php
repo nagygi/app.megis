@@ -96,7 +96,7 @@ class Experience extends Component
             'answeredCount' => count(array_intersect_key($this->answers, array_flip(array_column($rows, 'key')))),
             'total' => count($rows),
             'editable' => $this->acceptsInput(),
-        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Experience))->title(DiagnosisStep::Experience->label());
+        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Experience, __('diagnosis.experience.question')))->title(DiagnosisStep::Experience->label());
     }
 
     /**

@@ -234,7 +234,7 @@
             @else
                 <div>
                     <p class="text-xl font-extrabold uppercase">{{ __('diagnosis.what_awaits') }}</p>
-                    <p>{{ trans_choice('diagnosis.steps_lead', count($preview), ['count' => count($preview)]) }}</p>
+                    <p>{{ __('diagnosis.steps_lead', ['count' => \App\Services\Report\HungarianNumber::word(count($preview))]) }}</p>
                     <p class="text-sm text-grey-350">
                         {{ $productName }} ·
                         {{ __('diagnosis.minutes_until', ['minutes' => array_sum(array_column($preview, 'minutes'))]) }}

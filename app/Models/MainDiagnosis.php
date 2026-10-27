@@ -202,6 +202,27 @@ class MainDiagnosis extends Model
     }
 
     /**
+     * Where the run is: the weeks of a Teljes, the days of a snapshot, from
+     * the start to publishing (V10, V10·b, T5, V11).
+     *
+     * @return array{unit: string, current: int, count: int, segments: list<string>}
+     */
+    public function runWindow(): array
+    {
+        $start = ($this->running_at ?? $this->starts_on ?? now())->copy()->startOfDay();
+        $unit = $this->isSnapshot() ? 1 : 7;
+        $count = max(1, (int) ceil(($start->diffInDays($this->publishes_on) + 1) / $unit));
+        $current = min($count, max(1, (int) floor($start->diffInDays(now()) / $unit) + 1));
+
+        return [
+            'unit' => $this->isSnapshot() ? 'day' : 'week',
+            'current' => $current,
+            'count' => $count,
+            'segments' => collect(range(1, $count))->map(fn (int $index) => $index < $current ? 'done' : ($index === $current ? 'now' : 'later'))->all(),
+        ];
+    }
+
+    /**
      * Peers only in the Teljes product and only for a team (17 · 17.3, 25).
      */
     public function hasPeers(): bool

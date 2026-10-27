@@ -1,9 +1,6 @@
 {{-- V5 · A megélésed (08 · 8.3), the peer's T4 (25 · 25.4). --}}
 <div class="flex max-w-2xl flex-col gap-6">
-    <div class="flex flex-col gap-1">
-        <h2 class="text-xl font-semibold">{{ __('diagnosis.experience.question') }}</h2>
-        <p class="text-grey-700" aria-live="polite">{{ __('diagnosis.experience.count', ['answered' => $answeredCount, 'total' => $total]) }}</p>
-    </div>
+    <p class="text-grey-700" aria-live="polite">{{ __('diagnosis.experience.count', ['answered' => $answeredCount, 'total' => $total]) }}</p>
 
     <x-form.error name="answers" id="answers" />
 
@@ -42,7 +39,7 @@
         <x-diagnosis.next
             wire:click="submit"
             :disabled-reason="$answeredCount < $total ? __('diagnosis.experience.missing', ['count' => $total - $answeredCount]) : null"
-        />
+        >{{ $this->nextLabel(\App\Enums\DiagnosisStep::Experience) }}</x-diagnosis.next>
     @else
         <x-ui.notice>{{ __('diagnosis.locked') }}</x-ui.notice>
     @endif

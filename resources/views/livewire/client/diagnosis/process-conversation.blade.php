@@ -1,10 +1,5 @@
 {{-- V6·c · Beszélgetés (10). --}}
 <div class="flex max-w-2xl flex-col gap-6" @if ($extracting || $dictations !== []) wire:poll.2s="pollDictations" @endif>
-    <div class="flex flex-col gap-1">
-        <h2 class="text-xl font-semibold">{{ __('processes.conversation.lead') }}</h2>
-        <p class="text-grey-700">{{ __('processes.conversation.duration') }}</p>
-    </div>
-
     <x-form.error name="answers" id="answers" />
 
     <ol class="flex flex-col gap-4">

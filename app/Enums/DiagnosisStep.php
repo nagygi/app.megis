@@ -61,4 +61,22 @@ enum DiagnosisStep: string
     {
         return (int) config('diagnosis.minutes.'.$this->value);
     }
+
+    /**
+     * The symbol before the step's title, as in the prototype: the root for
+     * the values (V2, V3, V5), the tree for the brand base (V4), the soil for
+     * the processes (V6), the mycelium for who sees what (V9), the rings for
+     * the peer's experience (T4).
+     */
+    public function symbol(bool $peer = false): string
+    {
+        return match ($this) {
+            self::OwnValues, self::OrganizationValues => 'root',
+            self::Brand => 'tree-of-life',
+            self::Experience => $peer ? 'growth-rings' : 'root',
+            self::Capabilities => 'fruit',
+            self::Processes => 'soil',
+            self::Visibility => 'mycelium',
+        };
+    }
 }

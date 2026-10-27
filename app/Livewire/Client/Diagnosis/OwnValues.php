@@ -32,6 +32,11 @@ class OwnValues extends Component
     public string $screen = 'list';
 
     /**
+     * The "lap" of the address for the screens other than the list.
+     */
+    private const PAGES = ['from' => 'honnan', 'add' => 'uj'];
+
+    /**
      * @var list<array<string, mixed>>
      */
     public array $items = [];
@@ -58,8 +63,20 @@ class OwnValues extends Component
         }
 
         $this->items = $this->itemsOf($sets->forUser($this->user()));
-        $this->screen = $this->items === [] ? 'from' : 'list';
+        $requested = (string) request()->query('lap', '');
+        $this->screen = match (true) {
+            $requested === self::PAGES['add'] => 'add',
+            $requested === self::PAGES['from'] || $this->items === [] => 'from',
+            default => 'list',
+        };
         $this->resetDraft();
+
+        $editing = $this->screen === 'add' ? collect($this->items)->firstWhere('key', (string) request()->query('ertek', '')) : null;
+
+        if ($editing !== null) {
+            $this->draft = $editing;
+            $this->editingKey = $editing['key'];
+        }
     }
 
     public function show(string $screen): void
@@ -72,6 +89,8 @@ class OwnValues extends Component
                 $this->editingKey = null;
                 $this->resetDraft();
             }
+
+            $this->redirect($this->screenUrl($screen), navigate: false);
         }
     }
 
@@ -95,6 +114,7 @@ class OwnValues extends Component
         $set->update(['imported_mirror_session_id' => $mirror->id]);
         $this->persist($sets);
         $this->screen = 'list';
+        $this->redirect($this->screenUrl('list'), navigate: false);
     }
 
     public function pickFromLibrary(int $valueId, PersonalValueSetService $sets): void
@@ -127,6 +147,7 @@ class OwnValues extends Component
             $this->editingKey = $key;
             $this->screen = 'add';
             $this->resetValidation();
+            $this->redirect($this->screenUrl('add', $key), navigate: false);
         }
     }
 
@@ -191,6 +212,7 @@ class OwnValues extends Component
         $this->editingKey = null;
         $this->resetDraft();
         $this->screen = 'list';
+        $this->redirect($this->screenUrl('list'), navigate: false);
     }
 
     public function remove(string $key, PersonalValueSetService $sets): void
@@ -256,7 +278,49 @@ class OwnValues extends Component
             'max' => (int) config('diagnosis.own_values.max'),
             'recordUrl' => route('client.mirror.record', ['organization' => $this->organization, 'diagnozis' => $this->diagnosis->id]),
             'canRecord' => ! $this->isImpersonating(),
-        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::OwnValues))->title(DiagnosisStep::OwnValues->label());
+        ])->layout('layouts::client', $this->screenLayout())->title(DiagnosisStep::OwnValues->label());
+    }
+
+    /**
+     * The address of a screen; a full page load lets the header follow it.
+     */
+    public function screenUrl(string $screen, ?string $key = null): string
+    {
+        return route('client.diagnosis.sajat-ertekek', [
+            $this->organization,
+            $this->diagnosis,
+            ...($screen === 'list' ? [] : ['lap' => self::PAGES[$screen]]),
+            ...($key === null ? [] : ['ertek' => $key]),
+        ]);
+    }
+
+    /**
+     * The header of each screen, as in the prototype: V2 asks the question;
+     * V2·b leads with the list, back to "Honnan"; V2·c is "Érték hozzáadása",
+     * "Mit jelent számodra?", back to the list.
+     *
+     * @return array<string, mixed>
+     */
+    private function screenLayout(): array
+    {
+        $layout = $this->stepLayout(DiagnosisStep::OwnValues, __('diagnosis.own_values.question'));
+        $editable = $this->main()->ownValuesEditable();
+
+        return match ($this->screen) {
+            'list' => [
+                ...$layout,
+                'subtitle' => __('diagnosis.own_values.list_lead'),
+                ...($editable && ! $this->isRevisit() ? ['back' => $this->screenUrl('from'), 'backLabel' => __('diagnosis.own_values.back_from')] : []),
+            ],
+            'add' => [
+                ...$layout,
+                'title' => $this->editingKey ? __('diagnosis.own_values.edit_title') : __('diagnosis.own_values.add_title'),
+                'subtitle' => __('diagnosis.own_values.fields.meaning'),
+                'back' => $this->screenUrl($this->items === [] ? 'from' : 'list'),
+                'backLabel' => DiagnosisStep::OwnValues->label(),
+            ],
+            default => $layout,
+        };
     }
 
     private function persist(PersonalValueSetService $sets): void

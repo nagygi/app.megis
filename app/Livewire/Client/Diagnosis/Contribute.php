@@ -10,6 +10,7 @@ use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
 use App\Models\CalendarConnection;
 use App\Models\Diagnosis;
 use App\Models\Material;
+use App\Models\MirrorSession;
 use App\Models\OccasionExperience;
 use App\Models\Organization;
 use App\Services\Materials\MaterialStore;
@@ -110,13 +111,33 @@ class Contribute extends Component
                 ? CalendarConnection::query()->whereBelongsTo($this->organization)->where('user_id', $this->user()->id)->where('status', '!=', CalendarConnection::DISCONNECTED)->latest('id')->first()
                 : null,
             'canRecordMirror' => ! $this->isImpersonating(),
+            'lastMirror' => MirrorSession::query()->where('user_id', $this->user()->id)->latest('id')->value('created_at'),
         ])->layout('layouts::client', [
             'title' => __('processes.occasions.contribute_title'),
+            'label' => __('processes.occasions.contribute_title'),
+            'symbol' => 'fruit',
+            'subtitle' => __('processes.occasions.contribute_lead'),
+            'note' => $this->runNote(),
             'back' => $this->overviewUrl(),
-            'backLabel' => __('diagnosis.home_back'),
+            'backLabel' => $this->isLeader() ? __('client.header.diagnosis') : __('diagnosis.home_back'),
             'color' => 'cream',
             'close' => $this->overviewUrl(),
         ])->title(__('processes.occasions.contribute_title'));
+    }
+
+    /**
+     * "Teljes · fut · 3. hét" (prototype V11).
+     */
+    private function runNote(): string
+    {
+        $main = $this->main();
+        $window = $main->runWindow();
+
+        return __('processes.occasions.contribute_note', [
+            'product' => $main->product_name,
+            'stage' => mb_strtolower($main->stage->label()),
+            'when' => __('processes.occasions.window_'.$window['unit'], ['current' => $window['current']]),
+        ]);
     }
 
     /**

@@ -48,18 +48,23 @@ class Situations extends Component
             ->get()
             ->sortByDesc(fn (Material $material) => $material->occasion?->occurred_at ?? $material->placed_at)
             ->values();
+        $experiences = OccasionExperience::query()
+            ->where('user_id', $this->user()->id)
+            ->whereIn('process_occasion_id', $materials->pluck('process_occasion_id')->filter())
+            ->get()
+            ->keyBy('process_occasion_id');
 
         return view('livewire.client.diagnosis.situations', [
             'materials' => $materials,
-            'experiences' => OccasionExperience::query()
-                ->where('user_id', $this->user()->id)
-                ->whereIn('process_occasion_id', $materials->pluck('process_occasion_id')->filter())
-                ->get()
-                ->keyBy('process_occasion_id'),
+            'experiences' => $experiences,
             'editable' => $this->acceptsInput(),
             'isImpersonating' => $this->isImpersonating(),
         ])->layout('layouts::client', [
             'title' => __('processes.occasions.situations_title'),
+            // "Helyzetek", the fruit, "3 helyzet · 2 megéléssel" (prototype T5·b).
+            'label' => __('diagnosis.peer_home.situations'),
+            'symbol' => 'fruit',
+            'subtitle' => __('processes.occasions.situations_lead', ['count' => $materials->count(), 'lived' => $experiences->filter->isSubmitted()->count()]),
             'back' => $this->overviewUrl(),
             'backLabel' => __('diagnosis.home_back'),
             'color' => 'cream',

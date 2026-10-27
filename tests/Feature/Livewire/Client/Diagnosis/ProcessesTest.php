@@ -123,8 +123,9 @@ it('closes the step on the summary and records the measured processes', function
     $setup['organization']->update(['process_recommendation' => 'A Retró legyen benne.']);
     actingAsCustomer($setup['leader']);
 
+    $this->get(route('client.diagnosis.process-summary', processParams($setup, $main)))->assertOk()->assertSee('2 folyamat kerül a diagnózisba.');
+
     Livewire::test(ProcessSummary::class, processParams($setup, $main))
-        ->assertSee('2 folyamat kerül a diagnózisba.')
         ->assertSee('Megvan, de nincs a naptárban')
         ->assertSee('Kimaradt')
         ->assertSee('A Retró legyen benne.')
@@ -368,8 +369,9 @@ it('connects an iCal link from V6·b and lands on the detected list', function (
     actingAsCustomer($setup['leader']);
     Http::fake(['calendar.example.com/*' => Http::response("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nEND:VCALENDAR")]);
 
+    $this->get(route('client.diagnosis.process-calendar', processParams($setup, $main)))->assertOk()->assertSee('Mit olvasunk, és mit soha.');
+
     Livewire::test(ProcessCalendar::class, processParams($setup, $main))
-        ->assertSee('Mit olvasunk, és mit soha.')
         ->set('choosing', true)
         ->set('icsUrl', 'https://calendar.example.com/secret.ics')
         ->call('connectUrl')

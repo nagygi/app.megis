@@ -6,6 +6,7 @@ use App\Enums\AuditEventType;
 use App\Enums\ConsentKind;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\MaterialContext;
+use App\Enums\MaterialSource;
 use App\Enums\MaterialStatus;
 use App\Enums\ParticipantRole;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
@@ -13,6 +14,7 @@ use App\Models\Consent;
 use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
+use App\Models\OccasionExperience;
 use App\Models\Organization;
 use App\Models\PersonalValueSet;
 use App\Services\Audit\AuditLogger;
@@ -24,6 +26,7 @@ use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\MainDiagnoses\StepList;
 use App\Services\MainDiagnoses\StepProgress;
 use App\Services\Processes\OccasionService;
+use App\Services\Report\HungarianNumber;
 use App\Services\Report\ReportService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -139,10 +142,10 @@ class Overview extends Component
 
         $layout = match ($view) {
             'livewire.client.diagnosis.overview-published' => ['title' => __('diagnosis.home.title'), 'label' => __('client.header.diagnosis'), 'subtitle' => __('diagnosis.published_home.subtitle', ['product' => $main->product_name, 'date' => $main->published_at?->format('m.d.') ?? '–']), 'color' => 'charcoal'],
-            'livewire.client.diagnosis.overview-running' => ['title' => __('diagnosis.home.title'), 'label' => __('client.header.diagnosis'), 'subtitle' => $this->runningSubtitle(), 'color' => 'charcoal', 'plus' => $plus],
+            'livewire.client.diagnosis.overview-running' => ['title' => __('diagnosis.home.title'), 'label' => __('client.header.diagnosis'), 'symbol' => 'growth-rings', 'subtitle' => $this->runningSubtitle(), 'note' => $this->windowNote($main), 'color' => 'charcoal', 'plus' => $plus],
             'livewire.client.diagnosis.invitation' => ['title' => __('diagnosis.invitation.title'), 'color' => 'coral'],
             'livewire.client.diagnosis.overview-peer' => $steps->current() === null
-                ? ['title' => __('diagnosis.peer_home.title'), 'label' => __('client.header.home'), 'subtitle' => $this->peerHomeSubtitle(), 'color' => 'charcoal', 'plus' => $plus]
+                ? ['title' => __('diagnosis.peer_home.title'), 'label' => __('client.header.home'), 'symbol' => 'growth-rings', 'subtitle' => $this->peerHomeSubtitle(), 'note' => $this->windowNote($main).' · '.__('diagnosis.peer_home.publishes', ['date' => $main->publishes_on->format('m.d.')]), 'color' => 'charcoal', 'plus' => $plus]
                 : ['title' => __('diagnosis.what_awaits'), 'color' => 'cream', ...$this->peerWelcomeHeader($steps)],
             default => ['title' => __('diagnosis.what_awaits'), 'color' => 'cream', ...$this->leaderWelcomeHeader($steps)],
         };
@@ -159,6 +162,10 @@ class Overview extends Component
             'leaderName' => $main->leader->name,
             'otherRoles' => $this->otherRoles(),
             'home' => $view === 'livewire.client.diagnosis.overview-running' ? $this->runningHome($main, $steps) : null,
+            // T5: the week bar and what the peer brought in (prototype T5).
+            'window' => $main->runWindow(),
+            'situations' => $view === 'livewire.client.diagnosis.overview-peer' ? $this->ownSituations($main) : null,
+            'valueCount' => count($main->valueSetVersion?->snapshot['values'] ?? []),
             // V12 · the Képesség card from the approved rows (NM-12).
             'capabilities' => $view === 'livewire.client.diagnosis.overview-published' ? app(CapabilityOverview::class)->for($main, $this->user()) : null,
             'report' => $snapshot?->data,
@@ -166,7 +173,6 @@ class Overview extends Component
             // The Útravaló row lives from publishing (29 · 29.2).
             'takeawayReady' => $main->stage === MainDiagnosisStage::Published
                 && isset(app(ReportService::class)->snapshot($main)?->data['takeaways'][$this->user()->id]),
-            'situationCount' => Material::query()->where('parent_diagnosis_id', $main->diagnosis_id)->where('user_id', $this->user()->id)->where('context', MaterialContext::Occasion)->whereNotNull('placed_at')->count(),
         ])->layout('layouts::client', $layout)->title($layout['title']);
     }
 
@@ -191,7 +197,7 @@ class Overview extends Component
             $until = $main->starts_on ? __('diagnosis.until', ['date' => $main->starts_on->format('m.d.')]) : __('diagnosis.date_open');
 
             return $header + [
-                'subtitle' => trans_choice($main->isSnapshot() ? 'diagnosis.steps_lead_snapshot' : 'diagnosis.steps_lead', $steps->count(), ['count' => $steps->count()]),
+                'subtitle' => __($main->isSnapshot() ? 'diagnosis.steps_lead_snapshot' : 'diagnosis.steps_lead', ['count' => HungarianNumber::word($steps->count())]),
                 // The snapshot says which one it is, as V1·c does.
                 'note' => ($main->isSnapshot() ? $main->product_name.' · ' : '').__('diagnosis.minutes_until', ['minutes' => $steps->totalMinutes()]).' '.$until,
             ];
@@ -217,8 +223,36 @@ class Overview extends Component
         return [
             'label' => __('client.header.first_visit'),
             'symbol' => 'spiral',
-            'subtitle' => trans_choice('diagnosis.peer_steps_lead', $steps->count(), ['count' => $steps->count()]),
+            'subtitle' => __('diagnosis.peer_steps_lead', ['count' => HungarianNumber::word($steps->count())]),
             'note' => __('diagnosis.minutes_about', ['minutes' => $steps->totalMinutes()]),
+        ];
+    }
+
+    /**
+     * "3. hét a 7-ből", "8. nap a 14-ből" (prototype V10, V10·b, T5).
+     */
+    private function windowNote(MainDiagnosis $main): string
+    {
+        $window = $main->runWindow();
+
+        return __('diagnosis.home.'.$window['unit'].'_note', ['current' => $window['current'], 'count' => HungarianNumber::outOf($window['count'])]);
+    }
+
+    /**
+     * T5 · Helyzetek: told and uploaded, and whether each has its experience.
+     *
+     * @return array{told: int, documents: int, missing: int, total: int}
+     */
+    private function ownSituations(MainDiagnosis $main): array
+    {
+        $materials = Material::query()->where('parent_diagnosis_id', $main->diagnosis_id)->where('user_id', $this->user()->id)->where('context', MaterialContext::Occasion)->whereNotNull('placed_at')->get();
+        $given = OccasionExperience::query()->where('user_id', $this->user()->id)->whereIn('process_occasion_id', $materials->pluck('process_occasion_id')->filter())->get()->filter->isSubmitted()->pluck('process_occasion_id');
+
+        return [
+            'told' => $materials->where('is_situation', true)->count(),
+            'documents' => $materials->where('is_situation', false)->count(),
+            'missing' => $materials->filter(fn (Material $material) => $material->process_occasion_id !== null && ! $given->contains($material->process_occasion_id))->count(),
+            'total' => $materials->count(),
         ];
     }
 
@@ -245,10 +279,7 @@ class Overview extends Component
      */
     private function runningHome(MainDiagnosis $main, StepList $steps): array
     {
-        $start = ($main->running_at ?? $main->starts_on ?? now())->copy()->startOfDay();
-        $unit = $main->isSnapshot() ? 1 : 7;
-        $count = max(1, (int) ceil(($start->diffInDays($main->publishes_on) + 1) / $unit));
-        $current = min($count, max(1, (int) floor($start->diffInDays(now()) / $unit) + 1));
+        $window = $main->runWindow();
         $threshold = app(ThresholdPolicy::class);
         $materials = Material::query()->where('parent_diagnosis_id', $main->diagnosis_id)->where('status', '!=', MaterialStatus::Failed)->get();
         $conversations = $main->conversations()->with('admin')->orderBy('held_at')->get();
@@ -257,10 +288,7 @@ class Overview extends Component
         $reading = $main->stage === MainDiagnosisStage::Reading;
 
         return [
-            'unit' => $main->isSnapshot() ? 'day' : 'week',
-            'segments' => collect(range(1, $count))->map(fn (int $index) => $index < $current ? 'done' : ($index === $current ? 'now' : 'later'))->all(),
-            'current' => $current,
-            'count' => $count,
+            ...$window,
             // While it runs: the points to be measured; from the reading on the measured
             // ones, the same number as on the admin Kert and the report (R0).
             'measuringPoints' => $reading ? (int) ($main->calculation['measuring_points'] ?? 0) : $main->diagnosis->rows()->count(),
@@ -270,10 +298,12 @@ class Overview extends Component
                 'total' => $peers,
                 'missing' => $threshold->missingPeers($main),
             ] : null,
-            'conversations' => ['held' => $conversations->filter(fn ($conversation) => $conversation->held_at->isPast())->count(), 'next' => $next],
+            'conversations' => ['held' => $conversations->filter(fn ($conversation) => $conversation->held_at->isPast())->count(), 'total' => $conversations->count(), 'next' => $next],
+            // "7 felvétel · 5 dokumentum · 1 átirat" (prototype V10): a pasted text is a transcript.
             'contributions' => [
                 'recordings' => $materials->filter(fn (Material $material) => ! $material->is_situation && $material->source->hasAudio())->count(),
-                'documents' => $materials->filter(fn (Material $material) => ! $material->is_situation && ! $material->source->hasAudio() && ! in_array($material->context, [MaterialContext::Dictation, MaterialContext::CapabilityStory], true))->count(),
+                'documents' => $materials->filter(fn (Material $material) => ! $material->is_situation && $material->source === MaterialSource::TextUpload && ! in_array($material->context, [MaterialContext::Dictation, MaterialContext::CapabilityStory], true))->count(),
+                'transcripts' => $materials->filter(fn (Material $material) => ! $material->is_situation && $material->source === MaterialSource::Text && ! in_array($material->context, [MaterialContext::Dictation, MaterialContext::CapabilityStory], true))->count(),
                 'situations' => $materials->where('is_situation', true)->count(),
             ],
             // Képességek: the situations told, the peers' among them; numbers only (NM-12).
@@ -285,22 +315,16 @@ class Overview extends Component
     }
 
     /**
-     * "Value · Core Team · Teljes · fut", "3. hét a 7-ből · publikálás: 04.18." (T5, 25 · 25.5).
+     * "Value Core Team · Teljes · fut" (T5, 25 · 25.5); the week is the note under it.
      */
     private function peerHomeSubtitle(): string
     {
         $main = $this->main();
-        $start = $main->running_at ?? now();
-        $weeks = max(1, (int) ceil($start->diffInDays($main->publishes_on) / 7));
-        $week = min($weeks, max(1, (int) floor($start->diffInDays(now()) / 7) + 1));
 
         return __('diagnosis.peer_home.subtitle', [
             'subject' => $main->subjectName(),
             'product' => $main->product_name,
-            'stage' => $main->stage->label(),
-            'week' => $week,
-            'weeks' => $weeks,
-            'date' => $main->publishes_on->format('m.d.'),
+            'stage' => mb_strtolower($main->stage->label()),
         ]);
     }
 

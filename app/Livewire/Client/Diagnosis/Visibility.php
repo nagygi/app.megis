@@ -51,6 +51,6 @@ class Visibility extends Component
             'missing' => $missing,
             'missingUrl' => $missing === null ? null : $this->stepUrl($missing->step),
             'canStart' => $this->main()->stage->isBeforeRunning() && $missing === null,
-        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Visibility))->title(DiagnosisStep::Visibility->label());
+        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Visibility, __('diagnosis.visibility.lead')))->title(DiagnosisStep::Visibility->label());
     }
 }

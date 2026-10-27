@@ -46,7 +46,7 @@ it('shows the leader what awaits and moves the diagnosis to filling on the first
         ->assertOk()
         ->assertSee('Első belépés')
         ->assertSee('Mi vár rád')
-        ->assertSee('6 lépés, és indul a diagnózis.')
+        ->assertSee('Hat lépés, és indul a diagnózis.')
         ->assertSee('kb. 13 perc · '.$main->starts_on->format('m.d.').'-ig')
         ->assertSee('Saját értékek')
         ->assertSee('A márkád alapja')
@@ -64,7 +64,7 @@ it('keeps V1 "Kezdjük" while only the admin-filled organization values and bran
 
     $this->get(route('client.diagnosis.show', leaderParams($setup, $main)))
         ->assertOk()
-        ->assertSee('6 lépés, és indul a diagnózis.')
+        ->assertSee('Hat lépés, és indul a diagnózis.')
         ->assertSee('Kezdjük')
         ->assertDontSee('Innen folytatod.');
 });
@@ -109,9 +109,13 @@ it('adds own values: a new one goes to the Értéktár as the user\'s own', func
     $main = startMainDiagnosis($setup);
     actingAsCustomer($setup['leader']);
 
+    $page = route('client.diagnosis.sajat-ertekek', leaderParams($setup, $main));
+
+    // Each screen has its own address, so the header follows it (prototype V2, V2·b, V2·c).
     Livewire::test(OwnValues::class, leaderParams($setup, $main))
         ->assertSet('screen', 'from')
         ->call('show', 'add')
+        ->assertRedirect($page.'?lap=uj')
         ->set('draft.name', 'Kíváncsiság')
         ->call('addDraft')
         ->assertHasErrors(['draft.meaning'])
@@ -119,8 +123,15 @@ it('adds own values: a new one goes to the Értéktár as the user\'s own', func
         ->call('addDraft')
         ->assertHasNoErrors()
         ->assertSet('screen', 'list')
+        ->assertRedirect($page);
+
+    $this->get($page.'?lap=uj')->assertOk()->assertSee('Érték hozzáadása')->assertSee('Mit jelent számodra?');
+    $this->get($page)->assertOk()->assertSee('Ha továbblépsz, ezek lesznek a saját értékeid.')->assertSeeHtml('href="'.$page.'?lap=honnan"');
+
+    Livewire::test(OwnValues::class, leaderParams($setup, $main))
         ->assertSee('Kíváncsiság')
         ->assertSee('még nincs beépítve')
+        ->assertSee('A szervezet értékei')
         ->call('next')
         ->assertRedirect(route('client.diagnosis.szervezet-ertekei', leaderParams($setup, $main)));
 
@@ -170,6 +181,9 @@ it('brings the values of the Értéktükör, leaving out "nem az enyém"', funct
         ->assertSee('Az Értéktükörből hozom')
         ->call('importMirror')
         ->assertSet('screen', 'list')
+        ->assertRedirect(route('client.diagnosis.sajat-ertekek', leaderParams($setup, $main)));
+
+    Livewire::test(OwnValues::class, leaderParams($setup, $main))
         ->assertSee('Egyenesség')
         ->assertSee('inkább most mondom')
         ->assertSee('erősen jelen')
@@ -203,7 +217,9 @@ it('ties an own value to an Értéktár value of the same name the user may not 
         ->set('draft.name', 'egyenesség')
         ->set('draft.meaning', 'Kimondom, amit gondolok.')
         ->call('addDraft')
-        ->assertHasNoErrors()
+        ->assertHasNoErrors();
+
+    Livewire::test(OwnValues::class, leaderParams($setup, $main))
         ->assertSee('Kimondom, amit gondolok.')
         ->assertDontSee('Egy másik szervezet AI-szövege.');
 
@@ -422,7 +438,9 @@ it('asks a private person about the brand base in the singular', function () {
     $main = startMainDiagnosis(['organization' => $organization, 'team' => null, 'leader' => $person, 'admin' => User::factory()->admin()->create()], overrides: ['team_id' => null, 'leader_id' => null]);
     actingAsCustomer($person);
 
-    Livewire::test(Brand::class, ['organization' => $organization, 'diagnosis' => $main->diagnosis])
+    // The question is the header's subtitle (prototype V4).
+    $this->get(route('client.diagnosis.markad-alapja', ['organization' => $organization, 'diagnosis' => $main->diagnosis]))
+        ->assertOk()
         ->assertSee('Mit mond rólad a fa?')
         ->assertSee('Miért csinálod?')
         ->assertDontSee('Mit mond rólatok a fa?');

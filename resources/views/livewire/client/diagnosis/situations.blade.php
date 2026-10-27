@@ -15,15 +15,15 @@
                     <span>
                         <span class="block font-semibold">{{ $material->occasion?->process?->name ?? __('processes.occasions.states.unclassified') }}</span>
                         <span class="block text-sm text-grey-700">
-                            {{ $date->format('Y.m.d.') }}
+                            {{ $date->format('m.d.') }}
                             · {{ $material->is_situation ? ($material->audio_seconds !== null ? __('processes.occasions.spoken', ['duration' => $material->durationLabel()]) : __('processes.occasions.written')) : __('processes.occasions.uploaded') }}
                             @if ($material->process_occasion_id !== null)
                                 ·
                                 {{-- Given or not, the experience opens again until reading (prototype T5·b → V11·c). --}}
                                 @if ($editable)
-                                    <a href="{{ route('client.diagnosis.occasion-experience', [$organization, $diagnosis, $material, 'from' => 'helyzeteim']) }}" @class(['font-semibold', 'text-coral-ink' => ! $experience?->isSubmitted()])>{{ $experience?->isSubmitted() ? __('processes.occasions.experience_given') : __('processes.occasions.experience_missing') }}</a>
+                                    <a href="{{ route('client.diagnosis.occasion-experience', [$organization, $diagnosis, $material, 'from' => 'helyzeteim']) }}" @class(['inline-flex items-center gap-1 font-semibold', 'text-coral-ink' => ! $experience?->isSubmitted()])>@if ($experience?->isSubmitted())<x-megis.icon name="check" class="size-3.5" />@endif{{ $experience?->isSubmitted() ? __('processes.occasions.experience_given') : __('processes.occasions.experience_missing') }}</a>
                                 @elseif ($experience?->isSubmitted())
-                                    {{ __('processes.occasions.experience_given') }}
+                                    <span class="inline-flex items-center gap-1"><x-megis.icon name="check" class="size-3.5" />{{ __('processes.occasions.experience_given') }}</span>
                                 @else
                                     <span class="text-coral-ink">{{ __('processes.occasions.experience_missing') }}</span>
                                 @endif

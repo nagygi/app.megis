@@ -96,7 +96,7 @@ class Brand extends Component
             'givenBy' => $set->latestVersion?->creator?->name ?? $set->updater?->name,
             // A private person is asked in the singular ("Mit mond rólad a fa?").
             'texts' => $this->main()->subject === MainDiagnosisSubject::Individual ? 'diagnosis.brand_individual' : 'diagnosis.brand',
-        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Brand))->title(DiagnosisStep::Brand->label());
+        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Brand, __(($this->main()->subject === MainDiagnosisSubject::Individual ? 'diagnosis.brand_individual' : 'diagnosis.brand').'.question')))->title(DiagnosisStep::Brand->label());
     }
 
     public function canEdit(): bool

@@ -50,12 +50,12 @@ class ProcessSummary extends Component
             'excluded' => Process::query()->whereBelongsTo($this->organization)->whereNull('parent_id')->where('kind', ProcessKind::Excluded)->orderBy('id')->get(),
             'otherCount' => Process::query()->whereBelongsTo($this->organization)->where('kind', ProcessKind::OneOff)->count()
                 + ($connection?->one_off_count ?? 0) + ($connection?->unlinked_count ?? 0),
-            'limit' => $this->main()->productSettings()['max_measured_processes'],
             'editable' => $this->acceptsInput(),
             'sheetUrl' => fn (Process $process) => route('client.diagnosis.process', [$this->organization, $this->diagnosis, $process]),
         ])->layout('layouts::client', [
-            ...$this->stepLayout(DiagnosisStep::Processes),
+            ...$this->stepLayout(DiagnosisStep::Processes, trans_choice('processes.summary.lead', $measured->count(), ['count' => $measured->count()])),
             'title' => __('processes.summary.title'),
+            'note' => ($limit = $this->main()->productSettings()['max_measured_processes']) !== null ? __('processes.summary.limit', ['max' => $limit]) : null,
             'back' => route('client.diagnosis.process-list', [$this->organization, $this->diagnosis]),
             'backLabel' => __('processes.list.title'),
         ])->title(__('processes.summary.title'));

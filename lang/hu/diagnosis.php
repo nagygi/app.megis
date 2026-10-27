@@ -6,8 +6,9 @@
 return [
 
     'what_awaits' => 'Mi vár rád',
-    'steps_lead' => '{1} :count lépés, és indul a diagnózis.|[2,*] :count lépés, és indul a diagnózis.',
-    'steps_lead_snapshot' => '{1} :count lépés, és indul a snapshot.|[2,*] :count lépés, és indul a snapshot.',
+    // :count is the number in words up to ten ("Hét lépés"), HungarianNumber::word.
+    'steps_lead' => ':Count lépés, és indul a diagnózis.',
+    'steps_lead_snapshot' => ':Count lépés, és indul a snapshot.',
     'minutes_until' => 'kb. :minutes perc ·',
     'minutes_about' => 'kb. :minutes perc',
     'until' => ':date-ig',
@@ -31,13 +32,13 @@ return [
     'save_failed' => 'Nem sikerült menteni. Próbáld újra.',
     'cannot_start' => 'A diagnózis most nem indítható.',
     'step_missing' => 'Még hiányzik: :step.',
-    'overview_back' => 'Mi vár rád',
+    'overview_back' => 'Diagnózis',
     'home_back' => 'Kezdőlap',
     'locked' => 'Ez a lépés már nem módosítható.',
     'progress' => 'Lépés: :current / :total',
     'unsaved' => 'A válaszaid még nincsenek elküldve. Biztosan elmész?',
     'peer_link' => 'A(z) :subject diagnózisában társ vagy',
-    'peer_steps_lead' => '{2} Két lépés most, egy, amíg fut.|{3} Három lépés most, egy, amíg fut.|[4,*] :count lépés most, egy, amíg fut.',
+    'peer_steps_lead' => ':Count lépés most, egy amíg fut.',
     'peer_add' => 'Hozzáteszel',
     'peer_add_help' => 'amíg fut · egy-egy helyzet',
 
@@ -63,7 +64,7 @@ return [
 
     'invitation' => [
         'title' => 'Hogyan látod te?',
-        'lead' => ':leader meghívott a(z) :subject diagnózisába. Kb. :minutes perc.',
+        'lead' => ':leader meghívott a(z) :subject diagnózisába. :minutes perc.',
         'start' => 'Kezdem',
         'later' => 'Nem most',
         'closed' => 'A diagnózis kitöltése lezárult.',
@@ -83,12 +84,16 @@ return [
     // V10, V10·b · the leader's home while it runs and is read (26 · 26.1, 26.2).
     'home' => [
         'title' => 'A ti diagnózisotok',
-        'subtitle' => ':product · :stage · :from – :to',
-        'conversations_title' => 'Beszélgetések a mégissel',
+        'subtitle' => ':product · :stage · :from → :to',
+        'conversations_title' => 'Beszélgetések a mégisszel',
         'ring' => 'Belső működés · :count mérőpont',
         'where' => 'Hol tartunk',
-        'week_of' => ':current. hét / :count',
-        'day_of' => ':current. nap / :count',
+        'week_of' => ':current / :count hét',
+        'day_of' => ':current / :count nap',
+        // :count is "a 7-ből" (HungarianNumber::outOf).
+        'week_note' => ':current. hét :count',
+        'day_note' => ':current. nap :count',
+        'range' => ':from → :to',
         'states' => [
             'done' => 'kész',
             'now' => 'most',
@@ -101,14 +106,20 @@ return [
         'remind' => 'Emlékeztetem őket',
         'reminded' => 'Szóltunk azoknak, akik még nem töltötték ki.',
         'missing_peers' => '{1} Még :count társ hangja kell, hogy lássátok a rést.|[2,*] Még :count társ hangja kell, hogy lássátok a rést.',
-        'conversations' => ':held megtartva',
+        'conversations' => ':held / :total',
         'conversation_next' => 'következő: :date · :admin',
         'contributions' => 'Amit hozzátesztek',
-        'contributions_count' => ':recordings felvétel · :documents dokumentum · :situations elmondott helyzet',
+        'contributions_count' => ':recordings felvétel · :documents dokumentum · :transcripts átirat',
+        'contributions_situations' => ':count elmondott helyzet',
         'reading' => 'A mégis olvasata',
         'report' => 'A riport',
-        'deepening' => 'Belső működés · értékek · folyamatok · területek · a márkád alapja · :date',
-        'deepening_snapshot' => 'Belső működés · értékek · folyamatok · a márkád alapja · :date',
+        // Mélyítés: grey until publishing (prototype V10).
+        'deepening_title' => 'Mélyítés',
+        'deepening' => 'Belső működés',
+        'deepening_help' => 'értékek · folyamatok · területek · a márkád alapja',
+        'deepening_help_snapshot' => 'értékek · folyamatok · a márkád alapja',
+        'deepening_brand' => 'Brand',
+        'deepening_brand_help' => 'megjelenések · csatornák · fix assetek',
         'correcting' => 'A mégis javítja a diagnózisotokat. Hamarosan újra elérhető.',
     ],
 
@@ -128,14 +139,20 @@ return [
 
     'peer_home' => [
         'title' => 'A csapat hangja',
-        'subtitle' => ':subject · :product · :stage · :week. hét / :weeks · publikálás: :date',
+        'subtitle' => ':subject · :product · :stage',
+        'publishes' => 'publikálás: :date',
         'brought_in' => 'Amit eddig behoztál',
-        'experience_at' => 'az elején · :date',
-        'library_help' => 'a csapat értékei, definícióval',
+        // :count in words, "öt érték" (HungarianNumber::word).
+        'experience_at' => 'az elején · :date · :count érték',
+        'library_help' => 'a csapat :count értéke, definícióval',
+        'coach' => 'Coach',
+        'coach_help' => 'Mit kérdeznél?',
         'withdrawn' => 'Visszavontad a hozzájárulásodat: a válaszaid kikerültek a diagnózisból, és Útravalót sem kapsz.',
         'leader_link' => 'A(z) :subject diagnózisát te vezeted',
-        'situations' => 'A helyzeteid',
-        'situations_count' => ':count beküldve',
+        'situations' => 'Helyzetek',
+        'situations_count' => ':told elmondva · :documents dokumentum',
+        'situations_all_lived' => 'mindegyikhez a megélésed',
+        'situations_missing' => ':count megélés hiányzik',
     ],
 
     'visibility' => [
@@ -162,13 +179,14 @@ return [
 
     'own_values' => [
         'question' => 'Miben nem alkuszol, akkor sem, ha kényelmetlen?',
-        'from_mirror' => 'Az Értéktükörből hozom · :date',
+        'from_mirror' => 'Az Értéktükörből hozom',
         'from_mirror_help' => ':count érték, idézetekkel · te döntöd el, mi marad',
         'tell' => 'Elmondom',
-        'tell_help' => 'egy helyzet a hétről · kb. 2 perc',
+        'tell_help' => 'egy helyzet a hétről · 2 perc',
         'add_or_pick' => 'Hozzáadom vagy kiválasztom',
         'add_or_pick_help' => 'új érték a saját szavaddal, vagy egy az Értéktárból',
         'back_to_list' => 'Vissza a listához',
+        'back_from' => 'Honnan',
         'new_mirror' => 'Új tükröd van (:date)',
         'review_new_mirror' => 'Átnézem',
         'list_lead' => 'Ha továbblépsz, ezek lesznek a saját értékeid.',
@@ -185,8 +203,9 @@ return [
         'meaning_for_you' => 'Mit jelent neked',
         'meaning_missing' => 'Írd le, mit jelent neked.',
         'for_example' => 'Például',
-        'source_mirror' => 'az Értéktükörből · :count / :total helyzetedben',
-        'source_added_seen' => 'hozzáadva · :count / :total helyzetedben',
+        // :count with its suffix, "3-ban" (HungarianNumber::inessive).
+        'source_mirror' => 'az Értéktükörből · :total helyzetedből :count',
+        'source_added_seen' => 'hozzáadva · :total helyzetedből :count',
         'source_added' => 'hozzáadva · még nincs róla helyzet',
         'new_value' => 'Új érték',
         'where_from' => 'Honnan hozod?',

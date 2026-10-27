@@ -106,7 +106,10 @@ class OccasionExperienceForm extends Component
             'editable' => $this->acceptsInput(),
         ])->layout('layouts::client', [
             'title' => __('processes.occasions.experience_title'),
-            'subtitle' => collect([$material->occasion?->process?->name, $material->occasion?->occurred_at?->format('Y.m.d.'), $material->is_situation ? __('processes.occasions.situation') : $material->source->label()])->filter()->implode(' · '),
+            // As in the prototype V11·c: the question, then "Retró · 03.14. · jegyzet feltöltve".
+            'symbol' => 'fruit',
+            'subtitle' => __('processes.occasions.experience_question'),
+            'note' => collect([$material->occasion?->process?->name, $material->occasion?->occurred_at?->format('m.d.'), $material->is_situation ? __('processes.occasions.situation') : __('processes.occasions.uploaded')])->filter()->implode(' · '),
             'back' => $this->fromSituations() ? $this->situationsUrl() : $this->contributeUrl(),
             'backLabel' => $this->fromSituations() ? __('processes.occasions.situations_title') : __('processes.occasions.contribute_title'),
             'color' => 'cream',

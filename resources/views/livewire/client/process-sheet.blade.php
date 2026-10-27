@@ -172,9 +172,17 @@
         @endif
     </x-ui.card>
 
-    {{-- Everything is saved on the way: one way back. --}}
+    {{-- Everything is saved on the way: in the diagnosis "Kész" goes on, the list stays a way back; the process's own page in the library. --}}
+    @if ($doneUrl)
+        <x-ui.link-row :href="route('client.processes.show', [$organization, $process])" :title="__('processes.sheet.library_page')" :meta="__('processes.sheet.library_page_help')" />
+    @endif
     <div class="flex flex-wrap items-center gap-4">
-        <x-ui.button size="lg" icon="chevron-left" :href="$backUrl">{{ __('processes.sheet.back') }}</x-ui.button>
+        @if ($doneUrl)
+            <x-ui.button size="lg" icon-right="arrow-right" :href="$doneUrl">{{ __('processes.sheet.done') }}</x-ui.button>
+            <x-ui.button tone="ghost" icon="chevron-left" :href="$backUrl">{{ __('processes.sheet.back') }}</x-ui.button>
+        @else
+            <x-ui.button size="lg" icon="chevron-left" :href="$backUrl">{{ __('processes.sheet.back') }}</x-ui.button>
+        @endif
         <x-diagnosis.saved />
     </div>
 </div>

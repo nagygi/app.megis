@@ -2,10 +2,7 @@
 <div class="flex max-w-2xl flex-col gap-6" @if ($dictations !== []) wire:poll.2s="pollDictations" @endif>
     <x-ui.flash />
 
-    <div class="flex flex-col gap-1">
-        <h2 class="text-xl font-semibold">{{ __($texts.'.question') }}</h2>
-        <p class="text-grey-700" aria-live="polite">{{ __('diagnosis.brand.count', ['done' => $doneCount]) }}</p>
-    </div>
+    <p class="text-grey-700" aria-live="polite">{{ __('diagnosis.brand.count', ['done' => $doneCount]) }}</p>
 
     @if (! $canEdit)
         <x-ui.notice>{{ $givenBy ? __('diagnosis.brand.given_by', ['name' => $givenBy]) : __('diagnosis.organization_values.readonly') }}</x-ui.notice>
@@ -24,9 +21,15 @@
             @else
                 <p class="text-grey-600 italic">{{ __($texts.'.root_empty') }}</p>
             @endif
-            @if ($names->count() >= \App\Models\OrganizationValueSet::MIN_VALUES)
-                <p class="inline-flex items-center gap-1 text-sm font-semibold text-green"><x-megis.icon name="check" /> {{ __('diagnosis.brand.done') }}</p>
-            @endif
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                @if ($names->count() >= \App\Models\OrganizationValueSet::MIN_VALUES)
+                    <p class="inline-flex items-center gap-1 text-sm font-semibold text-green"><x-megis.icon name="check" /> {{ __('diagnosis.brand.done') }}</p>
+                @endif
+                {{-- The values are edited on their own step (prototype V4: "Szerkesztem" on the root too). --}}
+                @if ($canEdit)
+                    <x-ui.button tone="ghost" size="sm" :href="$this->stepUrl($this->steps()->has(\App\Enums\DiagnosisStep::OrganizationValues) ? \App\Enums\DiagnosisStep::OrganizationValues : \App\Enums\DiagnosisStep::OwnValues)">{{ __('diagnosis.edit') }}</x-ui.button>
+                @endif
+            </div>
         </x-ui.card>
 
         @foreach (\App\Models\OrganizationValueSet::BRAND_FIELDS as $field)
@@ -76,5 +79,5 @@
         @endforeach
     </ul>
 
-    <x-diagnosis.next wire:click="next" :disabled-reason="$canEdit && $doneCount < 4 ? __('diagnosis.brand.next_hint') : null" />
+    <x-diagnosis.next wire:click="next" :disabled-reason="$canEdit && $doneCount < 4 ? __('diagnosis.brand.next_hint') : null">{{ $this->nextLabel(\App\Enums\DiagnosisStep::Brand) }}</x-diagnosis.next>
 </div>

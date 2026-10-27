@@ -64,7 +64,7 @@ it('renders the peer\'s pages from the invitation to the home', function () {
     Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => ConsentKind::Answers, 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
     $main->participantFor($peer, ParticipantRole::Peer)->update(['started_at' => now()]);
 
-    $this->get(route('client.diagnosis.show', $parameters))->assertOk()->assertSee('Két lépés most, egy, amíg fut.');
+    $this->get(route('client.diagnosis.show', $parameters))->assertOk()->assertSee('Két lépés most, egy amíg fut.');
     $this->get(route('client.diagnosis.sajat-ertekek', $parameters))->assertOk()->assertSee('1 / 2');
     $this->get(route('client.diagnosis.megeles', $parameters))->assertOk()->assertSee('2 / 2');
     $this->get(route('client.diagnosis.ki-lat-mit', $parameters))->assertForbidden();
@@ -81,15 +81,15 @@ it('renders the occasion pages of a running diagnosis (12)', function () {
     $parameters = ['organization' => $setup['organization'], 'diagnosis' => $main->diagnosis];
     actingAsCustomer($setup['leader']);
 
-    $this->get(route('client.diagnosis.contribute', $parameters))->assertOk()->assertSee('Hozzáteszek')->assertSee('nincs besorolva');
+    $this->get(route('client.diagnosis.contribute', $parameters))->assertOk()->assertSee('Feltöltés')->assertSee('Nem kell eldöntened, hová tartozik.')->assertSee('Teljes · fut · 1. hét')->assertSee('nincs besorolva');
     $this->get(route('client.diagnosis.situation', $parameters))->assertOk()->assertSee('Mesélj el egy alkalmat');
     $this->get(route('client.diagnosis.place', [...$parameters, 'material' => $material]))->assertOk()->assertSee('Melyik rutinhoz kötődik?')->assertSee('Heti retró');
 
     app(OccasionService::class)->place($material, $process, today()->toDateString(), $setup['leader'], false);
 
     $this->get(route('client.diagnosis.place', [...$parameters, 'material' => $material]))->assertRedirect(route('client.diagnosis.contribute', $parameters));
-    $this->get(route('client.diagnosis.occasion-experience', [...$parameters, 'material' => $material]))->assertOk()->assertSee('Heti retró · '.today()->format('Y.m.d.').' · Egy helyzet');
-    $this->get(route('client.diagnosis.situations', $parameters))->assertOk()->assertSee('megélés hiányzik');
+    $this->get(route('client.diagnosis.occasion-experience', [...$parameters, 'material' => $material]))->assertOk()->assertSee('Hogyan élted meg ezt a helyzetet?')->assertSee('Heti retró · '.today()->format('m.d.').' · Egy helyzet');
+    $this->get(route('client.diagnosis.situations', $parameters))->assertOk()->assertSee('megélés hiányzik')->assertSee('1 helyzet · 0 megéléssel');
 });
 
 it('shows the leader\'s home while it runs, with the coral plus, and without it in reading (26 · 26.1, 26.2)', function () {
@@ -105,7 +105,13 @@ it('shows the leader\'s home while it runs, with the coral plus, and without it 
         ->assertSee('Hol tartunk')
         ->assertSee('0 / 2 kitöltötte')
         ->assertSee('Még 3 társ hangja kell, hogy lássátok a rést.')
-        ->assertSee('0 felvétel · 0 dokumentum · 0 elmondott helyzet')
+        ->assertSee('0 felvétel · 0 dokumentum · 0 átirat')
+        // The header as in the prototype: the rings, "Teljes · fut · 03.02. → 04.18.", "1. hét a 7-ből".
+        ->assertSee('Teljes · fut · ')
+        ->assertSee(' → '.$main->publishes_on->format('m.d.'))
+        ->assertSee('1. hét a 7-ből')
+        ->assertSee('Beszélgetések a mégisszel')
+        ->assertSee('Mélyítés')
         ->assertSeeHtml('href="'.route('client.diagnosis.contribute', $parameters).'"');
 
     app(StageMachine::class)->transition($main, MainDiagnosisStage::Reading, $setup['admin']);

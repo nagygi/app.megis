@@ -179,7 +179,7 @@ class OrganizationValues extends Component
             'isFull' => count($this->items) >= OrganizationValueSet::MAX_VALUES,
             'hasVersion' => $set->latestVersion !== null,
             'givenBy' => $set->latestVersion?->creator?->name ?? $set->updater?->name,
-        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::OrganizationValues))->title(DiagnosisStep::OrganizationValues->label());
+        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::OrganizationValues, __('diagnosis.organization_values.question')))->title(DiagnosisStep::OrganizationValues->label());
     }
 
     public function canEdit(): bool

@@ -1,7 +1,5 @@
 {{-- V6 · Folyamatok (11 · 11.1): two ways to the same list. --}}
 <div class="flex max-w-2xl flex-col gap-6">
-    <h2 class="text-xl font-semibold">{{ __('processes.entry.question') }}</h2>
-
     @if ($main->acceptsInput())
         <div class="flex flex-col gap-3">
             <h3 class="font-semibold">{{ __('processes.entry.choose') }}</h3>

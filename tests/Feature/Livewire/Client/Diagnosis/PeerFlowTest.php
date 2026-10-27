@@ -40,7 +40,7 @@ it('asks the peer for the consents before anything else (T1)', function () {
     // T2 has its own header, so the page loads again.
     $this->get(route('client.diagnosis.show', peerParams($setup, $main)))
         ->assertSee('Első belépés')
-        ->assertSee('Két lépés most, egy, amíg fut.');
+        ->assertSee('Két lépés most, egy amíg fut.');
 
     $consent = Consent::query()->where('user_id', $peer->id)->sole();
     expect($consent->kind)->toBe(ConsentKind::Answers)
@@ -109,7 +109,16 @@ it('lets a peer fill in the own values and the experience, answering the recorde
 
     Livewire::test(Overview::class, peerParams($setup, $main))
         ->assertSee('Amit eddig behoztál')
-        ->assertSee('Türelem');
+        ->assertSee('Türelem')
+        // As in the prototype T5: the situations among what was brought in, the Coach kept for later.
+        ->assertSee('0 elmondva · 0 dokumentum')
+        ->assertSee('az elején · '.$experience->diagnosed_on->format('m.d.').' · három érték')
+        ->assertSee('Coach');
+
+    $this->get(route('client.diagnosis.show', peerParams($setup, $main)))
+        ->assertOk()
+        ->assertSee($setup['team']->name.' · Teljes · fut')
+        ->assertSee('1. hét a 7-ből · publikálás: '.$main->publishes_on->format('m.d.'));
 });
 
 it('keeps the leader-only steps from peers and peers out before "Kezdem"', function () {

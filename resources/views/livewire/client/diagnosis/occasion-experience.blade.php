@@ -9,10 +9,7 @@
     x-on:change="dirty = true"
     x-on:beforeunload.window="if (dirty) { $event.preventDefault(); $event.returnValue = '' }"
 >
-    <div class="flex flex-col gap-1">
-        <h2 class="text-xl font-semibold">{{ __('processes.occasions.experience_question') }}</h2>
-        <p class="text-grey-700" aria-live="polite">{{ __('diagnosis.experience.count', ['answered' => $answeredCount, 'total' => $total]) }}</p>
-    </div>
+    <p class="text-grey-700" aria-live="polite">{{ __('diagnosis.experience.count', ['answered' => $answeredCount, 'total' => $total]) }}</p>
 
     <x-form.error name="answers" id="answers" />
 
@@ -27,7 +24,7 @@
         :disabled="! $editable"
     />
 
-    @foreach ([['title' => __('diagnosis.experience.values'), 'rows' => $valueRows], ['title' => __('diagnosis.experience.brand'), 'rows' => $treeRows]] as $block)
+    @foreach ([['title' => __('processes.occasions.values_block'), 'rows' => $valueRows], ['title' => __('processes.occasions.tree_block'), 'rows' => $treeRows]] as $block)
         <section class="flex flex-col gap-3" aria-label="{{ $block['title'] }}">
             <h3 class="text-lg font-semibold">{{ $block['title'] }}</h3>
             @foreach ($block['rows'] as $row)

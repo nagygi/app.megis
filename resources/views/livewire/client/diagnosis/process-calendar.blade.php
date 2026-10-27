@@ -1,7 +1,5 @@
 {{-- V6·b · Naptár (09 · 9.1, 9.2). --}}
 <div class="flex max-w-2xl flex-col gap-6">
-    <h2 class="text-xl font-semibold">{{ __('calendar.lead') }}</h2>
-
     @if ($failure)
         <x-ui.notice tone="error" :title="$failure">
             <x-slot:action>
@@ -32,17 +30,23 @@
             <x-ui.card as="section" class="flex flex-col gap-2" aria-labelledby="we-never">
                 <h3 id="we-never" class="font-semibold">{{ __('calendar.we_never') }}</h3>
                 <ul class="flex flex-col gap-2 text-sm">
-                    <li><span class="font-semibold">{{ __('calendar.never.attachments') }}</span><br><span class="text-grey-700">{{ __('calendar.never.attachments_help') }}</span></li>
-                    <li><span class="font-semibold">{{ __('calendar.never.private') }}</span></li>
+                    {{-- "soha" on the right of each (prototype V6·b). --}}
+                    <li class="flex items-start justify-between gap-3"><span><span class="font-semibold">{{ __('calendar.never.attachments') }}</span><br><span class="text-grey-700">{{ __('calendar.never.attachments_help') }}</span></span><x-ui.badge tone="muted">{{ __('calendar.never.tag') }}</x-ui.badge></li>
+                    <li class="flex items-start justify-between gap-3"><span class="font-semibold">{{ __('calendar.never.private') }}</span><x-ui.badge tone="muted">{{ __('calendar.never.tag') }}</x-ui.badge></li>
                 </ul>
             </x-ui.card>
         </div>
 
         <x-ui.card as="section" tone="cream" bordered class="flex flex-col gap-1 text-sm" aria-labelledby="goes-on">
             <h3 id="goes-on" class="text-base font-semibold">{{ __('calendar.goes_on') }}</h3>
-            @foreach (['metadata', 'excluded', 'disconnect', 'stays'] as $line)
-                <p>{{ __('calendar.goes_on_lines.'.$line) }}</p>
-            @endforeach
+            <dl class="flex flex-col gap-1">
+                @foreach (['metadata', 'excluded', 'disconnect', 'stays'] as $line)
+                    <div class="flex justify-between gap-3">
+                        <dt>{{ __('calendar.goes_on_lines.'.$line) }}</dt>
+                        <dd class="text-right font-semibold">{{ __('calendar.goes_on_values.'.$line) }}</dd>
+                    </div>
+                @endforeach
+            </dl>
         </x-ui.card>
 
         <div class="flex flex-wrap items-center gap-3">

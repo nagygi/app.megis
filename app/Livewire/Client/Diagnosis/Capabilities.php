@@ -143,7 +143,7 @@ class Capabilities extends Component
             'minCharacters' => (int) config('diagnosis.capability_stories.min_characters'),
             'editable' => $this->acceptsInput(),
             'isPeer' => $role === ParticipantRole::Peer,
-        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Capabilities))->title(DiagnosisStep::Capabilities->label());
+        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Capabilities, __('capabilities.step.question')))->title(DiagnosisStep::Capabilities->label());
     }
 
     protected function canDictate(string $field): bool

@@ -1,4 +1,4 @@
-{{-- V11 · Hozzáteszek (12 · 12.1). --}}
+{{-- V11 · Feltöltés (12 · 12.1, prototype V11). --}}
 <div class="flex max-w-2xl flex-col gap-6" @if ($materials->contains(fn ($material) => $material->status->isWorking())) wire:poll.5s @endif>
     <x-ui.flash />
 
@@ -6,27 +6,42 @@
         <section class="flex flex-col gap-3" aria-labelledby="start-measure">
             <h2 id="start-measure" class="text-lg font-semibold">{{ __('processes.occasions.measure') }}</h2>
             @if ($canRecordMirror)
-                <x-ui.link-row :href="route('client.mirror.record', ['organization' => $organization, 'diagnozis' => $diagnosis->id])" :title="__('client.menu.mirror')" :meta="__('processes.occasions.mirror_help')" />
+                <x-ui.link-row :href="route('client.mirror.record', ['organization' => $organization, 'diagnozis' => $diagnosis->id])" :title="__('client.menu.mirror')" :meta="__('processes.occasions.mirror_help').($lastMirror ? ' · '.__('processes.occasions.mirror_last', ['date' => $lastMirror->format('m.d.')]) : '')" />
                 <x-ui.link-row :href="route('client.diagnosis.situation', [$organization, $diagnosis])" :title="__('processes.occasions.situation')" :meta="__('processes.occasions.situation_help')" />
             @endif
+            {{-- Outward, the channels: its place is kept (prototype V11, V7 is not in the MVP). --}}
+            <div class="flex items-center justify-between gap-3 rounded-card border border-dashed border-grey-350 px-5 py-4 text-grey-700" aria-disabled="true">
+                <span>
+                    <span class="block font-semibold">{{ __('processes.occasions.appearance') }}</span>
+                    <span class="block text-sm">{{ __('processes.occasions.appearance_help') }}</span>
+                </span>
+                <span class="text-sm">{{ __('report.soon') }}</span>
+            </div>
         </section>
 
-        <x-ui.card as="form" wire:submit="storeUpload" class="flex flex-col gap-3">
-            <h2 class="text-lg font-semibold">{{ __('processes.occasions.upload') }}</h2>
+        <x-ui.card as="form" wire:submit="storeUpload" class="flex flex-col gap-3 border-dashed">
+            <div>
+                <h2 class="text-lg font-semibold">{{ __('processes.occasions.upload') }}</h2>
+                <p class="text-sm text-grey-700">{{ __('processes.occasions.upload_kinds') }}</p>
+            </div>
             <x-form.file name="file" id="occasion-file" wire:model="file" :label="__('processes.occasions.file')" :help="__('processes.occasions.upload_rules', $rules)" />
             <div wire:loading wire:target="file" class="text-sm" role="status">{{ __('processes.occasions.uploading') }}</div>
             <x-ui.button type="submit" size="sm" icon="upload" class="self-start" wire:loading.attr="disabled" wire:target="file">{{ __('processes.occasions.upload_button') }}</x-ui.button>
         </x-ui.card>
 
         @if ($this->isLeader())
-            <p class="text-sm text-grey-700">
-                @if ($connection)
-                    {{ __('calendar.connected', ['provider' => $connection->providerLabel(), 'date' => $connection->connected_at->format('m.d.')]) }}
-                @else
-                    {{ __('processes.occasions.no_calendar') }}
-                @endif
-                · <a href="{{ route('client.profile', $organization) }}" class="font-semibold">{{ __('client.menu.profile') }}</a>
-            </p>
+            <section class="flex flex-col gap-2" aria-labelledby="integration">
+                <h2 id="integration" class="text-lg font-semibold">{{ __('processes.occasions.integration') }}</h2>
+                <x-ui.link-row
+                    :href="route('client.profile', $organization)"
+                    :title="__('calendar.title')"
+                    :meta="$connection ? __('processes.occasions.calendar_since', ['date' => $connection->connected_at->format('m.d.')]) : __('processes.occasions.no_calendar')"
+                >
+                    @if ($connection)
+                        <x-slot:trailing>{{ __('processes.occasions.connected') }}</x-slot:trailing>
+                    @endif
+                </x-ui.link-row>
+            </section>
         @endif
     @else
         <x-ui.notice>{{ __('processes.occasions.closed') }}</x-ui.notice>

@@ -3,16 +3,17 @@
     <x-ui.flash />
 
     @if ($screen === 'from')
-        {{-- V2 --}}
-        <h2 class="text-xl font-semibold">{{ __('diagnosis.own_values.question') }}</h2>
-
+        {{-- V2: the question is in the header --}}
         <div class="flex flex-col gap-3">
             @if ($mirror && $editable)
                 <x-ui.link-row
                     wire:click="importMirror"
-                    :title="__('diagnosis.own_values.from_mirror', ['date' => $mirror->created_at->format('m.d.')])"
+                    :title="__('diagnosis.own_values.from_mirror')"
                     :meta="__('diagnosis.own_values.from_mirror_help', ['count' => $mirrorCount])"
-                />
+                >
+                    {{-- The mirror's date on the right (prototype V2). --}}
+                    <x-slot:trailing>{{ $mirror->created_at->format('m.d.') }}</x-slot:trailing>
+                </x-ui.link-row>
             @endif
 
             @if ($canRecord && $editable)
@@ -38,10 +39,7 @@
             </x-ui.notice>
         @endif
 
-        <div class="flex flex-col gap-1">
-            <h2 class="text-xl font-semibold">{{ __('diagnosis.own_values.list_lead') }}</h2>
-            <p class="text-grey-700">{{ trans_choice('diagnosis.own_values.list_count', count($items), ['count' => count($items)]) }} · {{ __('diagnosis.own_values.suggested', ['count' => config('diagnosis.own_values.suggested')]) }}</p>
-        </div>
+        <p class="text-grey-700">{{ trans_choice('diagnosis.own_values.list_count', count($items), ['count' => count($items)]) }}</p>
 
         <x-form.error name="items" id="items" />
 
@@ -92,9 +90,9 @@
                     <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-grey-700">
                         <span>
                             @if ($item['source'] === 'mirror')
-                                {{ __('diagnosis.own_values.source_mirror', ['total' => $occurrences['total'], 'count' => $count]) }}
+                                {{ __('diagnosis.own_values.source_mirror', ['total' => $occurrences['total'], 'count' => \App\Services\Report\HungarianNumber::inessive($count)]) }}
                             @elseif ($count > 0)
-                                {{ __('diagnosis.own_values.source_added_seen', ['total' => $occurrences['total'], 'count' => $count]) }}
+                                {{ __('diagnosis.own_values.source_added_seen', ['total' => $occurrences['total'], 'count' => \App\Services\Report\HungarianNumber::inessive($count)]) }}
                             @else
                                 {{ __('diagnosis.own_values.source_added') }}
                             @endif
@@ -113,14 +111,12 @@
                 <x-ui.button tone="ghost" wire:click="show('from')">{{ __('diagnosis.own_values.where_from') }}</x-ui.button>
             </div>
 
-            <x-diagnosis.next wire:click="next" />
+            <x-diagnosis.next wire:click="next">{{ $this->nextLabel(\App\Enums\DiagnosisStep::OwnValues) }}</x-diagnosis.next>
         @else
             <x-ui.notice>{{ __('diagnosis.own_values.locked') }}</x-ui.notice>
         @endif
     @else
-        {{-- V2·c --}}
-        <h2 class="text-xl font-semibold">{{ $editingKey ? __('diagnosis.own_values.edit_title') : __('diagnosis.own_values.add_title') }}</h2>
-
+        {{-- V2·c: "Érték hozzáadása" is the header --}}
         @if (! $editingKey && $canRecord)
             <x-ui.link-row :href="$recordUrl" :title="__('diagnosis.own_values.tell')" :meta="__('diagnosis.own_values.tell_help')" />
         @endif

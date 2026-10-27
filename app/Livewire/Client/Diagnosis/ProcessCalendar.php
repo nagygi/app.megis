@@ -74,7 +74,7 @@ class ProcessCalendar extends Component
             'canConnect' => $this->acceptsInput() && ! $this->isImpersonating(),
             'maxMegabytes' => (int) (config('megis.calendar.ics_max_kilobytes') / 1024),
         ])->layout('layouts::client', [
-            ...$this->stepLayout(DiagnosisStep::Processes),
+            ...$this->stepLayout(DiagnosisStep::Processes, __('calendar.lead')),
             'title' => __('calendar.title'),
             'back' => route('client.diagnosis.folyamatok', [$this->organization, $this->diagnosis]),
             'backLabel' => DiagnosisStep::Processes->label(),

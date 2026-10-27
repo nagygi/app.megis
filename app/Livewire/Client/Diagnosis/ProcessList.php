@@ -140,11 +140,15 @@ class ProcessList extends Component
         $this->reset(['name', 'rhythm', 'parentId', 'description']);
     }
 
+    /**
+     * "5 folyamat elfogadása": every routine accepted, then the summary (prototype V6·d → V6·f).
+     */
     public function acceptAll(ProcessService $processes): void
     {
         $this->authorizeInput();
 
         $processes->acceptAll($this->organization, $this->main());
+        $this->redirect(route('client.diagnosis.process-summary', [$this->organization, $this->diagnosis]), navigate: false);
     }
 
     /**
@@ -185,7 +189,7 @@ class ProcessList extends Component
             'canDictate' => $this->canDictate('importText'),
             'sheetUrl' => fn (Process $process) => route('client.diagnosis.process', [$this->organization, $this->diagnosis, $process]),
         ])->layout('layouts::client', [
-            ...$this->stepLayout(DiagnosisStep::Processes),
+            ...$this->stepLayout(DiagnosisStep::Processes, $connection ? __('processes.list.lead_calendar') : __('processes.list.lead')),
             'title' => __('processes.list.title'),
             'back' => route('client.diagnosis.folyamatok', [$this->organization, $this->diagnosis]),
             'backLabel' => DiagnosisStep::Processes->label(),

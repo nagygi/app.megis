@@ -2,8 +2,6 @@
 <div class="flex max-w-2xl flex-col gap-6">
     <x-ui.flash />
 
-    <h2 class="text-xl font-semibold">{{ __('diagnosis.visibility.lead') }}</h2>
-
     <dl class="flex flex-col gap-3">
         @php
             $actors = [

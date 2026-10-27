@@ -1,9 +1,6 @@
 {{-- Képességek (NM-12): situations told to the values, typed or spoken; the step after the Megélés. --}}
 <div class="flex max-w-2xl flex-col gap-6" @if ($dictations !== []) wire:poll.2s="pollDictations" @endif>
-    <div class="flex flex-col gap-1">
-        <h2 class="text-xl font-semibold">{{ __('capabilities.step.question') }}</h2>
-        <p class="text-grey-700">{{ trans_choice('capabilities.step.count', $suggested, ['count' => $suggested]) }}</p>
-    </div>
+    <p class="text-grey-700">{{ trans_choice('capabilities.step.count', $suggested, ['count' => $suggested]) }}</p>
 
     <p>{{ __($isPeer ? 'capabilities.step.lead_peer' : 'capabilities.step.lead') }}</p>
 

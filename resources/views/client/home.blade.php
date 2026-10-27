@@ -26,7 +26,7 @@
                 <div>
                     <h3 id="leader-path" class="text-lg font-semibold">{{ __('client.home.leader_path') }}</h3>
                     <p class="text-sm text-grey-700">
-                        {{ trans_choice($preview['main']?->isSnapshot() ? 'diagnosis.steps_lead_snapshot' : 'diagnosis.steps_lead', $preview['leaderSteps']->count(), ['count' => $preview['leaderSteps']->count()]) }}
+                        {{ __($preview['main']?->isSnapshot() ? 'diagnosis.steps_lead_snapshot' : 'diagnosis.steps_lead', ['count' => \App\Services\Report\HungarianNumber::word($preview['leaderSteps']->count())]) }}
                         {{ __('diagnosis.minutes_about', ['minutes' => $preview['leaderSteps']->totalMinutes()]) }}
                     </p>
                 </div>

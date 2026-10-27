@@ -34,6 +34,44 @@ final class HungarianNumber
     }
 
     /**
+     * "3-ban", "2-ben": by how the last spoken part sounds ("három", "kettő",
+     * "húsz", "száz"), as in "3 helyzetedből 3-ban" (prototype V2·b).
+     */
+    public static function inessive(int $number): string
+    {
+        return $number.'-'.(self::isBack($number) ? 'ban' : 'ben');
+    }
+
+    /**
+     * "a 7-ből", "az 1-ből", "a 14-ből": out of how many (prototype V10, T5).
+     */
+    public static function outOf(int $number): string
+    {
+        return self::article($number).' '.$number.'-'.(self::isBack($number) ? 'ból' : 'ből');
+    }
+
+    /**
+     * "az" before the numbers said with a vowel first: egy, öt, ötven.
+     */
+    public static function article(int $number): string
+    {
+        return in_array($number, [1, 5], true) || ($number >= 50 && $number <= 59) ? 'az' : 'a';
+    }
+
+    /**
+     * Whether the last spoken part of the number takes back vowels:
+     * "három", "hat", "nyolc", "húsz", "harminc", "száz".
+     */
+    private static function isBack(int $number): bool
+    {
+        return match (true) {
+            $number % 10 !== 0 => in_array($number % 10, [3, 6, 8], true),
+            $number % 100 !== 0 => in_array(intdiv($number % 100, 10), [2, 3, 6, 8], true),
+            default => $number === 0 || $number % 1000 !== 0,
+        };
+    }
+
+    /**
      * Per row, whole numbers with ,5 rounded up (18 · 18.4).
      */
     public static function rowValue(?float $number): ?int

@@ -86,15 +86,23 @@ class PlaceMaterial extends Component
 
     public function render(OccasionService $occasions): View
     {
-        $eligible = $occasions->eligibleProcesses($this->main(), $this->user());
+        $eligible = $occasions->eligibleProcesses($this->main(), $this->user())->load('responsible');
+        $material = $this->ownMaterial($this->materialUuid);
 
         return view('livewire.client.diagnosis.place-material', [
-            'material' => $this->ownMaterial($this->materialUuid),
+            'material' => $material,
             'eligible' => $eligible,
             'excluded' => $occasions->excludedProcesses($this->main()),
             'latest' => $occasions->latestCalendarOccasion($eligible),
         ])->layout('layouts::client', [
-            'title' => __('processes.occasions.where_title'),
+            // As in the prototype V11·b: "Feltöltés", the question, and what came in.
+            'title' => __('processes.occasions.contribute_title'),
+            'label' => __('processes.occasions.where_title'),
+            'symbol' => 'growth-rings',
+            'subtitle' => __('processes.occasions.which'),
+            'note' => $material->is_situation
+                ? ($material->audio_seconds !== null ? __('processes.occasions.spoken', ['duration' => $material->durationLabel()]) : __('processes.occasions.written'))
+                : ($material->original_name ?? $material->source->label()),
             'back' => $this->contributeUrl(),
             'backLabel' => __('processes.occasions.contribute_title'),
             'color' => 'cream',

@@ -23,27 +23,30 @@ it('walks the leader from V1 to "Indul a diagnózis"', function () {
     $keys = collect($setup['organization']->valueSet->items)->map(fn ($item) => 'value:'.$item->key)->merge(['tree:root', 'tree:trunk', 'tree:crown', 'tree:shadow'])->all();
 
     $page = loginInBrowser($setup['leader']);
-    $page->assertSee('Mi vár rád')->assertSee('6 lépés, és indul a diagnózis.')->assertNoAccessibilityIssues();
+    $page->assertSee('Mi vár rád')->assertSee('Hat lépés, és indul a diagnózis.')->assertNoAccessibilityIssues();
 
     $page->click('Kezdjük');
     $page->assertSee('Miben nem alkuszol')->assertNoAccessibilityIssues();
 
     $page->click('Hozzáadom vagy kiválasztom');
-    $page->assertSee('Érték hozzáadása');
+    // V2·c is its own page now: Livewire boots before the fields are typed into.
+    $page->assertSee('Érték hozzáadása')->wait(0.5);
     $page->fill('draft-name', 'Kíváncsiság')->fill('draft-meaning', 'Megkérdezem, mi történt.');
     $page->press('Hozzáadom');
     $page->assertSee('Ha továbblépsz, ezek lesznek a saját értékeid.')->assertNoAccessibilityIssues();
 
-    $page->press('Tovább');
+    // "Tovább" carries the next step's name (prototype V2·b, V3).
+    $page->press('A szervezet értékei');
     $page->assertSee('Mit mondtok ki közösen?')->assertNoAccessibilityIssues();
-    $page->press('Tovább');
+    $page->press('A márkád alapja');
     $page->assertSee('Mit mond rólatok a fa?')->assertNoAccessibilityIssues();
-    $page->press('Tovább');
+    $page->press('A megélésed');
 
     $page->assertSee('Hogyan látjátok ma a márkát?')->assertNoAccessibilityIssues();
     answerExperience($page, $keys);
     $page->assertSee('7 / 7 megválaszolva');
-    $page->press('Tovább');
+    // "Folyamatok" is in the menu's Tárak too: the step's own button.
+    $page->click('[data-focus-errors]');
 
     $page->assertSee('Milyen folyamataid vannak?')->assertNoAccessibilityIssues();
     $page->press('Kihagyom');
@@ -62,13 +65,13 @@ it('saves an empty brand as the leader leaves each field and lets the leader go 
 
     $page = loginInBrowser($setup['leader']);
     $page->navigate(route('client.diagnosis.markad-alapja', [$setup['organization'], $main->diagnosis]));
-    $page->assertSee('1 / 4 kész')->assertButtonDisabled('Tovább');
+    $page->assertSee('1 / 4 kész')->assertButtonDisabled('A megélésed');
 
     $page->fill('brand-purpose', 'Hogy a csapat kiszámítható legyen.')->keys('#brand-purpose', 'Tab');
     $page->fill('brand-value_proposition', 'Gyors, őszinte visszajelzés.')->keys('#brand-value_proposition', 'Tab');
     $page->fill('brand-impact', 'Kevesebb újramunka.')->keys('#brand-impact', 'Tab');
 
-    $page->waitForText('4 / 4 kész')->assertButtonEnabled('Tovább')->assertNoJavaScriptErrors();
+    $page->waitForText('4 / 4 kész')->assertButtonEnabled('A megélésed')->assertNoJavaScriptErrors();
     expect($set->refresh()->only(['purpose', 'value_proposition', 'impact']))->toBe([
         'purpose' => 'Hogy a csapat kiszámítható legyen.',
         'value_proposition' => 'Gyors, őszinte visszajelzés.',
@@ -91,13 +94,14 @@ it('walks a peer from the consent to the experience', function () {
 
     $page->click('#answersConsent');
     $page->press('Kezdem');
-    $page->assertSee('Két lépés most, egy, amíg fut.')->assertNoAccessibilityIssues();
+    $page->assertSee('Két lépés most, egy amíg fut.')->assertNoAccessibilityIssues();
 
     $page->click('Kezdjük');
     $page->click('Hozzáadom vagy kiválasztom');
+    $page->assertSee('Érték hozzáadása')->wait(0.5);
     $page->fill('draft-name', 'Türelem')->fill('draft-meaning', 'Kivárom a végét.');
     $page->press('Hozzáadom');
-    $page->press('Tovább');
+    $page->press('A megélésed');
 
     $page->assertSee('Hogyan látjátok ma a márkát?')->assertNoAccessibilityIssues();
     answerExperience($page, array_column($rows, 'key'));

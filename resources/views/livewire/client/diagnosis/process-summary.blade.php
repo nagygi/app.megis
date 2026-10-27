@@ -1,11 +1,6 @@
 {{-- V6·f · A folyamataid (11 · 11.4). --}}
 <div class="flex max-w-2xl flex-col gap-6">
-    <div class="flex flex-col gap-1">
-        <h2 class="text-xl font-semibold">{{ trans_choice('processes.summary.lead', $measuredCount, ['count' => $measuredCount]) }}</h2>
-        @if ($limit !== null)
-            <p class="text-sm text-grey-700">{{ __('processes.summary.limit', ['max' => $limit]) }}</p>
-        @endif
-    </div>
+    {{-- The count and the product's limit are in the header (prototype V6·f). --}}
 
     @if ($inCalendar->isNotEmpty())
         <section class="flex flex-col gap-2" aria-labelledby="summary-measured">
@@ -68,8 +63,9 @@
 
     @if ($editable)
         <div class="flex flex-wrap items-center gap-3">
-            <x-ui.button size="lg" icon-right="arrow-right" wire:click="next">{{ __('diagnosis.next') }}</x-ui.button>
-            <x-ui.button tone="ghost" icon="chevron-left" :href="route('client.diagnosis.process-list', [$organization, $diagnosis])">{{ __('processes.summary.back_to_list') }}</x-ui.button>
+            <x-ui.button size="lg" icon-right="arrow-right" wire:click="next">{{ $this->nextLabel(\App\Enums\DiagnosisStep::Processes) }}</x-ui.button>
+            <x-ui.button tone="outline" icon="plus" :href="route('client.diagnosis.process-list', [$organization, $diagnosis])">{{ __('processes.summary.add') }}</x-ui.button>
+            <x-ui.button tone="ghost" :href="route('client.diagnosis.show', [$organization, $diagnosis])">{{ __('processes.summary.later') }}</x-ui.button>
         </div>
     @endif
 </div>

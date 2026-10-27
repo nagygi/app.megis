@@ -2,10 +2,7 @@
 <div class="flex max-w-2xl flex-col gap-6" @if ($dictations !== []) wire:poll.2s="pollDictations" @endif>
     <x-ui.flash />
 
-    <div class="flex flex-col gap-1">
-        <h2 class="text-xl font-semibold">{{ __('diagnosis.organization_values.question') }}</h2>
-        <p class="text-grey-700">{{ trans_choice('diagnosis.organization_values.count', count($items), ['count' => count($items)]) }}</p>
-    </div>
+    <p class="text-grey-700">{{ trans_choice('diagnosis.organization_values.count', count($items), ['count' => count($items)]) }}</p>
 
     @if (! $canEdit)
         <x-ui.notice>{{ $givenBy ? __('diagnosis.organization_values.given_by', ['name' => $givenBy]) : __('diagnosis.organization_values.readonly') }}</x-ui.notice>
@@ -98,5 +95,5 @@
     <x-diagnosis.next
         wire:click="next"
         :disabled-reason="$canEdit && count($items) < \App\Models\OrganizationValueSet::MIN_VALUES ? __('diagnosis.organization_values.too_few', ['min' => \App\Models\OrganizationValueSet::MIN_VALUES]) : null"
-    />
+    >{{ $this->nextLabel(\App\Enums\DiagnosisStep::OrganizationValues) }}</x-diagnosis.next>
 </div>

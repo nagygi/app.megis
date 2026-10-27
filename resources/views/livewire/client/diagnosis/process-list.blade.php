@@ -3,7 +3,6 @@
     <x-ui.flash />
 
     <div class="flex flex-col gap-1">
-        <h2 class="text-xl font-semibold">{{ $connection ? __('processes.list.lead_calendar') : __('processes.list.lead') }}</h2>
         @if ($connection)
             <p class="text-grey-700">{{ __('processes.list.events', ['count' => $connection->event_count]) }}</p>
         @endif
@@ -98,11 +97,13 @@
 
     @if ($editable)
         <div class="flex flex-wrap items-center gap-3">
-            <x-ui.button size="lg" icon-right="arrow-right" :href="route('client.diagnosis.process-summary', [$organization, $diagnosis])">{{ __('diagnosis.next') }}</x-ui.button>
+            {{-- Accepting is the way on while something waits for it (prototype V6·d). --}}
             @if ($unaccepted > 0)
-                <x-ui.button tone="outline" wire:click="acceptAll">{{ trans_choice('processes.list.accept_all', $unaccepted, ['count' => $unaccepted]) }}</x-ui.button>
+                <x-ui.button size="lg" icon-right="arrow-right" wire:click="acceptAll">{{ trans_choice('processes.list.accept_all', $unaccepted, ['count' => $unaccepted]) }}</x-ui.button>
+            @else
+                <x-ui.button size="lg" icon-right="arrow-right" :href="route('client.diagnosis.process-summary', [$organization, $diagnosis])">{{ __('diagnosis.next') }}</x-ui.button>
             @endif
-            <x-ui.button tone="ghost" :href="route('client.diagnosis.show', [$organization, $diagnosis])">{{ __('processes.list.later') }}</x-ui.button>
+            <x-ui.button tone="ghost" :href="route('client.diagnosis.folyamatok', [$organization, $diagnosis])">{{ __('processes.list.later') }}</x-ui.button>
         </div>
     @endif
 </div>

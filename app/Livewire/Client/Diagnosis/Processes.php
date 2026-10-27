@@ -40,6 +40,6 @@ class Processes extends Component
         return view('livewire.client.diagnosis.processes', [
             'main' => $this->main(),
             'hasProcesses' => $this->organization->processes()->exists(),
-        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Processes))->title(DiagnosisStep::Processes->label());
+        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Processes, __('processes.entry.question')))->title(DiagnosisStep::Processes->label());
     }
 }

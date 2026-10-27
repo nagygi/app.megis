@@ -4,16 +4,15 @@
     $date = \Illuminate\Support\Carbon::parse($publishedOn)->format('m.d.');
     $position = fn ($number) => $number === null ? null : round(($number - 1) / 5 * 100);
 @endphp
-<x-layouts::client :title="__('takeaway.title')" color="green" :subtitle="__('takeaway.subtitle', ['date' => $date, 'subject' => $takeaway['subject_name']])" :back="$preview ? null : route('client.diagnosis.show', [$organization, $diagnosis])" :back-label="__('diagnosis.home_back')">
+{{-- As in the prototype T6: the lead is the subtitle, the date and the diagnosis the line under it. --}}
+<x-layouts::client :title="__('takeaway.title')" color="green" :subtitle="__('takeaway.lead')" :note="__('takeaway.subtitle', ['date' => $date, 'subject' => $takeaway['subject_name']])" :back="$preview ? null : route('client.diagnosis.show', [$organization, $diagnosis])" :back-label="__('diagnosis.home_back')">
     <div class="flex max-w-2xl flex-col gap-6">
-        <p class="text-lg">{{ __('takeaway.lead') }}</p>
 
         <ol class="flex flex-col gap-3">
             @if ($takeaway['strength'])
                 <li class="rounded-card bg-green p-5 text-cream on-dark">
                     <p class="text-xs font-semibold uppercase tracking-wide">1 · {{ __('takeaway.strength') }}</p>
-                    <p class="text-lg font-semibold">{{ $takeaway['strength']['name'] }}</p>
-                    <p>{{ $takeaway['strength']['situations'] !== null
+                    <p class="text-lg"><span class="font-semibold">{{ $takeaway['strength']['name'] }}:</span> {{ $takeaway['strength']['situations'] !== null
                         ? __('takeaway.strength_situations', ['score' => $whole($takeaway['strength']['situations']), 'count' => $takeaway['strength']['situation_count']])
                         : __('takeaway.strength_start', ['score' => $whole($takeaway['strength']['start'])]) }}</p>
                 </li>
@@ -21,22 +20,19 @@
             @if ($takeaway['own_value'])
                 <li class="rounded-card bg-charcoal p-5 text-cream on-dark">
                     <p class="text-xs font-semibold uppercase tracking-wide">2 · {{ __('takeaway.own_value') }}</p>
-                    <p class="text-lg font-semibold">{{ $takeaway['own_value']['name'] }}</p>
-                    <p>{{ __('takeaway.own_value_line', ['count' => $takeaway['own_value']['team_count']]) }}</p>
+                    <p class="text-lg"><span class="font-semibold">{{ $takeaway['own_value']['name'] }}:</span> {{ __('takeaway.own_value_line', ['count' => \App\Services\Report\HungarianNumber::word((int) $takeaway['own_value']['team_count'])]) }}</p>
                 </li>
             @endif
             @if ($takeaway['self_gap'])
                 <li class="rounded-card bg-coral p-5 text-black">
                     <p class="text-xs font-semibold uppercase tracking-wide">3 · {{ __('takeaway.self_gap') }}</p>
-                    <p class="text-lg font-semibold">{{ $takeaway['self_gap']['name'] }}</p>
-                    <p>{{ __('takeaway.self_gap_line', ['start' => $whole($takeaway['self_gap']['start']), 'situations' => $whole($takeaway['self_gap']['situations'])]) }}</p>
+                    <p class="text-lg"><span class="font-semibold">{{ $takeaway['self_gap']['name'] }}:</span> {{ __('takeaway.self_gap_line', ['start' => $whole($takeaway['self_gap']['start']), 'situations' => $whole($takeaway['self_gap']['situations'])]) }}</p>
                 </li>
             @endif
             @if ($takeaway['others_gap'])
                 <li class="rounded-card bg-yellow p-5 text-charcoal">
                     <p class="text-xs font-semibold uppercase tracking-wide">4 · {{ __('takeaway.others_gap') }}</p>
-                    <p class="text-lg font-semibold">{{ $takeaway['others_gap']['name'] }}</p>
-                    <p>{{ __('takeaway.others_gap_line', ['you' => $whole($takeaway['others_gap']['start']), 'others' => $whole($takeaway['others_gap']['others'])]) }}</p>
+                    <p class="text-lg"><span class="font-semibold">{{ $takeaway['others_gap']['name'] }}:</span> {{ __('takeaway.others_gap_line', ['you' => $whole($takeaway['others_gap']['start']), 'others' => $whole($takeaway['others_gap']['others'])]) }}</p>
                 </li>
             @endif
         </ol>

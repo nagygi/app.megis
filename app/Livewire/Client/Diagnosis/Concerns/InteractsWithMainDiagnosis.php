@@ -114,9 +114,23 @@ trait InteractsWithMainDiagnosis
     }
 
     /**
-     * @return array<string, mixed> the client layout's header for a step page
+     * The name on "Tovább": the next step's, as in the prototype ("A szervezet
+     * értékei"); plain "Tovább" when it goes home.
      */
-    public function stepLayout(DiagnosisStep $step): array
+    public function nextLabel(DiagnosisStep $step): string
+    {
+        $next = $this->isRevisit() ? null : $this->steps()->after($step);
+
+        return $next?->step->label() ?? __('diagnosis.next');
+    }
+
+    /**
+     * The client layout's header for a step page: the step's symbol, its
+     * question as the subtitle (prototype V2–V9, T3–T4).
+     *
+     * @return array<string, mixed>
+     */
+    public function stepLayout(DiagnosisStep $step, ?string $question = null): array
     {
         $steps = $this->steps();
         $revisit = $this->isRevisit();
@@ -134,6 +148,8 @@ trait InteractsWithMainDiagnosis
             'backLabel' => $previous?->step->label() ?? $home,
             'step' => $steps->position($step).' / '.$steps->count(),
             'progress' => [$steps->position($step), $steps->count()],
+            'symbol' => $step->symbol(peer: ! $this->isLeader()),
+            'subtitle' => $question,
             'color' => 'cream',
         ];
     }

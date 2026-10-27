@@ -62,7 +62,7 @@ it('leaves Képességek out while the capability measurement is off', function (
     expect($main->leaderSteps())->not->toContain(DiagnosisStep::Capabilities)
         ->and($main->peerSteps())->not->toContain(DiagnosisStep::Capabilities);
 
-    $this->get(route('client.diagnosis.show', capabilityParams($setup, $main)))->assertOk()->assertSee('6 lépés, és indul a diagnózis.');
+    $this->get(route('client.diagnosis.show', capabilityParams($setup, $main)))->assertOk()->assertSee('Hat lépés, és indul a diagnózis.');
     $this->get(route('client.diagnosis.kepessegek', capabilityParams($setup, $main)))->assertNotFound();
 });
 
@@ -78,7 +78,7 @@ it('puts Képességek after the Megélés while the capability measurement runs'
 
     $this->get(route('client.diagnosis.show', capabilityParams($setup, $main)))
         ->assertOk()
-        ->assertSee('7 lépés, és indul a diagnózis.')
+        ->assertSee('Hét lépés, és indul a diagnózis.')
         ->assertSee('kb. 16 perc')
         ->assertSee('Képességek')
         ->assertSee('amire építhettek, és ami hiányzik');
@@ -96,9 +96,10 @@ it('suggests three situations in a Teljes: the best and the worst lived value, a
     $values = app(OrganizationValueSetService::class)->forOrganization($setup['organization'])->items()->orderBy('position')->get();
     actingAsCustomer($setup['leader']);
 
+    $this->get(route('client.diagnosis.kepessegek', capabilityParams($setup, $main)))->assertOk()->assertSee('Hol lesz az értékeitekből tett?');
+
     Livewire::test(Capabilities::class, capabilityParams($setup, $main))
         ->assertOk()
-        ->assertSee('Hol lesz az értékeitekből tett?')
         ->assertSee('3 helyzet · leírva vagy elmondva')
         ->assertSee('Mikor került valamibe nemrég ez az érték?')
         ->assertSee('Mikor kellett volna nemrég ez az érték, és nem úgy ment?')
@@ -223,7 +224,7 @@ it('lets a peer tell one situation once started, the leader only counts them', f
 
     $this->get(route('client.diagnosis.show', capabilityParams($setup, $main)))
         ->assertOk()
-        ->assertSee('Három lépés most, egy, amíg fut.')
+        ->assertSee('Három lépés most, egy amíg fut.')
         ->assertSee('Képességek');
 
     $component = Livewire::test(Capabilities::class, capabilityParams($setup, $main))->assertSee('A vezető nem látja, mit írtál.');
