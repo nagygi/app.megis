@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.42 · HASH · 2026-10-27
+## 1.42 · b1b7888 · 2026-10-27
 
 A szervezet értékeinél az admin és az ügyfél felülete ugyanazokkal a szabályokkal működik (08 · 8.1, 8.5).
 
