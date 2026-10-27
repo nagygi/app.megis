@@ -6,6 +6,7 @@ use App\Enums\MainDiagnosisStage;
 use App\Http\Controllers\Controller;
 use App\Models\Diagnosis;
 use App\Models\Organization;
+use App\Services\Report\ReportPdfStore;
 use App\Services\Report\ReportService;
 use App\Services\Report\StandaloneReportBuilder;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\LaravelPdf\PdfBuilder;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * The PDFs (28 · 28.3): the report with its appendix, and the Útravaló, from
@@ -23,7 +25,10 @@ class ReportPdfController extends Controller
 {
     public function __construct(private ReportService $reports) {}
 
-    public function report(Request $request, Organization $organization, Diagnosis $diagnosis, StandaloneReportBuilder $standalone): PdfBuilder
+    /**
+     * A PDF the admin uploaded goes out instead of the generated one, under the same name.
+     */
+    public function report(Request $request, Organization $organization, Diagnosis $diagnosis, StandaloneReportBuilder $standalone, ReportPdfStore $uploads): PdfBuilder|StreamedResponse
     {
         abort_if($diagnosis->organization_id !== $organization->id, 404);
         $main = $diagnosis->main;
@@ -41,9 +46,14 @@ class ReportPdfController extends Controller
         }
 
         $date = Carbon::parse($data['meta']['published_on']);
+        $filename = 'megis-diagnozis-'.Str::slug($data['meta']['subject_name']).'-'.$date->format('Y-m-d').'.pdf';
+
+        if ($diagnosis->hasReportPdf()) {
+            return $uploads->response($diagnosis, $filename);
+        }
 
         return $this->pdf('pdf.report', ['report' => $data], $data['meta']['name'], $date, $data['meta']['subject_name'])
-            ->download('megis-diagnozis-'.Str::slug($data['meta']['subject_name']).'-'.$date->format('Y-m-d').'.pdf');
+            ->download($filename);
     }
 
     public function takeaway(Request $request, Organization $organization, Diagnosis $diagnosis): PdfBuilder

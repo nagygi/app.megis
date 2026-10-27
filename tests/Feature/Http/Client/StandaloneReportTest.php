@@ -11,7 +11,10 @@ use App\Models\Team;
 use App\Models\User;
 use App\Models\Value;
 use App\Services\Diagnoses\DiagnosisService;
+use App\Services\Report\ReportPdfStore;
 use App\Services\Report\StandaloneReportBuilder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelPdf\Facades\Pdf;
 
 /**
@@ -181,6 +184,18 @@ it('downloads the report as PDF', function () {
     $this->get(route('client.report.pdf', [$organization, $diagnosis]))->assertOk();
 
     Pdf::assertRespondedWithPdf(fn ($pdf) => $pdf->viewName === 'pdf.report' && str_starts_with($pdf->downloadName, 'megis-diagnozis-'));
+});
+
+it('downloads the PDF the admin uploaded instead of the generated one', function () {
+    Storage::fake('materials');
+    [$organization, $user, $diagnosis] = standaloneUserDiagnosis();
+    app(ReportPdfStore::class)->store($diagnosis, UploadedFile::fake()->createWithContent('sajat.pdf', 'egyedi riport'));
+    actingAsCustomer($user);
+
+    $response = $this->get(route('client.report.pdf', [$organization, $diagnosis]))->assertOk();
+
+    expect($response->streamedContent())->toBe('egyedi riport')
+        ->and($response->headers->get('Content-Disposition'))->toStartWith('attachment; filename=megis-diagnozis-');
 });
 
 it('builds the PDF view of a standalone report', function () {

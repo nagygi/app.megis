@@ -94,6 +94,8 @@
         </div>
     </section>
 
+    <livewire:admin.diagnoses.report-pdf :diagnosis="$diagnosis" />
+
     @if ($isPublished)
         <div class="grid gap-4 lg:grid-cols-2">
             {{-- Javítás publikálás után (21 · 21.4) --}}

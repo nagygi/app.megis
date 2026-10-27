@@ -1360,6 +1360,24 @@ return [
         ],
     ],
 
+    // Egyedi riport-PDF (28 · 28.3).
+    'report_pdf' => [
+        'title' => 'Egyedi riport-PDF',
+        'help' => 'Ha feltöltesz egy PDF-et, a „Letöltöm · PDF” ezt adja a generált helyett. A javítás és az újrapublikálás nem cseréli le: ha a riport változik, töltsd fel újra.',
+        'downloads_off' => 'A felhasználói oldalon a PDF-letöltés most ki van kapcsolva (MEGIS_PDF_DOWNLOADS), így ez a fájl sem tölthető le.',
+        'current' => ':name · feltöltve :date',
+        'none' => 'Nincs egyedi PDF: a letöltés a generált riportot adja.',
+        'file' => 'PDF fájl',
+        'file_help' => 'Csak PDF, legfeljebb 20 MB.',
+        'upload' => 'Feltöltöm',
+        'replace' => 'Cserélem',
+        'open' => 'Megnézem',
+        'remove' => 'Törlöm',
+        'confirm_remove' => 'Törlöd az egyedi PDF-et? A letöltés újra a generált riportot adja.',
+        'uploaded' => 'Az egyedi PDF feltöltve: a letöltés ezt adja.',
+        'removed' => 'Az egyedi PDF törölve: a letöltés újra a generált riportot adja.',
+    ],
+
     // Olvasat (A3, 20).
     'reading' => [
         'not_started' => 'Az olvasat az „Olvasat indítása” után nyílik meg.',

@@ -404,6 +404,8 @@
                 <p class="text-grey-700">–</p>
             @endif
         </x-ui.card>
+
+        <livewire:admin.diagnoses.report-pdf :diagnosis="$diagnosis" />
     @endif
 
     {{-- Status log (04 · 4.3) --}}

@@ -50,6 +50,12 @@ Három dolog, ami a riportot (27) körülveszi:
 - Az tölthet le, aki a lapot látja (27.1, 29).
 - A riport a felületen ugyanúgy néz ki, mint előtte; a PDF egy külön, nyomtatásra szánt nézet.
 - **Kikapcsolható (2026-10-27):** `MEGIS_PDF_DOWNLOADS=false` elrejti a felhasználói oldal „Letöltöm · PDF” gombjait (zárólap, Melléklet, Útravaló, a riportlista „PDF” gombja). Alapból be van kapcsolva. A letöltési címek kikapcsolva is működnek.
+- **Egyedi riport-PDF (2026-10-27):**
+  - Az admin a diagnózishoz saját PDF-et tölthet fel: fő diagnózisnál a Publikálás fülön (21.6), önálló diagnózisnál a diagnózis lapján, „A mégis javaslata” alatt.
+  - Ha van ilyen, a „Letöltöm · PDF” ezt adja a generált helyett, ugyanazzal a fájlnévvel és ugyanannak, aki eddig letölthette.
+  - Csak PDF, legfeljebb 20 MB. Publikálás előtt és után is feltölthető, cserélhető és törölhető; törlés után újra a generált PDF jön.
+  - A diagnózishoz tartozik, nem a fagyasztott riporthoz: a javítás és az újrapublikálás nem cseréli le.
+  - Az Útravalóra nem vonatkozik, mert az mindenkinek a saját értékeit mutatja.
 
 ## Nincs benne
 

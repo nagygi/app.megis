@@ -10,8 +10,11 @@ use App\Models\DiagnosisClaim;
 use App\Models\InboxItem;
 use App\Models\ReportFeedback;
 use App\Services\Report\PublishService;
+use App\Services\Report\ReportPdfStore;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Spatie\LaravelPdf\Facades\Pdf;
 
@@ -156,6 +159,22 @@ it('downloads the report and the Útravaló as PDF from the snapshot (28 · 28.3
     $this->get(route('client.report.pdf', [$setup['organization'], $main->diagnosis]))->assertForbidden();
     $this->get(route('client.diagnosis.takeaway.pdf', [$setup['organization'], $main->diagnosis]))->assertOk();
     Pdf::assertRespondedWithPdf(fn ($pdf) => $pdf->downloadName === 'megis-utravalo-'.today()->format('Y-m-d').'.pdf' && $pdf->viewName === 'pdf.takeaway');
+});
+
+it('gives the leader the PDF the admin uploaded instead of the generated one (28 · 28.3)', function () {
+    Storage::fake('materials');
+    [$setup, $main] = publishedReport();
+    $parameters = [$setup['organization'], $main->diagnosis];
+    app(ReportPdfStore::class)->store($main->diagnosis, UploadedFile::fake()->createWithContent('sajat.pdf', 'egyedi riport'));
+
+    actingAsCustomer($setup['leader']);
+    $response = $this->get(route('client.report.pdf', $parameters))->assertOk()->assertHeader('Content-Type', 'application/pdf');
+    expect($response->streamedContent())->toBe('egyedi riport')
+        ->and($response->headers->get('Content-Disposition'))->toStartWith('attachment; filename=megis-diagnozis-')
+        ->toEndWith(today()->format('Y-m-d').'.pdf');
+
+    actingAsCustomer($setup['peers'][0]);
+    $this->get(route('client.report.pdf', $parameters))->assertForbidden();
 });
 
 it('shows the PDF buttons only when MEGIS_PDF_DOWNLOADS is on (28 · 28.3)', function (bool $enabled) {

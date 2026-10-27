@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\LegalDocumentVersionController;
 use App\Http\Controllers\Admin\MaterialAudioController;
 use App\Http\Controllers\Admin\OpenMainDiagnosisController;
 use App\Http\Controllers\Admin\ReportPreviewController;
+use App\Http\Controllers\Admin\UploadedReportPdfController;
 use App\Http\Controllers\Client\CalendarOAuthController;
 use App\Http\Controllers\Client\CustomerLoginController;
 use App\Http\Controllers\Client\CustomerLogoutController;
@@ -111,6 +112,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('diagnozisok/{diagnosis}/kepessegek', Admin\Diagnoses\Capabilities::class)->name('diagnoses.capabilities');
         // The user's report of a standalone diagnosis before publishing (04 · 4.6).
         Route::livewire('diagnozisok/{diagnosis}/felhasznaloi-nezet', Admin\Diagnoses\Preview::class)->name('diagnoses.preview');
+        // The report PDF the admin uploaded (28 · 28.3).
+        Route::get('diagnozisok/{diagnosis}/riport-pdf', UploadedReportPdfController::class)->name('diagnoses.report-pdf');
         Route::livewire('diagnozisok/{diagnosis}/beallitas', Admin\MainDiagnoses\Form::class)->name('main-diagnoses.edit');
         Route::livewire('diagnozisok/{diagnosis}/reszdiagnozisok', Admin\MainDiagnoses\Subdiagnoses::class)->name('main-diagnoses.subdiagnoses');
         Route::livewire('diagnozisok/{diagnosis}/futas', Admin\MainDiagnoses\Run::class)->name('main-diagnoses.run');

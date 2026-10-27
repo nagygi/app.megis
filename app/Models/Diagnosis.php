@@ -8,6 +8,7 @@ use App\Enums\DiagnosisRowKind;
 use App\Enums\DiagnosisStatus;
 use App\Enums\ScoreState;
 use App\Models\Concerns\Blameable;
+use App\Services\Report\ReportPdfStore;
 use Carbon\CarbonInterface;
 use Database\Factories\DiagnosisFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -25,11 +26,19 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'diagnosis_type_id', 'diagnosed_on', 'diagnosed_until', 'creator_kind', 'status', 'aggregation', 'material_id', 'speaker',
     'parent_id', 'value_set_version_id', 'excluded_at', 'process_id',
     'score', 'score_state', 'automatic_score', 'automatic_score_state', 'score_override_reason', 'score_overridden_by', 'score_overridden_at',
+    'report_pdf_path', 'report_pdf_name', 'report_pdf_uploaded_at',
 ])]
 class Diagnosis extends Model
 {
     /** @use HasFactory<DiagnosisFactory> */
     use Blameable, HasFactory;
+
+    protected static function booted(): void
+    {
+        static::deleted(function (Diagnosis $diagnosis): void {
+            app(ReportPdfStore::class)->forget($diagnosis);
+        });
+    }
 
     /**
      * @return array<string, string>
@@ -49,6 +58,7 @@ class Diagnosis extends Model
             'automatic_score' => 'float',
             'automatic_score_state' => ScoreState::class,
             'score_overridden_at' => 'datetime',
+            'report_pdf_uploaded_at' => 'datetime',
         ];
     }
 
@@ -182,6 +192,14 @@ class Diagnosis extends Model
     public function isSubdiagnosis(): bool
     {
         return $this->parent_id !== null;
+    }
+
+    /**
+     * The admin uploaded the report PDF; the download gives it (28 · 28.3).
+     */
+    public function hasReportPdf(): bool
+    {
+        return $this->report_pdf_path !== null;
     }
 
     /**

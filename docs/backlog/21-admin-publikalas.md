@@ -56,6 +56,11 @@ Négy sor. Amíg nincs meg mind, a „Publikálom” gomb szürke, és a hiányz
 - A 21.3 zárolásai érvényben maradnak: a vezető és a társak nem kezdenek újra kitölteni.
 - Újrapublikáláskor nem megy ki újra e-mail.
 
+### 21.6 Egyedi riport-PDF
+
+- A Publikálás fülön, az Előnézet alatt egy kártya: az admin saját PDF-et tölthet fel, és ha van ilyen, a vezető „Letöltöm · PDF”-je ezt kapja a generált helyett (28.3).
+- Megnézhető, cserélhető és törölhető, publikálás előtt és után is. A javítás (21.4) és az újrapublikálás nem cseréli le.
+
 ## E-mailek
 
 - **Vezető:** „Elkészült a {Csapat} diagnózisa. [Megnézem] Ha átbeszélnéd velünk: [Időpontot foglalok]”
