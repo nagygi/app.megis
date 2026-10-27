@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.41 · HASH · 2026-10-27
+## 1.41 · bcb5b08 · 2026-10-27
 
 A belépés három rése bezárult (14 · 14.2), és a Publikálás ellenőrzőlistája nem visz 403-ra (21 · 21.2).
 
