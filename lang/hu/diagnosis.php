@@ -50,6 +50,7 @@ return [
 
     'end' => [
         'title' => 'A végén · :date',
+        'title_open' => 'A végén',
         'ring' => 'Belső működés',
         'gap' => 'A legnagyobb rés',
         'gap_help' => 'amit látni véltek, és amit mutattok',

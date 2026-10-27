@@ -104,15 +104,19 @@ return [
         'team_path' => 'A csapat hangja',
         'team_path_named' => 'A csapat hangja · :team',
         'team_path_help' => 'A csapat az induláskor kap meghívót.',
+        'team_path_help_dated' => 'A csapat az induláskor (:date) kap meghívót.',
         'invited_soon' => ':leader hamarosan meghív a(z) :subject diagnózisába.',
         'invited_later' => 'Amikor a vezetőd elindítja a diagnózist, meghívót kapsz.',
+        // The start day of the diagnosis being set up (starts_on), or "egyeztetés alatt".
+        'starts' => 'indulás: :date',
+        // The dates end in a dot already ("11.03.").
+        'invited_starts' => 'Indulás: :date',
         'path' => [
             'label' => 'A társ útja',
             'invitation' => 'Meghívó',
             'contribute' => 'Amíg fut, hozzáteszel',
             'takeaway' => 'Útravaló',
         ],
-        'takeaway_help' => 'a publikálás után · a te értékeid, ahogy a helyzeteidben látszanak',
     ],
 
     'profile' => [

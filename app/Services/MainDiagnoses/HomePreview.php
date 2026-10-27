@@ -15,11 +15,14 @@ use App\Models\User;
  * prototype B2): the way ahead, grey and not clickable. The leader of a
  * diagnosis not yet running, or an organization leader without a role in
  * one, sees the leader's steps and under them the team's; everyone else the
- * peer's. Once the diagnosis opens, the home is its page (V1, T1).
+ * peer's. Once the diagnosis opens, the home is its page (V1, T1). The
+ * upcoming one is the diagnosis not running yet the preview is about: its
+ * start day is shown.
  *
  * @phpstan-type Preview array{
  *     role: 'leader'|'peer',
  *     main: ?MainDiagnosis,
+ *     upcoming: ?MainDiagnosis,
  *     leaderSteps: ?StepList,
  *     peerSteps: ?StepList,
  *     team: ?string,
@@ -48,6 +51,7 @@ class HomePreview
             return [
                 'role' => 'peer',
                 'main' => $main,
+                'upcoming' => $main,
                 'leaderSteps' => null,
                 'peerSteps' => $this->progress->forPeer($main, $user),
                 'team' => $main->diagnosis->team?->name,
@@ -68,6 +72,7 @@ class HomePreview
         return [
             'role' => 'peer',
             'main' => null,
+            'upcoming' => null,
             'leaderSteps' => null,
             'peerSteps' => $this->mainDiagnoses->previewPeerSteps($organization->product?->key),
             'team' => null,
@@ -92,6 +97,7 @@ class HomePreview
         return [
             'role' => 'leader',
             'main' => $main,
+            'upcoming' => $teamOf,
             'leaderSteps' => $steps,
             'peerSteps' => $hasPeers ? $this->mainDiagnoses->previewPeerSteps($productKey) : null,
             'team' => $hasPeers ? $teamOf?->diagnosis->team?->name : null,

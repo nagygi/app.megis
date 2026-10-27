@@ -5,19 +5,8 @@
     @if ($withdrawn)
         <x-ui.notice>{{ __('diagnosis.peer_home.withdrawn') }}</x-ui.notice>
     @elseif ($current && $main->acceptsInput())
-        {{-- T2: the lead lines are in the header (Overview::peerWelcomeHeader), as on V1. --}}
-        <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" />
-
-        {{-- What comes later, the third step of the line (prototype T2): the "+" of the running diagnosis. --}}
-        <div class="-mt-4 flex items-center gap-3 rounded-card bg-grey-100 px-5 py-4 text-charcoal">
-            <span class="grid size-7 shrink-0 place-items-center rounded-pill bg-grey-300 text-grey-700" aria-hidden="true">
-                <x-megis.icon name="plus" class="size-4" />
-            </span>
-            <span class="flex-1">
-                <span class="block font-semibold">{{ __('diagnosis.peer_add') }}</span>
-                <span class="block text-sm text-grey-700">{{ __('diagnosis.peer_add_help') }}</span>
-            </span>
-        </div>
+        {{-- T2: the lead lines are in the header (Overview::peerWelcomeHeader), as on V1. What comes later is the last step of the line (prototype T2). --}}
+        <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" :tail="['title' => __('diagnosis.peer_add'), 'meta' => __('diagnosis.peer_add_help')]" />
 
         <div class="flex flex-wrap items-center gap-3">
             <x-ui.button size="lg" icon-right="arrow-right" :href="$stepUrl($current->step)">

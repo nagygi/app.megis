@@ -2,6 +2,7 @@
 
 use App\Enums\DiagnosisStatus;
 use App\Enums\ExperienceState;
+use App\Enums\ParticipantRole;
 use App\Enums\ScoreState;
 use App\Enums\ValueOrigin;
 use App\Livewire\Admin\Diagnoses\Show;
@@ -12,6 +13,7 @@ use App\Models\DiagnosisType;
 use App\Models\Organization;
 use App\Models\Value;
 use App\Services\Diagnoses\DiagnosisService;
+use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\Values\ValueService;
 use Livewire\Livewire;
 
@@ -161,6 +163,21 @@ it('logs the stage change of a main diagnosis, not the unchanged status (17 · 1
     Livewire::test(Show::class, ['diagnosis' => $main->diagnosis])
         ->assertSeeInOrder(['Vázlat', 'erre váltott:', 'Meghívva'])
         ->assertDontSee('(Draft');
+});
+
+it('tells what moves the stage of a main diagnosis on, and that the status follows it (17 · 17.5)', function () {
+    $setup = diagnosisTeam(peers: 1);
+    actingAsAdmin($setup['admin']);
+    $main = startMainDiagnosis($setup);
+
+    Livewire::test(Show::class, ['diagnosis' => $main->diagnosis])
+        ->assertSee($setup['leader']->name.' meghívót kapott ('.$main->invited_at->format('Y.m.d.').'), még nem lépett be.')
+        ->assertSee('A státusz a szakaszt követi, kézzel nem állítható');
+
+    app(MainDiagnosisService::class)->opened($main, $main->participants()->where('role', ParticipantRole::Leader)->sole());
+
+    Livewire::test(Show::class, ['diagnosis' => $main->refresh()->diagnosis])
+        ->assertSee($setup['leader']->name.' kitölti a lépéseit.');
 });
 
 it('does not skip from draft to published', function () {

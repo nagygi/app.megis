@@ -241,12 +241,24 @@
                         {{ filled($starts_on) ? rescue(fn () => __('diagnosis.until', ['date' => today()->parse($starts_on)->format('m.d.')]), '', false) : __('diagnosis.date_open') }}
                     </p>
                 </div>
-                <ol class="flex flex-col gap-2">
+                {{-- The step line of V1 (x-diagnosis.step-list), on the dark ground. --}}
+                <ol class="flex flex-col">
                     @foreach ($preview as $index => $step)
-                        <li class="flex items-center gap-3">
-                            <span class="grid size-6 shrink-0 place-items-center rounded-pill text-xs font-extrabold {{ $index === 0 ? 'bg-coral text-black' : 'bg-grey-700' }}" aria-hidden="true">{{ $index + 1 }}</span>
-                            <span class="flex-1">{{ $step['label'] }}@if ($step['readonly']) <span class="text-sm text-grey-350">· {{ __('diagnosis.readonly') }}</span>@endif</span>
-                            <span class="text-sm text-grey-350">{{ __('diagnosis.minutes', ['minutes' => $step['minutes']]) }}</span>
+                        <li class="flex gap-3">
+                            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+                                @if ($index === 0)
+                                    <span class="grid size-5.5 place-items-center rounded-pill border-2 border-coral"><span class="size-2.5 rounded-pill bg-coral"></span></span>
+                                @else
+                                    <span class="size-5.5 rounded-pill border-[1.5px] border-grey-500"></span>
+                                @endif
+                                @unless ($loop->last)
+                                    <span class="mt-[3px] min-h-3.5 w-0.5 flex-1 bg-grey-700"></span>
+                                @endunless
+                            </span>
+                            <span @class(['flex min-w-0 flex-1 items-baseline justify-between gap-3 pt-0.5', 'pb-3.5' => ! $loop->last])>
+                                <span class="font-semibold">{{ $step['label'] }}@if ($step['readonly']) <span class="text-sm font-normal text-grey-350">· {{ __('diagnosis.readonly') }}</span>@endif</span>
+                                <span class="shrink-0 whitespace-nowrap text-sm text-grey-350">{{ __('diagnosis.minutes', ['minutes' => $step['minutes']]) }}</span>
+                            </span>
                         </li>
                     @endforeach
                 </ol>

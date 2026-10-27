@@ -90,6 +90,21 @@
                 <p class="font-semibold">{{ $main->starts_on?->format('Y.m.d.') ?? __('diagnosis.date_open') }} – {{ $main->publishes_on->format('Y.m.d.') }}</p>
                 <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.reading_short', ['date' => $main->readingStartsOn()->format('Y.m.d.')]) }}</p>
             </div>
+            {{-- What moves the stage on, and that the status follows it (17 · 17.5). --}}
+            <div class="flex flex-col gap-1 border-t border-grey-200 pt-4 text-sm text-grey-700 sm:col-span-2 lg:col-span-4">
+                <p>{{ __('admin.main_diagnoses.stage_next.'.$main->stage->value, [
+                    'name' => $main->leader->name,
+                    'date' => match ($main->stage) {
+                        \App\Enums\MainDiagnosisStage::Invited => $main->invited_at?->format('Y.m.d.') ?? '',
+                        \App\Enums\MainDiagnosisStage::Running => $main->readingStartsOn()->format('Y.m.d.'),
+                        \App\Enums\MainDiagnosisStage::Published => $main->published_at?->format('Y.m.d.') ?? '',
+                        default => '',
+                    },
+                ]) }}</p>
+                @unless ($main->stage === \App\Enums\MainDiagnosisStage::Closed)
+                    <p>{{ __('admin.main_diagnoses.status_follows_stage') }}</p>
+                @endunless
+            </div>
         </x-ui.card>
     @elseif ($diagnosis->parent)
         <x-ui.notice>

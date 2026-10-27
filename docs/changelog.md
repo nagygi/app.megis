@@ -2,6 +2,25 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.36 · HASH · 2026-10-27
+
+A lépéslista a prototípus idővonala (V1, V1·b, T2), a Kezdőlapon az indulás napja, és az adminban látszik, mi viszi tovább a szakaszt.
+
+- **Lépéslista (V1, V1·b, T2, V10 Onboarding, Kezdőlap):**
+  - A szürke, számozott kártyák helyett idővonal: coral gyűrű ponttal az aktuális, zöld pipa a kész, szürke gyűrű a hátralévő lépés, köztük függőleges vonal. A perc jobbra, a „csak olvasható” a név alatt.
+  - T2 és a társ Kezdőlapja: a „Hozzáteszel · amíg fut · egy-egy helyzet” az idővonal utolsó sora, nem külön kártya.
+  - Az admin A1 előnézete („Amit a vezető lát az első belépéskor”) ugyanígy, sötét alapon.
+- **A végén (V1, T2, Kezdőlap):** keretes doboz helyett egy vonal alatt: „A VÉGÉN · 12.14.”, a szaggatott, kérdőjeles „Belső működés” gyűrű, alatta „A legnagyobb rés”, a fejezetek és a Képességek. A társnál az „Útravaló · a te értékeid”. A Brand gyűrűje nincs benne (az MVP-ben nincs Brand).
+- **Kezdőlap, ha már van induló diagnózis:**
+  - „A vezető útja” alcíme: „… kb. 16 perc · indulás: 10.26.”, kezdőnap nélkül „indulás: egyeztetés alatt”.
+  - „A csapat az induláskor (10.26.) kap meghívót.” A társnál: „… hamarosan meghív a(z) … diagnózisába. Indulás: 10.26.”
+  - Ezt látja a szervezet vezetője akkor is, ha a diagnózist más vezeti és már meghívót kapott.
+- **Admin, a diagnózis adatlapja:** az összegző kártya alján egy sor mondja meg, mi viszi tovább a szakaszt. Például: „{vezető} meghívót kapott (2026.10.27.), még nem lépett be. Amikor maga belép, a szakasz „Kitöltés” lesz (a nevében belépés nem számít).” Alatta: „A státusz a szakaszt követi, kézzel nem állítható: az olvasatig Draft, az olvasat indításával Jóváhagyásra vár, a publikálással Publikált.”
+- **Admin, A1:**
+  - „Mentem vázlatként” helyett „Mentem, meghívó nélkül”; utána: „Elmentettük. A vezető még nem kapott meghívót: az „Elküldöm a meghívót” küldi el.”
+  - A mező neve „Indulás · a vezető határideje”. A súgó szerint magától nem indít és nem küld semmit.
+- Nincs adatbázis-változás.
+
 ## 1.35 · 218174c · 2026-10-27
 
 A kitöltés és a kezdőlapok fejlécei, gombjai és szövegei a prototípus szerint („1 · Belépés és kitöltés”: V1–V6, V10–V11, T1–T6).
