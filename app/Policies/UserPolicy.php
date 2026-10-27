@@ -22,6 +22,15 @@ class UserPolicy
     }
 
     /**
+     * Any admin corrects a customer's name on the datasheet; an admin
+     * account's name only who may edit that account (33 · 33.2).
+     */
+    public function rename(User $actor, User $target): bool
+    {
+        return $target->isAdmin() ? $this->updateAdmin($actor, $target) : $actor->isAdmin();
+    }
+
+    /**
      * Only a superadmin may invite or appoint a superadmin.
      */
     public function inviteAdmin(User $actor, UserRole $role): bool

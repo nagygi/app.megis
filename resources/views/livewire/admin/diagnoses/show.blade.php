@@ -53,7 +53,7 @@
             </x-admin.page-header>
         @endunless
         <p class="text-grey-700">
-            {{ $diagnosis->organization->name }} · {{ $diagnosis->subjectLabel() }} · {{ $diagnosis->type->name }} · {{ $diagnosis->dateLabel() }}
+            {{ $diagnosis->organization->name }} · @if ($diagnosis->level === \App\Enums\DiagnosisLevel::User && $diagnosis->user){{ $diagnosis->level->label() }} · <x-admin.user-link :user="$diagnosis->user" />@else{{ $diagnosis->subjectLabel() }}@endif · {{ $diagnosis->type->name }} · {{ $diagnosis->dateLabel() }}
         </p>
         <div class="flex flex-wrap items-center gap-2 text-sm">
             @if ($main)
@@ -79,7 +79,7 @@
             </div>
             <div>
                 <p class="text-sm text-grey-700">{{ $main->subject === \App\Enums\MainDiagnosisSubject::Person ? __('admin.main_diagnoses.person') : __('admin.main_diagnoses.leader') }}</p>
-                <p class="font-semibold">{{ $main->leader->name }}</p>
+                <p><x-admin.user-link :user="$main->leader" /></p>
                 @if ($main->hasPeers())
                     <p class="text-sm text-grey-700">{{ trans_choice('admin.main_diagnoses.preview_peers', $main->participants->where('role', \App\Enums\ParticipantRole::Peer)->whereNull('excluded_at')->count(), ['count' => $main->participants->where('role', \App\Enums\ParticipantRole::Peer)->whereNull('excluded_at')->count()]) }}</p>
                 @endif
@@ -359,7 +359,7 @@
                         <td class="px-3 py-2">
                             <ul class="flex flex-col gap-0.5">
                                 @foreach ($entry['materials'] as $material)
-                                    <li><a href="{{ route('admin.materials.show', $material) }}">{{ $material->is_situation ? __('processes.occasions.situation') : ($material->original_name ?? $material->source->label()) }}</a> · {{ $material->user?->name ?? $material->creator?->name ?? '–' }}</li>
+                                    <li><a href="{{ route('admin.materials.show', $material) }}">{{ $material->is_situation ? __('processes.occasions.situation') : ($material->original_name ?? $material->source->label()) }}</a> · @if ($material->user)<x-admin.user-link :user="$material->user" />@else{{ $material->creator?->name ?? '–' }}@endif</li>
                                 @endforeach
                             </ul>
                             @if ($entry['quotes'] !== [])

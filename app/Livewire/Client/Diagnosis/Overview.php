@@ -96,7 +96,7 @@ class Overview extends Component
                     'given_at' => now(),
                 ]);
 
-                $audit->record(AuditEventType::ConsentGiven, $user, $user, ['diagnosis' => $this->diagnosis->name, 'kind' => $kind->value]);
+                $audit->record(AuditEventType::ConsentGiven, $user, $user, ['diagnosis' => $this->diagnosis->name, 'kind' => $kind->value], organization: $this->diagnosis->organization);
             }
 
             $participant->update(['started_at' => now()]);

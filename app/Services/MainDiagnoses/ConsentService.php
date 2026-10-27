@@ -57,7 +57,7 @@ class ConsentService
             $this->audit->record(AuditEventType::ConsentRevoked, $user, $user, [
                 'diagnosis' => $main->diagnosis->name,
                 'kind' => $consent->kind->value,
-            ]);
+            ], organization: $main->diagnosis->organization);
         });
 
         // The rows are calculated again without the peer (18 · 18.6).

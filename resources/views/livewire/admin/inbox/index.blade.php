@@ -40,7 +40,11 @@
                             {{ $item->organization?->name ?? __('admin.common.none') }}
                         @endif
                     </td>
-                    <td class="px-3 py-2">{{ $item->summary }}</td>
+                    <td class="px-3 py-2">
+                        {{ $item->summary }}
+                        {{-- The customer it is about opens their datasheet (33 · 33.1). --}}
+                        <x-admin.user-link :user="$item->subjectUser()" class="mt-0.5 block text-sm" />
+                    </td>
                     <td class="px-3 py-2 whitespace-nowrap text-grey-700" title="{{ $item->created_at->format('Y.m.d. H:i') }}">{{ $item->created_at->diffForHumans() }}</td>
                     @if ($showClosed)
                         <td class="px-3 py-2 whitespace-nowrap text-grey-700">

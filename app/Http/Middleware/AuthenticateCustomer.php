@@ -9,6 +9,7 @@ use App\Services\Audit\AuditLogger;
 use App\Services\Auth\AdminSessionState;
 use App\Services\Auth\GuardSession;
 use App\Services\Auth\ImpersonationService;
+use App\Support\CurrentOrganization;
 use Closure;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Http\Request;
@@ -33,12 +34,20 @@ class AuthenticateCustomer implements AuthenticatesRequests
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if ($this->impersonation->dropEnded()) {
+            return redirect()->route('admin.login');
+        }
+
         $impersonation = $this->impersonation->current();
 
         if ($impersonation !== null && ! $this->adminSessionAlive($impersonation)) {
             $this->impersonation->end(Impersonation::END_ADMIN_SESSION_EXPIRED);
 
             return redirect()->route('admin.login');
+        }
+
+        if ($impersonation !== null) {
+            $this->impersonation->markSeen($impersonation);
         }
 
         /** @var User|null $user */
@@ -102,6 +111,7 @@ class AuthenticateCustomer implements AuthenticatesRequests
             $impersonation->admin,
             ['actions' => $actions],
             $impersonation,
+            app(CurrentOrganization::class)->get(),
         );
     }
 

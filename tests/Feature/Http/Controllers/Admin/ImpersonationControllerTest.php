@@ -115,3 +115,60 @@ it('ends the work when the admin session expires', function () {
     $response->assertRedirect(route('admin.login'));
     expect(Impersonation::query()->sole()->end_reason)->toBe(Impersonation::END_ADMIN_SESSION_EXPIRED);
 });
+
+it('closes a work left without "Kilépés" after the admin idle time, ending at its last request (33 · 33.6)', function () {
+    $admin = actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $customer = customerOf($organization);
+    $this->post(route('admin.impersonate', $customer));
+    $this->travel(5)->minutes();
+    $this->get(route('client.home', $organization));
+    $lastSeen = Impersonation::query()->sole()->last_seen_at;
+    expect($lastSeen->isSameMinute(now()))->toBeTrue();
+
+    $this->travel(5)->hours();
+    $this->artisan('megis:impersonations:close')->assertSuccessful();
+    expect(Impersonation::query()->sole()->ended_at)->toBeNull();
+
+    $this->travel(2)->hours();
+    $this->artisan('megis:impersonations:close')->expectsOutputToContain('1 félbehagyott munkamenet lezárva.')->assertSuccessful();
+
+    $impersonation = Impersonation::query()->sole();
+    $end = AuditEvent::query()->where('type', AuditEventType::ImpersonationEnded)->sole();
+    expect($impersonation->end_reason)->toBe(Impersonation::END_ABANDONED)
+        ->and($impersonation->ended_at->equalTo($lastSeen))->toBeTrue()
+        ->and($end->created_at->equalTo($lastSeen))->toBeTrue()
+        ->and($end->actor_id)->toBe($admin->id)
+        ->and($end->payload)->toBe(['reason' => Impersonation::END_ABANDONED]);
+});
+
+it('does not let a session carry on as the customer once its work was closed (33 · 33.6)', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $customer = customerOf($organization);
+    $this->post(route('admin.impersonate', $customer));
+    Impersonation::query()->update(['ended_at' => now(), 'end_reason' => Impersonation::END_ABANDONED]);
+    // A new request starts without the work the previous one held in memory.
+    $this->app->forgetScopedInstances();
+
+    $this->get(route('client.home', $organization))->assertRedirect(route('admin.login'));
+
+    $this->assertGuest('web');
+    expect(session()->has('impersonation_id'))->toBeFalse();
+});
+
+it('logs a change in the customer\'s name with the organization it was made in (33 · 33.7)', function () {
+    Route::middleware(['web', 'customer', 'organization'])->group(function () {
+        // Implicit binding needs the type hint, as on the real pages.
+        Route::post('/{organization:slug}/_test/valtoztatas', fn (Organization $organization) => 'ok');
+    });
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $customer = customerOf($organization);
+    $this->post(route('admin.impersonate', $customer));
+
+    $this->post('/'.$organization->slug.'/_test/valtoztatas')->assertOk();
+
+    expect(AuditEvent::query()->where('type', AuditEventType::ImpersonationAction)->sole()->organization_id)->toBe($organization->id)
+        ->and(AuditEvent::query()->where('type', AuditEventType::ImpersonationStarted)->sole()->organization_id)->toBeNull();
+});

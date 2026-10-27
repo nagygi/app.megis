@@ -82,7 +82,7 @@ Ha nincs teendő, a blokk nem jelenik meg.
   - a végleges törlés óránkénti ütemezett feladatként fut (`cron.md`), így legkésőbb 24 órán belül lefut;
   - türelmi idő nincs, a véletlen törlés ellen az erős megerősítés (jelszó vagy kód) véd;
   - a mentésekben az adat még legfeljebb 30 napig megvan ([docs/uzemeltetes.md](../docs/uzemeltetes.md) · 6), ezt az adatkezelési tájékoztató (05) tartalmazza.
-- **Napló:** rögzül, ki, mikor és mit törölt. Az admin a felhasználó adatlapján (33) csak a naplót látja.
+- **Napló:** rögzül, ki, mikor és mit törölt. Az admin a felhasználó adatlapján (33) csak a naplót látja. Magánszemélynél a napló is törlődik, mert a szervezete a fiókkal együtt megy (33 · 33.7).
 - **Admin a felhasználó nevében:** a fiók és az adatok törlése, valamint a hozzájárulás megadása vagy visszavonása nem érhető el (14 · 14.6).
 
 ## E-mailek

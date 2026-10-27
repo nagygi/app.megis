@@ -38,7 +38,8 @@ it("loads the leader's iCal link in their name and logs it", function () {
         ->and(Process::query()->sole()->name)->toBe('Vezetői kör')
         ->and($event->type)->toBe(AuditEventType::CalendarConnectedByAdmin)
         ->and($event->subject_user_id)->toBe($setup['leader']->id)
-        ->and($event->actor_id)->toBe($admin->id);
+        ->and($event->actor_id)->toBe($admin->id)
+        ->and($event->organization_id)->toBe($setup['organization']->id);
 });
 
 it("loads the leader's exported file and replaces their previous calendar", function () {

@@ -21,6 +21,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 /**
  * The customer's datasheet (33): data, organizations, accepted documents and
@@ -28,6 +29,10 @@ use Livewire\Component;
  */
 class Show extends Component
 {
+    use WithPagination;
+
+    private const LOG_PAGE_SIZE = 50;
+
     public User $user;
 
     public string $last_name = '';
@@ -48,6 +53,8 @@ class Show extends Component
 
     public function startEditing(): void
     {
+        Gate::authorize('rename', $this->user);
+
         $this->fillForm();
         $this->resetValidation();
         $this->editing = true;
@@ -59,11 +66,14 @@ class Show extends Component
     }
 
     /**
-     * Any admin edits the name; only a superadmin edits the e-mail, and both
-     * the old and the new address are told (33 · 2. kérdés).
+     * Any admin edits a customer's name, an admin account's only who may edit
+     * it; only a superadmin edits the e-mail, and both the old and the new
+     * address are told (33 · 33.2). A new address is not known as undeliverable.
      */
     public function save(AuditLogger $audit): void
     {
+        Gate::authorize('rename', $this->user);
+
         $validated = $this->validate([
             'last_name' => ['nullable', 'string', 'max:255'],
             'first_name' => ['nullable', 'string', 'max:255'],
@@ -81,7 +91,13 @@ class Show extends Component
             'last_name' => $validated['last_name'] ?: null,
             'first_name' => $validated['first_name'] ?: null,
             'email' => $newEmail,
-        ])->save();
+        ]);
+
+        if ($newEmail !== $oldEmail) {
+            $this->user->mail_undeliverable_at = null;
+        }
+
+        $this->user->save();
 
         if ($newEmail !== $oldEmail) {
             Mail::to($oldEmail)->queue(new EmailChangedMail($newEmail, toOldAddress: true));
@@ -157,18 +173,20 @@ class Show extends Component
                 ->with('version')
                 ->latest('accepted_at')
                 ->get(),
+            // Napló (33 · 33.6): in time order, the newest first, paged.
             'events' => AuditEvent::query()
                 ->where('subject_user_id', $this->user->id)
-                ->with('actor')
+                ->with(['actor', 'organization'])
+                ->latest()
                 ->latest('id')
-                ->limit(100)
-                ->get(),
+                ->paginate(self::LOG_PAGE_SIZE, pageName: 'naplo'),
             'mirrors' => MirrorSession::query()
                 ->whereBelongsTo($this->user)
                 ->whereNotNull('claimed_at')
                 ->with('diagnosis')
                 ->latest('id')
                 ->get(),
+            'canRename' => Gate::allows('rename', $this->user),
             'canChangeEmail' => Gate::allows('changeEmail', $this->user),
             'canImpersonate' => Gate::allows('impersonate', $this->user),
             'status' => $this->user->load('memberships')->clientStatus(),

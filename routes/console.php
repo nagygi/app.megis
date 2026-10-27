@@ -70,6 +70,12 @@ Schedule::command('megis:accounts:purge')
     ->onOneServer()
     ->withoutOverlapping();
 
+// A "nevében" work left without "Kilépés" ends after the admin idle time (33 · 33.6).
+Schedule::command('megis:impersonations:close')
+    ->everyTenMinutes()
+    ->name('close:impersonations')
+    ->onOneServer();
+
 // Anonymous Értéktükör runs live 24 hours; only the anonymous statistics stay (06 · 6.1).
 Schedule::command('megis:mirror:prune')
     ->hourly()

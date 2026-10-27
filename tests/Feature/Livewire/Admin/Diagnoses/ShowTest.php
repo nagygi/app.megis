@@ -171,6 +171,7 @@ it('tells what moves the stage of a main diagnosis on, and that the status follo
     $main = startMainDiagnosis($setup);
 
     Livewire::test(Show::class, ['diagnosis' => $main->diagnosis])
+        ->assertSeeHtml('href="'.route('admin.clients.show', $setup['leader']).'"')
         ->assertSee($setup['leader']->name.' meghívót kapott ('.$main->invited_at->format('Y.m.d.').'), még nem lépett be.')
         ->assertSee('A státusz a szakaszt követi, kézzel nem állítható');
 

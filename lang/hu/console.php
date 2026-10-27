@@ -85,6 +85,10 @@ return [
         'done' => ':count fiók adatai törölve.',
     ],
 
+    'impersonations_close' => [
+        'done' => ':count félbehagyott munkamenet lezárva.',
+    ],
+
     'capabilities_run' => [
         'not_found' => 'Nincs ilyen szervezeti anyag: :material.',
         'empty_library' => 'A Képességtár üres, nincs mire illeszteni.',

@@ -89,7 +89,7 @@
     <div class="grid gap-6 lg:grid-cols-2">
         {{-- A vezető --}}
         <x-ui.card as="section" bordered class="flex flex-col gap-3" aria-labelledby="leader-title">
-            <h2 id="leader-title" class="text-lg font-semibold">{{ __('admin.run.leader', ['name' => $main->leader->name]) }}</h2>
+            <h2 id="leader-title" class="text-lg font-semibold">{{ __('admin.run.leader') }} · <x-admin.user-link :user="$main->leader" /></h2>
             @php($current = $leaderSteps->firstMissing())
             <ol class="flex flex-col gap-1 text-sm">
                 @foreach ($leaderSteps->steps as $state)
@@ -128,7 +128,7 @@
                     <ul class="flex flex-col gap-1">
                         @foreach ($peerStates as $entry)
                             <li class="flex justify-between gap-3">
-                                <span>{{ $entry['peer']->user->name }}</span>
+                                <x-admin.user-link :user="$entry['peer']->user" />
                                 <span>{{ __('admin.run.peer_states.'.$entry['state']) }}</span>
                             </li>
                         @endforeach
@@ -167,7 +167,7 @@
             <h2 id="calendar-title" class="text-lg font-semibold">{{ __('admin.processes.calendar') }}</h2>
             @forelse ($connections as $connection)
                 <p class="text-sm">
-                    {{ $connection->providerLabel() }} · {{ $connection->user?->name }} · {{ __('calendar.statuses.'.$connection->status) }}
+                    {{ $connection->providerLabel() }} · <x-admin.user-link :user="$connection->user" /> · {{ __('calendar.statuses.'.$connection->status) }}
                     @if ($connection->metadata_expires_at)
                         · {{ __('calendar.profile.metadata_until', ['date' => $connection->metadata_expires_at->format('Y.m.d.')]) }}
                     @endif
@@ -189,7 +189,7 @@
                 @foreach ($conversations as $item)
                     <li wire:key="conversation-{{ $item->id }}" class="flex flex-wrap items-center justify-between gap-2">
                         <span>
-                            {{ $item->held_at->format('Y.m.d. H:i') }} · {{ $item->withLabel() }}
+                            {{ $item->held_at->format('Y.m.d. H:i') }} · @if ($item->withUser)<x-admin.user-link :user="$item->withUser" />@else{{ $item->withLabel() }}@endif
                             @if ($item->admin) · {{ $item->admin->name }} @endif
                             @if ($item->note) · <span class="text-grey-700">{{ $item->note }}</span> @endif
                         </span>

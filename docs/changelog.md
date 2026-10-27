@@ -2,6 +2,37 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.37 · HASH · 2026-10-27
+
+Az ügyfél adatlapja (33) teljes: linkek a diagnózisokból, a Beérkezőből és a Futásról, szűrő, lapozott és olvasható napló, amely a szervezetével él. A menüben a futó diagnózis is látszik (15.4).
+
+- **Menü (15.4):** a szervezet neve alatt futó diagnózisnál a termék és az időablak áll („Teljes · 03.02. – 04.18.”), utána a legutóbb publikált riport, ahogy eddig.
+- **Linkek az adatlapra (33.1):** a felhasználó neve az adatlapjára visz. Ahol megjelenik:
+  - a Futás lapon: a vezető, a társak, a naptár és a beszélgetések felhasználója;
+  - a diagnózis adatlapján: a vezető, a felhasználói szintű diagnózis alanya és az anyag feltöltője;
+  - a Diagnózisok listáján: a felhasználói szintű sor;
+  - a Beérkezőben és az *Értékmérések › Beérkező*ben: a sor szövege alatt az a felhasználó, akiről a sor szól.
+- **Adatlap:**
+  - Szuperadmin nevét csak szuperadmin írhatja át, a „Szerkesztem” gomb a többieknek nem látszik.
+  - Új e-mail címnél a „nem kézbesíthető” jelzés törlődik.
+  - Az Értéktükör foglalásánál az időpont is látszik („időpontot foglalna · 2026.10.20. 14:05”).
+- **Napló (33.6):**
+  - 50 soronként lapoz, a legfrissebb elöl.
+  - Minden sor mutatja a szervezetet. A részletek: a hozzájárulás fajtája és diagnózisa, a felvétel napja, a naptár forrása, a „nevében” befejezés oka.
+  - A „nevében” módosítások a lap nevével állnak („Diagnózis · saját értékek (save)”) a Livewire-komponens technikai neve helyett.
+- **Félbehagyott „nevében” munkamenet:** ha az admin Kilépés nélkül megy el, 6 óra után magától lezárul „félbehagyva” okkal, a vége az utolsó kérés ideje. Ütemezett feladat: `close:impersonations`, tízpercenként. A lezárt munkamenet böngészője nem dolgozhat tovább a felhasználó nevében, az admin belépésre kerül.
+- **A napló őrzése (33.7):**
+  - A szervezethez köthető sorok a szervezettel élnek, és vele törlődnek.
+  - Fióktörléskor a megmaradó sorokból a diagnózis és a szervezet neve is kikerül.
+  - A magánszemély fiókjával a szervezete is törlődik, és vele a teljes naplója.
+- **Felhasználók lista (33.8):**
+  - A kereső a teljes névre is talál, bármilyen sorrendben („Kovács Anna”, „Anna Kovács”).
+  - Új szűrő: „Csak Értéktükör (diagnózis nélkül)”.
+  - Törölt felhasználónál az e-mail helyén „–” áll, itt és a szervezet Felhasználók fülén.
+- **Adatbázis:**
+  - `audit_events.organization_id` (a szervezettel törlődik);
+  - `impersonations.last_seen_at`.
+
 ## 1.36 · 698ea1a · 2026-10-27
 
 A lépéslista a prototípus idővonala (V1, V1·b, T2), a Kezdőlapon az indulás napja, és az adminban látszik, mi viszi tovább a szakaszt.

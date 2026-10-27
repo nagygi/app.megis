@@ -22,6 +22,7 @@ use App\Services\MainDiagnoses\DiagnosisRunService;
 use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\Mirror\MirrorInsightService;
 use App\Services\Processes\OccasionService;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
@@ -198,7 +199,14 @@ class Index extends Component
             default => $query->whereHas('organization', fn ($organization) => $organization->where('contact_admin_id', $contact)),
         };
 
-        $items = $this->applySorting($query->with('subject'))->paginate(50);
+        // With the customer of each subject for the datasheet link (33 · 33.1).
+        $items = $this->applySorting($query->with(['subject' => fn (MorphTo $subject) => $subject->morphWith([
+            MainDiagnosis::class => ['leader'],
+            MainDiagnosisParticipant::class => ['user'],
+            ReportFeedback::class => ['user'],
+            MirrorSession::class => ['user'],
+            Material::class => ['user'],
+        ])]))->paginate(50);
 
         foreach ($items as $item) {
             if ($item->type === InboxItemType::Classification && $item->subject instanceof Material) {

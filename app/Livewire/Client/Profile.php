@@ -153,7 +153,7 @@ class Profile extends Component
 
         $material = Material::query()->where('uuid', $uuid)->where('user_id', auth()->id())->firstOrFail();
         $materials->deleteAudio($material);
-        app(AuditLogger::class)->record(AuditEventType::RecordingDeleted, auth()->user(), auth()->user(), ['date' => $material->created_at->format('Y.m.d.')]);
+        app(AuditLogger::class)->record(AuditEventType::RecordingDeleted, auth()->user(), auth()->user(), ['date' => $material->created_at->format('Y.m.d.')], organization: $material->organization ?? $this->organization);
 
         session()->flash('status', __('client.recordings.deleted'));
     }

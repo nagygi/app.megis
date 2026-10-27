@@ -131,4 +131,20 @@ class InboxItem extends Model
     {
         return $this->closed_at === null;
     }
+
+    /**
+     * The customer the row is about, whose datasheet it links (33 · 33.1):
+     * the invitee, the leader, the one who gave feedback, booked or uploaded.
+     */
+    public function subjectUser(): ?User
+    {
+        return match (true) {
+            $this->subject instanceof MainDiagnosis => $this->subject->leader,
+            $this->subject instanceof MainDiagnosisParticipant,
+            $this->subject instanceof ReportFeedback,
+            $this->subject instanceof MirrorSession,
+            $this->subject instanceof Material => $this->subject->user,
+            default => null,
+        };
+    }
 }

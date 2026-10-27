@@ -335,10 +335,7 @@ class Processes extends Component
             throw ValidationException::withMessages([$field => $exception->getMessage()]);
         }
 
-        $audit->record(AuditEventType::CalendarConnectedByAdmin, $user, $admin, [
-            'provider' => $connection->provider,
-            'organization' => $this->organization->name,
-        ]);
+        $audit->record(AuditEventType::CalendarConnectedByAdmin, $user, $admin, ['provider' => $connection->provider], organization: $this->organization);
 
         $this->reset(['icsUrl', 'icsFile', 'leaderAsked']);
         session()->flash('status', __('admin.processes.loaded'));

@@ -69,7 +69,7 @@
             <tr wire:key="diagnosis-{{ $diagnosis->id }}">
                 <td class="px-3 py-2"><a href="{{ route('admin.diagnoses.show', $diagnosis) }}" class="font-semibold text-charcoal">{{ $diagnosis->name }}</a></td>
                 <td class="px-3 py-2">{{ $diagnosis->organization->name }}</td>
-                <td class="px-3 py-2">{{ $diagnosis->subjectLabel() }}</td>
+                <td class="px-3 py-2">@if ($diagnosis->level === \App\Enums\DiagnosisLevel::User && $diagnosis->user){{ $diagnosis->level->label() }} · <x-admin.user-link :user="$diagnosis->user" />@else{{ $diagnosis->subjectLabel() }}@endif</td>
                 <td class="px-3 py-2">{{ $diagnosis->type->name }}</td>
                 <td class="px-3 py-2 whitespace-nowrap">{{ $diagnosis->dateLabel() }}</td>
                 <td class="px-3 py-2">

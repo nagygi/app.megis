@@ -9,10 +9,13 @@ use App\Mail\DiagnosisNoticeMail;
 use App\Models\AuditEvent;
 use App\Models\EvidenceTrace;
 use App\Models\Material;
+use App\Models\Organization;
 use App\Models\PersonalValueSet;
 use App\Models\ReportSnapshot;
+use App\Models\User;
 use App\Models\Value;
 use App\Services\Accounts\AccountDeletionService;
+use App\Services\Audit\AuditLogger;
 use App\Services\Auth\ImpersonationService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
@@ -117,12 +120,31 @@ it('lists the diagnoses and the consents on the datasheet, and only the log of a
         ->assertSee($main->diagnosis->name)
         ->assertSee('Társ')
         ->assertSee('A válaszaim névvel csak a mégisnél');
+    app(AuditLogger::class)->record(AuditEventType::ConsentGiven, $peer, $peer, ['diagnosis' => $main->diagnosis->name, 'kind' => 'answers'], organization: $setup['organization']);
 
     app(AccountDeletionService::class)->request($peer);
     app(AccountDeletionService::class)->purge($peer->refresh());
 
+    // The log stays without the names its entries carried (33 · 33.7).
     Livewire::test(Datasheet::class, ['user' => $peer->refresh()])
         ->assertSee('Törölt felhasználó · #'.$peer->id)
         ->assertDontSee($main->diagnosis->name)
+        ->assertSee('A válaszaim névvel csak a mégisnél')
         ->assertSee('Fiók és adatok törölve');
+    expect(AuditEvent::query()->where('subject_user_id', $peer->id)->where('type', AuditEventType::ConsentGiven)->first()->payload)
+        ->toBe(['kind' => 'answers']);
+});
+
+it('leaves no log behind a private person, whose organization goes with the account (33 · 33.7)', function () {
+    $organization = Organization::factory()->individual()->create();
+    $person = customerOf($organization);
+    $logger = app(AuditLogger::class);
+    $logger->record(AuditEventType::RecordingDeleted, $person, $person, ['date' => '2026.10.20.'], organization: $organization);
+    $logger->record(AuditEventType::EmailChanged, $person, User::factory()->superadmin()->create(), ['old' => 'a@example.com', 'new' => 'b@example.com']);
+
+    app(AccountDeletionService::class)->request($person);
+    app(AccountDeletionService::class)->purge($person->refresh());
+
+    expect(Organization::query()->whereKey($organization->id)->exists())->toBeFalse()
+        ->and(AuditEvent::query()->where('subject_user_id', $person->id)->exists())->toBeFalse();
 });

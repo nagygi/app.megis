@@ -6,6 +6,7 @@ use App\Livewire\Admin\Inbox\Index;
 use App\Livewire\Admin\Measurements\Index as MeasurementsIndex;
 use App\Models\Diagnosis;
 use App\Models\InboxItem;
+use App\Models\MainDiagnosisParticipant;
 use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\Organization;
@@ -137,4 +138,17 @@ it('does not open the same question twice and closes it when the cause goes away
         ->and($inbox->closeAutomatically('threshold:'.$diagnosis->id))->toBe(1)
         ->and($first->fresh()->close_reason)->toBe(InboxItem::CLOSED_AUTOMATICALLY)
         ->and($inbox->open(InboxItemType::Threshold, 'Újra veszélyben.', diagnosis: $diagnosis, dedupeKey: 'threshold:'.$diagnosis->id)->id)->not->toBe($first->id);
+});
+
+it('opens the datasheet of the customer a row is about (33 · 33.1)', function () {
+    $admin = actingAsAdmin();
+    $organization = Organization::factory()->create(['contact_admin_id' => $admin->id]);
+    $invitee = customerOf($organization);
+    $participant = MainDiagnosisParticipant::factory()->create(['user_id' => $invitee->id]);
+    app(InboxService::class)->open(InboxItemType::Invitation, 'Nem nyitotta meg a meghívót', $organization, subject: $participant);
+    app(InboxService::class)->open(InboxItemType::Invitation, 'Sor felhasználó nélkül', $organization);
+
+    Livewire::test(Index::class)
+        ->assertSeeHtml('href="'.route('admin.clients.show', $invitee).'"')
+        ->assertSee('Sor felhasználó nélkül');
 });

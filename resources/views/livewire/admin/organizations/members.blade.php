@@ -54,7 +54,7 @@
                         <x-ui.badge tone="coral" class="mt-1">{{ __('admin.common.mail_undeliverable') }}</x-ui.badge>
                     @endif
                 </td>
-                <td class="px-3 py-2">{{ $member->email }}</td>
+                <td class="px-3 py-2">{{ $member->isAnonymized() ? __('admin.common.none') : $member->email }}</td>
                 <td class="px-3 py-2">{{ $membership->position ?? __('admin.common.none') }}</td>
                 <td class="px-3 py-2">{{ implode(', ', $membership->tagLabels()) }}</td>
                 <td class="px-3 py-2">

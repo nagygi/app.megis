@@ -22,7 +22,9 @@
             @endif
         </x-slot:badges>
         <x-slot:actions>
-            <x-ui.button tone="outline" size="sm" wire:click="startEditing">{{ __('admin.clients.edit_name') }}</x-ui.button>
+            @if ($canRename)
+                <x-ui.button tone="outline" size="sm" wire:click="startEditing">{{ __('admin.clients.edit_name') }}</x-ui.button>
+            @endif
             @if ($canImpersonate)
                 <form method="POST" action="{{ route('admin.impersonate', $user) }}" target="_blank">
                     @csrf
@@ -141,7 +143,7 @@
                             · <a href="{{ route('admin.diagnoses.show', $mirror->diagnosis) }}" class="text-charcoal">{{ $mirror->diagnosis->name }}</a>
                         @endif
                         @if ($mirror->booking_requested_at)
-                            <x-ui.badge tone="yellow" class="ml-1">{{ __('admin.clients.mirror_booking') }}</x-ui.badge>
+                            <x-ui.badge tone="yellow" class="ml-1">{{ __('admin.clients.mirror_booking', ['date' => $mirror->booking_requested_at->format('Y.m.d. H:i')]) }}</x-ui.badge>
                         @endif
                     </p>
                     <p class="text-sm text-grey-700">
@@ -158,19 +160,23 @@
     <x-ui.card as="section" bordered>
         <h2 class="mb-4 text-lg font-semibold">{{ __('admin.clients.section_log') }}</h2>
         @forelse ($events as $event)
-            <div class="border-b border-grey-200 py-2 last:border-0">
+            <div class="border-b border-grey-200 py-2 last:border-0" wire:key="client-log-{{ $event->id }}">
                 <p>
                     <span class="font-semibold">{{ $event->type->label() }}</span>
-                    <span class="text-grey-700">· {{ $event->created_at->format('Y.m.d. H:i') }}@if ($event->actor) · {{ $event->actor->name }}@endif</span>
+                    <span class="text-grey-700">· {{ $event->created_at->format('Y.m.d. H:i') }}@if ($event->actor) · {{ $event->actor->name }}@endif @if ($event->organization) · {{ $event->organization->name }}@endif</span>
                 </p>
-                @if ($event->type === \App\Enums\AuditEventType::ImpersonationAction)
-                    <p class="text-sm text-grey-700">{{ __('admin.clients.log_actions', ['actions' => implode(', ', $event->payload['actions'] ?? [])]) }}</p>
-                @elseif ($event->type === \App\Enums\AuditEventType::EmailChanged)
+                @if ($event->type === \App\Enums\AuditEventType::EmailChanged && $event->payload)
                     <p class="flex flex-wrap items-center gap-1 text-sm text-grey-700">{{ $event->payload['old'] ?? '' }} <x-megis.icon name="arrow-right" :label="__('admin.clients.changed_to')" /> {{ $event->payload['new'] ?? '' }}</p>
+                @elseif ($detail = $event->detail())
+                    <p class="text-sm text-grey-700">{{ $detail }}</p>
                 @endif
             </div>
         @empty
             <p class="text-grey-700">{{ __('admin.clients.no_log') }}</p>
         @endforelse
+
+        @if ($events->hasPages())
+            <div class="mt-4">{{ $events->links() }}</div>
+        @endif
     </x-ui.card>
 </div>

@@ -14,6 +14,7 @@
     <x-admin.list-toolbar>
         <x-admin.filter name="organization" :label="__('admin.clients.organizations')" :options="$organizationOptions" />
         <x-admin.filter name="status" :label="__('admin.clients.status')" :options="$statusOptions" />
+        <x-admin.filter name="mirror" :label="__('admin.clients.mirror_filter')" :options="$mirrorOptions" />
     </x-admin.list-toolbar>
 
     <x-admin.table :paginator="$clients">
@@ -34,7 +35,8 @@
                         <x-ui.badge tone="coral" class="mt-1">{{ __('admin.common.mail_undeliverable') }}</x-ui.badge>
                     @endif
                 </td>
-                <td class="px-3 py-2">{{ $client->email }}</td>
+                {{-- A deleted user's technical address is not shown (33 · 33.7). --}}
+                <td class="px-3 py-2">{{ $client->isAnonymized() ? __('admin.common.none') : $client->email }}</td>
                 <td class="px-3 py-2">{{ $client->memberships->pluck('organization.name')->join(', ') ?: __('admin.common.none') }}</td>
                 <td class="px-3 py-2"><x-ui.badge :tone="$statusTones[$status]">{{ __('admin.clients.status_values.'.$status) }}</x-ui.badge></td>
                 <td class="px-3 py-2 whitespace-nowrap">{{ $client->last_login_at?->format('Y.m.d. H:i') ?? __('admin.common.never') }}</td>

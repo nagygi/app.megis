@@ -25,6 +25,7 @@ use App\Services\Audit\AuditLogger;
 use App\Services\Inbox\InboxService;
 use App\Services\Materials\MaterialStore;
 use App\Services\Report\PublishService;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -104,10 +105,22 @@ class AccountDeletionService
                 'anonymized_at' => now(),
             ])->save();
 
-            // The log stays, without personal data (33, question 3).
-            AuditEvent::query()->where('subject_user_id', $user->id)->where('type', AuditEventType::EmailChanged)->update(['payload' => null]);
+            // The log lives as long as its organization: a private person's rows went with it
+            // above, and whoever has no organization left leaves no log behind (33 · 33.7).
+            if (! $user->memberships()->exists()) {
+                AuditEvent::query()->where('subject_user_id', $user->id)->delete();
+            } else {
+                // The rest stays without personal data: the e-mails and the names that may hold one.
+                AuditEvent::query()
+                    ->where('subject_user_id', $user->id)
+                    ->whereNotNull('payload')
+                    ->get()
+                    ->each(fn (AuditEvent $event) => $event->forceFill([
+                        'payload' => $event->type === AuditEventType::EmailChanged ? null : (Arr::except($event->payload, ['organization', 'diagnosis']) ?: null),
+                    ])->save());
 
-            $this->audit->record(AuditEventType::AccountDeleted, $user, null);
+                $this->audit->record(AuditEventType::AccountDeleted, $user, null);
+            }
         });
 
         $this->afterPurge($affected);
