@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.43 · HASH · 2026-10-27
+## 1.43 · 098f142 · 2026-10-27
 
 Jegyek az oldalon: a tesztelők és a megrendelő a stagingen az oldal egy elemét kijelölve rögzíthetnek hibát, módosítási kérést vagy kérdést (`exot/onsite-comment` 0.7, a DestinationX-ben már fut).
 
