@@ -163,6 +163,8 @@ return [
     'account_deleted' => [
         'subject' => 'Töröltük a fiókodat',
         'body' => 'A fiókodat és az adataidat töröltük a mégis-ből. Ha nem te kérted, írj nekünk: :support.',
+        // A superadmin archived the account (33 · 33.8).
+        'body_by_admin' => 'A mégis adminisztrátora törölte a fiókodat és az adataidat. Ha kérdésed van, írj nekünk: :support.',
     ],
 
 ];

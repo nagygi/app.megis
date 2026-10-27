@@ -2,6 +2,21 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.40 · HASH · 2026-10-27
+
+Az *Admin › Felhasználók* listán sorműveletek vannak: belépés a nevében, inaktiválás és archiválás (33 · 33.2, 33.8). Ami valakinek nem érhető el, az szürke menüpont, ráállva az okával.
+
+- **Sorműveletek:**
+  - *Belépek a nevében:* minden adminnak. Szürke, ha a fiók inaktív, archivált, még nem regisztrált vagy admin fiók.
+  - *Inaktiválom / Aktiválom:* minden adminnak, a fiók szintjén. Az inaktív fiók azonnal kijelentkezik, és nem tud belépni. A tagságai nem változnak.
+  - *Archiválom:* csak szuperadminnak, adminnál szürke („Archiválni csak szuperadmin tud.”). Ez a fióktörlés (31.7), szuperadmin indítja: a fiók azonnal inaktív, a személyes adatok egy órán belül törlődnek (`megis:accounts:purge`), és ez nem vonható vissza. Piros „Archiválom” gombbal kér megerősítést.
+  - Admin fióknál (admin, aki egy szervezetnek is tagja) mindhárom szürke: az *Admin felhasználók* között kezelhető.
+  - A szerver is ellenőrzi a jogosultságot (`UserPolicy`: `deactivateClient`, `activateClient`, `archive`).
+- **Adatlap:** a fejlécben ugyanez a *Műveletek* menü az inaktiválással és az archiválással. A „Belépek a nevében” gomb marad.
+- **Állapot:** új „Archivált” állapot és szűrő. Ide tartozik az is, aki maga kérte a törlését. Archivált fiókot nem lehet aktiválni. Az „Inaktív” szűrő az archiváltakat nem mutatja.
+- **Napló:** új bejegyzés a „Fiók inaktiválva” és a „Fiók aktiválva”, az adminnal, aki tette. Archiválásnál a „Fióktörlés kérve” sorban a szuperadmin áll.
+- **E-mail:** archiváláskor a törlésről szóló levél azt írja, hogy a mégis adminisztrátora törölte a fiókot. Nem azt, hogy „Ha nem te kérted…”.
+
 ## 1.39 · 718c419 · 2026-10-27
 
 Az Értéktár a Képességtárhoz hasonlóan felületről is betölthető: *Értéktár → Érték Import* (03 · 3.6). A betöltés csak szuperadminnal működik.

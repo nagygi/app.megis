@@ -105,6 +105,36 @@ class UserPolicy
     }
 
     /**
+     * A customer account on the user list and datasheet (33 · 33.2). Admin
+     * accounts are managed under Admin felhasználók; an archived one stays so.
+     */
+    public function deactivateClient(User $actor, User $target): bool
+    {
+        return $actor->isAdmin()
+            && ! $target->isAdmin()
+            && $target->isActive()
+            && ! $target->isDeletionRequested();
+    }
+
+    public function activateClient(User $actor, User $target): bool
+    {
+        return $actor->isAdmin()
+            && ! $target->isAdmin()
+            && ! $target->isActive()
+            && ! $target->isDeletionRequested();
+    }
+
+    /**
+     * Archiving is the account deletion of 31 · 31.7, started by a superadmin.
+     */
+    public function archive(User $actor, User $target): bool
+    {
+        return $actor->isSuperadmin()
+            && ! $target->isAdmin()
+            && ! $target->isDeletionRequested();
+    }
+
+    /**
      * Only active customers, never admin accounts (14 · 14.6).
      */
     public function impersonate(User $actor, User $target): bool

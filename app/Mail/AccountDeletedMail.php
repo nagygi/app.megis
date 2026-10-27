@@ -11,10 +11,13 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * "Törlés megtörtént" (31 · E-mailek): sent to the address the account had.
+ * When a superadmin archived the account, the text says so (33 · 33.8).
  */
 class AccountDeletedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
+
+    public function __construct(public bool $byAdmin = false) {}
 
     public function envelope(): Envelope
     {
@@ -25,7 +28,9 @@ class AccountDeletedMail extends Mailable implements ShouldQueue
     {
         return new Content(
             markdown: 'mail.account-deleted',
-            with: ['support' => config('megis.support_email')],
+            with: [
+                'body' => __($this->byAdmin ? 'mail.account_deleted.body_by_admin' : 'mail.account_deleted.body', ['support' => config('megis.support_email')]),
+            ],
         );
     }
 }

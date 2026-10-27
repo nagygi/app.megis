@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Clients;
 
 use App\Enums\AuditEventType;
 use App\Exceptions\HeadcountLimitReachedException;
+use App\Livewire\Admin\Clients\Concerns\ManagesClientAccount;
 use App\Mail\EmailChangedMail;
 use App\Models\AuditEvent;
 use App\Models\Consent;
@@ -29,6 +30,7 @@ use Livewire\WithPagination;
  */
 class Show extends Component
 {
+    use ManagesClientAccount;
     use WithPagination;
 
     private const LOG_PAGE_SIZE = 50;
@@ -191,6 +193,16 @@ class Show extends Component
             'canImpersonate' => Gate::allows('impersonate', $this->user),
             'status' => $this->user->load('memberships')->clientStatus(),
         ])->layout('layouts::admin')->title($this->user->name);
+    }
+
+    /**
+     * Only the account on the page, so the header shows the new status at once.
+     */
+    protected function findClient(int $userId): User
+    {
+        abort_unless($userId === $this->user->id, 404);
+
+        return $this->user;
     }
 
     private function fillForm(): void

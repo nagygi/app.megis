@@ -17,6 +17,9 @@ enum AuditEventType: string
     // "Adataim törlése" asked for, and done (31 · 31.7).
     case AccountDeletionRequested = 'account_deletion_requested';
     case AccountDeleted = 'account_deleted';
+    // An admin inactivated or activated the account (33 · 33.2).
+    case AccountDeactivated = 'account_deactivated';
+    case AccountActivated = 'account_activated';
     // Felvételeim: a recording's audio deleted (31 · 31.5).
     case RecordingDeleted = 'recording_deleted';
     // An admin loaded the leader's calendar file or link at the leader's request (09 · 9.2).

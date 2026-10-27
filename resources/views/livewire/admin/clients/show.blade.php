@@ -1,6 +1,6 @@
 @php
     // The same status tones on every user list: clients, members, admins.
-    $statusTones = ['active' => 'green', 'added' => 'neutral', 'invited' => 'yellow', 'pending' => 'yellow', 'invitation_expired' => 'coral', 'locked' => 'coral', 'inactive' => 'muted'];
+    $statusTones = ['active' => 'green', 'added' => 'neutral', 'invited' => 'yellow', 'pending' => 'yellow', 'invitation_expired' => 'coral', 'locked' => 'coral', 'inactive' => 'muted', 'archived' => 'muted'];
 @endphp
 
 <div class="flex max-w-5xl flex-col gap-6">
@@ -31,6 +31,14 @@
                     <x-ui.button type="submit" tone="coral" size="sm">{{ __('impersonation.start') }}</x-ui.button>
                 </form>
             @endif
+            <x-admin.row-actions :label="__('admin.common.row_actions', ['name' => $user->name])">
+                @include('livewire.admin.clients.partials.account-actions', [
+                    'client' => $user,
+                    'withImpersonation' => false,
+                    'statusReason' => $this->statusChangeUnavailableReason($user),
+                    'archiveReason' => $this->archiveUnavailableReason($user),
+                ])
+            </x-admin.row-actions>
         </x-slot:actions>
     </x-admin.page-header>
 

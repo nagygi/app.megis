@@ -218,12 +218,16 @@ class User extends Authenticatable
     }
 
     /**
-     * Status on the customer list (33 · 33.8): "active" with any usable
-     * membership, "pending" until registration, otherwise "inactive".
-     * Uses the loaded memberships.
+     * Status on the customer list (33 · 33.8): "archived" once the deletion is
+     * asked for, "active" with any usable membership, "pending" until
+     * registration, otherwise "inactive". Uses the loaded memberships.
      */
     public function clientStatus(): string
     {
+        if ($this->isDeletionRequested()) {
+            return 'archived';
+        }
+
         if ($this->deactivated_at !== null) {
             return 'inactive';
         }
@@ -237,14 +241,22 @@ class User extends Authenticatable
             : 'inactive';
     }
 
-    /**
-     * Ends every other session of this user (password change, reset, deactivation).
-     */
     public function isAnonymized(): bool
     {
         return $this->anonymized_at !== null;
     }
 
+    /**
+     * "Adataim törlése", or archived by a superadmin: the purge follows (31 · 31.7).
+     */
+    public function isDeletionRequested(): bool
+    {
+        return $this->deletion_requested_at !== null;
+    }
+
+    /**
+     * Ends every other session of this user (password change, reset, deactivation).
+     */
     public function invalidateSessions(): void
     {
         $this->increment('auth_epoch');

@@ -50,6 +50,8 @@ return [
         'email_changed' => 'E-mail cím módosítása',
         'account_deletion_requested' => 'Fióktörlés kérve',
         'account_deleted' => 'Fiók és adatok törölve',
+        'account_deactivated' => 'Fiók inaktiválva',
+        'account_activated' => 'Fiók aktiválva',
         'recording_deleted' => 'Felvétel hangja törölve',
         'calendar_connected_by_admin' => 'Naptár betöltve a nevében (admin)',
     ],

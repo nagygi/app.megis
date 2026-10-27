@@ -46,13 +46,14 @@ class AccountDeletionService
 
     /**
      * Inactive and signed out at once; the purge follows (`megis:accounts:purge`).
+     * Asked for by the user, or archived by a superadmin (33 · 33.8).
      */
-    public function request(User $user): void
+    public function request(User $user, ?User $actor = null): void
     {
         $user->forceFill(['deletion_requested_at' => now(), 'deactivated_at' => $user->deactivated_at ?? now()])->save();
         $user->invalidateSessions();
 
-        $this->audit->record(AuditEventType::AccountDeletionRequested, $user, $user);
+        $this->audit->record(AuditEventType::AccountDeletionRequested, $user, $actor ?? $user);
     }
 
     public function purge(User $user): void
@@ -62,6 +63,12 @@ class AccountDeletionService
         }
 
         $email = $user->email;
+        // Read before the log goes: someone else asked, so the mail does not say "if it was not you".
+        $archivedByAdmin = AuditEvent::query()
+            ->where('subject_user_id', $user->id)
+            ->where('type', AuditEventType::AccountDeletionRequested)
+            ->where('actor_id', '!=', $user->id)
+            ->exists();
         $materials = Material::query()->where('user_id', $user->id)->get();
         $affected = $this->affectedDiagnoses($user, $materials);
 
@@ -125,7 +132,7 @@ class AccountDeletionService
 
         $this->afterPurge($affected);
 
-        Mail::to($email)->send(new AccountDeletedMail);
+        Mail::to($email)->send(new AccountDeletedMail(byAdmin: $archivedByAdmin));
     }
 
     /**

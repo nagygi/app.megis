@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Clients;
 
 use App\Enums\MembershipStatus;
+use App\Livewire\Admin\Clients\Concerns\ManagesClientAccount;
 use App\Livewire\Admin\Concerns\WithDataTable;
 use App\Models\MainDiagnosisParticipant;
 use App\Models\MirrorSession;
@@ -18,6 +19,7 @@ use Livewire\Component;
  */
 class Index extends Component
 {
+    use ManagesClientAccount;
     use WithDataTable;
 
     public function mount(): void
@@ -51,11 +53,13 @@ class Index extends Component
                 ->whereNotExists(MainDiagnosisParticipant::query()->whereColumn('main_diagnosis_participants.user_id', 'users.id'));
         }
 
+        // An archived account is inactive too, but listed only as archived.
         match ($this->filter('status')) {
             'active' => $query->whereNull('deactivated_at')->whereNotNull('activated_at')
                 ->whereHas('memberships', fn (Builder $memberships) => $memberships->where('status', '!=', MembershipStatus::Inactive)),
             'pending' => $query->whereNull('deactivated_at')->whereNull('activated_at'),
-            'inactive' => $query->where(fn (Builder $inactive) => $inactive
+            'archived' => $query->whereNotNull('deletion_requested_at'),
+            'inactive' => $query->whereNull('deletion_requested_at')->where(fn (Builder $inactive) => $inactive
                 ->whereNotNull('deactivated_at')
                 ->orWhere(fn (Builder $withoutAccess) => $withoutAccess
                     ->whereNotNull('activated_at')
@@ -83,5 +87,10 @@ class Index extends Component
     protected function defaultSort(): array
     {
         return ['name', 'asc'];
+    }
+
+    protected function findClient(int $userId): User
+    {
+        return User::query()->findOrFail($userId);
     }
 }

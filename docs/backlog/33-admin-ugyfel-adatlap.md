@@ -24,8 +24,11 @@ Szuperadmin és Admin egyaránt használhatja (01).
 - **Műveletek** a 02 · 2.5 szabályaival:
   - szerkesztés: egy ügyfél nevét bármelyik admin, az e-mail címet csak szuperadmin írhatja át, ahogy az adminoknál (01 · 1.5). Admin-fiók nevét itt is csak az írhatja át, aki a fiókot szerkesztheti: szuperadminét csak szuperadmin. E-mail-módosításkor a felhasználó a régi és az új címére is értesítést kap, és a „nem kézbesíthető” jelzés törlődik;
   - meghívó küldése vagy újraküldése;
-  - inaktiválás vagy aktiválás;
+  - inaktiválás vagy aktiválás: a fiók szintjén, bármelyik admin. Az inaktív fiók nem tud belépni, a munkamenetei azonnal véget érnek, a tagságai nem változnak. A naplóba is bekerül;
+  - archiválás: csak szuperadmin. Ez a fióktörlés (31.7), csak a szuperadmin indítja: a fiók azonnal inaktív, a személyes adatok egy órán belül törlődnek, és ez nem vonható vissza. A felhasználó e-mailt kap, amely szerint az adminisztrátor törölte a fiókját. Archivált fiókot nem lehet aktiválni;
   - belépés a nevében (14 · 14.6).
+- Az inaktiválás, az aktiválás és az archiválás a fejléc *Műveletek* menüjében van, ugyanúgy, mint a listán (33.8).
+- Admin fióknál (admin, aki egy szervezetnek is tagja) ezek a műveletek nem érhetők el: az *Admin felhasználók* között kezelhető (01).
 
 ### 33.3 Szervezetek és diagnózisok
 
@@ -57,7 +60,8 @@ Időrendben, a legfrissebb elöl, 50 soronként lapozva, csak olvasható. Minden
   - A befejezés oka is látszik: Kilépés, az admin kijelentkezett, lejárt az admin munkamenete, vagy félbehagyva.
   - Ha az admin Kilépés nélkül megy el, a munkamenet 6 óra után (az admin tétlenségi ideje, 01) magától lezárul, „félbehagyva” okkal. A vége az utolsó kérés ideje (`close:impersonations`, `cron.md`). Utána a böngészője sem dolgozhat tovább a felhasználó nevében.
 - felvétel törlése a felvétel napjával (31.5), hozzájárulás megadása és visszavonása a fajtájával és a diagnózissal (31.6), e-mail cím módosítása (31), admin naptár-betöltése a forrással (09);
-- fióktörlés (31.7).
+- fióktörlés (31.7); ha szuperadmin archiválta, ő áll a „Fióktörlés kérve” sorban;
+- a fiók inaktiválása és aktiválása az adminnal, aki tette (33.2).
 
 A napló üzleti adat, nem log: a technikai logok 365 napos szabálya (NFR) nem vonatkozik rá. Addig marad meg, amíg a szervezet, amelyben történt: a szervezet törlésével a sorai is törlődnek. A szervezethez nem köthető sorok (e-mail-csere, „nevében” kezdés és befejezés, fióktörlés) a felhasználóhoz tartoznak (33.7).
 
@@ -73,7 +77,11 @@ A napló üzleti adat, nem log: a technikai logok 365 napos szabálya (NFR) nem 
 - Bal oldali menüpont: *Felhasználók* a *Szervezetek* csoportban, az NFR listaszabályai szerint.
 - Oszlopok: név, e-mail, szervezet(ek), állapot, utolsó belépés. Törölt felhasználónál az e-mail helyén „–” áll.
 - Kereső: név és e-mail; a teljes névre is, bármilyen sorrendben („Kovács Anna”, „Anna Kovács”). Szűrők: szervezet, állapot, „csak Értéktükör” (van megerősített Értéktükre, de nincs fő diagnózisa).
+- Állapot: Aktív, Meghívás alatt, Inaktív, Archivált. Archivált az, akinek a fióktörlése elindult: akár ő kérte (31.7), akár szuperadmin archiválta. Az archivált felhasználó a listán marad, a törlés után „Törölt felhasználó”-ként (33.7).
 - A sor az adatlapra nyílik. Új felhasználót innen nem lehet felvenni, az a szervezeten át megy (02).
+- Sorműveletek: belépés a nevében, inaktiválás vagy aktiválás, archiválás (33.2).
+  - Mindhárom menüpont mindig látszik. Ami az adott adminnak vagy felhasználónál nem érhető el, az szürke, és ráállva megmutatja az okát. Ilyen ok: csak szuperadmin archiválhat; admin fiók; archivált; inaktív; még nem regisztrált.
+  - A szerver is ellenőrzi a jogosultságot.
 
 ## Nincs benne
 
