@@ -77,7 +77,7 @@ A szervezet *Felhasználók* fülén. A fül tetején a létszám látszik: „8
 - Oszlopok: név, e-mail, pozíció, címkék, csapat(ok), állapot (Felvéve / Meghívva / Meghívó lejárt / Aktív / Inaktív), utolsó belépés.
 - „Felvéve” állapotú sorban jól látható **„Meghívó küldése”** gomb van.
 - Sorműveletek: szerkesztés (pozíció, címkék, csapatok), meghívó küldése vagy újraküldése, inaktiválás / aktiválás, belépés a nevében (14 · 14.6). A név az adatlapra nyílik (33).
-- Ha a felhasználónak küldött levél nem kézbesíthető, a sorban „A levél nem kézbesíthető” jelzés látszik ([docs/uzemeltetes.md](../docs/uzemeltetes.md)).
+- Ha a felhasználónak küldött levél nem kézbesíthető, a sorban „A levél nem kézbesíthető” jelzés látszik ([docs/uzemeltetes.md](../docs/uzemeltetes.md)). A jelzést a levélküldő értesítése állítja be: 34.
 
 **Meghívás**
 

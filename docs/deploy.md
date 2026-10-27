@@ -92,7 +92,7 @@ A kód kész, az élesítéshez ezek kellenek a környezetben és a mégistől:
 
 - [ ] **Staging-elfogadás a mégissel** a demó szervezeten (`DemoDiagnosisSeeder`): olvasat → publikálás → riport → visszajelzés → PDF → Útravaló.
 - [ ] **Próba-visszaállítás** a stagingre a „Mentés és próba-visszaállítás” szerint, az eredmény beírva.
-- [ ] **Levélküldő:** SES (eu-central-1) vagy más EU-s küldő, SPF, DKIM és DMARC a megis.hu-n. A visszapattanó levelek webhookja (02) a küldő kiválasztása után készül el; addig a „nem kézbesíthető” jelzést semmi nem állítja be.
+- [ ] **Levélküldő:** SES (eu-central-1) vagy más EU-s küldő, SPF, DKIM és DMARC a megis.hu-n. A visszapattanó levelek webhookja (34) a küldő kiválasztása után készül el; addig a „nem kézbesíthető” jelzést semmi nem állítja be.
 - [ ] **Infrastruktúra:** Redis `noeviction`, S3 verziózással és 30 napos életciklussal, RDS-mentés 30 napra, Gotenberg konténer belső hálózaton (Docker nélkül WeasyPrint a Geologica fonttal), ffprobe, CloudWatch Logs 365 nappal, uptime-figyelés a `/health`-re.
 - [ ] **Titkok és kulcsok:** `APP_DEBUG=false`, https-es `APP_URL`, éles Turnstile-kulcsok, EU-s AI-kulcsok, `MEGIS_TRANSCRIBER=ai` a 12.7 PoC döntése szerint, `MEGIS_HEALTH_TOKEN`.
 - [ ] **Naptár-alkalmazások:** a Google-ellenőrzés lezárva (addig 100 tesztfelhasználó), Microsoft Entra alkalmazás.
