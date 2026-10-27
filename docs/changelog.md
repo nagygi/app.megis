@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.37 · HASH · 2026-10-27
+## 1.37 · 1bd9315 · 2026-10-27
 
 Az ügyfél adatlapja (33) teljes: linkek a diagnózisokból, a Beérkezőből és a Futásról, szűrő, lapozott és olvasható napló, amely a szervezetével él. A menüben a futó diagnózis is látszik (15.4).
 
