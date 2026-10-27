@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.40 · HASH · 2026-10-27
+## 1.40 · 954a275 · 2026-10-27
 
 Az *Admin › Felhasználók* listán sorműveletek vannak: belépés a nevében, inaktiválás és archiválás (33 · 33.2, 33.8). Ami valakinek nem érhető el, az szürke menüpont, ráállva az okával.
 
