@@ -323,7 +323,9 @@ it('sends the experience as a Megélés subdiagnosis with the value set version'
     actingAsCustomer($setup['leader']);
 
     $component = Livewire::test(Experience::class, leaderParams($setup, $main))
-        ->assertSee('0 / 7 megválaszolva');
+        ->assertSee('0 / 7 megválaszolva')
+        ->assertSee(['Alig 1', 'Nagyon 1'])
+        ->assertDontSeeHtml('aria-expanded');
 
     $keys = collect($setup['organization']->valueSet->items)->map(fn ($item) => 'value:'.$item->key)
         ->merge(['tree:root', 'tree:trunk', 'tree:crown', 'tree:shadow']);

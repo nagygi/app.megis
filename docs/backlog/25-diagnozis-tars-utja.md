@@ -46,7 +46,7 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
 
 - Ugyanaz a csúszka, mint a vezetőnél (08 · 8.3): a szervezet értékei és a márkád alapjának négy eleme.
 - Soronként 1–6 vagy „nem tudom”. Minden sorra kell válasz, a fejléc számol: „9 / 9 megválaszolva”.
-- Egy érintéssel megnyílik a definíció a szervezet szavaival (08), a diagnózisban rögzített verzióból: „Mit jelent a Nyíltság? · 1 és 6”.
+- Az értékek sorában mindig látszik a definíció a szervezet szavaival (08), a diagnózisban rögzített verzióból: „Mit jelent: Nyíltság? · 1 és 6”, alatta az 1 és a 6 jelentése. Nem csukható be: nélküle a kérdés nem értelmezhető. A vezető V5-je ugyanígy.
 - Beküldéskor Megélés típusú felhasználói részdiagnózis jön létre (04, 17.4).
 - „Tovább” → T5.
 

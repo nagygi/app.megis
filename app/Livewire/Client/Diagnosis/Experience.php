@@ -27,8 +27,6 @@ class Experience extends Component
      */
     public array $answers = [];
 
-    public ?string $openKey = null;
-
     public function mount(Organization $organization, Diagnosis $diagnosis, ExperienceService $experiences): void
     {
         $this->bootDiagnosis($organization, $diagnosis);
@@ -56,11 +54,6 @@ class Experience extends Component
 
         $this->participant()->update(['experience_draft' => $this->answers]);
         $this->dispatch('saved');
-    }
-
-    public function toggle(string $key): void
-    {
-        $this->openKey = $this->openKey === $key ? null : $key;
     }
 
     /**

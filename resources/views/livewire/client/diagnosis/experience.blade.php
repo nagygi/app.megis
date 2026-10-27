@@ -16,17 +16,13 @@
                             <p class="text-sm text-grey-700">{{ $row['meaning'] }}</p>
                         @endif
                         @if ($row['kind'] === 'value' && (filled($row['low']) || filled($row['high'])))
-                            <x-ui.button tone="ghost" size="sm" class="-ml-1.5 self-start" :icon-right="$openKey === $row['key'] ? 'chevron-up' : 'chevron-down'" wire:click="toggle('{{ $row['key'] }}')" aria-expanded="{{ $openKey === $row['key'] ? 'true' : 'false' }}">
-                                {{ __('diagnosis.experience.definition', ['name' => $row['label']]) }}
-                            </x-ui.button>
-                            @if ($openKey === $row['key'])
-                                <dl class="grid grid-cols-[2rem_1fr] gap-1 rounded-field bg-grey-100 p-3 text-sm">
-                                    <dt class="font-extrabold text-coral-ink">1</dt>
-                                    <dd>{{ $row['low'] }}</dd>
-                                    <dt class="font-extrabold text-green">6</dt>
-                                    <dd>{{ $row['high'] }}</dd>
-                                </dl>
-                            @endif
+                            <p class="mt-2 text-sm font-semibold">{{ __('diagnosis.experience.definition', ['name' => $row['label']]) }}</p>
+                            <dl class="grid grid-cols-[2rem_1fr] gap-1 rounded-field bg-grey-100 p-3 text-sm">
+                                <dt class="font-extrabold text-coral-ink">1</dt>
+                                <dd>{{ $row['low'] }}</dd>
+                                <dt class="font-extrabold text-green">6</dt>
+                                <dd>{{ $row['high'] }}</dd>
+                            </dl>
                         @endif
                     </div>
                     <x-diagnosis.scale :name="$inputName" :label="$row['label']" :disabled="! $editable" />
