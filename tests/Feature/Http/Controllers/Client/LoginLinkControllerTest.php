@@ -40,13 +40,42 @@ it('shows "Ez a link már lejárt" for a used link', function () {
 });
 
 it('sends a fresh code from an expired link', function () {
+    fakeTurnstile();
     Mail::fake();
     $customer = customerOf();
     $token = app(TokenService::class)->issue($customer, TokenPurpose::LoginCode)->plainToken;
     $this->travel(16)->minutes();
 
-    $response = $this->post(route('client.login.link.resend', $token));
+    $response = $this->post(route('client.login.link.resend', $token), ['cf-turnstile-response' => 'turnstile-token']);
 
     $response->assertRedirect(route('client.login.code'));
     Mail::assertQueued(LoginCodeMail::class, fn (LoginCodeMail $mail) => $mail->hasTo($customer->email));
+});
+
+it('asks for Turnstile before a fresh code from an expired link (14 · 14.2)', function () {
+    fakeTurnstile(false);
+    Mail::fake();
+    $token = app(TokenService::class)->issue(customerOf(), TokenPurpose::LoginCode)->plainToken;
+    $this->travel(16)->minutes();
+
+    $response = $this->post(route('client.login.link.resend', $token), ['cf-turnstile-response' => 'turnstile-token']);
+
+    $response->assertSessionHasErrors('cf-turnstile-response');
+    Mail::assertNothingQueued();
+});
+
+it('limits fresh codes from an expired link to five per hour, like B1 (14 · 14.2)', function () {
+    fakeTurnstile();
+    Mail::fake();
+    $token = app(TokenService::class)->issue(customerOf(), TokenPurpose::LoginCode)->plainToken;
+
+    foreach (range(1, 5) as $attempt) {
+        $this->travel(61)->seconds();
+        $this->post(route('client.login.link.resend', $token), ['cf-turnstile-response' => 'turnstile-token'])->assertRedirect(route('client.login.code'));
+    }
+    $this->travel(61)->seconds();
+    $response = $this->post(route('client.login.link.resend', $token), ['cf-turnstile-response' => 'turnstile-token']);
+
+    $response->assertSessionHasErrors('cf-turnstile-response');
+    Mail::assertQueued(LoginCodeMail::class, 5);
 });

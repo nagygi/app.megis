@@ -26,6 +26,7 @@ Négy sor. Amíg nincs meg mind, a „Publikálom” gomb szürke, és a hiányz
 - minden állítás és szöveg jóváhagyva (20);
 - nincs besorolatlan anyag a diagnózisban (22);
 - a küszöb rendben van, vagy tudatosan felül van írva (19.4). Magánszemélynél és társ nélküli terméknél ez a sor nem jelenik meg.
+  - A sor a Futás fülre visz, ezért csak a kapcsolattartónál és a szuperadminnál link (19.1). A többi adminnál link nélkül áll, a kapcsolattartó nevével.
 
 ### 21.3 Publikálás
 

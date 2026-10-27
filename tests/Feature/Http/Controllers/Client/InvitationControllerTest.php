@@ -51,6 +51,17 @@ it('shows the registration form with who invited whom, without using up the link
     expect($membership->user->tokens()->sole()->consumed_at)->toBeNull();
 });
 
+it('sends an existing account to B1, which says who invited them and where (14 · 14.2)', function () {
+    [$membership, $token] = invitedMembership();
+    $membership->user->forceFill(['activated_at' => now()])->save();
+
+    $response = $this->followingRedirects()->get(route('client.invitation.show', $token));
+
+    $response->assertOk()
+        ->assertSee('Belépés')
+        ->assertSee('Nagy Luca meghívott a(z) Acme Kft. felhasználójaként.');
+});
+
 it('registers the customer, records both legal acceptances and logs in', function () {
     fakeTurnstile();
     $terms = LegalDocumentVersion::factory()->ofType(LegalDocumentType::Terms)->create();

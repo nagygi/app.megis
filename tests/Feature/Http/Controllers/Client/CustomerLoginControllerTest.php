@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Client\CustomerLoginController;
 use App\Mail\LoginCodeMail;
 use App\Models\Organization;
 use App\Models\User;
@@ -98,6 +99,37 @@ it('pauses password login for 15 minutes after 10 wrong passwords, while the cod
     postCustomerLogin(['email' => $customer->email, 'password' => 'jelszo-1234'])->assertSessionHasErrors('password');
     postCustomerLogin(['email' => $customer->email])->assertRedirect(route('client.login.code'));
     Mail::assertQueued(LoginCodeMail::class);
+});
+
+it('pauses an address without a password account the same way, so the pause tells nothing (14 · 14.2)', function (Closure $email) {
+    fakeTurnstile();
+    $address = $email();
+
+    foreach (range(1, 9) as $attempt) {
+        $this->travel(61)->seconds();
+        postCustomerLogin(['email' => $address, 'password' => 'wrong-password'])->assertSessionHasErrors(['password' => 'Hibás e-mail cím vagy jelszó.']);
+    }
+    $this->travel(61)->seconds();
+    postCustomerLogin(['email' => $address, 'password' => 'wrong-password'])
+        ->assertSessionHasErrors(['password' => 'Túl sok hibás jelszó. 15 percig csak kóddal léphetsz be.']);
+
+    $this->travel(16)->minutes();
+    postCustomerLogin(['email' => $address, 'password' => 'wrong-password'])->assertSessionHasErrors(['password' => 'Hibás e-mail cím vagy jelszó.']);
+})->with([
+    'unknown' => fn () => 'nobody@example.com',
+    'without a password' => fn () => tap(customerOf(), fn (User $customer) => $customer->forceFill(['password' => null])->save())->email,
+]);
+
+it('says on B1 who invited an existing account and where, from a signed link only (14 · 14.2)', function () {
+    $organization = Organization::factory()->create(['name' => 'Acme Kft.']);
+    $inviter = User::factory()->admin()->create(['last_name' => 'Nagy', 'first_name' => 'Luca']);
+
+    $this->get(CustomerLoginController::invitedUrl($organization, $inviter))
+        ->assertOk()
+        ->assertSee('Nagy Luca meghívott a(z) Acme Kft. felhasználójaként.');
+    $this->get(route('client.login', ['szervezet' => $organization->id, 'meghivo' => $inviter->id]))
+        ->assertOk()
+        ->assertDontSee('Nagy Luca meghívott');
 });
 
 it('redirects a logged-in customer away from the login page', function () {

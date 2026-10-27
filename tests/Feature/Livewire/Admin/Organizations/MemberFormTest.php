@@ -69,7 +69,9 @@ it('adds an existing account to another organization with a notice instead of a 
     expect($membership->user_id)->toBe($existing->id)
         ->and($membership->status)->toBe(MembershipStatus::Active)
         ->and($membership->is_partner)->toBeTrue();
-    Mail::assertQueued(OrganizationAddedMail::class, fn (OrganizationAddedMail $mail) => $mail->hasTo($existing->email));
+    // The link leads to B1 with who invited them and where (14 · 14.2).
+    Mail::assertQueued(OrganizationAddedMail::class, fn (OrganizationAddedMail $mail) => $mail->hasTo($existing->email)
+        && str_contains($mail->render(), 'signature='));
 });
 
 it('requires at least one tag', function () {

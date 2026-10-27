@@ -4,9 +4,10 @@
         <p>{{ __('auth_ui.customer.link_expired') }}</p>
 
         @if ($canResend)
-            <form method="POST" action="{{ route('client.login.link.resend', $token) }}">
+            <form method="POST" action="{{ route('client.login.link.resend', $token) }}" class="flex flex-col gap-5">
                 @csrf
-                <x-ui.button type="submit" size="lg">{{ __('auth_ui.customer.request_new') }}</x-ui.button>
+                <x-turnstile />
+                <x-ui.button type="submit" size="lg" class="self-start">{{ __('auth_ui.customer.request_new') }}</x-ui.button>
             </form>
         @else
             <x-ui.button :href="route('client.login')" size="lg" class="self-start">{{ __('auth_ui.customer.request_new') }}</x-ui.button>

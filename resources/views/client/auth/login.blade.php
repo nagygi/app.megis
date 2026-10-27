@@ -1,5 +1,5 @@
 {{-- B1 · Belépés (14 · 14.2) --}}
-<x-layouts::client :title="__('auth_ui.customer.login_title')" guest>
+<x-layouts::client :title="__('auth_ui.customer.login_title')" :subtitle="$invitation" guest>
     <x-ui.flash inline class="mb-6 max-w-md" />
 
     <form

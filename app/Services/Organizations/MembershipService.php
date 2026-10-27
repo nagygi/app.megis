@@ -87,7 +87,7 @@ class MembershipService
         $token = $this->prepareInvitation($membership, $actor);
 
         if ($token === null) {
-            Mail::to($user->email)->queue(new OrganizationAddedMail($user, $organization));
+            Mail::to($user->email)->queue(new OrganizationAddedMail($user, $organization, $actor));
 
             return;
         }

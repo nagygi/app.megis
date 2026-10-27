@@ -38,9 +38,12 @@ class InvitationController extends Controller
             return view('client.auth.invitation-expired');
         }
 
-        // An existing account was only added to the organization: it logs in instead.
+        // An existing account was only added to the organization: it logs in
+        // instead, and B1 says who invited them and where (14 · 14.2).
         if ($invitation->user->isActivated()) {
-            return redirect()->route('client.login');
+            return $invitation->creator !== null
+                ? redirect()->to(CustomerLoginController::invitedUrl($invitation->organization, $invitation->creator))
+                : redirect()->route('client.login');
         }
 
         return view('client.auth.register', [

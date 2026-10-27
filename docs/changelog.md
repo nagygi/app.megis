@@ -2,6 +2,15 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.41 · HASH · 2026-10-27
+
+A belépés három rése bezárult (14 · 14.2), és a Publikálás ellenőrzőlistája nem visz 403-ra (21 · 21.2).
+
+- **„{X} meghívott…” a belépés lapján:** ha egy meglévő fiókot egy újabb szervezethez adnak, a „hozzáadtunk” levél linkje a belépésre visz. Ott a kísérősor: „{Meghívó} meghívott a(z) {Szervezet} felhasználójaként.” Ugyanígy működik a régi meghívó linkje, ha a fiók közben regisztrált. A link alá van írva és 14 napig él, a kísérősort kézzel írt címmel nem lehet előállítani.
+- **„Újat kérek” a lejárt belépő linken:** a gomb Turnstile-t kér, és a kódkérés óránkénti keretébe számít (e-mail címenként és IP-nként 5). Eddig csak a 60 másodperces várakozás fogta, így óránként kb. 60 kód volt kérhető.
+- **10 hibás jelszó:** a 15 perces szünet ismeretlen és jelszó nélküli címre is ugyanúgy jár (a számláló ilyenkor a cache-ben fut). A „Túl sok hibás jelszó…” üzenetből így nem derül ki, kinek van fiókja. Ismeretlen címnél is lefut a jelszó-hash, így a válaszidő sem árulkodik.
+- **Publikálás › Ellenőrzőlista:** a küszöb-sor csak a kapcsolattartónál és a szuperadminnál link a Futás fülre. A többi adminnál link nélkül áll: „a Futás fülön a kapcsolattartó ({név}) vagy a szuperadmin írja felül”.
+
 ## 1.40 · 954a275 · 2026-10-27
 
 Az *Admin › Felhasználók* listán sorműveletek vannak: belépés a nevében, inaktiválás és archiválás (33 · 33.2, 33.8). Ami valakinek nem érhető el, az szürke menüpont, ráállva az okával.

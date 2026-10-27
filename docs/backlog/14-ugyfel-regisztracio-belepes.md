@@ -30,6 +30,7 @@ Az admin belépése külön működik: 01.
 - Elsődleges gomb: „Belépek”. Ez kódot küld.
 - Szöveges link: „Jelszóval lépek be”. Erre egy jelszómező jelenik meg.
 - Ha a felhasználó meghívóból vagy az Értéktükörből jön, a kísérősor mondja meg, ki hívta meg, és hová. Egyébként csak a „Belépés” cím áll.
+  - Meglévő fióknál ezt a „hozzáadtunk” levél linkje és a régi meghívó linkje hozza: „{Meghívó} meghívott a(z) {Szervezet} felhasználójaként.” A link alá van írva, 14 napig él, a kísérősor máshonnan nem állítható elő.
 - Ismeretlen, inaktív vagy jelszó nélküli fiók esetén ugyanaz a válasz jelenik meg, így kívülről nem derül ki, kinek van fiókja:
   - Kódkérésnél: „Ha ehhez a címhez tartozik fiók, elküldtük a belépő kódot.” Alatta: „Még nincs fiókod? Nézz bele a tükörbe.” (ET1).
   - Jelszónál: „Hibás e-mail cím vagy jelszó.”
@@ -40,7 +41,7 @@ Az admin belépése külön működik: 01.
 - A lapon van a kód beviteli mezője. Ha a felhasználó másik eszközön olvassa a levelet, ide írja be a kódot.
 - Gombok: „Újraküldöm” (60 másodperc után aktív) és „Másik e-mail”.
 - 5 hibás kód után a kód érvényét veszti, újat kell kérni.
-- **Lejárt vagy már használt belépő link** (az „Extra inputok” lap 2. állapota): a B2 lapja „Ez a link már lejárt” fejléccel, „Újat kérek” gombbal. A belépő kódot, a meghívóval ellentétben, a felhasználó maga kérheti újra.
+- **Lejárt vagy már használt belépő link** (az „Extra inputok” lap 2. állapota): a B2 lapja „Ez a link már lejárt” fejléccel, „Újat kérek” gombbal. A belépő kódot, a meghívóval ellentétben, a felhasználó maga kérheti újra. A gomb Turnstile-t kér, és a kódkérés óránkénti keretébe számít.
 
 **Védelem**
 
@@ -48,6 +49,7 @@ Az admin belépése külön működik: 01.
   - kódkérés: óránként legfeljebb 5;
   - belépési próbálkozás: percenként legfeljebb 5.
 - 10 egymást követő hibás jelszó után a jelszavas belépés 15 percre szünetel. Kóddal közben is be lehet lépni. A számlálót a sikeres belépés nullázza.
+  - A szünet ismeretlen és jelszó nélküli címre is ugyanígy jár, így az üzenetből sem derül ki, kinek van fiókja.
 
 **Session**
 

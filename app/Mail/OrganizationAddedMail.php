@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Http\Controllers\Client\CustomerLoginController;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -21,6 +22,7 @@ class OrganizationAddedMail extends Mailable implements ShouldQueue
     public function __construct(
         public User $user,
         public Organization $organization,
+        public ?User $inviter = null,
     ) {
         $this->afterCommit();
     }
@@ -34,7 +36,8 @@ class OrganizationAddedMail extends Mailable implements ShouldQueue
     {
         return new Content(
             markdown: 'mail.organization-added',
-            with: ['url' => route('client.login')],
+            // B1 then says who invited them and where (14 · 14.2).
+            with: ['url' => $this->inviter !== null ? CustomerLoginController::invitedUrl($this->organization, $this->inviter) : route('client.login')],
         );
     }
 }

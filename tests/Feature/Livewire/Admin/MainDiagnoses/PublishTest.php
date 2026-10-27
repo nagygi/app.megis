@@ -7,6 +7,7 @@ use App\Mail\DiagnosisNoticeMail;
 use App\Models\ChapterUpdate;
 use App\Models\DiagnosisClaim;
 use App\Models\ReportSnapshot;
+use App\Models\User;
 use App\Services\Report\PublishService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
@@ -28,6 +29,20 @@ it('keeps "Publikálom" grey until the checklist is complete (21 · 21.2)', func
         ->call('publish');
 
     expect($main->refresh()->stage)->toBe(MainDiagnosisStage::Reading);
+});
+
+it('links the threshold row to the Futás tab only for whoever may open it (21 · 21.2)', function () {
+    [$setup, $main] = approvedReading();
+    $main->update(['threshold_overridden_at' => null, 'threshold_overridden_by' => null]);
+    $runUrl = route('admin.main-diagnoses.run', $main->diagnosis);
+
+    actingAsAdmin($setup['admin']);
+    Livewire::test(Publish::class, ['diagnosis' => $main->diagnosis])->assertSeeHtml('<a href="'.$runUrl.'" class="inline-flex');
+
+    actingAsAdmin(User::factory()->admin()->create());
+    Livewire::test(Publish::class, ['diagnosis' => $main->diagnosis])
+        ->assertDontSeeHtml('href="'.$runUrl.'"')
+        ->assertSee('a Futás fülön a kapcsolattartó ('.$setup['admin']->name.') vagy a szuperadmin írja felül');
 });
 
 it('publishes, freezes the report and mails the leader and the peers (21 · 21.3)', function () {

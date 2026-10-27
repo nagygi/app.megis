@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Enums\TokenPurpose;
 use App\Http\Controllers\Concerns\ThrottlesAttempts;
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
+use App\Models\User;
 use App\Rules\Turnstile;
 use App\Services\Auth\CustomerAuthenticator;
 use App\Services\Auth\LandingResolver;
@@ -12,6 +15,7 @@ use App\Services\Auth\LoginOutcome;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -28,9 +32,25 @@ class CustomerLoginController extends Controller
 
     public const ATTEMPTS_PER_MINUTE = 5;
 
+    /**
+     * The login page for an existing account invited to another organization:
+     * B1 says who invited them and where (14 · 14.2). Signed, so the line
+     * cannot be made up; it lives as long as an invitation.
+     */
+    public static function invitedUrl(Organization $organization, User $inviter): string
+    {
+        return URL::temporarySignedRoute('client.login', TokenPurpose::ClientInvitation->lifetime(), [
+            'szervezet' => $organization->id,
+            'meghivo' => $inviter->id,
+        ]);
+    }
+
     public function create(Request $request): View
     {
-        return view('client.auth.login', ['email' => $request->session()->get('login.email')]);
+        return view('client.auth.login', [
+            'email' => $request->session()->get('login.email'),
+            'invitation' => $this->invitationContext($request),
+        ]);
     }
 
     /**
@@ -75,5 +95,19 @@ class CustomerLoginController extends Controller
         $authenticator->login($user);
 
         return redirect()->intended($landing->urlFor($user));
+    }
+
+    private function invitationContext(Request $request): ?string
+    {
+        if (! $request->hasValidSignature()) {
+            return null;
+        }
+
+        $organization = Organization::query()->find($request->query('szervezet'));
+        $inviter = User::query()->find($request->query('meghivo'));
+
+        return $organization !== null && $inviter !== null
+            ? __('auth_ui.customer.invitation_context', ['inviter' => $inviter->name, 'organization' => $organization->name])
+            : null;
     }
 }

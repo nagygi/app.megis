@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Http\Controllers\Concerns\ThrottlesAttempts;
 use App\Http\Controllers\Controller;
+use App\Rules\Turnstile;
 use App\Services\Auth\CustomerAuthenticator;
 use App\Services\Auth\LandingResolver;
 use App\Services\Auth\LoginCodeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 /**
@@ -16,6 +19,8 @@ use Illuminate\View\View;
  */
 class LoginLinkController extends Controller
 {
+    use ThrottlesAttempts;
+
     public function show(string $token, LoginCodeService $codes): View
     {
         $linkToken = $codes->findLinkToken($token);
@@ -41,7 +46,10 @@ class LoginLinkController extends Controller
     }
 
     /**
-     * "Újat kérek": unlike an invitation, a login code may be requested again by the user.
+     * "Újat kérek": unlike an invitation, a login code may be requested again
+     * by the user, with Turnstile and the hourly limit of B1 (14 · 14.2).
+     *
+     * @throws ValidationException
      */
     public function resend(Request $request, string $token, LoginCodeService $codes): RedirectResponse
     {
@@ -51,9 +59,12 @@ class LoginLinkController extends Controller
             return redirect()->route('client.login');
         }
 
+        $request->validate([Turnstile::FIELD => [new Turnstile]]);
+
         $email = $linkToken->user->email;
 
         if ($codes->secondsUntilResend($email) === 0) {
+            $this->throttle('login-code', $email, (string) $request->ip(), CustomerLoginController::CODE_REQUESTS_PER_HOUR, 3600, Turnstile::FIELD);
             $codes->send($email);
         }
 

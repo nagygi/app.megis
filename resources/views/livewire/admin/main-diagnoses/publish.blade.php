@@ -4,7 +4,8 @@
         'rows' => route('admin.main-diagnoses.reading', $diagnosis),
         'claims' => route('admin.main-diagnoses.reading', $diagnosis).'#claims-title',
         'classified' => route('admin.organizations.processes', $diagnosis->organization),
-        'threshold' => route('admin.main-diagnoses.run', $diagnosis),
+        // The Futás tab is the contact's and the superadmin's (19 · 19.1): no link for the others.
+        'threshold' => auth()->user()?->can('run', $diagnosis) ? route('admin.main-diagnoses.run', $diagnosis) : null,
         'capabilities' => route('admin.diagnoses.capabilities', $diagnosis),
     ];
 @endphp
@@ -23,6 +24,8 @@
                     <x-ui.badge :tone="$done ? 'green' : 'coral'">{{ $done ? __('admin.publish.done') : __('admin.publish.missing') }}</x-ui.badge>
                     @if ($done)
                         <span>{{ __('admin.publish.items.'.$key) }}</span>
+                    @elseif ($links[$key] === null)
+                        <span>{{ __('admin.publish.items.'.$key) }} <span class="text-sm text-grey-700">· {{ __('admin.publish.threshold_by_contact', ['name' => $diagnosis->organization->contactAdmin?->name ?? '–']) }}</span></span>
                     @else
                         <a href="{{ $links[$key] }}" class="inline-flex min-h-10 items-center gap-1 font-semibold">{{ __('admin.publish.items.'.$key) }} <x-megis.icon name="chevron-right" /></a>
                     @endif

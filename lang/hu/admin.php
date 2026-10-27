@@ -1422,6 +1422,7 @@ return [
             'threshold' => 'A küszöb rendben, vagy tudatosan felülírva',
             'capabilities' => 'Minden megmutatott képesség jóváhagyva (Képességek fül)',
         ],
+        'threshold_by_contact' => 'a Futás fülön a kapcsolattartó (:name) vagy a szuperadmin írja felül',
         'publish' => 'Publikálom',
         'confirm' => 'A vezető e-mailt kap, a társak az Útravalójukat. A riport a mai napra fagy. Publikálod?',
         'confirm_republish' => 'Újrapublikálás: e-mail nem megy ki, a riport és az Útravaló újra elérhető. A riport a mai napra fagy. Publikálod?',

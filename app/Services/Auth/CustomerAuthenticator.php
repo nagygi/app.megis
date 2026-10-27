@@ -3,6 +3,7 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -20,6 +21,7 @@ class CustomerAuthenticator
     public function __construct(
         private Hasher $hasher,
         private GuardSession $guardSession,
+        private Cache $cache,
     ) {}
 
     /**
@@ -51,7 +53,10 @@ class CustomerAuthenticator
         $user = $this->findLoginable($email);
 
         if ($user === null || $user->password === null) {
-            return [LoginOutcome::Invalid, null];
+            // Hashed all the same, so the time taken does not tell either.
+            $this->hasher->make($password);
+
+            return [$this->recordFailureWithoutAccount($email), null];
         }
 
         if ($user->isPasswordPaused()) {
@@ -81,5 +86,32 @@ class CustomerAuthenticator
         Log::channel('auth')->warning('Failed customer password login.', ['user_id' => $user->id]);
 
         return $user->isPasswordPaused() ? LoginOutcome::PasswordPaused : LoginOutcome::Invalid;
+    }
+
+    /**
+     * The same count and pause on an address with no password account, kept
+     * in the cache: the pause message comes for any address, so it does not
+     * tell who has an account (14 · 14.2).
+     */
+    private function recordFailureWithoutAccount(string $email): LoginOutcome
+    {
+        $key = 'customer-password:'.sha1(Str::lower(trim($email)));
+
+        if ($this->cache->has($key.':paused')) {
+            return LoginOutcome::PasswordPaused;
+        }
+
+        $failures = (int) $this->cache->get($key) + 1;
+
+        if ($failures < self::MAX_FAILED_PASSWORDS) {
+            $this->cache->put($key, $failures, now()->addDay());
+
+            return LoginOutcome::Invalid;
+        }
+
+        $this->cache->forget($key);
+        $this->cache->put($key.':paused', true, now()->addMinutes(self::PAUSE_MINUTES));
+
+        return LoginOutcome::PasswordPaused;
     }
 }
