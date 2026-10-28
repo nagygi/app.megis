@@ -2,6 +2,16 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.45 · HASH · 2026-10-28
+
+Jegyek az oldalon: az `exot/onsite-comment` 0.7.0-ról 0.9.0-ra frissült. A `composer.json`-ban `^0.9` áll, mert 0.x verziónál a `^0.7` a 0.8-at már nem engedi.
+
+- **Új jegy űrlap:** a Linkek mező alól kikerült a „Pl. specifikáció, Figma-terv, másik oldal. Csak http(s) link.” súgósor. Mobilon a képernyőkép csak kis bélyegképként látszik, a jegyre teljes méretben kerül.
+- **Trello:** minden kártyára rákerül az „OnsiteComment” címke, így a boardon szűrhető, mi jött a widgetből. A státuszlisták angol nevet kapnak: To Do, In Progress, Testing, Done, Closed.
+- **Teendő a stagingen a deploy után** (ha a Trello be van állítva): `php artisan onsite-comment:trello:setup --board=<board link>`. Átnevezi a meglévő magyar listákat, és létrehozza a címkét. Amíg nem fut, a szinkron a régi nevekkel is működik.
+- Nincs új migráció és új kötelező env-kulcs.
+- **Rollback:** 1.44 (a csomag 0.7.0-ra áll vissza). Ha a setup már lefutott, a listák angolul maradnak; kézzel kell visszanevezni őket.
+
 ## 1.44 · 9a93b28 · 2026-10-27
 
 Az `update.sh` nem akad el a szerveren kézzel telepített dev csomagokon (a DestinationX-es javítás átvétele).
