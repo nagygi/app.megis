@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.48 · HASH · 2026-10-28
+## 1.48 · 01e9840 · 2026-10-28
 
 Vezetőcserénél a régi vezető a diagnózis társa lesz (17 · 17.2, 17.7).
 
