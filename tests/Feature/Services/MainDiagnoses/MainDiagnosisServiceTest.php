@@ -182,7 +182,7 @@ it('makes a new team member a peer while the diagnosis runs, until reading start
     expect($main->participants()->where('user_id', $late->id)->exists())->toBeFalse();
 });
 
-it('replaces the leader without an e-mail and keeps the old leader\'s row', function () {
+it('replaces the leader without an e-mail, keeps the old leader\'s row and makes them a peer', function () {
     $setup = diagnosisTeam(peers: 2);
     $main = startMainDiagnosis($setup);
     $newLeader = $setup['peers'][0];
@@ -192,10 +192,21 @@ it('replaces the leader without an e-mail and keeps the old leader\'s row', func
     $main->refresh();
     expect($main->leader_id)->toBe($newLeader->id)
         ->and($main->participants()->where('user_id', $setup['leader']->id)->whereNotNull('replaced_at')->exists())->toBeTrue()
+        ->and($main->peers()->where('user_id', $setup['leader']->id)->whereNull('invited_at')->exists())->toBeTrue()
         ->and($main->peers()->where('user_id', $newLeader->id)->exists())->toBeFalse()
         ->and($main->leaderParticipant()->invited_at)->toBeNull();
 
     Mail::assertNotQueued(DiagnosisLeaderInvitationMail::class, fn ($mail) => $mail->hasTo($newLeader->email));
+    Mail::assertNotQueued(DiagnosisPeerInvitationMail::class, fn ($mail) => $mail->hasTo($setup['leader']->email));
+});
+
+it('invites the replaced leader as a peer when the diagnosis runs (25 · 25.1)', function () {
+    [$setup, $main] = runningDiagnosis();
+
+    app(MainDiagnosisService::class)->changeLeader($main, $setup['peers'][0]);
+
+    expect($main->peers()->where('user_id', $setup['leader']->id)->whereNotNull('invited_at')->exists())->toBeTrue();
+    Mail::assertQueued(DiagnosisPeerInvitationMail::class, fn ($mail) => $mail->hasTo($setup['leader']->email));
 });
 
 it('closes from any stage and a diagnosis closed before reading stays a draft', function () {

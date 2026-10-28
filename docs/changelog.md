@@ -2,6 +2,14 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.48 · HASH · 2026-10-28
+
+Vezetőcserénél a régi vezető a diagnózis társa lesz (17 · 17.2, 17.7).
+
+- **Eddig:** a lecserélt vezetőnek csak a lezárt vezetősora maradt meg, társ-sora nem lett. Az admin *Beállítás* lapja bepipált társként mutatta, a kezdőlapja viszont ezt írta: „Jelenleg nincs olyan diagnózis, amelyben részt veszel.” A „Fut” indulásakor meghívót sem kapott volna.
+- **Most:** ha a régi vezető még a csapat tagja, a csere után társ lesz. Az admin a pipával ugyanúgy kiveheti, mint bármelyik társat. A kitöltése megmarad, a saját értékei és a megélése a társ-lépéseinél is ott vannak. Ha a diagnózis már fut, azonnal megkapja a társ-meghívót.
+- **Teendő a stagingen a deploy után:** a régebbi cseréket a javítás nem pótolja. Az „Él csapat · Teljes · 2026.11.02.” diagnózist (ALma Kft, a lecserélt vezető ng+alma16) egyszer el kell menteni a *Beállítás* lapon („Mentem”). Ez a deploy előtt is működik.
+
 ## 1.47 · d00b513 · 2026-10-28
 
 Jegyek az oldalon: az `exot/onsite-comment` 1.0.0-ról 1.1.0-ra frissült (`composer.lock`; a `^1.0` feltétel maradt).

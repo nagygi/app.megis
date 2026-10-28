@@ -204,8 +204,9 @@ class MainDiagnosisService
 
     /**
      * The leader is replaced with a confirmation; the old leader's answers
-     * stay. No e-mail goes out: A1 sends the new leader's invitation on its
-     * own button (17 · 17.7).
+     * stay, and they become a peer while still in the team (17 · 17.2). No
+     * e-mail goes out to the new leader: A1 sends the invitation on its own
+     * button (17 · 17.7).
      */
     public function changeLeader(MainDiagnosis $main, User $newLeader): void
     {
@@ -218,6 +219,8 @@ class MainDiagnosisService
         }
 
         DB::transaction(function () use ($main, $newLeader): void {
+            $oldLeaderId = $main->leader_id;
+
             $main->participants()
                 ->where('role', ParticipantRole::Leader)
                 ->whereNull('replaced_at')
@@ -236,6 +239,18 @@ class MainDiagnosisService
 
             if ($main->subject === MainDiagnosisSubject::Team && $diagnosis->team !== null) {
                 $diagnosis->team->users()->syncWithoutDetaching([$newLeader->id => ['is_leader' => true]]);
+
+                // The old leader is a peer like the rest of the team; invited at once if it runs (25 · 25.1).
+                if ($main->hasPeers() && $this->teamPeerCandidates($diagnosis->team, $newLeader->id)->contains('id', $oldLeaderId)) {
+                    $peer = $main->participants()->updateOrCreate(
+                        ['user_id' => $oldLeaderId, 'role' => ParticipantRole::Peer],
+                        ['excluded_at' => null],
+                    );
+
+                    if ($main->stage === MainDiagnosisStage::Running && $peer->invited_at === null) {
+                        $this->invitePeer($peer);
+                    }
+                }
             }
 
             if ($main->subject === MainDiagnosisSubject::Person) {

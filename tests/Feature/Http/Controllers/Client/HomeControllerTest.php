@@ -3,6 +3,7 @@
 use App\Models\Membership;
 use App\Models\Organization;
 use App\Models\User;
+use App\Services\MainDiagnoses\MainDiagnosisService;
 use Illuminate\Support\Facades\Queue;
 
 it('greets the customer until a diagnosis of the organization starts', function () {
@@ -115,6 +116,20 @@ it('keeps "amint elindul" for a peer whose diagnosis does not run yet', function
     $this->get(route('client.home', $setup['organization']))
         ->assertOk()
         ->assertSee('amint elindul');
+});
+
+it('shows a replaced leader the peer\'s way of the diagnosis', function () {
+    $setup = diagnosisTeam(peers: 1);
+    $main = startMainDiagnosis($setup);
+    $newLeader = $setup['peers'][0];
+    app(MainDiagnosisService::class)->changeLeader($main, $newLeader);
+    actingAsCustomer($setup['leader']);
+
+    $this->get(route('client.home', $setup['organization']))
+        ->assertOk()
+        ->assertSee('amint elindul')
+        ->assertSee($newLeader->name.' hamarosan meghív a(z) '.$setup['team']->name.' diagnózisába.')
+        ->assertDontSee('Jelenleg nincs olyan diagnózis, amelyben részt veszel.');
 });
 
 it('opens the user menu from the avatar and the menu from the round button', function () {
