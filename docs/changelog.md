@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.47 · HASH · 2026-10-28
+## 1.47 · d00b513 · 2026-10-28
 
 Jegyek az oldalon: az `exot/onsite-comment` 1.0.0-ról 1.1.0-ra frissült (`composer.lock`; a `^1.0` feltétel maradt).
 
