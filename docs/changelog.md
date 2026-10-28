@@ -2,6 +2,21 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.46 · HASH · 2026-10-28
+
+Jegyek az oldalon: az `exot/onsite-comment` 0.9.0-ról 1.0.0-ra frissült. A `composer.json`-ban innentől `^1.0` áll, ez minden 1.x kiadást elfogad, így a csomag következő frissítéseinél nem kell átírni.
+
+- **Képek a jegyekhez:**
+  - Az új jegy formjában és a jegy panelen képet lehet feltölteni fájlválasztóval, behúzással vagy beillesztéssel (Ctrl+V). PNG vagy JPG, jegyenként legfeljebb 20, képenként 6 MB.
+  - A böngésző feltöltés előtt legfeljebb 1920 px szélesre kicsinyíti a képet, és a fotók helyadatait is eltávolítja.
+  - A saját képét mindenki törölheti, a fejlesztő bármelyiket.
+  - A képek a Trello-kártyára és a Markdown exportba is bekerülnek.
+- **Konzolhibák:** a jegyre a sikertelen kérések (`fetch`/XHR 4xx/5xx, hálózati hiba) és a be nem töltött fájlok is felkerülnek, időponttal, oldallal és ismétlésszámmal. Az új jegy formjában egy jelölővel kikapcsolható.
+- **Migráció:** a csomag saját SQLite-jában új tábla jön (`osc_attachments`). A `php artisan migrate` után magától lefut; a `megis_dev`-hez nem nyúl.
+- **Teendő a stagingen a deploy után:** `php artisan onsite-comment:doctor`. A „Képfeltöltés” sora jelzi, ha a PHP feltöltési korlátja kisebb 6 MB-nál. Az nginx `client_max_body_size` értéke legyen legalább `8m`; az alapértelmezett 1 MB-nál nagyobb képre 413-as hibát ad.
+- Nincs új kötelező env-kulcs. Opcionális: `ONSITE_COMMENT_ATTACHMENT_MAX_KB`, `ONSITE_COMMENT_ATTACHMENT_MAX_COUNT`.
+- **Rollback:** 1.45 (a csomag 0.9.0-ra áll vissza). Az új tábla és a feltöltött képek megmaradnak, a 0.9.0 nem mutatja őket.
+
 ## 1.45 · 09ebc87 · 2026-10-28
 
 Jegyek az oldalon: az `exot/onsite-comment` 0.7.0-ról 0.9.0-ra frissült. A `composer.json`-ban `^0.9` áll, mert 0.x verziónál a `^0.7` a 0.8-at már nem engedi.

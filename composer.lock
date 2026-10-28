@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3936d7c8e5a78fff69d0221d8478a6ca",
+    "content-hash": "d5b89563418392891ae91bfc98a37c25",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -664,16 +664,16 @@
         },
         {
             "name": "exot/onsite-comment",
-            "version": "v0.9.0",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:EXOT-Labs-Kft/exot-onsite-comment.git",
-                "reference": "2cba2e5adf9653e787d91554e720c15ad13afdd1"
+                "reference": "9ce5eb6cdabd3792454b139630935a1a1b8b98c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EXOT-Labs-Kft/exot-onsite-comment/zipball/2cba2e5adf9653e787d91554e720c15ad13afdd1",
-                "reference": "2cba2e5adf9653e787d91554e720c15ad13afdd1",
+                "url": "https://api.github.com/repos/EXOT-Labs-Kft/exot-onsite-comment/zipball/9ce5eb6cdabd3792454b139630935a1a1b8b98c8",
+                "reference": "9ce5eb6cdabd3792454b139630935a1a1b8b98c8",
                 "shasum": ""
             },
             "require": {
@@ -737,7 +737,7 @@
                 "qa",
                 "trello"
             ],
-            "time": "2026-10-27T20:24:01+00:00"
+            "time": "2026-10-28T11:30:33+00:00"
         },
         {
             "name": "firebase/php-jwt",
