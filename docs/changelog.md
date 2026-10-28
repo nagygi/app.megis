@@ -2,6 +2,21 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.47 · HASH · 2026-10-28
+
+Jegyek az oldalon: az `exot/onsite-comment` 1.0.0-ról 1.1.0-ra frissült (`composer.lock`; a `^1.0` feltétel maradt).
+
+- **E-mail értesítés új jegyről:** a fejlesztő szerepkörű résztvevő a widget menüjében kapcsolhatja be magának („E-mail új jegyről”). Alapból ki van kapcsolva.
+  - A levél tartalma: összefoglaló (típus, prioritás, bejelentő, oldal, leírás) és egy link, ami az oldalon megnyitja a jegyet. Kép nincs benne.
+  - A saját jegyéről senki nem kap levelet.
+  - CLI-ből: `php artisan onsite-comment:participants --notify-on=<e-mail>` és `--notify-off=<e-mail>`.
+- **A levél a projekt mailerén megy ki** (`MAIL_*`), ezért a `MEGIS_MAIL_ALLOWLIST` rá is vonatkozik. Ha a stagingen a lista nem üres, a fejlesztő címe (vagy pl. az `@exot.hu` domain) legyen rajta, különben a levél elvész.
+- **Queue:** a küldés job, a stagingen a redis worker viszi (ugyanaz, mint a Trello pusht). Helyben a queue a stagingdel közös adatbázisban van, ezért a helyi `.env`-ben `ONSITE_COMMENT_NOTIFICATIONS_QUEUE_CONNECTION=sync` kell, ugyanúgy, mint a Trellónál. A `.env.example` ezt mutatja.
+- **Migráció:** a csomag saját SQLite-jában új oszlop jön (`osc_participants.notify_new_tickets`). A `php artisan migrate` után magától lefut; a `megis_dev`-hez nem nyúl.
+- **Teendő a stagingen a deploy után:** `php artisan onsite-comment:doctor`. Az új „E-mail értesítés” sor mutatja, hányan kérik a levelet, melyik mailer viszi, és ki a feladó.
+- Nincs új kötelező env-kulcs. Opcionális: `ONSITE_COMMENT_MAIL_MAILER`, `ONSITE_COMMENT_NOTIFICATIONS` (`false`: kikapcsolva), `ONSITE_COMMENT_NOTIFICATIONS_QUEUE_CONNECTION` és `_QUEUE`.
+- **Rollback:** 1.46 (a csomag 1.0.0-ra áll vissza). Az új oszlop megmarad, az 1.0.0 nem olvassa.
+
 ## 1.46 · 383e6cc · 2026-10-28
 
 Jegyek az oldalon: az `exot/onsite-comment` 0.9.0-ról 1.0.0-ra frissült. A `composer.json`-ban innentől `^1.0` áll, ez minden 1.x kiadást elfogad, így a csomag következő frissítéseinél nem kell átírni.
