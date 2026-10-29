@@ -2,6 +2,18 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.49 · HASH · 2026-10-29
+
+„Vissza” gomb az admin részletoldalain: oda visz vissza, ahonnan az oldalt megnyitottad.
+
+- **Eddig:** a listából megnyitott oldalakról nem lehetett visszalépni. Ilyen volt például a fődiagnózis *Részdiagnózisok* füléről megnyitott részdiagnózis. Csak az értéktükörnek, a folyamat-alkalmaknak és a felhasználói nézetnek volt „Vissza” linkje, és mindhárom fix helyre mutatott.
+- **Most:** minden admin részletoldal és űrlap kap a cím fölé egy „Vissza” linket. Ide tartoznak a diagnózisok és a fődiagnózis fülei, a szervezet fülei, az ügyfél-adatlap, az anyag, az érték, a képesség és a minta oldala, valamint az új/szerkesztő és import űrlapok.
+  - A link oda visz, ahonnan az oldalt megnyitottad, a lista szűrőivel és lapjával együtt. Ha egy diagnózist az ügyfél-adatlapról nyitsz meg, oda visz vissza; ha a szűrt Diagnózisok listáról, a szűrt listára.
+  - A fülek között váltva is ugyanoda mutat. Ha egy innen megnyitott oldalról jössz vissza, nem cserélődik le. Egy új elem mentése után az új oldal oda mutat, ahonnan az űrlapot megnyitottad.
+  - Ha az oldalt kívülről nyitod meg (könyvjelző, begépelt cím, levélben kapott link), az oldal saját listájára visz. Részdiagnózisnál ez a fődiagnózis *Részdiagnózisok* füle, önálló diagnózisnál a szervezet *Diagnózisok* füle.
+  - A menüből elérhető listák, a Beérkező, a Profil, a Beállítások és a Rendszer oldalai nem kapnak „Vissza” linket.
+- A nem fődiagnózis *Képességmérés* lapján a külön „Vissza a diagnózishoz” gomb helyére a cím fölötti link került.
+
 ## 1.48 · 01e9840 · 2026-10-28
 
 Vezetőcserénél a régi vezető a diagnózis társa lesz (17 · 17.2, 17.7).

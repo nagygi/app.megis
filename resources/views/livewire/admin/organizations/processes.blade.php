@@ -2,7 +2,7 @@
 <div class="flex flex-col gap-6" @if ($dictations !== []) wire:poll.2s="pollDictations" @endif>
     <x-ui.flash />
 
-    <x-admin.page-header :title="__('admin.organizations.tabs.processes')" :spaced="false" />
+    <x-admin.page-header :title="__('admin.organizations.tabs.processes')" :back="route('admin.organizations.index')" :back-home="route('admin.organizations.edit', $organization)" :spaced="false" />
 
     @if ($unclassified->isNotEmpty())
         {{-- Besorolásra vár (12 · 12.6) --}}

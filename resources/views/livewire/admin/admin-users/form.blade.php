@@ -1,5 +1,5 @@
 <div class="max-w-3xl">
-    <x-admin.page-header :title="$isEditing ? __('admin.admins.edit_title') : __('admin.admins.invite_title')" />
+    <x-admin.page-header :title="$isEditing ? __('admin.admins.edit_title') : __('admin.admins.invite_title')" :back="route('admin.admins.index')" />
 
     @unless ($canEdit)
         <x-ui.notice class="mb-6">{{ __('admin.admins.superadmin_readonly') }}</x-ui.notice>

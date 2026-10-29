@@ -17,7 +17,12 @@
     {{-- Header: the basic data and the status steps (04 · 4.3) --}}
     <div class="flex flex-col gap-2">
         @unless ($main)
-            <x-admin.page-header :title="$diagnosis->name" :spaced="false">
+            {{-- Opened from outside, a subdiagnosis leads to the subdiagnoses of its main diagnosis (17 · 17.4). --}}
+            <x-admin.page-header
+                :title="$diagnosis->name"
+                :back="$diagnosis->parent ? route('admin.main-diagnoses.subdiagnoses', $diagnosis->parent) : route('admin.organizations.diagnoses', $diagnosis->organization)"
+                :spaced="false"
+            >
                 <x-slot:badges>
                     <x-admin.diagnosis-status :status="$diagnosis->status" />
                 </x-slot:badges>

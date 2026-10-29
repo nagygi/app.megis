@@ -1,6 +1,6 @@
 {{-- Title, state and tabs of a value page (03 · 3.1, 3.3, 3.7). Expects $value. --}}
 <div class="mb-6 flex flex-col gap-4">
-    <x-admin.page-header :title="$value->name" :spaced="false">
+    <x-admin.page-header :title="$value->name" :back="route('admin.values.index')" :back-home="route('admin.values.edit', $value)" :spaced="false">
         <x-slot:badges>
             <div class="flex flex-wrap items-center gap-2">
                 @if ($value->latestVersion)

@@ -6,7 +6,7 @@
 <div class="flex max-w-3xl flex-col gap-6">
     <x-ui.flash />
 
-    <x-admin.page-header :title="__('admin.capabilities.import.title')" :spaced="false" />
+    <x-admin.page-header :title="__('admin.capabilities.import.title')" :back="route('admin.capabilities.index')" :spaced="false" />
 
     <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4">
         <p>{{ __('admin.capabilities.import.lead') }}</p>

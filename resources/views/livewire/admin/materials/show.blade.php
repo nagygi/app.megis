@@ -12,7 +12,7 @@
 <div class="flex max-w-5xl flex-col gap-6" @if ($status->isWorking()) wire:poll.5s @endif>
     <x-ui.flash />
 
-    <x-admin.page-header :title="$material->original_name ?? $material->context->label()" :description="$meta" :spaced="false">
+    <x-admin.page-header :title="$material->original_name ?? $material->context->label()" :description="$meta" :back="route('admin.inbox.index')" :spaced="false">
         <x-slot:badges>
             <x-ui.badge :tone="$status === \App\Enums\MaterialStatus::Failed ? 'coral' : ($status === \App\Enums\MaterialStatus::Processed ? 'green' : 'yellow')">{{ $status->label() }}</x-ui.badge>
         </x-slot:badges>

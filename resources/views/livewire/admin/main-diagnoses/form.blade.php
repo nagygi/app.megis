@@ -7,7 +7,7 @@
     @if ($main)
         <x-admin.main-diagnosis-tabs :diagnosis="$main->diagnosis" class="mb-6" />
     @else
-        <x-admin.page-header :title="$title" />
+        <x-admin.page-header :title="$title" :back="route('admin.diagnoses.index')" />
     @endif
 
     {{-- Side by side only from the desktop width: next to the admin's sidebar a 1024px screen leaves the form narrower than the preview. --}}

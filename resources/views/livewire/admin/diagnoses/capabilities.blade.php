@@ -11,11 +11,12 @@
     @if ($main)
         <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
     @else
-        <x-admin.page-header :title="__('capabilities.review.title').' · '.$diagnosis->name" :spaced="false">
-            <x-slot:actions>
-                <x-ui.button tone="outline" size="sm" :href="route('admin.diagnoses.show', $diagnosis)">{{ __('capabilities.review.back') }}</x-ui.button>
-            </x-slot:actions>
-        </x-admin.page-header>
+        <x-admin.page-header
+            :title="__('capabilities.review.title').' · '.$diagnosis->name"
+            :back="route('admin.diagnoses.show', $diagnosis)"
+            :back-label="__('capabilities.review.back')"
+            :spaced="false"
+        />
     @endif
 
     <p class="max-w-3xl text-grey-700">{{ __('capabilities.review.lead') }}</p>

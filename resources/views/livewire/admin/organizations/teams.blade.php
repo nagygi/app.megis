@@ -7,7 +7,7 @@
 <div>
     <x-ui.flash class="mb-6" />
 
-    <x-admin.page-header :title="__('admin.organizations.tabs.teams')">
+    <x-admin.page-header :title="__('admin.organizations.tabs.teams')" :back="route('admin.organizations.index')" :back-home="route('admin.organizations.edit', $organization)">
         <x-slot:actions>
             <x-ui.button icon="plus" wire:click="create">{{ __('admin.teams.create') }}</x-ui.button>
         </x-slot:actions>

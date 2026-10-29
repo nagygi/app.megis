@@ -26,6 +26,9 @@
 @endphp
 
 <div {{ $attributes->class(['flex flex-col gap-3']) }}>
+    {{-- One Vissza for all the tabs: to where the diagnosis was opened from. --}}
+    <x-admin.back-link :fallback="route('admin.organizations.diagnoses', $diagnosis->organization)" :home="route('admin.diagnoses.show', $diagnosis)" />
+
     <div class="flex flex-wrap items-center gap-3">
         <h1 class="text-2xl font-semibold text-charcoal">{{ $diagnosis->name }}</h1>
         @if ($main)

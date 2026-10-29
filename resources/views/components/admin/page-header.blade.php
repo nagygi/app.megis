@@ -1,6 +1,8 @@
 {{--
     The title of an admin page, with the same build everywhere:
-    - back: a link above the title (href), named by backLabel;
+    - back: the Vissza above the title, to the page it was opened from; back
+      is its list, where it leads from outside, backHome the URL its tabs
+      hang under, backLabel names the list (x-admin.back-link);
     - badges: a slot right of the title (state, version);
     - description: a line under the title;
     - actions: a slot on the right.
@@ -10,16 +12,14 @@
     'title',
     'description' => null,
     'back' => null,
+    'backHome' => null,
     'backLabel' => null,
     'spaced' => true,
 ])
 
 <div {{ $attributes->class(['flex flex-col gap-2', 'mb-6' => $spaced]) }}>
     @if ($back)
-        <a href="{{ $back }}" class="-ml-1 inline-flex min-h-10 items-center gap-1 self-start text-sm font-semibold text-charcoal no-underline hover:underline">
-            <x-megis.icon name="chevron-left" />
-            {{ $backLabel ?? __('ui.back') }}
-        </a>
+        <x-admin.back-link :fallback="$back" :home="$backHome" :label="$backLabel" />
     @endif
 
     <div class="flex flex-wrap items-center justify-between gap-4">

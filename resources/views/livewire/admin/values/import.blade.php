@@ -5,7 +5,7 @@
 <div class="flex max-w-3xl flex-col gap-6">
     <x-ui.flash />
 
-    <x-admin.page-header :title="__('admin.values.import.title')" :spaced="false" />
+    <x-admin.page-header :title="__('admin.values.import.title')" :back="route('admin.values.index')" :spaced="false" />
 
     <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4">
         @unless ($canImport)
