@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.49 · HASH · 2026-10-29
+## 1.49 · d69e635 · 2026-10-29
 
 „Vissza” gomb az admin részletoldalain: oda visz vissza, ahonnan az oldalt megnyitottad.
 
