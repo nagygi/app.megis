@@ -10,6 +10,7 @@
 @php
     $admin = auth('admin')->user();
     $mailAllowlist = app(\App\Support\MailAllowlist::class);
+    $location = app(\App\Support\AdminBreadcrumbs::class)->current();
 @endphp
 
 <!DOCTYPE html>

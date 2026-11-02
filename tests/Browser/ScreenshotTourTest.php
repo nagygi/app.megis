@@ -228,6 +228,8 @@ it('tours the admin', function () {
     [$setup, $main] = approvedReading();
     $diagnosis = $main->diagnosis;
     $organization = $setup['organization'];
+    $subdiagnosis = $diagnosis->subdiagnoses()->first()
+        ?? Diagnosis::factory()->create(['organization_id' => $organization->id, 'parent_id' => $diagnosis->id]);
 
     $page = adminLoginInBrowser($setup['admin']);
     tourShot($page, 'admin-01-organizations');
@@ -247,5 +249,8 @@ it('tours the admin', function () {
         'admin-13-capabilities' => route('admin.capabilities.index', absolute: false),
         'admin-14-inbox' => route('admin.inbox.index', absolute: false),
         'admin-15-clients' => route('admin.clients.index', absolute: false),
+        'admin-16-organization-diagnoses' => route('admin.organizations.diagnoses', $organization, false),
+        'admin-17-subdiagnosis' => route('admin.diagnoses.show', $subdiagnosis, false),
+        'admin-18-start' => route('admin.main-diagnoses.create', ['szervezet' => $organization->id], false),
     ]);
 })->group('screenshots');

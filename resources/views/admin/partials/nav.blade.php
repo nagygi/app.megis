@@ -3,78 +3,8 @@
     under it the on-page tickets switch (exot/onsite-comment, local and staging only).
 --}}
 @php
-    $inbox = app(\App\Services\Inbox\InboxService::class);
-
-    $groups = [
-        [
-            'label' => null,
-            'items' => [
-                ['route' => 'admin.inbox.index', 'active' => 'admin.inbox.*', 'label' => __('admin.nav.inbox'), 'count' => $inbox->openCount(auth()->user())],
-            ],
-        ],
-        [
-            'label' => __('admin.nav.organizations'),
-            'items' => [
-                ['route' => 'admin.organizations.index', 'active' => 'admin.organizations.*', 'label' => __('admin.nav.organizations')],
-                ['route' => 'admin.clients.index', 'active' => 'admin.clients.*', 'label' => __('admin.nav.clients')],
-            ],
-        ],
-        [
-            'label' => __('admin.nav.diagnoses'),
-            'items' => [
-                ['route' => 'admin.diagnoses.index', 'active' => 'admin.diagnoses.*', 'label' => __('admin.nav.all_diagnoses')],
-                ['route' => 'admin.diagnosis-types.index', 'active' => 'admin.diagnosis-types.*', 'label' => __('admin.nav.diagnosis_types')],
-                ['route' => 'admin.support-questions.index', 'active' => 'admin.support-questions.*', 'label' => __('admin.nav.support_questions')],
-            ],
-        ],
-        [
-            'label' => __('admin.nav.measurements'),
-            'items' => [
-                ['route' => 'admin.mirrors.index', 'active' => 'admin.mirrors.*', 'label' => __('admin.nav.mirrors')],
-                ['route' => 'admin.measurements.index', 'active' => 'admin.measurements.*', 'label' => __('admin.nav.inbox'), 'count' => $inbox->openMeasurementCount(auth()->user())],
-            ],
-        ],
-        [
-            'label' => __('admin.nav.value_library'),
-            'items' => [
-                ['route' => 'admin.values.index', 'active' => ['admin.values.index', 'admin.values.create', 'admin.values.edit', 'admin.values.versions'], 'label' => __('admin.nav.values')],
-                ['route' => 'admin.value-categories.index', 'active' => 'admin.value-categories.*', 'label' => __('admin.nav.value_categories')],
-                ['route' => 'admin.values.import', 'active' => 'admin.values.import', 'label' => __('admin.nav.value_import')],
-            ],
-        ],
-        [
-            'label' => __('admin.nav.capability_library'),
-            'items' => [
-                ['route' => 'admin.capabilities.index', 'active' => ['admin.capabilities.index', 'admin.capabilities.create', 'admin.capabilities.edit', 'admin.capabilities.patterns', 'admin.capabilities.versions'], 'label' => __('admin.nav.capabilities')],
-                ['route' => 'admin.patterns.index', 'active' => 'admin.patterns.*', 'label' => __('admin.nav.patterns')],
-                ['route' => 'admin.capability-groups.index', 'active' => 'admin.capability-groups.*', 'label' => __('admin.nav.capability_groups')],
-                ['route' => 'admin.capability-rules.index', 'active' => 'admin.capability-rules.*', 'label' => __('admin.nav.capability_rules')],
-                ['route' => 'admin.capabilities.import', 'active' => 'admin.capabilities.import', 'label' => __('admin.nav.capability_import')],
-            ],
-        ],
-        [
-            'label' => __('admin.nav.settings'),
-            'items' => [
-                ['route' => 'admin.products.index', 'active' => 'admin.products.*', 'label' => __('admin.nav.products')],
-                ['route' => 'admin.admins.index', 'active' => 'admin.admins.*', 'label' => __('admin.nav.admins')],
-                ['route' => 'admin.settings.legal', 'active' => 'admin.settings.legal', 'label' => __('admin.nav.legal_documents')],
-                ['route' => 'admin.settings.areas', 'active' => 'admin.settings.areas', 'label' => __('admin.nav.areas')],
-            ],
-        ],
-    ];
-
-    if (auth()->user()?->can('viewSystem')) {
-        $groups[] = [
-            'label' => __('admin.nav.system'),
-            'items' => [
-                ['route' => 'admin.system.index', 'active' => 'admin.system.index', 'label' => __('admin.nav.system_overview')],
-                ['route' => 'admin.system.health', 'active' => 'admin.system.health', 'label' => __('admin.nav.system_health')],
-                ['route' => 'admin.system.ai.usage', 'active' => 'admin.system.ai.usage', 'label' => __('admin.nav.ai_usage')],
-                ['route' => 'admin.system.ai.configuration', 'active' => 'admin.system.ai.configuration', 'label' => __('admin.nav.ai_configuration')],
-                ['route' => 'admin.system.ai.prompts', 'active' => 'admin.system.ai.prompts', 'label' => __('admin.nav.ai_prompts')],
-            ],
-        ];
-    }
+    // The layout resolves where the page sits ($location): its menu item is lit, its group kept open.
+    $groups = app(\App\Support\AdminNavigation::class)->groups(auth()->user());
 
     // Items inside a labelled group are sub-items: smaller and greyer than the top-level ones.
     $linkClasses = fn (bool $isActive, bool $nested): string => 'flex min-h-10 items-center justify-between gap-2 rounded-field px-3 py-2 no-underline '
@@ -94,7 +24,7 @@
 
     <nav aria-label="{{ __('admin.title') }}" class="flex flex-1 flex-col gap-6">
         @foreach ($groups as $group)
-            @php($groupActive = collect($group['items'])->contains(fn ($item) => request()->routeIs(...(array) $item['active'])))
+            @php($groupActive = collect($group['items'])->contains('route', $location->section))
             <div
                 @if ($group['label'])
                     x-data="{
@@ -132,7 +62,8 @@
                     @if ($group['label']) x-show="open" @endif
                 >
                     @foreach ($group['items'] as $item)
-                        @php($isActive = request()->routeIs(...(array) $item['active']))
+                        @php($isActive = $item['route'] === $location->section)
+                        @php($count = isset($item['count']) ? $item['count']() : 0)
                         <li>
                             <a
                                 href="{{ route($item['route']) }}"
@@ -140,12 +71,12 @@
                                 @if ($isActive) aria-current="page" @endif
                             >
                                 <span>{{ $item['label'] }}</span>
-                                @if (($item['count'] ?? 0) > 0)
+                                @if ($count > 0)
                                     <span @class([
                                         'rounded-pill px-2 text-xs font-semibold',
                                         'bg-cream text-charcoal' => $isActive,
                                         'bg-coral text-black' => ! $isActive,
-                                    ])>{{ $item['count'] }}</span>
+                                    ])>{{ $count }}</span>
                                 @endif
                             </a>
                         </li>
