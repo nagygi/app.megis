@@ -102,16 +102,17 @@ class AdminNavigation
     }
 
     /**
-     * The menu item whose active patterns cover the route, the first one.
+     * The menu item whose active patterns cover the route, the first one, with
+     * its group's label.
      *
-     * @return Item|null
+     * @return array{route: string, active: string|list<string>, label: string, group: ?string}|null
      */
     public function itemFor(string $routeName, ?User $admin): ?array
     {
         foreach ($this->groups($admin) as $group) {
             foreach ($group['items'] as $item) {
                 if (Str::is($item['active'], $routeName)) {
-                    return $item;
+                    return $item + ['group' => $group['label']];
                 }
             }
         }

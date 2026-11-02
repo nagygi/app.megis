@@ -1,11 +1,10 @@
 {{--
-    The band of a main diagnosis (17, 19 · 19.1): its name, stage and data,
+    The header of a main diagnosis (17, 19 · 19.1): its name, stage and data,
     and its tabs (the settings, the Futás tab for the contact and the
-    superadmin, the subdiagnoses). It continues the layout's green header
-    under the breadcrumbs, as the organization's name and tabs do on its
-    pages; every tab page starts with it, and the page draws it, so the stage
-    and the tabs follow an action without a reload (Publikálom, the reading's
-    approvals).
+    superadmin, the subdiagnoses), under the organization's header and the
+    breadcrumbs. Every tab page starts with it, and the page draws it, so the
+    stage and the tabs follow an action without a reload (Publikálom, the
+    reading's approvals).
 --}}
 @props(['diagnosis'])
 
@@ -27,19 +26,19 @@
     $days = $main?->dayCount();
 @endphp
 
-<div {{ $attributes->class(['-mx-4 -mt-6 bg-green px-4 text-cream on-dark lg:-mx-8 lg:px-8']) }}>
-    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <h1 class="text-2xl font-semibold">{{ $diagnosis->name }}</h1>
+<div {{ $attributes->class(['flex flex-col gap-3']) }}>
+    <div class="flex flex-wrap items-center gap-3">
+        <h1 class="text-2xl font-semibold text-charcoal">{{ $diagnosis->name }}</h1>
         @if ($main)
-            <x-ui.badge tone="yellow">{{ $main->stage->label() }}</x-ui.badge>
+            <x-ui.badge tone="dark">{{ $main->stage->label() }}</x-ui.badge>
         @endif
     </div>
 
-    {{-- The organization is in the breadcrumbs above. --}}
+    {{-- The organization is in the header above. --}}
     @if ($main)
-        <p class="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm">
+        <p class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-field bg-yellow-pale px-3 py-2 text-sm">
             @if ($diagnosis->team)
-                <span>{{ $diagnosis->team->name }}</span>
+                <span class="font-semibold">{{ $diagnosis->team->name }}</span>
             @endif
             <span>{{ $main->product_name }}</span>
             @if ($days)
@@ -51,8 +50,6 @@
 
     <x-ui.tabs
         :label="$diagnosis->name"
-        variant="folder"
-        class="mt-4"
         :tabs="array_map(fn (array $tab) => ['href' => route($tab['route'], $diagnosis), 'label' => $tab['label']], $tabs)"
     />
 </div>

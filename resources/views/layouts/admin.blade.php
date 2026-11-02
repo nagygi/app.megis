@@ -1,8 +1,10 @@
 {{--
     Admin layout (01). The header says where the page sits (AdminBreadcrumbs):
-    the breadcrumbs, green inside an organization, charcoal elsewhere. On the
-    organization's tabs its name and tabs follow (02 · 2.3); a main diagnosis
-    draws its own band under it (x-admin.main-diagnosis-tabs).
+    inside an organization it is green, with the organization's name and tabs
+    (02 · 2.3) on every page of it, the page's tab lit; elsewhere charcoal,
+    with the menu group. The breadcrumbs open the content, above the page's
+    title; a main diagnosis draws its own tabs under them
+    (x-admin.main-diagnosis-tabs).
 --}}
 @props([
     'title' => null,
@@ -13,7 +15,6 @@
     $mailAllowlist = app(\App\Support\MailAllowlist::class);
     $location = app(\App\Support\AdminBreadcrumbs::class)->current();
     $organization = $location->organization;
-    $isOrganizationTab = $organization !== null && request()->routeIs(...\App\Support\AdminBreadcrumbs::ORGANIZATION_TABS);
 @endphp
 
 <!DOCTYPE html>
@@ -77,9 +78,9 @@
                         <x-megis.icon name="menu" class="size-5" :label="__('admin.menu_open')" />
                     </button>
 
-                    <div class="min-w-0 flex-1">
-                        <x-admin.breadcrumbs :location="$location" />
-                    </div>
+                    <p @class(['min-w-0 flex-1 truncate font-semibold', 'text-xl' => $organization, 'text-lg' => ! $organization])>
+                        {{ $organization?->name ?? $location->area ?? $title }}
+                    </p>
 
                     @if ($admin)
                         <x-ui.dropdown id="admin-user-menu" :label="__('admin.user_menu.open')" :width="256" trigger-class="press -mr-1 grid size-11 place-items-center rounded-pill">
@@ -102,14 +103,15 @@
                     @endif
                 </div>
 
-                @if ($isOrganizationTab)
-                    <p class="truncate px-4 text-xl font-semibold lg:px-8">{{ $organization->name }}</p>
-                    <x-admin.organization-tabs :organization="$organization" class="mt-3 px-4 lg:px-8" />
+                @if ($organization)
+                    <x-admin.organization-tabs :organization="$organization" :active="$location->tab" class="px-4 lg:px-8" />
                 @endif
             </header>
 
             {{-- Livewire pages show their own flash messages, so they update after actions too. --}}
             <main id="main" class="flex-1 px-4 py-6 lg:px-8">
+                <x-admin.breadcrumbs :location="$location" class="-mt-3 mb-3" />
+
                 {{ $slot }}
             </main>
         </div>

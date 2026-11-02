@@ -2,6 +2,23 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.53 · {hash} · 2026-11-03
+
+Admin: a szervezet fejléce a szervezet minden oldalán megmarad, a morzsa a fülsor alá, a cím fölé került.
+
+- **Eddig (1.51):**
+  - A szervezet neve és fülei csak a hat fülön látszottak.
+  - Egy meghívásnál, egy folyamat alkalmainál, egy diagnózison vagy a Diagnózis indításán eltűntek, csak a morzsa maradt.
+  - A morzsa a fejléc felső sorában állt.
+- **Most:**
+  - **Fejléc:** szervezeten belül minden oldalon zöld, a szervezet nevével és füleivel. Az a fül világít, amelyik alá az oldal tartozik:
+    - meghívás, felhasználó szerkesztése: *Felhasználók*;
+    - folyamat alkalmai, a szervezet besorolatlan anyaga: *Folyamatok*;
+    - diagnózis, részdiagnózis, Diagnózis indítása: *Diagnózisok*.
+  - **Morzsa:** a fülsor alatt, az oldal címe fölött áll, pl. *Szervezetek › szervezet › Diagnózisok*. A szervezet fülein is látszik: *Szervezetek › szervezet*. A „Vissza” és a szűrők megtartása nem változott.
+  - **Fődiagnózis:** a neve, a szakasza, az adatai és a fülei a morzsa alatt, a tartalom elején állnak, aláhúzott fülsorral.
+  - **Szervezeten kívül:** a sötét fejléc a menücsoport nevét mutatja (pl. *Értéktár*), a morzsa itt is a cím fölött áll.
+
 ## 1.52 · 6b86c2a · 2026-11-02
 
 Diagnózis indítása (A1, 17 · 17.1–17.2): a szervezet kontextusában, a név felül és automatikusan.

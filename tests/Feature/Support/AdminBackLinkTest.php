@@ -8,8 +8,8 @@ use App\Models\User;
 use Illuminate\Testing\TestResponse;
 
 /**
- * The Vissza in the header (x-admin.breadcrumbs): where it leads; null when
- * the page was opened from a page of its breadcrumbs.
+ * The Vissza before the breadcrumbs (x-admin.breadcrumbs): where it leads;
+ * null when the page was opened from a page of its breadcrumbs.
  */
 function backLink(TestResponse $response): ?string
 {
@@ -19,11 +19,11 @@ function backLink(TestResponse $response): ?string
 }
 
 /**
- * The breadcrumbs in the header, label => URL.
+ * The breadcrumbs above the page's title, label => URL.
  *
  * @return array<string, string>
  */
-function headerCrumbs(TestResponse $response): array
+function pageCrumbs(TestResponse $response): array
 {
     preg_match('/<nav aria-label="Útvonal".*?<\/nav>/s', $response->getContent(), $nav);
     preg_match_all('/<a href="([^"]*)"[^>]*>\s*<span class="truncate">(.*?)<\/span>/s', $nav[0] ?? '', $links, PREG_SET_ORDER);
@@ -68,7 +68,7 @@ it('keeps where a page was opened from when coming back from a page opened there
     $response = $this->get($subdiagnoses, ['referer' => route('admin.diagnoses.show', $subdiagnosis)]);
 
     expect(backLink($toSubdiagnosis))->toBeNull()
-        ->and(headerCrumbs($toSubdiagnosis)['Részdiagnózisok'])->toBe($subdiagnoses)
+        ->and(pageCrumbs($toSubdiagnosis)['Részdiagnózisok'])->toBe($subdiagnoses)
         ->and(backLink($response))->toBe(route('admin.diagnoses.index'));
 });
 
@@ -90,7 +90,7 @@ it('leads up the breadcrumbs without a Vissza when a subdiagnosis is not opened 
     $response = $this->get(route('admin.diagnoses.show', $subdiagnosis), array_filter(['referer' => $referer]));
 
     expect(backLink($response))->toBeNull()
-        ->and(headerCrumbs($response)['Részdiagnózisok'])->toBe(route('admin.main-diagnoses.subdiagnoses', $main->diagnosis));
+        ->and(pageCrumbs($response)['Részdiagnózisok'])->toBe(route('admin.main-diagnoses.subdiagnoses', $main->diagnosis));
 })->with([
     'no referer' => null,
     'another site' => 'https://example.com/admin/diagnozisok',
@@ -103,7 +103,7 @@ it('leads from a standalone diagnosis up to the diagnoses of its organization', 
     $response = $this->get(route('admin.diagnoses.show', $diagnosis));
 
     expect(backLink($response))->toBeNull()
-        ->and(headerCrumbs($response))->toBe([
+        ->and(pageCrumbs($response))->toBe([
             'Szervezetek' => route('admin.organizations.index'),
             $diagnosis->organization->name => route('admin.organizations.edit', $diagnosis->organization),
             'Diagnózisok' => route('admin.organizations.diagnoses', $diagnosis->organization),
@@ -118,14 +118,14 @@ it('leads back to a list of the breadcrumbs through its crumb, with the filters,
     $fromInbox = $this->get(route('admin.mirrors.show', $mirror), ['referer' => route('admin.inbox.index')]);
 
     expect(backLink($fromList))->toBeNull()
-        ->and(headerCrumbs($fromList))->toBe(['Értéktükrök' => $list])
+        ->and(pageCrumbs($fromList))->toBe(['Értéktükrök' => $list])
         ->and(backLink($fromInbox))->toBe(route('admin.inbox.index'))
-        ->and(headerCrumbs($fromInbox))->toBe(['Értéktükrök' => route('admin.mirrors.index')]);
+        ->and(pageCrumbs($fromInbox))->toBe(['Értéktükrök' => route('admin.mirrors.index')]);
 });
 
 it('gives the menu\'s own lists neither breadcrumbs nor Vissza', function () {
     $response = $this->get(route('admin.organizations.index'), ['referer' => route('admin.inbox.index')]);
 
     expect(backLink($response))->toBeNull()
-        ->and(headerCrumbs($response))->toBe([]);
+        ->and(pageCrumbs($response))->toBe([]);
 });

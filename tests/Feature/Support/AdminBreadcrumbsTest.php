@@ -44,18 +44,22 @@ function diagnosesCrumbs(Organization $organization): array
 
 beforeEach(fn () => actingAsAdmin());
 
-it('puts the tabs of an organization under the organizations, sharing the organization as their home', function () {
+it('puts the tabs of an organization under the organization, sharing it as their home', function () {
     $organization = Organization::factory()->create();
 
     $location = locate('admin.organizations.diagnoses', ['organization' => $organization]);
 
-    expect(crumbs($location))->toBe(['Szervezetek' => route('admin.organizations.index')])
+    expect(crumbs($location))->toBe([
+        'Szervezetek' => route('admin.organizations.index'),
+        $organization->name => route('admin.organizations.edit', $organization),
+    ])
         ->and($location->organization->is($organization))->toBeTrue()
+        ->and($location->tab)->toBe('admin.organizations.diagnoses')
         ->and($location->home)->toBe(route('admin.organizations.edit', $organization))
         ->and($location->section)->toBe('admin.organizations.index');
 });
 
-it('puts the occasions of a process under the organization\'s Folyamatok tab', function () {
+it('puts the occasions of a process under the organization\'s Folyamatok tab, lighting it', function () {
     $organization = Organization::factory()->create();
     $process = Process::factory()->for($organization)->create();
 
@@ -65,10 +69,24 @@ it('puts the occasions of a process under the organization\'s Folyamatok tab', f
         'Szervezetek' => route('admin.organizations.index'),
         $organization->name => route('admin.organizations.edit', $organization),
         'Folyamatok' => route('admin.organizations.processes', $organization),
-    ])->and($location->home)->toBeNull();
+    ])->and($location->tab)->toBe('admin.organizations.processes')
+        ->and($location->home)->toBeNull();
 });
 
-it('puts every tab of a main diagnosis under its organization\'s diagnoses, lighting Szervezetek', function (string $routeName) {
+it('puts an invitation under the organization\'s Felhasználók tab, lighting it', function () {
+    $organization = Organization::factory()->create();
+
+    $location = locate('admin.organizations.members.create', ['organization' => $organization]);
+
+    expect(crumbs($location))->toBe([
+        'Szervezetek' => route('admin.organizations.index'),
+        $organization->name => route('admin.organizations.edit', $organization),
+        'Felhasználók' => route('admin.organizations.members', $organization),
+    ])->and($location->organization->is($organization))->toBeTrue()
+        ->and($location->tab)->toBe('admin.organizations.members');
+});
+
+it('puts every tab of a main diagnosis under its organization\'s diagnoses, lighting Szervezetek and the Diagnózisok tab', function (string $routeName) {
     $main = MainDiagnosis::factory()->create();
     $diagnosis = $main->diagnosis;
 
@@ -76,6 +94,7 @@ it('puts every tab of a main diagnosis under its organization\'s diagnoses, ligh
 
     expect(crumbs($location))->toBe(diagnosesCrumbs($diagnosis->organization))
         ->and($location->organization->is($diagnosis->organization))->toBeTrue()
+        ->and($location->tab)->toBe('admin.organizations.diagnoses')
         ->and($location->home)->toBe(route('admin.diagnoses.show', $diagnosis))
         ->and($location->section)->toBe('admin.organizations.index');
 })->with([
@@ -115,6 +134,7 @@ it('puts A1 under the diagnoses of the organization it was opened for, or under 
 
     expect(crumbs($forOrganization))->toBe(diagnosesCrumbs($organization))
         ->and($forOrganization->organization->is($organization))->toBeTrue()
+        ->and($forOrganization->tab)->toBe('admin.organizations.diagnoses')
         ->and(crumbs($withoutOrganization))->toBe(['Diagnózisok listája' => route('admin.diagnoses.index')])
         ->and($withoutOrganization->organization)->toBeNull()
         ->and($withoutOrganization->section)->toBe('admin.diagnoses.index');
@@ -127,8 +147,15 @@ it('puts a library page under its menu item, its tabs sharing the first one as t
 
     expect(crumbs($location))->toBe(['Értékek' => route('admin.values.index')])
         ->and($location->organization)->toBeNull()
+        ->and($location->tab)->toBeNull()
         ->and($location->home)->toBe(route('admin.values.edit', $value))
-        ->and($location->section)->toBe('admin.values.index');
+        ->and($location->section)->toBe('admin.values.index')
+        ->and($location->area)->toBe(__('admin.nav.value_library'));
+});
+
+it('names the menu group of a page outside an organization, or the item without a group', function () {
+    expect(locate('admin.diagnoses.index')->area)->toBe(__('admin.nav.diagnoses'))
+        ->and(locate('admin.inbox.index')->area)->toBe(__('admin.nav.inbox'));
 });
 
 it('puts nothing above a menu item\'s own list, and nothing at all above a page outside the menu', function () {
@@ -141,13 +168,23 @@ it('puts nothing above a menu item\'s own list, and nothing at all above a page 
         ->and($profile->section)->toBeNull();
 });
 
-it('puts a material under the diagnosis it was uploaded to, or under the Beérkező without one', function () {
+it('puts a material under the diagnosis it was uploaded to, under the Folyamatok tab of its organization alone, or under the Beérkező without one', function () {
     $diagnosis = Diagnosis::factory()->create();
     $uploaded = Material::factory()->create(['parent_diagnosis_id' => $diagnosis->id, 'organization_id' => $diagnosis->organization_id]);
+    $unclassified = Material::factory()->create(['organization_id' => $diagnosis->organization_id]);
     $loose = Material::factory()->create();
+
+    $ofOrganization = locate('admin.materials.show', ['material' => $unclassified]);
 
     expect(crumbs(locate('admin.materials.show', ['material' => $uploaded])))->toBe([
         ...diagnosesCrumbs($diagnosis->organization),
         $diagnosis->name => route('admin.diagnoses.show', $diagnosis),
-    ])->and(crumbs(locate('admin.materials.show', ['material' => $loose])))->toBe(['Beérkező' => route('admin.inbox.index')]);
+    ])
+        ->and(crumbs($ofOrganization))->toBe([
+            'Szervezetek' => route('admin.organizations.index'),
+            $diagnosis->organization->name => route('admin.organizations.edit', $diagnosis->organization),
+            'Folyamatok' => route('admin.organizations.processes', $diagnosis->organization),
+        ])
+        ->and($ofOrganization->tab)->toBe('admin.organizations.processes')
+        ->and(crumbs(locate('admin.materials.show', ['material' => $loose])))->toBe(['Beérkező' => route('admin.inbox.index')]);
 });

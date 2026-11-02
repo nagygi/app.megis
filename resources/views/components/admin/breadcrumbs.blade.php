@@ -1,6 +1,7 @@
 {{--
-    The breadcrumbs in the admin's header (AdminLocation): the pages above
-    this one, each a link. Where the page was opened from (AdminBackLink):
+    The breadcrumbs of an admin page (AdminLocation), above its title: the
+    pages above this one, each a link. Where the page was opened from
+    (AdminBackLink):
     - a page of the trail: that crumb leads back to it as it was left, with
       the list's filters and page;
     - anywhere else (the garden, a client's page): a Vissza before the trail.
@@ -26,13 +27,13 @@
 @endphp
 
 @if ($trail !== [])
-    <div {{ $attributes->class(['flex min-w-0 items-center gap-3 text-sm']) }}>
+    <div {{ $attributes->class(['flex min-w-0 items-center gap-3 text-sm text-grey-700']) }}>
         @if ($back)
-            <a id="admin-back" href="{{ $back }}" class="inline-flex min-h-10 shrink-0 items-center gap-1 font-semibold no-underline hover:underline">
+            <a id="admin-back" href="{{ $back }}" class="inline-flex min-h-10 shrink-0 items-center gap-1 font-semibold text-charcoal no-underline hover:underline">
                 <x-megis.icon name="chevron-left" />
                 {{ __('ui.back') }}
             </a>
-            <span aria-hidden="true" class="h-4 w-px shrink-0 bg-current opacity-40 max-sm:hidden"></span>
+            <span aria-hidden="true" class="h-4 w-px shrink-0 bg-grey-300 max-sm:hidden"></span>
         @endif
 
         <nav aria-label="{{ __('admin.breadcrumbs') }}" @class(['min-w-0', 'max-sm:hidden' => $back])>
@@ -41,12 +42,12 @@
                     <li @class(['flex min-w-0 items-center gap-1.5', 'max-sm:hidden' => ! $loop->last])>
                         {{-- The icon's own display wins over a utility: its wrapper hides it. --}}
                         @unless ($loop->first)
-                            <span class="flex shrink-0 opacity-60 max-sm:hidden"><x-megis.icon name="chevron-right" /></span>
+                            <span class="flex shrink-0 text-grey-500 max-sm:hidden"><x-megis.icon name="chevron-right" /></span>
                         @endunless
                         @if ($loop->last)
                             <span class="flex shrink-0 sm:hidden"><x-megis.icon name="chevron-left" /></span>
                         @endif
-                        <a href="{{ $crumb['url'] }}" class="inline-flex min-h-10 min-w-0 max-w-80 items-center no-underline hover:underline">
+                        <a href="{{ $crumb['url'] }}" class="inline-flex min-h-10 min-w-0 max-w-80 items-center text-grey-700 no-underline hover:text-charcoal hover:underline">
                             <span class="truncate">{{ $crumb['label'] }}</span>
                         </a>
                     </li>

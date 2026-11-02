@@ -7,13 +7,15 @@ use App\Models\Material;
 use App\Models\Organization;
 use App\Models\Process;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 
 /**
  * The breadcrumbs of an admin page (AdminLocation): the pages above it up to
- * its menu item. A diagnosis sits under its organization's Diagnózisok tab,
- * a subdiagnosis under its main diagnosis' Részdiagnózisok; every other page
- * under the list of its menu item (AdminNavigation).
+ * its menu item. Inside an organization they run through its tabs: a
+ * diagnosis sits under the Diagnózisok tab, a subdiagnosis under its main
+ * diagnosis' Részdiagnózisok; every other page under the list of its menu
+ * item (AdminNavigation).
  *
  * Only the layout asks, on the full page request: the route's parameters are
  * models by then, and a Livewire update does not render the layout again.
@@ -23,7 +25,7 @@ class AdminBreadcrumbs
     /**
      * The tabs of an organization (02 · 2.3), in the layout's header.
      */
-    public const ORGANIZATION_TABS = [
+    private const ORGANIZATION_TABS = [
         'admin.organizations.edit',
         'admin.organizations.members',
         'admin.organizations.teams',
@@ -90,22 +92,19 @@ class AdminBreadcrumbs
         };
     }
 
+    /**
+     * The tabs of an organization sit under it; the pages under a tab (a
+     * process' occasions, a member's form) under the tab.
+     */
     private function organizationPage(string $routeName, Organization $organization, ?Process $process): AdminLocation
     {
-        $trail = [$this->organizations()];
-
-        if (! in_array($routeName, self::ORGANIZATION_TABS, true)) {
-            $tab = $process !== null ? 'processes' : 'members';
-            $trail[] = ['label' => $organization->name, 'url' => route('admin.organizations.edit', $organization)];
-            $trail[] = ['label' => __('admin.organizations.tabs.'.$tab), 'url' => route('admin.organizations.'.$tab, $organization)];
+        if (in_array($routeName, self::ORGANIZATION_TABS, true)) {
+            return $this->inOrganization($organization, $routeName, $this->organizationCrumbs($organization), home: route('admin.organizations.edit', $organization));
         }
 
-        return new AdminLocation(
-            trail: $trail,
-            organization: $organization,
-            home: in_array($routeName, self::ORGANIZATION_TABS, true) ? route('admin.organizations.edit', $organization) : null,
-            section: 'admin.organizations.index',
-        );
+        $tab = $process !== null ? 'admin.organizations.processes' : 'admin.organizations.members';
+
+        return $this->inOrganization($organization, $tab, $this->tabCrumbs($organization, $tab));
     }
 
     /**
@@ -113,11 +112,7 @@ class AdminBreadcrumbs
      */
     private function startPage(?Organization $organization): ?AdminLocation
     {
-        return $organization === null ? null : new AdminLocation(
-            trail: $this->diagnosesOf($organization),
-            organization: $organization,
-            section: 'admin.organizations.index',
-        );
+        return $organization === null ? null : $this->inOrganization($organization, 'admin.organizations.diagnoses', $this->diagnosesOf($organization));
     }
 
     /**
@@ -130,46 +125,46 @@ class AdminBreadcrumbs
         $isMain = $diagnosis->main()->exists();
         $isOwnPage = $routeName === 'admin.diagnoses.show' || ($isMain && in_array($routeName, self::MAIN_DIAGNOSIS_TABS, true));
 
-        return new AdminLocation(
-            trail: $isOwnPage ? $this->above($diagnosis) : [...$this->above($diagnosis), $this->diagnosisCrumb($diagnosis)],
-            organization: $diagnosis->organization,
+        return $this->inOrganization(
+            $diagnosis->organization,
+            'admin.organizations.diagnoses',
+            $isOwnPage ? $this->above($diagnosis) : [...$this->above($diagnosis), $this->diagnosisCrumb($diagnosis)],
             home: $isOwnPage && $isMain ? route('admin.diagnoses.show', $diagnosis) : null,
-            section: 'admin.organizations.index',
         );
     }
 
     /**
-     * An uploaded material sits under what it was uploaded to.
+     * An uploaded material sits under what it was uploaded to; one of the
+     * organization alone under the Folyamatok tab, which lists it.
      */
     private function materialPage(?Material $material): AdminLocation
     {
         $process = $material?->occasion?->process;
 
         return match (true) {
-            $material?->parentDiagnosis !== null => new AdminLocation(
-                trail: [...$this->above($material->parentDiagnosis), $this->diagnosisCrumb($material->parentDiagnosis)],
-                organization: $material->parentDiagnosis->organization,
-                section: 'admin.organizations.index',
+            $material?->parentDiagnosis !== null => $this->inOrganization(
+                $material->parentDiagnosis->organization,
+                'admin.organizations.diagnoses',
+                [...$this->above($material->parentDiagnosis), $this->diagnosisCrumb($material->parentDiagnosis)],
             ),
-            $process !== null => new AdminLocation(
-                trail: [
-                    $this->organizations(),
-                    ['label' => $process->organization->name, 'url' => route('admin.organizations.edit', $process->organization)],
-                    ['label' => __('admin.organizations.tabs.processes'), 'url' => route('admin.organizations.processes', $process->organization)],
+            $process !== null => $this->inOrganization(
+                $process->organization,
+                'admin.organizations.processes',
+                [
+                    ...$this->tabCrumbs($process->organization, 'admin.organizations.processes'),
                     ['label' => $process->name, 'url' => route('admin.organizations.process-occasions', [$process->organization, $process])],
                 ],
-                organization: $process->organization,
-                section: 'admin.organizations.index',
             ),
-            $material?->organization !== null => new AdminLocation(
-                trail: [$this->organizations(), ['label' => $material->organization->name, 'url' => route('admin.organizations.edit', $material->organization)]],
-                organization: $material->organization,
-                section: 'admin.organizations.index',
+            $material?->organization !== null => $this->inOrganization(
+                $material->organization,
+                'admin.organizations.processes',
+                $this->tabCrumbs($material->organization, 'admin.organizations.processes'),
             ),
             // Nothing to hang under: the Beérkező it arrived to.
             default => new AdminLocation(
                 trail: [['label' => __('admin.nav.inbox'), 'url' => route('admin.inbox.index')]],
                 section: 'admin.inbox.index',
+                area: __('admin.nav.inbox'),
             ),
         };
     }
@@ -193,6 +188,23 @@ class AdminBreadcrumbs
             trail: $item['route'] === $routeName ? [] : [['label' => $item['label'], 'url' => route($item['route'])]],
             home: $homeRoute !== null && isset($parameters[$parameter]) ? route($homeRoute, $parameters[$parameter]) : null,
             section: $item['route'],
+            area: $item['group'] ?? $item['label'],
+        );
+    }
+
+    /**
+     * A page of an organization: its name and tabs head the page, the tab lit.
+     *
+     * @param  list<array{label: string, url: string}>  $trail
+     */
+    private function inOrganization(Organization $organization, string $tab, array $trail, ?string $home = null): AdminLocation
+    {
+        return new AdminLocation(
+            trail: $trail,
+            organization: $organization,
+            tab: $tab,
+            home: $home,
+            section: 'admin.organizations.index',
         );
     }
 
@@ -223,10 +235,30 @@ class AdminBreadcrumbs
      */
     private function diagnosesOf(Organization $organization): array
     {
+        return $this->tabCrumbs($organization, 'admin.organizations.diagnoses');
+    }
+
+    /**
+     * The crumbs down to a tab of the organization (members, processes, diagnoses).
+     *
+     * @return list<array{label: string, url: string}>
+     */
+    private function tabCrumbs(Organization $organization, string $tab): array
+    {
         return [
-            $this->organizations(),
+            ...$this->organizationCrumbs($organization),
+            ['label' => __('admin.organizations.tabs.'.Str::afterLast($tab, '.')), 'url' => route($tab, $organization)],
+        ];
+    }
+
+    /**
+     * @return list<array{label: string, url: string}>
+     */
+    private function organizationCrumbs(Organization $organization): array
+    {
+        return [
+            ['label' => __('admin.nav.organizations'), 'url' => route('admin.organizations.index')],
             ['label' => $organization->name, 'url' => route('admin.organizations.edit', $organization)],
-            ['label' => __('admin.organizations.tabs.diagnoses'), 'url' => route('admin.organizations.diagnoses', $organization)],
         ];
     }
 
@@ -236,14 +268,6 @@ class AdminBreadcrumbs
     private function diagnosisCrumb(Diagnosis $diagnosis): array
     {
         return ['label' => $diagnosis->name, 'url' => route('admin.diagnoses.show', $diagnosis)];
-    }
-
-    /**
-     * @return array{label: string, url: string}
-     */
-    private function organizations(): array
-    {
-        return ['label' => __('admin.nav.organizations'), 'url' => route('admin.organizations.index')];
     }
 
     /**

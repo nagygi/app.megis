@@ -17,10 +17,10 @@ it('leads up from a subdiagnosis through the breadcrumbs to the diagnoses of the
         ->click('Kovács Anna részdiagnózisa')
         ->press('Betöltöm az aggregált adatokat')
         ->assertSee('Előnézet')
-        ->click('header a[href$="/reszdiagnozisok"]');
+        ->click('nav[aria-label="Útvonal"] a[href$="/reszdiagnozisok"]');
 
     $page->assertPathIs(route('admin.main-diagnoses.subdiagnoses', $main->diagnosis, false))
-        ->click('header a[href$="/diagnozisok"]');
+        ->click('nav[aria-label="Útvonal"] a[href$="/diagnozisok"]');
 
     $page->assertPathIs($diagnoses)
         ->assertNoJavaScriptErrors();
