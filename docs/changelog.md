@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.54 · {hash} · 2026-11-03
+## 1.54 · added1e · 2026-11-03
 
 Diagnózis kitöltése (V1·b, 23 · 23.3, 24 · 24.2): a Saját értékek lépés a mentett listától kész, nem kell hozzá a „Tovább”.
 
