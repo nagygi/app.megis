@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.52 · {hash} · 2026-11-02
+## 1.52 · 6b86c2a · 2026-11-02
 
 Diagnózis indítása (A1, 17 · 17.1–17.2): a szervezet kontextusában, a név felül és automatikusan.
 
