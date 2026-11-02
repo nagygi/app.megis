@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.53 · {hash} · 2026-11-03
+## 1.53 · 0264b63 · 2026-11-03
 
 Admin: a szervezet fejléce a szervezet minden oldalán megmarad, a morzsa a fülsor alá, a cím fölé került.
 
