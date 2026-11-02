@@ -2,17 +2,19 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.50 · ae838d8 · 2026-11-02
+## 1.52 · {hash} · 2026-11-02
 
-„Belépek a nevében” a még nem regisztrált felhasználónál is (14 · 14.6): az admin előre látja, mit fog látni a felhasználó a regisztráció után.
+Diagnózis indítása (A1, 17 · 17.1–17.2): a szervezet kontextusában, a név felül és automatikusan.
 
-- **Eddig:** a menüpont szürke volt („A felhasználó még nem regisztrált.”), ha a felhasználó Felvéve vagy Meghívva állapotú volt. Ez a szervezet *Felhasználók* fülén, az *Admin › Felhasználók* listán és az adatlapon is így volt.
-- **Most:** ilyenkor is működik. Az ügyféloldal új lapon nyílik a coral sávval, ugyanott, ahová a felhasználó a regisztráció után érkezik. Ez a vezetett vagy társként kitöltendő diagnózis, vagy a szervezet kezdőlapja.
-  - Azokat a szervezeteket látja, ahová felvették vagy meghívták. A regisztrált felhasználónál továbbra is csak az aktív tagság nyit szervezetet: náluk a Felvéve/Meghívva tagság sora szürke marad („…a meghívó elküldésével azonnal aktív lesz”).
-  - Ugyanazok a szabályok, mint a regisztrált felhasználónál: a jelszó, a jogi dokumentumok, a hozzájárulások, a fióktörlés és a naptár összekötése tiltott, minden módosítás naplózva.
-  - Az ÁSZF-elfogadás lapja nem állja útját: a felhasználó a regisztrációs űrlapon fogadja el.
-  - A felhasználó állapota nem változik. A listán „Felvéve”/„Meghívva” marad, az utolsó belépés „még nem”, a tagsága nem aktiválódik, a meghívó linkje érvényes marad.
-  - A nem regisztrált felhasználó maga továbbra sem tud belépni: az ügyféloldal csak az admin „nevében” munkájában nyílik meg neki.
+- **Eddig:**
+  - Az A1 szürke fejlécű, szervezet nélküli oldal volt, akkor is, ha a szervezet *Diagnózisok* füléről nyitottad meg.
+  - A Név az űrlap alján, üresen állt („Ha üresen hagyod: …”), és csak mentéskor kapta meg az automatikus nevet.
+- **Most:**
+  - **Fejléc:** az A1 a szervezet zöld fejlécével és a *Szervezetek › szervezet › Diagnózisok* morzsával nyílik. Ha az oldalon másik szervezetet választasz, az A1 annak a kontextusában nyílik újra.
+  - **Név:** a Név az űrlap első mezője. Kitölti magát a csapatból (új csapatnál a beírt névből), a termékből és a kezdés napjából, pl. „Él csapat · Teljes · 2026.11.09.”, és követi az űrlapot.
+    - Átírhatod. Ha átírtad, már nem változik; az „Automatikus név” gombbal vagy a mező kiürítésével visszakapod az automatikusat.
+    - Ha nem írtad át, mentéskor a ténylegesen mentett csapatból és dátumból épül.
+  - **Mégse:** a szervezet *Diagnózisok* fülére visz, ha szervezettel nyitottad meg.
 
 ## 1.51 · c47706b · 2026-11-02
 
@@ -37,6 +39,18 @@ Admin: a fejléc mutatja, hol vagy. Kattintható morzsa, és a diagnózisnak egy
   - **Szürke fejléc:** a menüből elérhető oldalakon nem ismétli az oldal címét.
   - **Fülek:** egy gomb után (pl. Publikálom, jóváhagyás az Olvasatban) is a megnyitott fül marad kiemelve. Ez a diagnózisnál és az érték, a képesség és a minta füleinél is így van.
   - A levél-allowlist figyelmeztetése a fejléc fölé került.
+
+## 1.50 · ae838d8 · 2026-11-02
+
+„Belépek a nevében” a még nem regisztrált felhasználónál is (14 · 14.6): az admin előre látja, mit fog látni a felhasználó a regisztráció után.
+
+- **Eddig:** a menüpont szürke volt („A felhasználó még nem regisztrált.”), ha a felhasználó Felvéve vagy Meghívva állapotú volt. Ez a szervezet *Felhasználók* fülén, az *Admin › Felhasználók* listán és az adatlapon is így volt.
+- **Most:** ilyenkor is működik. Az ügyféloldal új lapon nyílik a coral sávval, ugyanott, ahová a felhasználó a regisztráció után érkezik. Ez a vezetett vagy társként kitöltendő diagnózis, vagy a szervezet kezdőlapja.
+  - Azokat a szervezeteket látja, ahová felvették vagy meghívták. A regisztrált felhasználónál továbbra is csak az aktív tagság nyit szervezetet: náluk a Felvéve/Meghívva tagság sora szürke marad („…a meghívó elküldésével azonnal aktív lesz”).
+  - Ugyanazok a szabályok, mint a regisztrált felhasználónál: a jelszó, a jogi dokumentumok, a hozzájárulások, a fióktörlés és a naptár összekötése tiltott, minden módosítás naplózva.
+  - Az ÁSZF-elfogadás lapja nem állja útját: a felhasználó a regisztrációs űrlapon fogadja el.
+  - A felhasználó állapota nem változik. A listán „Felvéve”/„Meghívva” marad, az utolsó belépés „még nem”, a tagsága nem aktiválódik, a meghívó linkje érvényes marad.
+  - A nem regisztrált felhasználó maga továbbra sem tud belépni: az ügyféloldal csak az admin „nevében” munkájában nyílik meg neki.
 
 ## 1.49 · d69e635 · 2026-10-29
 

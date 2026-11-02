@@ -24,6 +24,7 @@ use App\Services\Inbox\InboxService;
 use App\Services\Organizations\MembershipService;
 use App\Services\Organizations\OrganizationValueSetService;
 use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -80,7 +81,7 @@ class MainDiagnosisService
             $diagnosis = $this->diagnoses->create([
                 'name' => filled($data['name'] ?? null)
                     ? trim($data['name'])
-                    : $this->defaultName($organization, $subject, $team, $leader, $product->name, $startsOn),
+                    : $this->defaultName($this->subjectName($organization, $subject, $team?->name, $leader) ?? '', $product->name, $startsOn),
                 'organization_id' => $organization->id,
                 'level' => $subject->level(),
                 'team_id' => $team?->id,
@@ -462,17 +463,28 @@ class MainDiagnosisService
     }
 
     /**
-     * "{Csapat} · {Termék} · {kezdés}" (17 · 17.1).
+     * "{Csapat} · {Termék} · {kezdés}" (17 · 17.1). A1 offers it while the
+     * admin fills the form, and a draft saved without a name gets it.
      */
-    public function defaultName(Organization $organization, MainDiagnosisSubject $subject, ?Team $team, User $leader, string $productName, ?CarbonImmutable $startsOn): string
+    public function defaultName(string $subjectName, string $productName, ?CarbonInterface $startsOn): string
     {
-        $subjectName = match ($subject) {
-            MainDiagnosisSubject::Team => $team?->name,
-            MainDiagnosisSubject::Person => $leader->name,
+        return mb_substr(implode(' · ', [$subjectName, $productName, ($startsOn ?? today())->format('Y.m.d.')]), 0, 255);
+    }
+
+    /**
+     * Who the diagnosis is about, by name: the team (a new one has only its
+     * name yet), the person, or the individual organization; null while A1
+     * has not chosen it.
+     */
+    public function subjectName(Organization $organization, MainDiagnosisSubject $subject, ?string $teamName, ?User $leader): ?string
+    {
+        $name = match ($subject) {
+            MainDiagnosisSubject::Team => $teamName,
+            MainDiagnosisSubject::Person => $leader?->name,
             MainDiagnosisSubject::Individual => $organization->name,
         };
 
-        return mb_substr(implode(' · ', [$subjectName, $productName, ($startsOn ?? today())->format('Y.m.d.')]), 0, 255);
+        return blank($name) ? null : trim($name);
     }
 
     private function sendLeaderInvitation(MainDiagnosis $main, User $actor): void

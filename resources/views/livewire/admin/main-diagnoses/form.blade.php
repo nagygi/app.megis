@@ -16,6 +16,21 @@
         {{-- Side by side only from the desktop width: next to the admin's sidebar a 1024px screen leaves the form narrower than the preview. --}}
         <div class="grid gap-6 desktop:grid-cols-[minmax(0,1fr)_22rem]">
             <x-ui.card as="form" bordered padding="lg" wire:submit="saveDraft" class="flex flex-col gap-6">
+                {{-- Név: offered from the team, the product and the start until the admin writes their own (17 · 17.1). --}}
+                @if ($organization && $hasFlow)
+                    <div class="flex flex-col gap-2">
+                        <x-form.input
+                            name="name"
+                            wire:model.blur="name"
+                            :label="__('admin.main_diagnoses.name')"
+                            :help="$main ? null : __($subjectEnum === \App\Enums\MainDiagnosisSubject::Team ? 'admin.main_diagnoses.name_help' : 'admin.main_diagnoses.name_help_person')"
+                        />
+                        @if ($nameEdited && ! $main)
+                            <x-ui.button tone="ghost" size="sm" icon="refresh" class="-ml-1.5 self-start" wire:click="resetName">{{ __('admin.main_diagnoses.name_reset') }}</x-ui.button>
+                        @endif
+                    </div>
+                @endif
+
                 {{-- Ügyfél --}}
                 <fieldset class="flex flex-col gap-4">
                     <legend class="mb-2 text-lg font-semibold">{{ __('admin.main_diagnoses.section_client') }}</legend>
@@ -94,7 +109,7 @@
                                         @endforeach
                                     </x-form.select>
                                 @else
-                                    <x-form.input name="new_team_name" wire:model="new_team_name" :label="__('admin.main_diagnoses.new_team')" required />
+                                    <x-form.input name="new_team_name" wire:model.live.debounce.500ms="new_team_name" :label="__('admin.main_diagnoses.new_team')" required />
                                 @endif
                                 <x-ui.button tone="ghost" size="sm" :icon="$newTeam ? null : 'plus'" class="-ml-1.5 self-start" wire:click="$toggle('newTeam')">
                                     {{ $newTeam ? __('admin.main_diagnoses.pick_team') : __('admin.main_diagnoses.add_team') }}
@@ -210,8 +225,6 @@
                         </fieldset>
                     @endif
 
-                    <x-form.input name="name" wire:model="name" :label="__('admin.main_diagnoses.name')" :help="__($subjectEnum === \App\Enums\MainDiagnosisSubject::Team ? 'admin.main_diagnoses.name_help' : 'admin.main_diagnoses.name_help_person')" />
-
                     @if ($blockers !== [] && $isDraft)
                         <x-ui.notice tone="error">
                             <ul class="flex flex-col gap-1">
@@ -229,7 +242,11 @@
                         @elseif ($canEditSettings)
                             <x-ui.button type="submit">{{ __('admin.common.save') }}</x-ui.button>
                         @endif
-                        <x-ui.button tone="outline" :href="$main ? route('admin.diagnoses.show', $main->diagnosis) : route('admin.diagnoses.index')">{{ __('admin.common.cancel') }}</x-ui.button>
+                        <x-ui.button tone="outline" :href="match (true) {
+                                $main !== null => route('admin.diagnoses.show', $main->diagnosis),
+                                $organization !== null => route('admin.organizations.diagnoses', $organization),
+                                default => route('admin.diagnoses.index'),
+                            }">{{ __('admin.common.cancel') }}</x-ui.button>
                     </div>
 
                     @if ($main && $main->stage !== \App\Enums\MainDiagnosisStage::Closed)

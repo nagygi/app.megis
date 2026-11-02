@@ -16,6 +16,7 @@ use App\Models\Team;
 use App\Models\User;
 use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\MainDiagnoses\StepState;
+use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -74,6 +75,11 @@ class Form extends Component
 
     public string $name = '';
 
+    /**
+     * The admin wrote the name: A1 stops building it from the team, the product and the start.
+     */
+    public bool $nameEdited = false;
+
     public bool $changingLeader = false;
 
     public ?int $replacementLeaderId = null;
@@ -117,19 +123,21 @@ class Form extends Component
         $this->starts_on = today()->addWeek()->toDateString();
 
         if ($this->organization_id !== null) {
-            $this->updatedOrganizationId();
+            $this->applyOrganizationDefaults();
         }
     }
 
+    /**
+     * Another organization: A1 opens again under it, so the header, the
+     * breadcrumbs and the colour are the chosen organization's.
+     */
     public function updatedOrganizationId(): void
     {
-        $organization = $this->organization();
+        $this->applyOrganizationDefaults();
 
-        $this->reset(['team_id', 'leader_id', 'peers', 'newTeam', 'new_team_name', 'newLeader']);
-        $this->contact_admin_id = $organization?->contact_admin_id;
-        $this->subject = $organization?->isIndividual() ? MainDiagnosisSubject::Individual->value : MainDiagnosisSubject::Team->value;
-        $this->publishes_on = $this->defaultPublishesOn();
-        $this->leader_id = $this->defaultLeaderId();
+        if ($this->main === null) {
+            $this->redirectRoute('admin.main-diagnoses.create', array_filter(['szervezet' => $this->organization_id]), navigate: false);
+        }
     }
 
     public function updatedSubject(): void
@@ -146,6 +154,19 @@ class Form extends Component
     public function updatedLeaderId(): void
     {
         $this->resetPeers();
+    }
+
+    /**
+     * Emptied, the name is built again.
+     */
+    public function updatedName(): void
+    {
+        $this->nameEdited = filled(trim($this->name));
+    }
+
+    public function resetName(): void
+    {
+        $this->nameEdited = false;
     }
 
     public function updatedStartsOn(): void
@@ -267,6 +288,14 @@ class Form extends Component
         $settings = $productKey === null ? null : config('diagnosis.products.'.$productKey);
         $hasPeers = $subject === MainDiagnosisSubject::Team && ($settings['has_peers'] ?? false);
         $title = $this->main ? __('admin.main_diagnoses.edit_title') : __('admin.main_diagnoses.create_title');
+
+        // "{Csapat} · {Termék} · {kezdés}" follows the form until the admin writes their own (17 · 17.1).
+        if ($this->main === null && ! $this->nameEdited) {
+            $subjectName = $organization === null || $subject === null ? null
+                : $mainDiagnoses->subjectName($organization, $subject, $this->newTeam ? $this->new_team_name : $team?->name, $leader);
+            $this->name = $subjectName === null || $product === null ? ''
+                : $mainDiagnoses->defaultName($subjectName, $product->name, filled($this->starts_on) ? rescue(fn () => CarbonImmutable::parse($this->starts_on), null, false) : null);
+        }
         $organizationLeaderIds = $this->organizationLeaderIds();
 
         return view('livewire.admin.main-diagnoses.form', [
@@ -292,6 +321,7 @@ class Form extends Component
             'readingStartsOn' => filled($this->publishes_on)
                 ? rescue(fn () => today()->parse($this->publishes_on)->subDays((int) config('diagnosis.reading_offset_days'))->format('Y.m.d.'), null, false)
                 : null,
+            'nameEdited' => $this->nameEdited,
             'canEditSettings' => $this->main === null || ! in_array($this->main->stage, [MainDiagnosisStage::Reading, MainDiagnosisStage::Published, MainDiagnosisStage::Closed], true),
             'isDraft' => $this->main === null || $this->main->stage === MainDiagnosisStage::Draft,
         ])->layout('layouts::admin')->title($title);
@@ -377,7 +407,8 @@ class Form extends Component
                 'starts_on' => filled($this->starts_on) ? $this->starts_on : null,
                 'publishes_on' => $this->publishes_on,
                 'show_peer_quotes' => $this->show_peer_quotes,
-                'name' => $this->name,
+                // The offered name is built again from what is saved, so a field the last render missed still counts.
+                'name' => $this->nameEdited ? $this->name : null,
             ], auth('admin')->user());
         } catch (HeadcountLimitReachedException) {
             $this->addError('leader_email', __('admin.main_diagnoses.headcount_full'));
@@ -555,6 +586,21 @@ class Form extends Component
             ->teamPeerCandidates($team, $this->leader_id)
             ->mapWithKeys(fn (User $user) => [$user->id => true])
             ->all();
+    }
+
+    /**
+     * What a new organization brings to A1: its contact, the subject its type
+     * allows, the publishing day of its product and its leader.
+     */
+    private function applyOrganizationDefaults(): void
+    {
+        $organization = $this->organization();
+
+        $this->reset(['team_id', 'leader_id', 'peers', 'newTeam', 'new_team_name', 'newLeader']);
+        $this->contact_admin_id = $organization?->contact_admin_id;
+        $this->subject = $organization?->isIndividual() ? MainDiagnosisSubject::Individual->value : MainDiagnosisSubject::Team->value;
+        $this->publishes_on = $this->defaultPublishesOn();
+        $this->leader_id = $this->defaultLeaderId();
     }
 
     private function defaultPublishesOn(): string

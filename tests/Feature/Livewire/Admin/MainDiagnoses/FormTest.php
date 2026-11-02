@@ -47,12 +47,59 @@ it('names the default diagnosis name after the subject on A1 (17 · 17.1)', func
     $setup = diagnosisTeam(peers: 1);
     actingAsAdmin($setup['admin']);
 
-    Livewire::test(Form::class)
-        ->set('organization_id', $setup['organization']->id)
+    Livewire::withQueryParams(['szervezet' => $setup['organization']->id])->test(Form::class)
         ->assertSee('„Csapat · Termék · a kezdés napja”')
         ->set('subject', 'person')
         ->assertSee('„Név · Termék · a kezdés napja”')
         ->assertDontSee('„Csapat · Termék · a kezdés napja”');
+});
+
+it('offers the name from the team, the product and the start, following the form until the admin writes their own (17 · 17.1)', function () {
+    $setup = diagnosisTeam(peers: 1);
+    actingAsAdmin($setup['admin']);
+    $team = $setup['team']->name;
+
+    $form = Livewire::withQueryParams(['szervezet' => $setup['organization']->id])->test(Form::class)
+        ->assertSet('name', '')
+        ->set('team_id', $setup['team']->id)
+        ->assertSet('name', $team.' · Teljes · '.today()->addWeek()->format('Y.m.d.'))
+        ->set('starts_on', today()->addDays(10)->toDateString())
+        ->assertSet('name', $team.' · Teljes · '.today()->addDays(10)->format('Y.m.d.'))
+        ->set('newTeam', true)
+        ->set('new_team_name', 'Új csapat')
+        ->assertSet('name', 'Új csapat · Teljes · '.today()->addDays(10)->format('Y.m.d.'))
+        ->set('name', 'Őszi felmérés')
+        ->set('new_team_name', 'Másik csapat')
+        ->assertSet('name', 'Őszi felmérés')
+        ->assertSee('Automatikus név');
+
+    $form->call('resetName')
+        ->assertSet('name', 'Másik csapat · Teljes · '.today()->addDays(10)->format('Y.m.d.'))
+        ->set('name', '')
+        ->assertSet('nameEdited', false)
+        ->assertDontSee('Automatikus név');
+});
+
+it('saves the name the admin wrote on A1', function () {
+    $setup = diagnosisTeam(peers: 1);
+    actingAsAdmin($setup['admin']);
+
+    Livewire::withQueryParams(['szervezet' => $setup['organization']->id])->test(Form::class)
+        ->set('team_id', $setup['team']->id)
+        ->set('name', 'Őszi felmérés')
+        ->call('saveDraft')
+        ->assertHasNoErrors();
+
+    expect(MainDiagnosis::query()->sole()->diagnosis->name)->toBe('Őszi felmérés');
+});
+
+it('opens A1 again under the organization chosen on it', function () {
+    $setup = diagnosisTeam(peers: 1);
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Form::class)
+        ->set('organization_id', $setup['organization']->id)
+        ->assertRedirect(route('admin.main-diagnoses.create', ['szervezet' => $setup['organization']->id]));
 });
 
 it('tells organizations of the same name apart by their address on A1', function () {
@@ -158,8 +205,7 @@ it('says when the product has no diagnosis flow', function () {
     $setup = diagnosisTeam(product: Product::SNAPSHOT_EXTERNAL);
     actingAsAdmin($setup['admin']);
 
-    Livewire::test(Form::class)
-        ->set('organization_id', $setup['organization']->id)
+    Livewire::withQueryParams(['szervezet' => $setup['organization']->id])->test(Form::class)
         ->assertSee('Ehhez a termékhez még nincs diagnózis-folyamat.');
 });
 
