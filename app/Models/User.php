@@ -151,15 +151,30 @@ class User extends Authenticatable
     }
 
     /**
-     * Organizations the user may currently enter: active membership in an active organization.
+     * Organizations the user may currently enter: an accessible membership in an active organization.
      *
      * @return BelongsToMany<Organization, $this, Membership>
      */
     public function accessibleOrganizations(): BelongsToMany
     {
         return $this->organizations()
-            ->wherePivot('status', MembershipStatus::Active->value)
+            ->wherePivotIn('status', array_map(fn (MembershipStatus $status): string => $status->value, $this->accessibleMembershipStatuses()))
             ->whereNull('organizations.deactivated_at');
+    }
+
+    /**
+     * The membership statuses that open an organization on the customer side:
+     * an active one once registered. A not yet registered account reaches the
+     * customer side only through "Belépek a nevében" (14 · 14.6), which shows
+     * the organizations it was added or invited to as it will see them.
+     *
+     * @return list<MembershipStatus>
+     */
+    public function accessibleMembershipStatuses(): array
+    {
+        return $this->isActivated()
+            ? [MembershipStatus::Active]
+            : [MembershipStatus::Added, MembershipStatus::Invited, MembershipStatus::Active];
     }
 
     #[Scope]

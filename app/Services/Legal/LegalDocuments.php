@@ -59,11 +59,16 @@ class LegalDocuments
 
     /**
      * Versions in force that require re-acceptance and that the user has not accepted yet.
+     * A not yet registered user accepts the current versions when registering (14 · 14.1).
      *
      * @return Collection<int, LegalDocumentVersion>
      */
     public function pendingReacceptance(User $user): Collection
     {
+        if (! $user->isActivated()) {
+            return collect();
+        }
+
         $acceptedVersionIds = LegalAcceptance::query()
             ->where('user_id', $user->id)
             ->pluck('legal_document_version_id');

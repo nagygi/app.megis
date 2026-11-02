@@ -104,10 +104,9 @@ it('offers "Belépek a nevében" on the list only where it works', function () {
 
     Livewire::test(Index::class)
         ->assertSee(route('admin.impersonate', $active))
+        ->assertSee(route('admin.impersonate', $unregistered))
         ->assertDontSee(route('admin.impersonate', $inactive))
-        ->assertDontSee(route('admin.impersonate', $unregistered))
-        ->assertSee('A felhasználó fiókja inaktív.')
-        ->assertSee('A felhasználó még nem regisztrált.');
+        ->assertSee('A felhasználó fiókja inaktív.');
 });
 
 it('does not activate an archived account', function () {

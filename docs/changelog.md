@@ -2,6 +2,18 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.50 · HASH · 2026-11-02
+
+„Belépek a nevében” a még nem regisztrált felhasználónál is (14 · 14.6): az admin előre látja, mit fog látni a felhasználó a regisztráció után.
+
+- **Eddig:** a menüpont szürke volt („A felhasználó még nem regisztrált.”), ha a felhasználó Felvéve vagy Meghívva állapotú volt. Ez a szervezet *Felhasználók* fülén, az *Admin › Felhasználók* listán és az adatlapon is így volt.
+- **Most:** ilyenkor is működik. Az ügyféloldal új lapon nyílik a coral sávval, ugyanott, ahová a felhasználó a regisztráció után érkezik. Ez a vezetett vagy társként kitöltendő diagnózis, vagy a szervezet kezdőlapja.
+  - Azokat a szervezeteket látja, ahová felvették vagy meghívták. A regisztrált felhasználónál továbbra is csak az aktív tagság nyit szervezetet: náluk a Felvéve/Meghívva tagság sora szürke marad („…a meghívó elküldésével azonnal aktív lesz”).
+  - Ugyanazok a szabályok, mint a regisztrált felhasználónál: a jelszó, a jogi dokumentumok, a hozzájárulások, a fióktörlés és a naptár összekötése tiltott, minden módosítás naplózva.
+  - Az ÁSZF-elfogadás lapja nem állja útját: a felhasználó a regisztrációs űrlapon fogadja el.
+  - A felhasználó állapota nem változik. A listán „Felvéve”/„Meghívva” marad, az utolsó belépés „még nem”, a tagsága nem aktiválódik, a meghívó linkje érvényes marad.
+  - A nem regisztrált felhasználó maga továbbra sem tud belépni: az ügyféloldal csak az admin „nevében” munkájában nyílik meg neki.
+
 ## 1.49 · d69e635 · 2026-10-29
 
 „Vissza” gomb az admin részletoldalain: oda visz vissza, ahonnan az oldalt megnyitottad.

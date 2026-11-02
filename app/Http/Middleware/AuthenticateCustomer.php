@@ -57,7 +57,10 @@ class AuthenticateCustomer implements AuthenticatesRequests
             return redirect()->guest(route('client.login'));
         }
 
-        if (! $user->isActive() || ! $user->isActivated() || ! $this->guardSession->epochMatches(GuardSession::WEB, $user)) {
+        // A not yet registered account is only reached in its name (14 · 14.6).
+        $isRegisteredOrImpersonated = $user->isActivated() || $impersonation !== null;
+
+        if (! $user->isActive() || ! $isRegisteredOrImpersonated || ! $this->guardSession->epochMatches(GuardSession::WEB, $user)) {
             $this->guardSession->logout(GuardSession::WEB);
 
             return redirect()->guest(route('client.login'));

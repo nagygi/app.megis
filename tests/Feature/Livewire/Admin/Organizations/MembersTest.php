@@ -90,6 +90,19 @@ it('offers "Belépek a nevében" for an active member', function () {
     $component->assertSee(route('admin.impersonate', $membership->user));
 });
 
+it('offers "Belépek a nevében" for a member who has not registered yet', function (Closure $membershipFactory) {
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $membership = $membershipFactory()->for($organization)->create(['user_id' => User::factory()->invited()]);
+
+    $component = Livewire::test(Members::class, ['organization' => $organization]);
+
+    $component->assertSee(route('admin.impersonate', $membership->user));
+})->with([
+    'added' => [fn () => Membership::factory()->added()],
+    'invited' => [fn () => Membership::factory()->invited()],
+]);
+
 it('greys out "Belépek a nevében" with the reason', function (Closure $membershipFactory, string $reason) {
     actingAsAdmin();
     $organization = Organization::factory()->create();
@@ -103,7 +116,6 @@ it('greys out "Belépek a nevében" with the reason', function (Closure $members
 })->with([
     'deactivated account' => [fn () => Membership::factory()->state(['user_id' => User::factory()->deactivated()]), 'A felhasználó fiókja inaktív.'],
     'inactive in the organization' => [fn () => Membership::factory()->inactive(), 'A felhasználó ebben a szervezetben inaktív.'],
-    'not registered yet' => [fn () => Membership::factory()->invited()->state(['user_id' => User::factory()->invited()]), 'A felhasználó még nem regisztrált.'],
     'registered, invitation still open' => [fn () => Membership::factory()->invited(), 'A felhasználó tagsága ebben a szervezetben még nem aktív. A meghívó elküldésével azonnal aktív lesz.'],
 ]);
 

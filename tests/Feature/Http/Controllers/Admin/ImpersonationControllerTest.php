@@ -2,10 +2,12 @@
 
 use App\Enums\AuditEventType;
 use App\Enums\LegalDocumentType;
+use App\Enums\MembershipStatus;
 use App\Livewire\Client\Profile;
 use App\Models\AuditEvent;
 use App\Models\Impersonation;
 use App\Models\LegalDocumentVersion;
+use App\Models\Membership;
 use App\Models\Organization;
 use App\Models\User;
 use App\Services\Auth\GuardSession;
@@ -34,6 +36,35 @@ it('does not touch the customer’s last login', function () {
     $this->post(route('admin.impersonate', $customer));
 
     expect($customer->fresh()->last_login_at)->toBeNull();
+});
+
+it('opens the customer side of a customer who has not registered yet, as they will see it', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $customer = User::factory()->invited()->create();
+    $membership = Membership::factory()->added()->for($organization)->for($customer)->create();
+    // Accepted on the registration form, so it does not stop the preview.
+    LegalDocumentVersion::factory()->ofType(LegalDocumentType::Terms)->requiringReacceptance()->create();
+
+    $this->post(route('admin.impersonate', $customer));
+
+    $this->get(route('client.landing'))->assertRedirect(route('client.home', $organization));
+    $this->get(route('client.home', $organization))
+        ->assertOk()
+        ->assertSee($customer->name.' nevében dolgozol');
+    expect($customer->fresh())->activated_at->toBeNull()->last_login_at->toBeNull()
+        ->and($membership->fresh()->status)->toBe(MembershipStatus::Added);
+});
+
+it('keeps a customer who has not registered yet off the customer side outside the admin’s work', function () {
+    $organization = Organization::factory()->create();
+    $customer = User::factory()->invited()->create();
+    Membership::factory()->invited()->for($organization)->for($customer)->create();
+    actingAsCustomer($customer);
+
+    $this->get(route('client.home', $organization))->assertRedirect(route('client.login'));
+
+    $this->assertGuest('web');
 });
 
 it('refuses to work in the name of an admin account', function () {

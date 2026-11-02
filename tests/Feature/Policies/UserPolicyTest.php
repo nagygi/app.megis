@@ -67,13 +67,13 @@ it('lets only a superadmin change their own or a customer e-mail', function () {
         ->and($superadmin->can('changeEmail', $customer))->toBeTrue();
 });
 
-it('allows working in the name of active customers only', function () {
+it('allows working in the name of active customers only, registered or not', function () {
     $admin = User::factory()->admin()->create();
 
     expect($admin->can('impersonate', User::factory()->create()))->toBeTrue()
+        ->and($admin->can('impersonate', User::factory()->invited()->create()))->toBeTrue()
         ->and($admin->can('impersonate', User::factory()->admin()->create()))->toBeFalse()
-        ->and($admin->can('impersonate', User::factory()->deactivated()->create()))->toBeFalse()
-        ->and($admin->can('impersonate', User::factory()->invited()->create()))->toBeFalse();
+        ->and($admin->can('impersonate', User::factory()->deactivated()->create()))->toBeFalse();
 });
 
 it('offers a new invitation only to admins who never set a password', function () {

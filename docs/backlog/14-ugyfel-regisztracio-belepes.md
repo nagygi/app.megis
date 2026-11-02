@@ -103,6 +103,7 @@ További szabályok:
 - A 02-es jegy Felhasználók listájának sorművelete: „Belépés a nevében”.
   - Admin és Szuperadmin használhatja.
   - Csak aktív felhasználónál érhető el. Admin szerepkörű fióknál nincs ilyen sorművelet.
+  - A még nem regisztrált (Felvéve, Meghívva) felhasználónál is működik: az admin azt látja, amit a felhasználó a regisztráció után fog. A felhasználó állapota, tagsága és meghívója nem változik. A felhasználó maga továbbra sem lép be a regisztráció előtt.
 - Az ügyféloldal új lapon nyílik meg. Felül végig egy coral sáv látszik: „{Név} nevében dolgozol · Kilépés”.
 - Az admin teljes joggal dolgozhat, kivéve:
   - a jelszó és az e-mail cím módosítása;

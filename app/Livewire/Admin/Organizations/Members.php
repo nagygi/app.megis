@@ -148,14 +148,13 @@ class Members extends Component
     {
         $user = $membership->user;
 
-        if ($membership->status === MembershipStatus::Active && Gate::allows('impersonate', $user)) {
+        if (in_array($membership->status, $user->accessibleMembershipStatuses(), true) && Gate::allows('impersonate', $user)) {
             return null;
         }
 
         return match (true) {
             ! $user->isActive() => __('admin.members.impersonation_unavailable.user_inactive'),
             $membership->status === MembershipStatus::Inactive => __('admin.members.impersonation_unavailable.membership_inactive'),
-            ! $user->isActivated() => __('admin.members.impersonation_unavailable.not_registered'),
             default => __('admin.members.impersonation_unavailable.membership_pending'),
         };
     }

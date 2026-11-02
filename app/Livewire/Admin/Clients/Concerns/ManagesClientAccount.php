@@ -55,8 +55,7 @@ trait ManagesClientAccount
         return match (true) {
             $client->isAdmin() => __('admin.clients.unavailable.admin_impersonation'),
             $client->isDeletionRequested() => __('admin.clients.unavailable.archived'),
-            ! $client->isActive() => __('admin.members.impersonation_unavailable.user_inactive'),
-            default => __('admin.members.impersonation_unavailable.not_registered'),
+            default => __('admin.members.impersonation_unavailable.user_inactive'),
         };
     }
 

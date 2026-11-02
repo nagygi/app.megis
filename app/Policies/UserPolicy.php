@@ -135,14 +135,14 @@ class UserPolicy
     }
 
     /**
-     * Only active customers, never admin accounts (14 · 14.6).
+     * Only active customers, never admin accounts (14 · 14.6). A not yet
+     * registered one too: the admin sees what they will see after registering.
      */
     public function impersonate(User $actor, User $target): bool
     {
         return $actor->isAdmin()
             && ! $target->isAdmin()
-            && $target->isActive()
-            && $target->isActivated();
+            && $target->isActive();
     }
 
     private function isLastActiveSuperadmin(User $target): bool
