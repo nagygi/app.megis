@@ -14,7 +14,7 @@ A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {
   - A felhasználó állapota nem változik. A listán „Felvéve”/„Meghívva” marad, az utolsó belépés „még nem”, a tagsága nem aktiválódik, a meghívó linkje érvényes marad.
   - A nem regisztrált felhasználó maga továbbra sem tud belépni: az ügyféloldal csak az admin „nevében” munkájában nyílik meg neki.
 
-## 1.50 · c47706b · 2026-11-02
+## 1.51 · c47706b · 2026-11-02
 
 Admin: a fejléc mutatja, hol vagy. Kattintható morzsa, és a diagnózisnak egy fülsora van.
 
