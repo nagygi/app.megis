@@ -1,6 +1,6 @@
 {{-- Title, state and tabs of a capability page (07 · 7.1, 7.3, 7.5). Expects $capability. --}}
 <div class="mb-6 flex flex-col gap-4">
-    <x-admin.page-header :title="$capability->code.' · '.$capability->name" :back="route('admin.capabilities.index')" :back-home="route('admin.capabilities.edit', $capability)" :spaced="false">
+    <x-admin.page-header :title="$capability->code.' · '.$capability->name" :spaced="false">
         <x-slot:badges>
             <div class="flex flex-wrap items-center gap-2">
                 @if ($capability->latestVersion)
@@ -45,7 +45,6 @@
         :tabs="collect(['admin.capabilities.edit' => 'data', 'admin.capabilities.patterns' => 'patterns', 'admin.capabilities.versions' => 'versions'])->map(fn (string $tab, string $route) => [
             'href' => route($route, $capability),
             'label' => __('admin.capabilities.tabs.'.$tab),
-            'active' => request()->routeIs($route),
         ])->values()->all()"
     />
 </div>

@@ -8,12 +8,11 @@
 
     @if ($user->isAnonymized())
         {{-- A deleted user: only the log, without name and e-mail (33 · 33.7) --}}
-        <x-admin.page-header :title="__('admin.clients.deleted_title', ['id' => $user->id, 'date' => $user->anonymized_at->format('Y.m.d.')])" :back="route('admin.clients.index')" :spaced="false" />
+        <x-admin.page-header :title="__('admin.clients.deleted_title', ['id' => $user->id, 'date' => $user->anonymized_at->format('Y.m.d.')])" :spaced="false" />
     @else
     <x-admin.page-header
         :title="$user->name"
         :description="$user->email.' · '.__('admin.clients.last_login').': '.($user->last_login_at?->format('Y.m.d. H:i') ?? __('admin.common.never'))"
-        :back="route('admin.clients.index')"
         :spaced="false"
     >
         <x-slot:badges>

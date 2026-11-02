@@ -7,7 +7,7 @@
     @if ($capability)
         @include('livewire.admin.capabilities.partials.header', ['capability' => $capability])
     @else
-        <x-admin.page-header :title="$title" :back="route('admin.capabilities.index')" />
+        <x-admin.page-header :title="$title" />
     @endif
 
     {{-- About 25 fields: one card per section, so the form reads in parts. --}}

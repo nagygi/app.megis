@@ -14,6 +14,30 @@ A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {
   - A felhasználó állapota nem változik. A listán „Felvéve”/„Meghívva” marad, az utolsó belépés „még nem”, a tagsága nem aktiválódik, a meghívó linkje érvényes marad.
   - A nem regisztrált felhasználó maga továbbra sem tud belépni: az ügyféloldal csak az admin „nevében” munkájában nyílik meg neki.
 
+## 1.50 · {hash} · 2026-11-02
+
+Admin: a fejléc mutatja, hol vagy. Kattintható morzsa, és a diagnózisnak egy fülsora van.
+
+- **Eddig:**
+  - A fejlécben a „Szervezetek / szervezet neve” sima szöveg volt.
+  - Egy diagnózison belül két fülsor állt egymás alatt (a szervezeté és a diagnózisé), és a szervezet neve háromszor szerepelt.
+  - A bal menüben a diagnózisoldalakon a „Diagnózisok listája” világított, a fejléc közben a szervezetet mutatta.
+  - A cím fölötti „Vissza” oda vitt, ahonnan az oldalt megnyitottad, és nem látszott, mi van az oldal fölött.
+- **Most:**
+  - **Morzsa:** a fejléc felső sorában ott vannak az oldal fölötti oldalak, mindegyik link. Például:
+    - diagnózisnál: *Szervezetek › szervezet › Diagnózisok*;
+    - részdiagnózisnál: *… › Diagnózisok › fődiagnózis › Részdiagnózisok*;
+    - egy érték oldalán: *Értékek*.
+    A menü saját listáinak nincs morzsájuk.
+  - **Vissza:** csak akkor van „‹ Vissza” a morzsa előtt, ha máshonnan nyitottad meg az oldalt (pl. a Diagnózisok listája kertjéből vagy az ügyfél-adatlapról). Ha a morzsa egyik oldaláról jöttél, a morzsa visz vissza, a lista szűrőivel és lapjával együtt.
+  - **Telefonon** egy lépés látszik: a Vissza, vagy ha az nincs, a közvetlenül fölötte lévő oldal.
+  - **A fődiagnózis fülei** a zöld fejléc folytatásában vannak: a név, a szakasz, a csapat, a termék, a napok, a kapcsolattartó, alatta a fülek. A szervezet fülei itt nem jelennek meg; a szervezet a morzsában van. A cím fölötti „Vissza” link és a sárga sáv megszűnt.
+  - **A szervezet neve és fülei** csak a szervezet hat fülén állnak a fejlécben. A folyamat alkalmainál, a felhasználó meghívásánál és a diagnózisoknál a morzsa vezet vissza.
+  - **A bal menü** a morzsát követi: a diagnózis oldalain a „Szervezetek” világít. A „Diagnózisok listája” a listán, az új diagnózis űrlapjain és a feltöltésen.
+  - **Szürke fejléc:** a menüből elérhető oldalakon nem ismétli az oldal címét.
+  - **Fülek:** egy gomb után (pl. Publikálom, jóváhagyás az Olvasatban) is a megnyitott fül marad kiemelve. Ez a diagnózisnál és az érték, a képesség és a minta füleinél is így van.
+  - A levél-allowlist figyelmeztetése a fejléc fölé került.
+
 ## 1.49 · d69e635 · 2026-10-29
 
 „Vissza” gomb az admin részletoldalain: oda visz vissza, ahonnan az oldalt megnyitottad.

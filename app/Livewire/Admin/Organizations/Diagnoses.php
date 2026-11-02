@@ -33,6 +33,6 @@ class Diagnoses extends Component
                 ->orderByDesc('diagnosed_on')
                 ->orderByDesc('id')
                 ->get(),
-        ])->layout('layouts::admin', ['organization' => $this->organization])->title($this->organization->name);
+        ])->layout('layouts::admin')->title($this->organization->name);
     }
 }

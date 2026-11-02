@@ -195,7 +195,7 @@ class Capabilities extends Component
             'preconditionOptions' => Precondition::query()->orderBy('code')->get(),
             'candidates' => CapabilityTrace::query()->whereIn('material_id', $materials->pluck('id'))->usable()->whereNotNull('candidate')->orderBy('id')->get(),
             'proposedCount' => $findings->flatten()->where('status', FindingStatus::Proposed)->count(),
-        ])->layout('layouts::admin', ['organization' => $this->diagnosis->organization])
+        ])->layout('layouts::admin')
             ->title(__('capabilities.review.title').' · '.$this->diagnosis->name);
     }
 

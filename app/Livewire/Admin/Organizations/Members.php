@@ -121,7 +121,7 @@ class Members extends Component
                 'partner' => __('enums.membership_tag.partner'),
             ],
             'teamOptions' => Team::query()->whereBelongsTo($this->organization)->orderBy('name')->pluck('name', 'id'),
-        ])->layout('layouts::admin', ['organization' => $this->organization])->title($this->organization->name);
+        ])->layout('layouts::admin')->title($this->organization->name);
     }
 
     protected function sortableColumns(): array

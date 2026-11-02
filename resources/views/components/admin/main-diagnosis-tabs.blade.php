@@ -1,9 +1,11 @@
 {{--
-    The header and the tabs of a main diagnosis (17, 19 · 19.1): the diagnosis,
-    its settings (A1), the Futás tab for the contact and the superadmin, its
-    subdiagnoses (17 · 17.4). Every tab page starts with it, so the title, the
-    stage and the tabs stay put while switching; the layout's header carries
-    the organization's colour on all of them.
+    The band of a main diagnosis (17, 19 · 19.1): its name, stage and data,
+    and its tabs (the settings, the Futás tab for the contact and the
+    superadmin, the subdiagnoses). It continues the layout's green header
+    under the breadcrumbs, as the organization's name and tabs do on its
+    pages; every tab page starts with it, and the page draws it, so the stage
+    and the tabs follow an action without a reload (Publikálom, the reading's
+    approvals).
 --}}
 @props(['diagnosis'])
 
@@ -25,20 +27,17 @@
     $days = $main?->dayCount();
 @endphp
 
-<div {{ $attributes->class(['flex flex-col gap-3']) }}>
-    {{-- One Vissza for all the tabs: to where the diagnosis was opened from. --}}
-    <x-admin.back-link :fallback="route('admin.organizations.diagnoses', $diagnosis->organization)" :home="route('admin.diagnoses.show', $diagnosis)" />
-
-    <div class="flex flex-wrap items-center gap-3">
-        <h1 class="text-2xl font-semibold text-charcoal">{{ $diagnosis->name }}</h1>
+<div {{ $attributes->class(['-mx-4 -mt-6 bg-green px-4 text-cream on-dark lg:-mx-8 lg:px-8']) }}>
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <h1 class="text-2xl font-semibold">{{ $diagnosis->name }}</h1>
         @if ($main)
-            <x-ui.badge tone="dark">{{ $main->stage->label() }}</x-ui.badge>
+            <x-ui.badge tone="yellow">{{ $main->stage->label() }}</x-ui.badge>
         @endif
     </div>
 
+    {{-- The organization is in the breadcrumbs above. --}}
     @if ($main)
-        <p class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-field bg-yellow-pale px-3 py-2 text-sm">
-            <span class="font-semibold">{{ $diagnosis->organization->name }}</span>
+        <p class="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm">
             @if ($diagnosis->team)
                 <span>{{ $diagnosis->team->name }}</span>
             @endif
@@ -52,6 +51,8 @@
 
     <x-ui.tabs
         :label="$diagnosis->name"
-        :tabs="array_map(fn (array $tab) => ['href' => route($tab['route'], $diagnosis), 'label' => $tab['label'], 'active' => request()->routeIs($tab['route'])], $tabs)"
+        variant="folder"
+        class="mt-4"
+        :tabs="array_map(fn (array $tab) => ['href' => route($tab['route'], $diagnosis), 'label' => $tab['label']], $tabs)"
     />
 </div>

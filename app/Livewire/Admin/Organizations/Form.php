@@ -147,6 +147,6 @@ class Form extends Component
             'products' => Product::query()->orderBy('name')->get(['id', 'name']),
             'contacts' => User::query()->admins()->whereNull('deactivated_at')->orderBy('last_name')->get(),
             'slugChanged' => $this->organization !== null && $this->slug !== $this->organization->slug,
-        ])->layout('layouts::admin', ['organization' => $this->organization])->title($title);
+        ])->layout('layouts::admin')->title($title);
     }
 }

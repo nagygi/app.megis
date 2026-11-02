@@ -2,7 +2,7 @@
 <div>
     <x-ui.flash class="mb-6" />
 
-    <x-admin.page-header :title="__('admin.organizations.tabs.diagnoses')" :back="route('admin.organizations.index')" :back-home="route('admin.organizations.edit', $organization)">
+    <x-admin.page-header :title="__('admin.organizations.tabs.diagnoses')">
         <x-slot:actions>
             <x-ui.button :href="route('admin.main-diagnoses.create', ['szervezet' => $organization->id])">{{ __('admin.main_diagnoses.start') }}</x-ui.button>
         </x-slot:actions>

@@ -1,5 +1,5 @@
 <div class="max-w-3xl">
-    <x-admin.page-header :title="$title" :back="route('admin.capability-groups.index')" />
+    <x-admin.page-header :title="$title" />
 
     <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-5">
         <x-form.input name="name" wire:model="name" :label="__('admin.capability_groups.name')" required />

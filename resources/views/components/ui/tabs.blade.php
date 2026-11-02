@@ -1,6 +1,8 @@
 {{--
     A row of page tabs (links), one look for all of them.
-    - tabs: list of ['href' => …, 'label' => …, 'active' => bool];
+    - tabs: list of ['href' => …, 'label' => …, 'active' => bool]; without
+      active, the tab whose href is the page's path, after a Livewire update
+      too (whose request goes to livewire/update);
     - label: the nav's accessible name;
     - variant: underline (default, on light grounds) or folder (in a dark
       header: the active tab takes the page's ground, as if the page were its
@@ -8,6 +10,11 @@
     Scrolls sideways on a phone instead of wrapping.
 --}}
 @props(['tabs', 'label', 'variant' => 'underline'])
+
+@php
+    $pagePath = trim(\Livewire\Livewire::originalPath(), '/');
+    $tabs = array_map(fn (array $tab) => $tab + ['active' => trim((string) parse_url($tab['href'], PHP_URL_PATH), '/') === $pagePath], $tabs);
+@endphp
 
 <nav aria-label="{{ $label }}" {{ $attributes }}>
     <ul @class([

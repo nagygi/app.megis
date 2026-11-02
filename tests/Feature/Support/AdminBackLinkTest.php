@@ -8,15 +8,27 @@ use App\Models\User;
 use Illuminate\Testing\TestResponse;
 
 /**
- * The Vissza above the title (x-admin.back-link): where it leads and what it says.
- *
- * @return array{href: string, label: string}|null
+ * The Vissza in the header (x-admin.breadcrumbs): where it leads; null when
+ * the page was opened from a page of its breadcrumbs.
  */
-function backLink(TestResponse $response): ?array
+function backLink(TestResponse $response): ?string
 {
-    $found = preg_match('/<a href="([^"]*)" class="-ml-1 inline-flex[^"]*">\s*<span\s+class="megis-mask megis-icon-chevron-left[^>]*><\/span>\s*(.*?)\s*<\/a>/s', $response->getContent(), $match);
+    $found = preg_match('/<a id="admin-back" href="([^"]*)"/', $response->getContent(), $match);
 
-    return $found ? ['href' => html_entity_decode($match[1]), 'label' => $match[2]] : null;
+    return $found ? html_entity_decode($match[1]) : null;
+}
+
+/**
+ * The breadcrumbs in the header, label => URL.
+ *
+ * @return array<string, string>
+ */
+function headerCrumbs(TestResponse $response): array
+{
+    preg_match('/<nav aria-label="Útvonal".*?<\/nav>/s', $response->getContent(), $nav);
+    preg_match_all('/<a href="([^"]*)"[^>]*>\s*<span class="truncate">(.*?)<\/span>/s', $nav[0] ?? '', $links, PREG_SET_ORDER);
+
+    return collect($links)->mapWithKeys(fn (array $link) => [html_entity_decode($link[2]) => html_entity_decode($link[1])])->all();
 }
 
 function subdiagnosisOf(MainDiagnosis $main): Diagnosis
@@ -33,7 +45,7 @@ it('leads back to the admin page the diagnosis was opened from, with its filters
     $response = $this->get(route('admin.diagnoses.show', $diagnosis), ['referer' => $list]);
 
     $response->assertOk();
-    expect(backLink($response))->toBe(['href' => $list, 'label' => 'Vissza']);
+    expect(backLink($response))->toBe($list);
 });
 
 it('keeps where a main diagnosis was opened from while switching its tabs', function () {
@@ -43,7 +55,7 @@ it('keeps where a main diagnosis was opened from while switching its tabs', func
 
     $response = $this->get(route('admin.main-diagnoses.subdiagnoses', $main->diagnosis), ['referer' => route('admin.diagnoses.show', $main->diagnosis)]);
 
-    expect(backLink($response)['href'])->toBe($client);
+    expect(backLink($response))->toBe($client);
 });
 
 it('keeps where a page was opened from when coming back from a page opened there', function () {
@@ -55,8 +67,9 @@ it('keeps where a page was opened from when coming back from a page opened there
 
     $response = $this->get($subdiagnoses, ['referer' => route('admin.diagnoses.show', $subdiagnosis)]);
 
-    expect(backLink($toSubdiagnosis)['href'])->toBe($subdiagnoses)
-        ->and(backLink($response)['href'])->toBe(route('admin.diagnoses.index'));
+    expect(backLink($toSubdiagnosis))->toBeNull()
+        ->and(headerCrumbs($toSubdiagnosis)['Részdiagnózisok'])->toBe($subdiagnoses)
+        ->and(backLink($response))->toBe(route('admin.diagnoses.index'));
 });
 
 it('hands where a create form was opened from on to the page it redirects to', function () {
@@ -66,38 +79,53 @@ it('hands where a create form was opened from on to the page it redirects to', f
 
     $response = $this->get(route('admin.materials.show', $material), ['referer' => route('admin.diagnoses.upload')]);
 
-    expect(backLink($response)['href'])->toBe($list);
+    expect(backLink($response))->toBe($list);
 });
 
-it('falls back to the subdiagnoses of the main diagnosis when not opened from an admin page', function (?string $referer) {
+it('leads up the breadcrumbs without a Vissza when a subdiagnosis is not opened from an admin page', function (?string $referer) {
     $main = MainDiagnosis::factory()->create();
     $subdiagnosis = subdiagnosisOf($main);
     $this->get(route('admin.diagnoses.show', $subdiagnosis), ['referer' => route('admin.diagnoses.index')]);
 
     $response = $this->get(route('admin.diagnoses.show', $subdiagnosis), array_filter(['referer' => $referer]));
 
-    expect(backLink($response)['href'])->toBe(route('admin.main-diagnoses.subdiagnoses', $main->diagnosis));
+    expect(backLink($response))->toBeNull()
+        ->and(headerCrumbs($response)['Részdiagnózisok'])->toBe(route('admin.main-diagnoses.subdiagnoses', $main->diagnosis));
 })->with([
     'no referer' => null,
     'another site' => 'https://example.com/admin/diagnozisok',
     'the login page' => fn () => route('admin.login'),
 ]);
 
-it('falls back to the diagnoses of the organization for a standalone diagnosis', function () {
+it('leads from a standalone diagnosis up to the diagnoses of its organization', function () {
     $diagnosis = Diagnosis::factory()->create();
 
     $response = $this->get(route('admin.diagnoses.show', $diagnosis));
 
-    expect(backLink($response)['href'])->toBe(route('admin.organizations.diagnoses', $diagnosis->organization));
+    expect(backLink($response))->toBeNull()
+        ->and(headerCrumbs($response))->toBe([
+            'Szervezetek' => route('admin.organizations.index'),
+            $diagnosis->organization->name => route('admin.organizations.edit', $diagnosis->organization),
+            'Diagnózisok' => route('admin.organizations.diagnoses', $diagnosis->organization),
+        ]);
 });
 
-it('names the list only when Vissza leads to it', function (Closure $referer, string $label) {
+it('leads back to a list of the breadcrumbs through its crumb, with the filters, and to anywhere else through Vissza', function () {
     $mirror = MirrorSession::factory()->create();
+    $list = route('admin.mirrors.index', ['kereses' => 'Anna']);
 
-    $response = $this->get(route('admin.mirrors.show', $mirror), ['referer' => $referer()]);
+    $fromList = $this->get(route('admin.mirrors.show', $mirror), ['referer' => $list]);
+    $fromInbox = $this->get(route('admin.mirrors.show', $mirror), ['referer' => route('admin.inbox.index')]);
 
-    expect(backLink($response)['label'])->toBe($label);
-})->with([
-    'from the list' => [fn () => route('admin.mirrors.index'), 'Értéktükrök'],
-    'from elsewhere' => [fn () => route('admin.inbox.index'), 'Vissza'],
-]);
+    expect(backLink($fromList))->toBeNull()
+        ->and(headerCrumbs($fromList))->toBe(['Értéktükrök' => $list])
+        ->and(backLink($fromInbox))->toBe(route('admin.inbox.index'))
+        ->and(headerCrumbs($fromInbox))->toBe(['Értéktükrök' => route('admin.mirrors.index')]);
+});
+
+it('gives the menu\'s own lists neither breadcrumbs nor Vissza', function () {
+    $response = $this->get(route('admin.organizations.index'), ['referer' => route('admin.inbox.index')]);
+
+    expect(backLink($response))->toBeNull()
+        ->and(headerCrumbs($response))->toBe([]);
+});

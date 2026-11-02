@@ -9,7 +9,7 @@
 <div>
     <x-ui.flash class="mb-6" />
 
-    <x-admin.page-header :title="__('admin.members.headcount', ['count' => $headcountLabel])" :back="route('admin.organizations.index')" :back-home="route('admin.organizations.edit', $organization)">
+    <x-admin.page-header :title="__('admin.members.headcount', ['count' => $headcountLabel])">
         <x-slot:actions>
             @if ($hasFreeSeat)
                 <x-ui.button icon="plus" :href="route('admin.organizations.members.create', $organization)">{{ __('admin.members.invite') }}</x-ui.button>

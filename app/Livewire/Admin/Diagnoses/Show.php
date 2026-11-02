@@ -364,7 +364,7 @@ class Show extends Component
                 ->with('unmatchedValue')
                 ->get()
                 ->groupBy('unmatched_value_id'),
-        ])->layout('layouts::admin', ['organization' => $this->diagnosis->organization])->title($this->diagnosis->name);
+        ])->layout('layouts::admin')->title($this->diagnosis->name);
     }
 
     /**

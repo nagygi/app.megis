@@ -4,7 +4,7 @@
 @endphp
 
 <div class="flex max-w-3xl flex-col gap-6">
-    <x-admin.page-header :title="__('admin.organizations.tabs.values')" :back="route('admin.organizations.index')" :back-home="route('admin.organizations.edit', $organization)" :spaced="false" />
+    <x-admin.page-header :title="__('admin.organizations.tabs.values')" :spaced="false" />
     <x-ui.flash />
 
     @if ($viewed)

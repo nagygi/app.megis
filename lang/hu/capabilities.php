@@ -80,7 +80,6 @@ return [
 
     'review' => [
         'title' => 'Képességek',
-        'back' => 'Vissza a diagnózishoz',
         'lead' => 'Az AI az anyagokból nyomokat keres, és a Mintatár mintáira illeszti őket. Minden találat javaslat, amíg nem döntesz róla. Az állapot és a konfidencia a Szabálykönyv szerint számolódik, a „magas” konfidenciát csak kézzel lehet megadni.',
         'materials' => 'Anyagok',
         'not_measured' => 'nem mért',

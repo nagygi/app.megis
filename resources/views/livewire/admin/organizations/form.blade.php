@@ -3,8 +3,6 @@
 
     <x-admin.page-header
         :title="$isEditing ? __('admin.organizations.tabs.data') : __('admin.organizations.create_title')"
-        :back="route('admin.organizations.index')"
-        :back-home="$isEditing ? route('admin.organizations.edit', $organization) : null"
     />
 
     <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-5">

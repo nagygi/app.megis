@@ -265,7 +265,7 @@ class Run extends Component
             'processingCount' => $run->processingCount($main),
             'admins' => User::query()->admins()->orderBy('last_name')->orderBy('first_name')->get(),
             'isOpen' => ! in_array($main->stage, [MainDiagnosisStage::Published, MainDiagnosisStage::Closed], true),
-        ])->layout('layouts::admin', ['organization' => $organization])->title($this->diagnosis->name);
+        ])->layout('layouts::admin')->title($this->diagnosis->name);
     }
 
     private function main(): MainDiagnosis

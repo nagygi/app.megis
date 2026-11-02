@@ -15,8 +15,6 @@
     <x-admin.page-header
         :title="__('admin.mirrors.show_title', ['date' => $mirror->created_at->format('Y.m.d. H:i')])"
         :description="$meta"
-        :back="route('admin.mirrors.index')"
-        :back-label="__('admin.mirrors.title')"
         :spaced="false"
     >
         <x-slot:badges>

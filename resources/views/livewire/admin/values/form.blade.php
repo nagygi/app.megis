@@ -5,7 +5,7 @@
     @if ($value)
         @include('livewire.admin.values.partials.header', ['value' => $value])
     @else
-        <x-admin.page-header :title="$title" :back="route('admin.values.index')" />
+        <x-admin.page-header :title="$title" />
     @endif
 
     {{-- One card per section, so the long form reads in parts. --}}

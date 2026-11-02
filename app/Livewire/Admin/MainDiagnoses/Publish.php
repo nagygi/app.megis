@@ -93,7 +93,7 @@ class Publish extends Component
             'snapshots' => ReportSnapshot::query()->where('main_diagnosis_id', $main->id)->latest('sequence')->get(['id', 'sequence', 'reason', 'note', 'created_at', 'created_by']),
             'isPublished' => $main->stage === MainDiagnosisStage::Published,
             'isReading' => $main->stage === MainDiagnosisStage::Reading,
-        ])->layout('layouts::admin', ['organization' => $this->diagnosis->organization])->title($this->diagnosis->name);
+        ])->layout('layouts::admin')->title($this->diagnosis->name);
     }
 
     private function main(): MainDiagnosis

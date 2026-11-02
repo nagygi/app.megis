@@ -157,7 +157,7 @@ class MemberForm extends Component
                 ->orderBy('position')
                 ->limit(200)
                 ->pluck('position'),
-        ])->layout('layouts::admin', ['organization' => $this->organization])->title($this->organization->name);
+        ])->layout('layouts::admin')->title($this->organization->name);
     }
 
     /**

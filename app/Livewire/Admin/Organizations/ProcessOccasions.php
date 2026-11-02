@@ -92,6 +92,6 @@ class ProcessOccasions extends Component
                 ->get(),
             'main' => $occasions->adminDiagnosisFor($this->process),
             'rules' => MaterialStore::rules(),
-        ])->layout('layouts::admin', ['organization' => $this->organization])->title($this->process->name);
+        ])->layout('layouts::admin')->title($this->process->name);
     }
 }

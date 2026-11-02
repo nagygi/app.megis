@@ -3,7 +3,7 @@
     <x-ui.flash />
 
     <div class="flex flex-col gap-2">
-        <x-admin.page-header :title="__('admin.diagnoses.preview.title')" :back="route('admin.diagnoses.show', $diagnosis)" :back-label="__('admin.diagnoses.preview.back')" :spaced="false">
+        <x-admin.page-header :title="__('admin.diagnoses.preview.title')" :spaced="false">
             <x-slot:badges>
                 <x-admin.diagnosis-status :status="$diagnosis->status" />
             </x-slot:badges>

@@ -61,6 +61,6 @@ class Preview extends Component
                 default => __('admin.diagnoses.preview.viewers.organization', ['organization' => $this->diagnosis->organization->name, 'count' => $viewers->count()]),
             },
             'canPublish' => in_array(DiagnosisStatus::Published, $this->diagnosis->status->nextStatuses(), true),
-        ])->layout('layouts::admin', ['organization' => $this->diagnosis->organization])->title(__('admin.diagnoses.preview.title').' · '.$this->diagnosis->name);
+        ])->layout('layouts::admin')->title(__('admin.diagnoses.preview.title').' · '.$this->diagnosis->name);
     }
 }

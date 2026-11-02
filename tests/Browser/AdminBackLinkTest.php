@@ -4,7 +4,7 @@ use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
 use App\Models\User;
 
-it('leads back from a subdiagnosis to the list it was opened from, after a Livewire update too', function () {
+it('leads up from a subdiagnosis through the breadcrumbs to the diagnoses of the organization, after a Livewire update too', function () {
     $main = MainDiagnosis::factory()->create();
     $main->diagnosis->update(['name' => 'Alma Kft · Teljes']);
     Diagnosis::factory()->create(['organization_id' => $main->diagnosis->organization_id, 'parent_id' => $main->diagnosis_id, 'name' => 'Kovács Anna részdiagnózisa']);
@@ -17,10 +17,10 @@ it('leads back from a subdiagnosis to the list it was opened from, after a Livew
         ->click('Kovács Anna részdiagnózisa')
         ->press('Betöltöm az aggregált adatokat')
         ->assertSee('Előnézet')
-        ->click('Vissza');
+        ->click('header a[href$="/reszdiagnozisok"]');
 
     $page->assertPathIs(route('admin.main-diagnoses.subdiagnoses', $main->diagnosis, false))
-        ->click('Vissza');
+        ->click('header a[href$="/diagnozisok"]');
 
     $page->assertPathIs($diagnoses)
         ->assertNoJavaScriptErrors();

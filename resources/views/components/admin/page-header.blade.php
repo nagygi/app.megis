@@ -1,8 +1,6 @@
 {{--
-    The title of an admin page, with the same build everywhere:
-    - back: the Vissza above the title, to the page it was opened from; back
-      is its list, where it leads from outside, backHome the URL its tabs
-      hang under, backLabel names the list (x-admin.back-link);
+    The title of an admin page, with the same build everywhere; the way back
+    is in the layout's breadcrumbs:
     - badges: a slot right of the title (state, version);
     - description: a line under the title;
     - actions: a slot on the right.
@@ -11,17 +9,10 @@
 @props([
     'title',
     'description' => null,
-    'back' => null,
-    'backHome' => null,
-    'backLabel' => null,
     'spaced' => true,
 ])
 
 <div {{ $attributes->class(['flex flex-col gap-2', 'mb-6' => $spaced]) }}>
-    @if ($back)
-        <x-admin.back-link :fallback="$back" :home="$backHome" :label="$backLabel" />
-    @endif
-
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="flex min-w-0 flex-wrap items-center gap-3">
             <h1 class="text-2xl font-semibold text-charcoal">{{ $title }}</h1>

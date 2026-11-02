@@ -50,6 +50,8 @@ return [
         'mirrors' => 'Értéktükrök',
     ],
 
+    'breadcrumbs' => 'Útvonal',
+
     'user_menu' => [
         'open' => 'Felhasználói menü',
         'profile' => 'Profilom',
@@ -857,7 +859,6 @@ return [
         'preview' => [
             'button' => 'Előnézet',
             'title' => 'Előnézet',
-            'back' => 'Vissza a diagnózishoz',
             'frame' => 'A felhasználó riportja',
             'viewers' => [
                 'user' => 'Így látja: :name.',

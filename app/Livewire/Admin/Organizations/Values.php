@@ -193,7 +193,7 @@ class Values extends Component
             'viewed' => $this->viewing === null ? null : $versions->firstWhere('number', $this->viewing),
             'hasVersion' => $versions->isNotEmpty(),
             'isFull' => count($this->items) >= OrganizationValueSet::MAX_VALUES,
-        ])->layout('layouts::admin', ['organization' => $this->organization])->title($this->organization->name);
+        ])->layout('layouts::admin')->title($this->organization->name);
     }
 
     /**

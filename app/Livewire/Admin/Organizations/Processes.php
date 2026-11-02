@@ -268,7 +268,7 @@ class Processes extends Component
             'maxMegabytes' => (int) (config('megis.calendar.ics_max_kilobytes') / 1024),
             'members' => $members,
             'parents' => $processes->whereNull('parent_id')->values(),
-        ])->layout('layouts::admin', ['organization' => $this->organization])->title($this->organization->name);
+        ])->layout('layouts::admin')->title($this->organization->name);
     }
 
     protected function authorizeImport(): void

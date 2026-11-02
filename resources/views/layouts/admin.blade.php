@@ -1,16 +1,19 @@
 {{--
-    Admin layout (01). The header is charcoal globally and green inside an
-    organization, with the organization's name and tabs (02 · 2.3).
+    Admin layout (01). The header says where the page sits (AdminBreadcrumbs):
+    the breadcrumbs, green inside an organization, charcoal elsewhere. On the
+    organization's tabs its name and tabs follow (02 · 2.3); a main diagnosis
+    draws its own band under it (x-admin.main-diagnosis-tabs).
 --}}
 @props([
     'title' => null,
-    'organization' => null,
 ])
 
 @php
     $admin = auth('admin')->user();
     $mailAllowlist = app(\App\Support\MailAllowlist::class);
     $location = app(\App\Support\AdminBreadcrumbs::class)->current();
+    $organization = $location->organization;
+    $isOrganizationTab = $organization !== null && request()->routeIs(...\App\Support\AdminBreadcrumbs::ORGANIZATION_TABS);
 @endphp
 
 <!DOCTYPE html>
@@ -49,6 +52,15 @@
         <div x-show="navOpen" x-cloak class="fixed inset-0 z-30 bg-charcoal/40 lg:hidden" @click="navOpen = false"></div>
 
         <div class="flex min-w-0 flex-1 flex-col">
+            {{-- Outside production the allowlist drops mail silently, in the queue worker. --}}
+            @if ($mailAllowlist->isRestricting())
+                <div class="px-4 pt-4 lg:px-8">
+                    <x-ui.notice tone="warning">
+                        {{ __('admin.mail_allowlist_notice', ['entries' => implode(', ', $mailAllowlist->entries())]) }}
+                    </x-ui.notice>
+                </div>
+            @endif
+
             <header @class([
                 'on-dark text-cream',
                 'bg-green' => $organization,
@@ -57,7 +69,7 @@
                 <div class="flex items-center gap-3 px-4 py-3 lg:px-8">
                     <button
                         type="button"
-                        class="press -ml-2 grid size-11 place-items-center rounded-pill hover:text-yellow lg:hidden"
+                        class="press -ml-2 grid size-11 shrink-0 place-items-center rounded-pill hover:text-yellow lg:hidden"
                         aria-controls="admin-nav"
                         :aria-expanded="navOpen"
                         @click="navOpen = ! navOpen"
@@ -66,12 +78,7 @@
                     </button>
 
                     <div class="min-w-0 flex-1">
-                        @if ($organization)
-                            <p class="text-sm">{{ __('admin.nav.organizations') }}</p>
-                            <p class="truncate text-lg font-semibold">{{ $organization->name }}</p>
-                        @else
-                            <p class="truncate text-lg font-semibold">{{ $title }}</p>
-                        @endif
+                        <x-admin.breadcrumbs :location="$location" />
                     </div>
 
                     @if ($admin)
@@ -95,20 +102,14 @@
                     @endif
                 </div>
 
-                @if ($organization)
-                    <x-admin.organization-tabs :organization="$organization" class="px-4 lg:px-8" />
+                @if ($isOrganizationTab)
+                    <p class="truncate px-4 text-xl font-semibold lg:px-8">{{ $organization->name }}</p>
+                    <x-admin.organization-tabs :organization="$organization" class="mt-3 px-4 lg:px-8" />
                 @endif
             </header>
 
             {{-- Livewire pages show their own flash messages, so they update after actions too. --}}
             <main id="main" class="flex-1 px-4 py-6 lg:px-8">
-                {{-- Outside production the allowlist drops mail silently, in the queue worker. --}}
-                @if ($mailAllowlist->isRestricting())
-                    <x-ui.notice tone="warning" class="mb-6">
-                        {{ __('admin.mail_allowlist_notice', ['entries' => implode(', ', $mailAllowlist->entries())]) }}
-                    </x-ui.notice>
-                @endif
-
                 {{ $slot }}
             </main>
         </div>

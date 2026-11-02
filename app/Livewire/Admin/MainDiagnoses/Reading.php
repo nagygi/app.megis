@@ -406,7 +406,7 @@ class Reading extends Component
                 ->get(),
             'isOpen' => in_array($main->stage, [MainDiagnosisStage::Reading, MainDiagnosisStage::Published], true),
             'feedback' => $this->feedbackId === null ? null : ReportFeedback::query()->where('main_diagnosis_id', $main->id)->with('user')->find($this->feedbackId),
-        ])->layout('layouts::admin', ['organization' => $this->diagnosis->organization])->title($this->diagnosis->name);
+        ])->layout('layouts::admin')->title($this->diagnosis->name);
     }
 
     private function loadTexts(): void

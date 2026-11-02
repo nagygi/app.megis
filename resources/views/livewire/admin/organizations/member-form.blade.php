@@ -1,5 +1,5 @@
 <div class="max-w-3xl">
-    <x-admin.page-header :title="$isEditing ? __('admin.members.edit_title') : __('admin.members.invite_title')" :back="route('admin.organizations.members', $organization)" />
+    <x-admin.page-header :title="$isEditing ? __('admin.members.edit_title') : __('admin.members.invite_title')" />
 
     <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-6">
         @if ($isEditing)

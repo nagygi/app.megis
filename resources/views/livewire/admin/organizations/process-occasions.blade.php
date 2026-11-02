@@ -5,8 +5,6 @@
     <x-admin.page-header
         :title="$process->name"
         :description="$process->kind->label().($process->rhythm ? ' · '.$process->rhythm->label() : '')"
-        :back="route('admin.organizations.processes', $organization)"
-        :back-label="__('admin.organizations.tabs.processes')"
         :spaced="false"
     />
 

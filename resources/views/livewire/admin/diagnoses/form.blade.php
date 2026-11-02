@@ -1,7 +1,7 @@
 <div class="max-w-3xl">
     <x-ui.flash class="mb-6" />
 
-    <x-admin.page-header :title="$title" :back="$diagnosis ? route('admin.diagnoses.show', $diagnosis) : route('admin.diagnoses.index')" />
+    <x-admin.page-header :title="$title" />
 
     <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-5">
         <x-form.input name="name" wire:model="name" :label="__('admin.diagnoses.name')" required />

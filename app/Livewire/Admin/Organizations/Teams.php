@@ -143,7 +143,7 @@ class Teams extends Component
         return view('livewire.admin.organizations.teams', [
             'teams' => $this->applySorting($query)->paginate(25),
             'members' => $this->showForm ? $this->memberOptions() : collect(),
-        ])->layout('layouts::admin', ['organization' => $this->organization])->title($this->organization->name);
+        ])->layout('layouts::admin')->title($this->organization->name);
     }
 
     protected function sortableColumns(): array
