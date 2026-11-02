@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.54 · {hash} · 2026-11-03
+
+Diagnózis kitöltése (V1·b, 23 · 23.3, 24 · 24.2): a Saját értékek lépés a mentett listától kész, nem kell hozzá a „Tovább”.
+
+- **Eddig:**
+  - A Saját értékek csak akkor kapott pipát, ha a lépés alján megnyomtad a „Tovább” gombot, mert az rögzítette a lista verzióját.
+  - Egy érték felvétele vagy törlése csak a listát mentette. Ha ezután a lépéslistából mentél tovább, a lépés nyitva maradt.
+  - A „Folytatom” ezért a Saját értékekre vitt vissza, akkor is, ha a többi lépést már kitöltötted.
+- **Most:**
+  - **Kész:** a lépés akkor kész, ha a mentett lista teljes: legalább 1 érték, névvel és jelentéssel; magánszemélynél 3–5 érték, mindkét véggel. Ha kiveszed az utolsó értéket, a lépés újra nyitott.
+  - **„Folytatom”:** egy teljes lista után a következő hiányzó lépésre visz.
+  - **„Tovább”:** továbbra is verziót rögzít a listáról.
+  - **Magánszemély:** a saját értékei minden mentéskor a szervezet értékei is lesznek, így *A márkád alapja* a „Tovább” nélkül is a friss értékeket mutatja. A szervezet értékeinek verziója a „Tovább”-nál jön létre, mint eddig.
+
 ## 1.53 · 0264b63 · 2026-11-03
 
 Admin: a szervezet fejléce a szervezet minden oldalán megmarad, a morzsa a fülsor alá, a cím fölé került.

@@ -84,6 +84,35 @@ it('greets the leader with "Innen folytatod" once a step is done', function () {
         ->assertSee('Folytatom');
 });
 
+it('counts the saved own values as done without "Tovább", so "Folytatom" goes on', function () {
+    $setup = diagnosisTeam();
+    $main = startMainDiagnosis($setup);
+    $main->leaderParticipant()->update(['opened_at' => now()->subDay()]);
+    actingAsCustomer($setup['leader']);
+
+    $component = Livewire::test(OwnValues::class, leaderParams($setup, $main))
+        ->call('show', 'add')
+        ->set('draft.name', 'Kíváncsiság')
+        ->set('draft.meaning', 'Megkérdezem, mi történt.')
+        ->call('addDraft')
+        ->assertHasNoErrors();
+
+    $steps = app(StepProgress::class)->forLeader($main->refresh(), $setup['leader']);
+    expect($steps->get(DiagnosisStep::OwnValues)->done)->toBeTrue()
+        ->and($steps->current()->step)->toBe(DiagnosisStep::Experience)
+        ->and(PersonalValueSet::query()->where('user_id', $setup['leader']->id)->sole()->latestVersion)->toBeNull();
+
+    $this->get(route('client.diagnosis.show', leaderParams($setup, $main)))
+        ->assertOk()
+        ->assertSee('3 / 6 kész')
+        ->assertSeeHtml('href="'.route('client.diagnosis.megeles', leaderParams($setup, $main)).'"');
+
+    // An empty list is not done again.
+    $component->call('remove', PersonalValueSet::query()->where('user_id', $setup['leader']->id)->sole()->items()->sole()->key);
+
+    expect(app(StepProgress::class)->forLeader($main->refresh(), $setup['leader'])->get(DiagnosisStep::OwnValues)->done)->toBeFalse();
+});
+
 it('keeps people who are not in the diagnosis out', function () {
     $setup = diagnosisTeam();
     $main = startMainDiagnosis($setup);
@@ -447,9 +476,13 @@ it('makes a private person\'s own values the organization values', function () {
             ->call('addDraft');
     }
 
+    // The organization values follow the saved list before "Tovább" too.
+    expect($organization->valueSet()->first()->items()->pluck('name')->all())->toBe(['Bátorság', 'Nyíltság', 'Felelősség']);
+
     $component->call('next')->assertHasNoErrors()->assertRedirect(route('client.diagnosis.markad-alapja', ['organization' => $organization, 'diagnosis' => $main->diagnosis]));
 
-    expect($organization->valueSet()->first()->items()->pluck('name')->all())->toBe(['Bátorság', 'Nyíltság', 'Felelősség']);
+    expect($organization->valueSet()->first()->items()->pluck('name')->all())->toBe(['Bátorság', 'Nyíltság', 'Felelősség'])
+        ->and(array_column($organization->valueSet()->first()->latestVersion->snapshot['values'], 'name'))->toBe(['Bátorság', 'Nyíltság', 'Felelősség']);
 });
 
 it('asks a private person about the brand base in the singular', function () {

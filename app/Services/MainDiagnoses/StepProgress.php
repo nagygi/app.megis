@@ -107,11 +107,12 @@ class StepProgress
     }
 
     /**
-     * The own values are confirmed by leaving the step, which records a version (24).
+     * The saved list counts, as every change saves it (23 · 23.3); "Tovább"
+     * only records its version (24 · 24.2).
      */
     public function ownValuesComplete(?PersonalValueSet $set, bool $individual): bool
     {
-        $values = $set?->latestVersion?->snapshot['values'] ?? null;
+        $values = $set?->versionSnapshot()['values'] ?? null;
 
         if ($values === null) {
             return false;
@@ -186,7 +187,7 @@ class StepProgress
 
         return match ($step) {
             DiagnosisStep::OwnValues => $this->ownValuesComplete(
-                PersonalValueSet::query()->with('latestVersion')->where('user_id', $user->id)->first(),
+                PersonalValueSet::query()->where('user_id', $user->id)->first(),
                 $main->subject === MainDiagnosisSubject::Individual,
             ),
             DiagnosisStep::OrganizationValues => $this->organizationValuesComplete($this->latestOrganizationVersion($main)),

@@ -323,10 +323,19 @@ class OwnValues extends Component
         };
     }
 
+    /**
+     * The working copy; a private person's organization values follow it,
+     * as the step is done without "Tovább" too (23 · 23.3).
+     */
     private function persist(PersonalValueSetService $sets): void
     {
         $set = $sets->forUser($this->user());
         $sets->save($set, $this->items, recordVersion: false);
+
+        if ($this->isIndividual() && $this->isLeader()) {
+            $sets->syncOrganization($set, $this->organization, recordVersion: false);
+        }
+
         $this->items = $this->itemsOf($set->refresh());
         $this->dispatch('saved');
     }

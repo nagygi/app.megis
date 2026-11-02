@@ -33,6 +33,7 @@ Kapcsolódik: 03, 06, 08, 17.
 - „+ Új érték” a lista alján.
 - **Hány érték:** legalább 1, legfeljebb 5, a felület hármat ajánl. Magánszemélynél 3–5, mert itt a saját értékek a szervezet értékei is (08).
 - **Verzió:** a lista a lépés elhagyásakor („Tovább”) és az Értéktár „Hozzáadom a sajátjaimhoz” gombjánál (30) új verziót kap, ahogy a szervezet értékszettje (08 · 8.4).
+- **Mikor kész:** minden változás menti a listát, a lépés a mentett lista szerint kész (23.3), „Tovább” nélkül is. Ha kiveszi az utolsó értéket, a lépés újra nyitott. Magánszemélynél a szervezet értékei minden mentéskor követik a listát. A verziójuk a „Tovább”-nál jön létre.
 
 ### 24.3 Érték hozzáadása (V2·c)
 

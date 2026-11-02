@@ -121,8 +121,9 @@ class PersonalValueSetService
     /**
      * A private person's own values are the organization's values too (08):
      * the organization's list follows the own list, its brand base stays.
+     * Without a version it follows the working copy.
      */
-    public function syncOrganization(PersonalValueSet $set, Organization $organization): ?Version
+    public function syncOrganization(PersonalValueSet $set, Organization $organization, bool $recordVersion = true): ?Version
     {
         $valueSet = $this->organizationValueSets->forOrganization($organization);
 
@@ -144,6 +145,7 @@ class PersonalValueSetService
                 'value_proposition' => $valueSet->value_proposition,
                 'impact' => $valueSet->impact,
             ],
+            $recordVersion,
         );
     }
 
