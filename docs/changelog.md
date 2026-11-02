@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.50 · HASH · 2026-11-02
+## 1.50 · ae838d8 · 2026-11-02
 
 „Belépek a nevében” a még nem regisztrált felhasználónál is (14 · 14.6): az admin előre látja, mit fog látni a felhasználó a regisztráció után.
 
