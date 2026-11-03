@@ -22,8 +22,7 @@ class SyncCalendarsCommand extends Command
         $count = 0;
 
         CalendarConnection::query()
-            ->where('status', CalendarConnection::ACTIVE)
-            ->where('provider', '!=', CalendarConnection::ICS_FILE)
+            ->where('status', '!=', CalendarConnection::DISCONNECTED)
             ->with(['user', 'organization', 'mainDiagnosis'])
             ->each(function (CalendarConnection $connection) use ($calendars, &$count): void {
                 try {

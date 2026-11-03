@@ -76,17 +76,22 @@ class CalendarService
 
     /**
      * The daily refresh until the time window ends (09 · 9.4); at the end the
-     * calendar is disconnected (09 · 9.5). A lost access breaks the connection (09 · 9.6).
+     * calendar is disconnected (09 · 9.5), an ICS file and a broken connection
+     * too. A lost access breaks the connection (09 · 9.6).
      */
     public function sync(CalendarConnection $connection): void
     {
-        if (! $connection->isActive() || ! $connection->refreshes()) {
+        if ($connection->status === CalendarConnection::DISCONNECTED) {
             return;
         }
 
         if ($this->windowEnded($connection)) {
             $this->disconnect($connection);
 
+            return;
+        }
+
+        if (! $connection->isActive() || ! $connection->refreshes()) {
             return;
         }
 

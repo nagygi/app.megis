@@ -164,6 +164,23 @@ it('disconnects automatically when the time window ended', function () {
     expect($connection->refresh()->status)->toBe(CalendarConnection::DISCONNECTED);
 });
 
+it('disconnects an ICS file and a broken connection too when the time window ended (09 · 9.5)', function (string $status) {
+    $setup = diagnosisTeam(peers: 1);
+    $main = startMainDiagnosis($setup);
+    AiGateway::fake([namingAnswer([])]);
+    $connection = app(CalendarService::class)->connectIcsFile($setup['leader'], $setup['organization'], $main, sampleIcs($setup['leader']->email, $setup['peers'][0]->email));
+    $connection->update(['status' => $status]);
+
+    $this->artisan('megis:calendar:sync')->assertSuccessful();
+    expect($connection->refresh()->status)->toBe($status);
+
+    $main->update(['publishes_on' => today()->subDay()]);
+    $this->artisan('megis:calendar:sync')->assertSuccessful();
+
+    expect($connection->refresh()->status)->toBe(CalendarConnection::DISCONNECTED)
+        ->and($connection->events()->count())->toBe(0);
+})->with([CalendarConnection::ACTIVE, CalendarConnection::BROKEN]);
+
 it('marks the connection broken when the access was withdrawn', function () {
     $setup = diagnosisTeam(peers: 1);
     $main = startMainDiagnosis($setup);

@@ -2,6 +2,15 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.73 · {hash} · 2026-11-03
+
+Naptár (09 · 9.5): az időablak végén a feltöltött ICS fájl és a megszakadt kapcsolat is szétkötődik.
+
+- **Eddig:** a napi frissítés (`sync:calendars`) csak az aktív, frissülő kapcsolatokat nézte (Google, Microsoft, iCal link). Az ICS fájl és a megszakadt kapcsolat sosem kötődött szét: a Profilban a publikálás után is „Naptár összekötve” állt, és az esemény-metaadat csak a 90 napos törléssel ment el.
+- **Most:** a napi futás minden nem szétkötött kapcsolatot megnéz. Ha a diagnózis időablaka véget ért (lejárt a publikálás napja, vagy publikálták, lezárták), szétköt: a hozzáférés megszűnik, a metaadat azonnal törlődik, a folyamatok és az alkalmak megmaradnak.
+  - **Frissítés továbbra is** csak az iCal linknél, a Google- és a Microsoft-naptárnál van, az ICS fájlnál nincs.
+  - **Diagnózis nélkül betöltött naptár** (az admin bármelyik tag nevében, 11 · 11.6): nincs időablaka, a Profilban köthető szét.
+
 ## 1.72 · f4d5e9a · 2026-11-03
 
 Belépés (14 · 14.2): a kódos és a linkes belépés is nullázza a hibás jelszavak számlálóját.

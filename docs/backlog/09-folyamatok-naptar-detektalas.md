@@ -87,7 +87,7 @@ A detektálás szabályalapú, az AI csak kiegészíti.
   - A törlés után a folyamat (név, ritmus, felelős, résztvevők) és az alkalmak dátuma megmarad.
 - **Szétkötés:** a Profilban („Naptár összekötve · 03.02. · Szétkötés”), megerősítéssel.
   - A hozzáférés megszűnik, és a metaadat azonnal törlődik. A folyamatok és az alkalmak megmaradnak.
-  - A diagnózis időablakának végén a rendszer automatikusan szétköt.
+  - A diagnózis időablakának végén a rendszer automatikusan szétköt: a feltöltött ICS fájlt és a megszakadt kapcsolatot is. A diagnózis nélkül betöltött naptárnak (11 · 11.6) nincs időablaka, az a Profilban köthető szét.
 - **Újraösszekötés:** bármikor lehetséges. A rendszer az új javaslatokat a meglévő folyamatokhoz illeszti (azonos sorozat vagy név alapján), nem hoz létre duplikátumot.
 
 ### 9.6 Hibák
