@@ -9,6 +9,7 @@ use App\Models\Impersonation;
 use App\Models\LegalDocumentVersion;
 use App\Models\Membership;
 use App\Models\Organization;
+use App\Models\Team;
 use App\Models\User;
 use App\Services\Auth\GuardSession;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,24 @@ it('opens the customer side in the customer’s name with the coral bar', functi
         ->assertSee($customer->name.' nevében dolgozol');
     expect(Impersonation::query()->sole())->admin_id->toBe($admin->id)->user_id->toBe($customer->id)
         ->and(AuditEvent::query()->where('type', AuditEventType::ImpersonationStarted)->count())->toBe(1);
+});
+
+it('shows the customer’s tags and teams in this organization on the coral bar', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $customer = User::factory()->create();
+    Membership::factory()->organizationLeader()->for($organization)->for($customer)->create();
+    $customer->teams()->attach(Team::factory()->for($organization)->create(['name' => 'Value Core Team']), ['is_leader' => true]);
+    $customer->teams()->attach(Team::factory()->for($organization)->create(['name' => 'Sales']));
+    $customer->teams()->attach(Team::factory()->create(['name' => 'Másik szervezet csapata']));
+
+    $this->post(route('admin.impersonate', $customer));
+
+    $this->get(route('client.home', $organization))
+        ->assertOk()
+        ->assertSee('Címkék: szervezet vezetője')
+        ->assertSee('Csapatok: Sales, Value Core Team (csapat vezető)')
+        ->assertDontSee('Másik szervezet csapata');
 });
 
 it('does not touch the customer’s last login', function () {

@@ -2,6 +2,17 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.56 · {hash} · 2026-11-03
+
+„Belépek a nevében” (14 · 14.6): a coral sáv a felhasználó címkéit és csapatait is mutatja.
+
+- **Eddig:** a sávban csak „{Név} nevében dolgozol · Kilépés” állt. Hogy milyen szerepben van ott a felhasználó, az adminból kellett kikeresni.
+- **Most:**
+  - **Címkék:** a név után „Címkék: szervezet vezetője, munkatárs”, a felhasználó címkéi az aktuális szervezetben.
+  - **Csapatok:** „Csapatok: Sales, Value Core Team (csapat vezető)”, ábécérendben. Ahol a felhasználó csapatvezető, ott ez is látszik.
+  - Mindkettő az aktuális szervezetre vonatkozik. Ha nincs címke vagy csapat, az adott rész kimarad.
+  - Telefonon a sáv több sorba törik.
+
 ## 1.55 · 286b88d · 2026-11-03
 
 Admin: „Szervezetek › szervezet” a fejlécben, a morzsa a fültől az aktuális oldalig; az A1 vezetői előnézete megszűnt.

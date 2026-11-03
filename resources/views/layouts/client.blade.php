@@ -60,7 +60,16 @@
     $currentOrganization = $user
         ? (app(\App\Support\CurrentOrganization::class)->get() ?? app(\App\Services\Auth\LandingResolver::class)->organizationFor($user))
         : null;
-    $position = $currentOrganization ? $organizations->firstWhere('id', $currentOrganization->id)?->pivot->position : null;
+    $membership = $currentOrganization ? $organizations->firstWhere('id', $currentOrganization->id)?->pivot : null;
+    $position = $membership?->position;
+
+    // The coral bar tells the admin in which role they work: the tags and teams in this organization.
+    $impersonationTags = $impersonation ? implode(', ', $membership?->tagLabels() ?? []) : '';
+    $impersonationTeams = $impersonation && $currentOrganization
+        ? $user->teams()->where('teams.organization_id', $currentOrganization->id)->orderBy('teams.name')->get()
+            ->map(fn (\App\Models\Team $team): string => $team->pivot->is_leader ? $team->name.' ('.__('enums.membership_tag.team_leader').')' : $team->name)
+            ->implode(', ')
+        : '';
 @endphp
 
 <!DOCTYPE html>
@@ -85,8 +94,14 @@
     </a>
 
     @if ($impersonation)
-        <div class="sticky top-0 z-40 flex items-center justify-center gap-3 bg-coral px-4 py-2 text-sm font-semibold text-black" role="status">
+        <div class="sticky top-0 z-40 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-coral px-4 py-2 text-sm font-semibold text-black" role="status">
             <span>{{ __('impersonation.banner', ['name' => $impersonation->user->name]) }}</span>
+            @if ($impersonationTags !== '')
+                <span class="font-normal">{{ __('impersonation.tags', ['tags' => $impersonationTags]) }}</span>
+            @endif
+            @if ($impersonationTeams !== '')
+                <span class="font-normal">{{ __('impersonation.teams', ['teams' => $impersonationTeams]) }}</span>
+            @endif
             <form method="POST" action="{{ route('client.impersonation.end') }}">
                 @csrf
                 <button type="submit" class="underline">{{ __('impersonation.exit') }}</button>
