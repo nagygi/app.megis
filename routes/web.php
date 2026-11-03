@@ -86,6 +86,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('szervezetek/{organization}/csapatok', Admin\Organizations\Teams::class)->name('organizations.teams');
         Route::livewire('szervezetek/{organization}/felhasznalok', Admin\Organizations\Members::class)->name('organizations.members');
         Route::livewire('szervezetek/{organization}/ertekek', Admin\Organizations\Values::class)->name('organizations.values');
+        Route::livewire('szervezetek/{organization}/markad-alapja', Admin\Organizations\Brand::class)->name('organizations.brand');
         Route::livewire('szervezetek/{organization}/folyamatok', Admin\Organizations\Processes::class)->name('organizations.processes');
         Route::livewire('szervezetek/{organization}/folyamatok/{process}', Admin\Organizations\ProcessOccasions::class)->whereNumber('process')->name('organizations.process-occasions');
         Route::livewire('szervezetek/{organization}/diagnozisok', Admin\Organizations\Diagnoses::class)->name('organizations.diagnoses');

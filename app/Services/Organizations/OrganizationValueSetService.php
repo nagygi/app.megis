@@ -101,6 +101,27 @@ class OrganizationValueSetService
         });
     }
 
+    /**
+     * Replaces only the brand base and keeps the values as stored: the V4 step
+     * and the admin's "A márkád alapja" tab (08 · 8.2, 8.5).
+     *
+     * @param  array<string, ?string>  $brand  purpose, value_proposition, impact
+     */
+    public function saveBrand(OrganizationValueSet $set, array $brand, bool $recordVersion = true): ?Version
+    {
+        return $this->save($set, $set->items()->get()->map(fn ($item) => [
+            'key' => $item->key,
+            'value_id' => $item->value_id,
+            'source_version_id' => $item->source_version_id,
+            'name' => $item->name,
+            'meaning' => $item->meaning,
+            'non_meaning' => $item->non_meaning,
+            'low_example' => $item->low_example,
+            'high_example' => $item->high_example,
+            'example' => $item->example,
+        ])->all(), $brand, $recordVersion);
+    }
+
     private function text(?string $text): ?string
     {
         $text = trim((string) $text);

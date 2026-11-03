@@ -17,6 +17,7 @@
     }
 
     $tabs[] = ['route' => 'admin.organizations.values', 'label' => __('admin.organizations.tabs.values')];
+    $tabs[] = ['route' => 'admin.organizations.brand', 'label' => __('admin.organizations.tabs.brand')];
     $tabs[] = ['route' => 'admin.organizations.processes', 'label' => __('admin.organizations.tabs.processes')];
     $tabs[] = ['route' => 'admin.organizations.diagnoses', 'label' => __('admin.organizations.tabs.diagnoses')];
 

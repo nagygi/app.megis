@@ -46,6 +46,7 @@ it('renders every admin page for a superadmin with a page heading', function (Cl
     'teams' => fn (array $models) => route('admin.organizations.teams', $models['organization']),
     'members' => fn (array $models) => route('admin.organizations.members', $models['organization']),
     'organization values' => fn (array $models) => route('admin.organizations.values', $models['organization']),
+    'organization brand' => fn (array $models) => route('admin.organizations.brand', $models['organization']),
     'organization processes' => fn (array $models) => route('admin.organizations.processes', $models['organization']),
     'process occasions' => fn (array $models) => route('admin.organizations.process-occasions', [$models['organization'], Process::factory()->for($models['organization'])->create()]),
     'organization diagnoses' => fn (array $models) => route('admin.organizations.diagnoses', $models['organization']),

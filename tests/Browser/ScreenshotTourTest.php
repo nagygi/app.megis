@@ -238,6 +238,7 @@ it('tours the admin', function () {
         'admin-02-organization' => route('admin.organizations.edit', $organization, false),
         'admin-03-members' => route('admin.organizations.members', $organization, false),
         'admin-04-organization-values' => route('admin.organizations.values', $organization, false),
+        'admin-04b-organization-brand' => route('admin.organizations.brand', $organization, false),
         'admin-05-diagnoses' => route('admin.diagnoses.index', absolute: false),
         'admin-06-main-show' => route('admin.diagnoses.show', $diagnosis, false),
         'admin-07-main-settings' => route('admin.main-diagnoses.edit', $diagnosis, false),

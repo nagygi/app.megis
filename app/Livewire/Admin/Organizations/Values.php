@@ -19,8 +19,9 @@ use Livewire\Component;
 
 /**
  * The organization's "Értékek" tab (08 · 8.5): 3–5 values in the
- * organization's words and the brand base, with the same rules as on the
- * customer side. Every saved change is a new version of the value set.
+ * organization's words, with the same rules as on the customer side. The
+ * brand base has its own tab (Brand); every saved change of either is a new
+ * version of the one value set.
  */
 class Values extends Component
 {
@@ -30,12 +31,6 @@ class Values extends Component
      * @var list<array<string, mixed>>
      */
     public array $items = [];
-
-    public string $purpose = '';
-
-    public string $value_proposition = '';
-
-    public string $impact = '';
 
     public ?int $pickedValueId = null;
 
@@ -59,10 +54,6 @@ class Values extends Component
                 'name' => $item->name,
                 ...collect(OrganizationValueSetItem::TEXT_FIELDS)->mapWithKeys(fn (string $field) => [$field => (string) $item->{$field}])->all(),
             ])->all();
-
-            foreach (OrganizationValueSet::BRAND_FIELDS as $field) {
-                $this->{$field} = (string) $set->{$field};
-            }
         }
     }
 
@@ -141,10 +132,6 @@ class Values extends Component
             'items.*.low_example' => ['required', 'string', 'max:500'],
             'items.*.high_example' => ['required', 'string', 'max:500'],
             'items.*.example' => ['nullable', 'string', 'max:500'],
-            // All four brand base elements are required, as on the customer side (08 · 8.2).
-            'purpose' => ['required', 'string', 'max:500'],
-            'value_proposition' => ['required', 'string', 'max:500'],
-            'impact' => ['required', 'string', 'max:500'],
         ], [
             'items.min' => __('admin.value_sets.too_few', ['min' => OrganizationValueSet::MIN_VALUES]),
             'items.max' => __('admin.value_sets.too_many', ['max' => OrganizationValueSet::MAX_VALUES]),
@@ -160,11 +147,7 @@ class Values extends Component
 
         $set = $valueSets->forOrganization($this->organization);
         $hadVersion = $set->latestVersion !== null;
-        $version = $valueSets->save($set, $this->items, [
-            'purpose' => $this->purpose,
-            'value_proposition' => $this->value_proposition,
-            'impact' => $this->impact,
-        ]);
+        $version = $valueSets->save($set, $this->items, $set->only(OrganizationValueSet::BRAND_FIELDS));
 
         // New values got their Értéktár ids; keep the form in step with what was saved.
         $this->items = $set->items()->get()->map(fn ($item) => [
@@ -238,7 +221,6 @@ class Values extends Component
             'items.*.value_id' => __('admin.value_sets.value'),
             'items.*.name' => __('admin.value_sets.fields.name'),
             ...collect(OrganizationValueSetItem::TEXT_FIELDS)->mapWithKeys(fn (string $field) => ['items.*.'.$field => __('admin.value_sets.fields.'.$field)])->all(),
-            ...collect(OrganizationValueSet::BRAND_FIELDS)->mapWithKeys(fn (string $field) => [$field => __('admin.value_sets.brand.'.$field)])->all(),
         ];
     }
 }

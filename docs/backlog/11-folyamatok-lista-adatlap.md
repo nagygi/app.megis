@@ -118,7 +118,7 @@ A lista gépi javaslat, jóváhagyásra. Négy csoportja van: Erős minta · Biz
 
 ### 11.6 Admin: a szervezet *Folyamatok* füle
 
-- A szervezet oldalának ötödik füle: *Adatok · Csapatok · Felhasználók · Értékek · Folyamatok*.
+- A szervezet oldalának füle az *Értékek* és *A márkád alapja* után: *Adatok · Felhasználók · Csapatok · Értékek · A márkád alapja · Folyamatok · Diagnózisok*.
 - **Lista** az NFR listaszabályai szerint:
   - Oszlopok: név, szülő, forrás (naptár / beszélgetés / kézi), konfidencia, állapot, felelős, alkalmak száma, töréspont-jelölt (10).
   - A *Bizonytalan* és az *Egyéb* sorok külön blokkban látszanak, átnézésre.

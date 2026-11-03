@@ -7,7 +7,7 @@ A szervezet vezetője megadja a szervezet értékeit (V3) és a márkád alapjá
 **Ki használhatja**
 
 - A kliens oldalon a **szervezet vezetője** címkéjű felhasználó (02).
-- Az adminban az admin, a szervezet *Értékek* fülén (8.5).
+- Az adminban az admin, a szervezet *Értékek* és *A márkád alapja* fülén (8.5).
 - A többi felhasználó csak olvashatja.
 
 **Hol jelenik meg**
@@ -74,11 +74,14 @@ Négy doboz, ugyanazzal a mintával: jel és cím, alatta szürkén a kérdés, 
 - Ahol használják (diagnózis, AI elemzés), ott rögzítjük, melyik verziót. A futó diagnózist az új verzió nem változtatja meg, ahogy az Értéktárban is (03 · 3.3).
 - Módosításkor ez a figyelmeztetés jelenik meg: „A korábbi értékek nem törlődnek. Az új diagnózisok az új értékek szerint futnak.”
 
-### 8.5 Admin: a szervezet *Értékek* füle (02)
+### 8.5 Admin: a szervezet *Értékek* és *A márkád alapja* füle (02)
 
-- A szervezet oldalán negyedik fül: *Adatok · Csapatok · Felhasználók · Értékek · Folyamatok* (a *Folyamatok* fül: 11).
-- Ugyanazok a mezők és szabályok, mint a kliens oldalon: 3–5 érték, a márkád alapja, verziók.
-- **Verziók:** listában látszik, ki és mikor mentette, a régi verziók csak olvasható nézetben nyithatók meg.
+- A szervezet oldalán két egymás utáni fül: *Adatok · Felhasználók · Csapatok · Értékek · A márkád alapja · Folyamatok · Diagnózisok* (a *Folyamatok* fül: 11).
+- Ugyanazok a mezők és szabályok, mint a kliens oldalon:
+  - az *Értékek* fülön 3–5 érték;
+  - *A márkád alapja* fülön a négy doboz. A gyökér a mentett értékeket sorolja fel, a másik három kötelező.
+- **Fülenként ment.** Mindkét fül ugyanazt az értékszettet menti, a másik fül részét változatlanul hagyja. Az értékek a márkád alapja nélkül is menthetők.
+- **Verziók:** a két fülnek közös a verziósora, ezért mindkettőn ugyanaz a lista látszik: ki és mikor mentette. A régi verzió csak olvasható nézetben nyílik meg, és mindig az adott fül részét mutatja.
 
 ## Nincs benne
 

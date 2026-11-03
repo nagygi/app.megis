@@ -30,6 +30,7 @@ class AdminBreadcrumbs
         'admin.organizations.members',
         'admin.organizations.teams',
         'admin.organizations.values',
+        'admin.organizations.brand',
         'admin.organizations.processes',
         'admin.organizations.diagnoses',
     ];

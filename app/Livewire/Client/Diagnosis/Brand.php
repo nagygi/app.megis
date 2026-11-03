@@ -137,19 +137,7 @@ class Brand extends Component
 
     private function persist(OrganizationValueSetService $valueSets, bool $recordVersion = false): void
     {
-        $set = $valueSets->forOrganization($this->organization);
-
-        $valueSets->save($set, $set->items()->get()->map(fn ($item) => [
-            'key' => $item->key,
-            'value_id' => $item->value_id,
-            'source_version_id' => $item->source_version_id,
-            'name' => $item->name,
-            'meaning' => $item->meaning,
-            'non_meaning' => $item->non_meaning,
-            'low_example' => $item->low_example,
-            'high_example' => $item->high_example,
-            'example' => $item->example,
-        ])->all(), [
+        $valueSets->saveBrand($valueSets->forOrganization($this->organization), [
             'purpose' => $this->purpose,
             'value_proposition' => $this->value_proposition,
             'impact' => $this->impact,

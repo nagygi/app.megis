@@ -24,10 +24,7 @@ function completeValueSet(mixed $component): mixed
         $component->set('pickedValueId', libraryValue($name)->id)->call('addFromLibrary');
     }
 
-    return $component
-        ->set('purpose', 'Hogy a csapat merjen.')
-        ->set('value_proposition', 'Egy bátrabb csapatot.')
-        ->set('impact', 'Kimondott mondatok.');
+    return $component;
 }
 
 it('prefills a value from the Értéktár with the first item of each list', function () {
@@ -66,18 +63,20 @@ it('requires three to five values with both scale ends', function () {
     expect(OrganizationValueSet::query()->count())->toBe(0);
 });
 
-it('requires all of the brand base, as on the customer side', function () {
+it('saves the values without the brand base and keeps the stored one', function () {
     actingAsAdmin();
     $organization = Organization::factory()->create();
+    $set = OrganizationValueSet::factory()->for($organization)->create(['purpose' => 'Hogy a csapat merjen.']);
 
     completeValueSet(Livewire::test(Values::class, ['organization' => $organization]))
-        ->set('purpose', '')
-        ->set('value_proposition', '')
-        ->set('impact', ' ')
         ->call('save')
-        ->assertHasErrors(['purpose' => 'required', 'value_proposition' => 'required', 'impact' => 'required']);
+        ->assertHasNoErrors();
 
-    expect(OrganizationValueSet::query()->count())->toBe(0);
+    expect($set->fresh())
+        ->purpose->toBe('Hogy a csapat merjen.')
+        ->impact->toBeNull()
+        ->and($set->items()->count())->toBe(3)
+        ->and($set->latestVersion->snapshot['purpose'])->toBe('Hogy a csapat merjen.');
 });
 
 it('stops adding at five values and greys out the adding', function () {
@@ -102,14 +101,12 @@ it('saves the set as a version and keeps the Értéktár value as it was', funct
 
     completeValueSet(Livewire::test(Values::class, ['organization' => $organization]))
         ->set('items.0.meaning', 'Nálunk ez azt jelenti, hogy kimondjuk.')
-        ->set('purpose', 'Hogy a csapat merjen.')
         ->call('save')
         ->assertHasNoErrors()
         ->assertSee('Mentve, első verzió: v1.');
 
     $set = $organization->valueSet()->sole();
     expect($set->items()->count())->toBe(3)
-        ->and($set->purpose)->toBe('Hogy a csapat merjen.')
         ->and($set->latestVersion)->number->toBe(1)->created_by->toBe($admin->id)
         ->and($set->latestVersion->snapshot['values'][0]['meaning'])->toBe('Nálunk ez azt jelenti, hogy kimondjuk.')
         ->and(Value::query()->firstWhere('name', 'Bátorság')->meanings[0])->toBe('Bátorság: első jelentés');
@@ -124,7 +121,7 @@ it('warns that new diagnoses use the new values after a change', function () {
         ->assertSee('A korábbi értékek nem törlődnek. Az új diagnózisok az új értékek szerint futnak.')
         ->call('save')
         ->assertSee('Nem változott semmi, nem készült új verzió.')
-        ->set('impact', 'Bátrabb csapatok.')
+        ->set('items.0.example', 'Kimondtuk a csúszást.')
         ->call('save')
         ->assertSee('Mentve, új verzió: v2.');
 
@@ -178,12 +175,13 @@ it('offers only values the organization may choose', function () {
 it('opens a saved version read-only', function () {
     actingAsAdmin();
     $organization = Organization::factory()->create();
-    completeValueSet(Livewire::test(Values::class, ['organization' => $organization]))->set('purpose', 'Első cél.')->call('save');
+    completeValueSet(Livewire::test(Values::class, ['organization' => $organization]))->set('items.0.example', 'Első példa.')->call('save');
 
     Livewire::test(Values::class, ['organization' => $organization])
-        ->set('purpose', 'Második cél.')
+        ->set('items.0.example', 'Második példa.')
         ->call('save')
         ->set('viewing', 1)
         ->assertSee('v1 · csak olvasható')
-        ->assertSee('Első cél.');
+        ->assertSee('Első példa.')
+        ->assertDontSee('Második példa.');
 });

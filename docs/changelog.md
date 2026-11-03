@@ -2,6 +2,23 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.62 · {hash} · 2026-11-03
+
+Admin, szervezet: „A márkád alapja” saját fület kapott, közvetlenül az *Értékek* után (08 · 8.5).
+
+- **Eddig:**
+  - Az *Értékek* fülön az értékek alatt állt a négy doboz (gyökér · törzs · korona · árnyék), egy közös mentés gombbal.
+  - Értéket csak akkor lehetett menteni, ha a márka három mezője is ki volt töltve.
+- **Most:**
+  - **A fülsor:** *Adatok · Felhasználók · Csapatok · Értékek · **A márkád alapja** · Folyamatok · Diagnózisok*.
+  - **Fülenként ment:**
+    - az *Értékek* fül csak az értékeket validálja és menti, így márka nélkül is menthető;
+    - *A márkád alapja* fül a három mezőt (mind kötelező), az értékekhez nem nyúl.
+  - **A gyökér** a mentett értékeket sorolja fel, alatta link visz az *Értékek* fülre.
+  - **Verziók:**
+    - a két fül ugyanazt az értékszettet menti, ezért mindkettőn ugyanaz a verziólista látszik;
+    - egy régi verzió csak olvasható nézetben nyílik meg, és mindig az adott fül részét mutatja.
+
 ## 1.61 · 57dece0 · 2026-11-03
 
 „Belépek a nevében” (14 · 14.6): a coral sávban a címkék és a csapatok pillékként jelennek meg, így a sáv kisebb.

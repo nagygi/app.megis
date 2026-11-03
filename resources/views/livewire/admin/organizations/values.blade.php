@@ -28,13 +28,6 @@
                     </dl>
                 </div>
             @endforeach
-
-            <dl class="grid gap-2 text-sm md:grid-cols-[14rem_1fr]">
-                @foreach (\App\Models\OrganizationValueSet::BRAND_FIELDS as $field)
-                    <dt class="font-medium">{{ __('admin.value_sets.brand.'.$field) }}</dt>
-                    <dd>{{ filled($viewed->snapshot[$field] ?? null) ? $viewed->snapshot[$field] : __('admin.common.none') }}</dd>
-                @endforeach
-            </dl>
         </x-ui.card>
     @else
         @if ($hasVersion)
@@ -124,64 +117,11 @@
                 </x-ui.card>
             </section>
 
-            {{-- The brand base (08 · 8.2) --}}
-            <section class="flex flex-col gap-4" aria-labelledby="brand-title">
-                <h2 id="brand-title" class="text-lg font-semibold">{{ __('admin.value_sets.brand_title') }}</h2>
-
-                <div class="grid gap-4 md:grid-cols-2">
-                    <x-ui.card bordered class="flex flex-col gap-2">
-                        <h3 class="flex items-center gap-2 font-semibold"><x-megis.symbol name="root" class="size-6" /> {{ __('admin.value_sets.brand.root') }}</h3>
-                        <p class="text-sm text-grey-700">{{ __('admin.value_sets.brand_questions.root') }}</p>
-                        <p>{{ collect($items)->pluck('name')->implode(' · ') ?: __('admin.common.none') }}</p>
-                    </x-ui.card>
-
-                    @foreach (['purpose' => 'trunk', 'value_proposition' => 'fruit', 'impact' => 'shade'] as $field => $symbol)
-                        <x-ui.card bordered class="flex flex-col gap-2">
-                            <h3 class="flex items-center gap-2 font-semibold"><x-megis.symbol :name="$symbol" class="size-6" /> {{ __('admin.value_sets.brand.'.$field) }}</h3>
-                            <x-form.textarea
-                                :name="$field"
-                                wire:model="{{ $field }}"
-                                :label="__('admin.value_sets.brand_questions.'.$field)"
-                                required
-                                rows="3"
-                                maxlength="500"
-                                :help="__('admin.value_sets.brand_help')"
-                            />
-                        </x-ui.card>
-                    @endforeach
-                </div>
-            </section>
-
             <div>
                 <x-ui.button type="submit">{{ __('admin.common.save') }}</x-ui.button>
             </div>
         </form>
 
-        {{-- Versions (08 · 8.4, 8.5) --}}
-        <section class="flex flex-col gap-3" aria-labelledby="versions-title">
-            <h2 id="versions-title" class="text-lg font-semibold">{{ __('admin.values.tabs.versions') }}</h2>
-            @if ($versions->isEmpty())
-                <x-ui.empty-state class="border border-grey-250">{{ __('admin.value_sets.no_versions') }}</x-ui.empty-state>
-            @else
-                <x-admin.table>
-                    <x-slot:head>
-                        <x-admin.th>{{ __('admin.versions.number') }}</x-admin.th>
-                        <x-admin.th>{{ __('admin.versions.author') }}</x-admin.th>
-                        <x-admin.th>{{ __('admin.versions.date') }}</x-admin.th>
-                        <x-admin.th><span class="sr-only">{{ __('admin.common.actions') }}</span></x-admin.th>
-                    </x-slot:head>
-                    @foreach ($versions as $version)
-                        <tr wire:key="set-version-{{ $version->id }}">
-                            <td class="px-3 py-2 font-semibold">{{ $version->label() }}</td>
-                            <td class="px-3 py-2">{{ $version->creator?->name ?? __('admin.versions.system') }}</td>
-                            <td class="px-3 py-2 whitespace-nowrap">{{ $version->created_at->format('Y.m.d. H:i') }}</td>
-                            <td class="px-3 py-2 text-right">
-                                <x-ui.button tone="outline" size="sm" wire:click="$set('viewing', {{ $version->number }})">{{ __('admin.versions.open') }}</x-ui.button>
-                            </td>
-                        </tr>
-                    @endforeach
-                </x-admin.table>
-            @endif
-        </section>
+        @include('livewire.admin.organizations.partials.value-set-versions')
     @endif
 </div>
