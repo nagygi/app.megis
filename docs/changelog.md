@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.67 · {hash} · 2026-11-03
+## 1.67 · b742bbb · 2026-11-03
 
 Admin, *Szervezetek* lista: alapból az utolsó aktivitás szerint rendez, a legfrissebb elöl (02 · 2.2).
 
