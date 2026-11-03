@@ -111,7 +111,7 @@ it('shows the leader\'s home while it runs, with the coral plus, and without it 
         ->assertSee('Teljes · fut · ')
         ->assertSee(' → '.$main->publishes_on->format('m.d.'))
         ->assertSee('1. hét a 7-ből')
-        ->assertSee('Beszélgetések a mégisszel')
+        ->assertSee('Beszélgetések a mégissel')
         ->assertSee('Mélyítés')
         ->assertSeeHtml('href="'.route('client.diagnosis.contribute', $parameters).'"');
 
