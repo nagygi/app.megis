@@ -124,6 +124,10 @@
                 </span>
                 <x-report.soon dark />
             </div>
+            {{-- The snapshot's PDF: S1, S1·b and the Melléklet (28 · 28.3). --}}
+            @if (! $preview && config('megis.pdf_downloads'))
+                <x-ui.button size="sm" icon="document" tone="outline" class="self-start" :href="$url('pdf')">{{ __('report.closing.pdf') }}</x-ui.button>
+            @endif
         </div>
     </div>
 </x-layouts::client>

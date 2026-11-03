@@ -2,6 +2,25 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.90 · {hash} · 2026-11-03
+
+Visszajelzés, Melléklet, PDF (28): a jegy hiányai pótolva.
+
+- **A riport lezárás után is olvasható (28.1):**
+  - **Eddig:** a diagnózis lezárása után az egész riport 403-at adott, a menü Riportok-listájából is eltűnt, a kezdőlap nem nyitotta meg.
+  - **Most:**
+    - a riport, a PDF, a Melléklet és a vezető V12 kezdőlapja megmarad, a Riportok-lista is mutatja;
+    - a kezdőlap a lezárt diagnózist nyitja, ha nincs frissebb;
+    - a visszajelzés gombjai eltűnnek, az elküldött válasz állapota olvasható;
+    - a kitöltés lapjai lezárás után továbbra sem nyílnak meg.
+- **„Igen”-összesítés (28.1):** a Publikálás fülön publikálás után „Visszajelzések” blokk: „4 fejezetből 2 Igen · 1 Részben · 1 Nem így látjuk”. Fejezetenként a legutolsó válasz számít, alatta soronként a fejezet, a válasz, a név, a dátum és a beépítés. Eddig a válaszokat semmi nem gyűjtötte össze.
+- **PDF (28.3):**
+  - **A riport PDF-je:** új R1·b lap: minden mérőpont csoportonként, csökkenő PHI-vel, jelölésekkel. A végén a teljes Melléklet: Kire, Miből, Mikor, Ki olvasta, az idézetek, az állítások, az átírások és a mérőpontok. Eddig csak egy rövid kivonat volt.
+  - **A snapshot PDF-je** az S1-et és az S1·b-t követi, a fejezetek lapjai nélkül. Az S1 lap alján „Letöltöm · PDF”.
+  - **Melléklet-PDF:** a Melléklet „Letöltöm · PDF”-je eddig a teljes riportot adta, most csak a Mellékletet (`megis-melleklet-{csapat}-{datum}.pdf`). A standalone diagnózisé marad a riport-PDF.
+  - **Fejléc:** a mégis logója, eddig szöveges „mégis” állt.
+- **A jegy a kódhoz igazítva:** a „Miben nem?” gombja „Elküldöm”.
+
 ## 1.89 · c007ff6 · 2026-11-03
 
 Riport (27): a jegy hiányai pótolva.

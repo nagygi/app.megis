@@ -3,15 +3,19 @@
 use App\Enums\DiagnosisRowKind;
 use App\Enums\InboxItemType;
 use App\Livewire\Admin\Inbox\Index as Inbox;
+use App\Livewire\Admin\MainDiagnoses\Publish;
 use App\Livewire\Admin\MainDiagnoses\Reading;
 use App\Livewire\Client\Report\Feedback;
 use App\Mail\FeedbackReplyMail;
 use App\Models\ChapterUpdate;
 use App\Models\DiagnosisClaim;
 use App\Models\InboxItem;
+use App\Models\Product;
 use App\Models\ReportFeedback;
+use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\Report\PublishService;
 use App\Services\Report\ReportPdfStore;
+use App\Services\Report\ReportService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
@@ -188,9 +192,11 @@ it('shows the PDF buttons only when MEGIS_PDF_DOWNLOADS is on (28 · 28.3)', fun
     $assertLink = fn ($response, string $href) => $enabled ? $response->assertSeeHtml($href) : $response->assertDontSeeHtml($href);
 
     actingAsCustomer($setup['leader']);
-    foreach (['client.diagnosis.show', 'client.report.closing', 'client.report.appendix'] as $page) {
+    foreach (['client.diagnosis.show', 'client.report.closing'] as $page) {
         $assertLink($this->get(route($page, $parameters))->assertOk(), route('client.report.pdf', $parameters));
     }
+    // The Melléklet has a PDF of its own.
+    $assertLink($this->get(route('client.report.appendix', $parameters))->assertOk(), route('client.report.appendix.pdf', $parameters));
 
     actingAsCustomer($setup['peers'][0]);
     $assertLink($this->get(route('client.diagnosis.takeaway', $parameters))->assertOk(), route('client.diagnosis.takeaway.pdf', $parameters));
@@ -211,4 +217,75 @@ it('shows the leader\'s home after publishing (26 · 26.3)', function () {
     $this->get(route('client.diagnosis.show', [$setup['organization'], $main->diagnosis]))
         ->assertOk()
         ->assertSeeHtml(route('client.diagnosis.takeaway', [$setup['organization'], $main->diagnosis]));
+});
+
+it('keeps the report readable after the closing, without the feedback buttons (28 · 28.1)', function () {
+    [$setup, $main] = publishedReport();
+    actingAsCustomer($setup['leader']);
+    Livewire::test(Feedback::class, ['main' => $main, 'chapter' => 'values'])->call('choose', 'yes');
+    app(MainDiagnosisService::class)->close($main->refresh(), $setup['admin']);
+    $parameters = [$setup['organization'], $main->diagnosis];
+
+    $this->get(route('client.report.chapter', [...$parameters, 'ertekek']))->assertOk()->assertSee('Nálatok szólnak a csúszásról.');
+    $this->get(route('client.home', $setup['organization']))->assertRedirect(route('client.diagnosis.show', $parameters));
+    $this->get(route('client.diagnosis.show', $parameters))->assertOk();
+    $this->get(route('client.diagnosis.sajat-ertekek', $parameters))->assertNotFound();
+    expect(app(ReportService::class)->reportsFor($setup['leader'], $setup['organization'])->pluck('id')->all())->toBe([$main->id]);
+
+    Livewire::test(Feedback::class, ['main' => $main->refresh(), 'chapter' => 'values'])
+        ->assertSee(__('report.feedback.sent_yes', ['date' => now()->format('m.d.')]))
+        ->assertDontSee(__('report.feedback.answers.partial'))
+        ->call('choose', 'no')
+        ->assertForbidden();
+});
+
+it('counts the latest answer per chapter on the Publikálás tab, the "Igen" too (28 · 28.1)', function () {
+    [$setup, $main] = publishedReport();
+    foreach (['values' => 'yes', 'processes' => 'yes', 'areas' => 'partial'] as $chapter => $answer) {
+        ReportFeedback::create(['main_diagnosis_id' => $main->id, 'user_id' => $setup['leader']->id, 'chapter' => $chapter, 'answer' => $answer, 'text' => $answer === 'yes' ? null : 'Nem egészen.', 'answered_at' => now()]);
+    }
+    // The latest answer counts: the values were "Nem így látjuk" first.
+    ReportFeedback::query()->where('chapter', 'values')->update(['created_at' => now()->addMinute()]);
+    ReportFeedback::create(['main_diagnosis_id' => $main->id, 'user_id' => $setup['leader']->id, 'chapter' => 'brand', 'answer' => 'no', 'text' => 'Más a fa.', 'answered_at' => now()]);
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Publish::class, ['diagnosis' => $main->diagnosis])
+        ->assertSee('4 fejezetből 2 Igen · 1 Részben · 1 Nem így látjuk')
+        ->assertSee('A márkád alapja · Nem így látjuk · '.$setup['leader']->name);
+});
+
+it('downloads the Melléklet on its own, and prints R1·b and the whole Melléklet in the report (28 · 28.3)', function () {
+    Pdf::fake();
+    [$setup, $main] = publishedReport();
+    actingAsCustomer($setup['leader']);
+    $parameters = [$setup['organization'], $main->diagnosis];
+
+    $this->get(route('client.report.appendix', $parameters))->assertSee(route('client.report.appendix.pdf', $parameters));
+    $this->get(route('client.report.appendix.pdf', $parameters))->assertOk();
+    Pdf::assertRespondedWithPdf(fn ($pdf) => $pdf->viewName === 'pdf.appendix' && str_starts_with($pdf->downloadName, 'megis-melleklet-'));
+
+    $data = app(ReportService::class)->snapshot($main)->data;
+    $html = view('pdf.report', ['report' => $data, 'title' => 'Riport', 'date' => today()])->render();
+
+    expect($html)->toContain(__('report.internal_page.question'))
+        ->toContain(__('appendix.who'))
+        ->toContain(__('appendix.when'))
+        ->toContain('Szóltam a csúszásról')
+        ->toContain('Nálatok szólnak a csúszásról.');
+});
+
+it('prints the snapshot as S1 and S1·b, and links its PDF from the page (28 · 28.3, 27 · 27.10)', function () {
+    [$setup, $main] = approvedReading();
+    $main->update(['product_key' => Product::SNAPSHOT_INTERNAL]);
+    app(PublishService::class)->publish($main->refresh(), $setup['admin']);
+    actingAsCustomer($setup['leader']);
+    $parameters = [$setup['organization'], $main->diagnosis];
+
+    $this->get(route('client.report.show', $parameters))->assertSee(route('client.report.pdf', $parameters));
+
+    $html = view('pdf.report', ['report' => app(ReportService::class)->snapshot($main)->data, 'title' => 'Snapshot', 'date' => today()])->render();
+
+    expect($html)->toContain(__('report.snapshot.brand_link'))
+        ->not->toContain('<h1>'.__('report.chapters.values').'</h1>')
+        ->not->toContain(__('report.internal_page.question'));
 });

@@ -74,6 +74,10 @@ enum MainDiagnosisStage: string
         return in_array($this, [self::Draft, self::Invited, self::Filling], true);
     }
 
+    /**
+     * Published or closed: the report and the Útravaló stay readable after
+     * the closing too (28, 29); only the feedback stops (28 · 28.1).
+     */
     public function isFinished(): bool
     {
         return in_array($this, [self::Published, self::Closed], true);

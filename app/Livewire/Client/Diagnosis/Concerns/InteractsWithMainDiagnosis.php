@@ -33,7 +33,7 @@ trait InteractsWithMainDiagnosis
         $main = $diagnosis->main;
 
         abort_if($main === null || $diagnosis->organization_id !== $organization->id, 404);
-        abort_if(in_array($main->stage, [MainDiagnosisStage::Draft, MainDiagnosisStage::Closed], true), 404);
+        abort_if($main->stage === MainDiagnosisStage::Draft || ($main->stage === MainDiagnosisStage::Closed && ! $this->opensWhenClosed()), 404);
 
         $user = $this->user();
         $participant = $main->participantFor($user, ParticipantRole::Leader) ?? $main->participantFor($user, ParticipantRole::Peer);
@@ -45,6 +45,15 @@ trait InteractsWithMainDiagnosis
         $this->organization = $organization;
         $this->diagnosis = $diagnosis;
         $this->role = $participant->role->value;
+    }
+
+    /**
+     * A closed diagnosis keeps only its home (V12, T5): the report and the
+     * Útravaló stay readable, the steps are gone (27 · 27.11, 29).
+     */
+    protected function opensWhenClosed(): bool
+    {
+        return false;
     }
 
     public function main(): MainDiagnosis

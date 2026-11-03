@@ -56,6 +56,24 @@ class ReportPdfController extends Controller
             ->download($filename);
     }
 
+    /**
+     * The Melléklet on its own, from its page (28 · 28.3).
+     */
+    public function appendix(Request $request, Organization $organization, Diagnosis $diagnosis): PdfBuilder
+    {
+        abort_if($diagnosis->organization_id !== $organization->id, 404);
+        $main = $diagnosis->main;
+        abort_if($main === null, 404);
+        abort_unless($this->reports->canView($request->user(), $main), 403);
+        $data = $this->reports->snapshot($main)?->data;
+        abort_if($data === null, 404);
+
+        $date = Carbon::parse($data['meta']['published_on']);
+
+        return $this->pdf('pdf.appendix', ['report' => $data], __('appendix.pdf_title').' · '.$data['meta']['name'], $date, $data['meta']['subject_name'])
+            ->download('megis-melleklet-'.Str::slug($data['meta']['subject_name']).'-'.$date->format('Y-m-d').'.pdf');
+    }
+
     public function takeaway(Request $request, Organization $organization, Diagnosis $diagnosis): PdfBuilder
     {
         $main = $diagnosis->main;

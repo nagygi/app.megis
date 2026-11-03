@@ -1485,6 +1485,11 @@ return [
         'confirm_withdraw' => 'Biztosan visszavonod a publikált diagnózist?',
         'withdrawn' => 'Visszavonva: a diagnózis újra olvasat-szakaszban van.',
         'snapshots' => 'Fagyasztott riportok',
+        'feedback' => [
+            'title' => 'Visszajelzések',
+            'summary' => ':chapters fejezetből :yes Igen · :partial Részben · :no Nem így látjuk',
+            'empty' => 'Még nem jött visszajelzés a riportra.',
+        ],
         'reasons' => [
             'published' => 'publikálás',
             'correction' => 'javítás',

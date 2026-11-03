@@ -71,7 +71,8 @@ class LandingResolver
 
         return $query(ParticipantRole::Leader, [MainDiagnosisStage::Invited, MainDiagnosisStage::Filling, MainDiagnosisStage::Running, MainDiagnosisStage::Reading])
             ?? $query(ParticipantRole::Peer, [MainDiagnosisStage::Running, MainDiagnosisStage::Reading])
-            ?? $query(ParticipantRole::Leader, [MainDiagnosisStage::Published])
-            ?? $query(ParticipantRole::Peer, [MainDiagnosisStage::Published]);
+            // A closed one stays the home: the report and the Útravaló can be read on (27 · 27.11, 29).
+            ?? $query(ParticipantRole::Leader, [MainDiagnosisStage::Published, MainDiagnosisStage::Closed])
+            ?? $query(ParticipantRole::Peer, [MainDiagnosisStage::Published, MainDiagnosisStage::Closed]);
     }
 }

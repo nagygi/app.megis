@@ -14,13 +14,14 @@ Három dolog, ami a riportot (27) körülveszi:
 
 - **Hol:** minden fejezet alján (értékek, folyamatok, területek, a márkád alapja), a snapshotnál egyszer, a lap végén. A mélyítő lapokon nincs: a tétel a „Miben nem?” szövegben nevezhető meg.
 - **Gombok:** Igen · Részben · Nem így látjuk.
-- **„Részben” és „Nem így látjuk”** egy sort nyit: „Miben nem?”. Ide szöveg írható, vagy hang mondható a 06-os felvevővel, átirattal. Gomb: „Küldés”.
+- **„Részben” és „Nem így látjuk”** egy sort nyit: „Miben nem?”. Ide szöveg írható, vagy hang mondható a 06-os felvevővel, átirattal. Gomb: „Elküldöm”.
 - **Elküldés után:** „Elküldve a mégisnek · {dátum} · „Részben” · a mégis beépíti az olvasatba.”
 - A visszajelzés a Beérkezőbe kerül (22). Minden „Részben” és „Nem így látjuk” új sort nyit, az „Igen” nem kerül a Beérkezőbe.
 - **Módosítható:** a vezető újra válaszolhat, mindig a legutolsó számít.
-- **Meddig:** amíg a diagnózis publikált (17.5).
+- **Meddig:** amíg a diagnózis publikált (17.5). Lezárás után a gombok eltűnnek, az elküldött visszajelzés állapota olvasható marad, ahogy a riport is (27, 29).
 - **Beépítés után** a fejezet fejlécén ez látszik: „frissítve · {dátum} · a ti visszajelzésetek alapján” (21.4).
 - A visszajelzés pontot nem ír át.
+- **„Igen”-összesítés:** a Publikálás fülön (21), publikálás után: „{n} fejezetből {k} Igen · {j} Részben · {i} Nem így látjuk”. Fejezetenként a legutolsó válasz számít, alatta soronként a fejezet, a válasz, a név, a dátum és ha beépült, „Beépítve · {dátum}”.
 
 ### 28.2 Melléklet (RM)
 
@@ -42,11 +43,12 @@ Három dolog, ami a riportot (27) körülveszi:
   - a Teljes riport;
   - a Belső snapshot;
   - az Útravaló (29);
-  - a Melléklet.
+  - a Melléklet, külön is, a Melléklet lapjáról.
 - A PDF a publikált, fagyasztott adatokból készül, szerveroldalon. Interaktív elem nincs benne.
-- **A riport PDF-je:** az R0 a fejezetek táblájával; Teljesnél az R1 pontjai (a legnagyobb rés, egy erősség, egy repedés); a mégis javaslata; fejezetenként egy lap minden sorral, a definícióval, az állításokkal és legfeljebb 3 idézettel; a zárólap és egy rövid Melléklet (Ki olvasta, Miből, amit a mégis átírt, a mérőpontok). Csak a Csapat nézet, más nézet nem.
+- **A riport PDF-je:** az R0 a fejezetek táblájával; Teljesnél az R1 pontjai (a legnagyobb rés, egy erősség, egy repedés); a mégis javaslata; az R1·b: minden mérőpont csoportonként, csökkenő PHI-vel, a „legnagyobb rés” és „repedés” jelöléssel; fejezetenként egy lap minden sorral, a definícióval, az állításokkal és legfeljebb 3 idézettel; a zárólap és a Melléklet (Kire, Miből, Mikor, Ki olvasta, az idézetek, az állítások, amit a mégis átírt, a mérőpontok). Csak a Csapat nézet, más nézet nem.
+- **A snapshot PDF-je** a képernyőt követi: az S1 (a gyűrű, a lépcső, a bontás, az erősség és a töréspont, a javaslat), az S1·b (a fa belső oldala) és a Melléklet. Az S1 lap alján „Letöltöm · PDF”.
 - **Fejléc és lábléc:** mégis logó, a diagnózis neve, a dátum, és „Bizalmas · {Csapat}”.
-- **Fájlnév:** `megis-diagnozis-{csapat}-{datum}.pdf`, illetve `megis-utravalo-{datum}.pdf`.
+- **Fájlnév:** `megis-diagnozis-{csapat}-{datum}.pdf`, `megis-melleklet-{csapat}-{datum}.pdf`, illetve `megis-utravalo-{datum}.pdf`.
 - Az tölthet le, aki a lapot látja (27.1, 29).
 - A riport a felületen ugyanúgy néz ki, mint előtte; a PDF egy külön, nyomtatásra szánt nézet.
 - **Kikapcsolható (2026-10-27):** `MEGIS_PDF_DOWNLOADS=false` elrejti a felhasználói oldal „Letöltöm · PDF” gombjait (zárólap, Melléklet, Útravaló, a riportlista „PDF” gombja). Alapból be van kapcsolva. A letöltési címek kikapcsolva is működnek.
@@ -62,9 +64,3 @@ Három dolog, ami a riportot (27) körülveszi:
 - A „Kérdezem a Coachot” út a visszajelzésnél: [NM-18](../backlog_nem_MVP/NM-18-coach.md).
 - Megosztás linkkel: a zárólapon „hamarosan” (27.11).
 - A visszajelzések összesítése diagnózisokon át (22).
-
-## Hátravan
-
-- **„Igen”-összesítés:** a diagnózis oldalán nincs összesítés („4 fejezetből 3 Igen”). Most semmi nem gyűjti össze a válaszokat.
-- **Visszajelzés lezárás után:** lezáráskor a gomboknak el kell tűnniük, az elküldött visszajelzés állapotának olvashatónak kell maradnia. Most lezárás után az egész riport 403-at ad.
-- **A riport PDF-je:** nincs külön R1·b lap. A Mellékletből hiányzik a Kire és a Mikor sor, az idézetek és az állítások. A snapshot PDF-je az általános elrendezést használja, nem az S1-et és az S1·b-t.

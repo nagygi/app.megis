@@ -37,10 +37,11 @@ class ReportService
     /**
      * The leader and the organization's leaders; a person inside a company
      * only themselves; never a peer, who gets the Útravaló (27 · 27.1, 29).
+     * Published or closed: the closing ends the feedback, not the report (28).
      */
     public function canView(User $user, MainDiagnosis $main): bool
     {
-        if ($main->stage !== MainDiagnosisStage::Published) {
+        if (! $main->stage->isFinished()) {
             return false;
         }
 
@@ -67,7 +68,7 @@ class ReportService
     public function reportsFor(User $user, Organization $organization): Collection
     {
         return MainDiagnosis::query()
-            ->where('stage', MainDiagnosisStage::Published)
+            ->whereIn('stage', [MainDiagnosisStage::Published->value, MainDiagnosisStage::Closed->value])
             ->whereHas('diagnosis', fn ($query) => $query->where('organization_id', $organization->id))
             ->with('diagnosis.team')
             ->latest('published_at')

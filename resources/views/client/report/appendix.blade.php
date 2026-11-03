@@ -123,8 +123,9 @@
             </details>
         </div>
 
+        {{-- The Melléklet on its own; a standalone diagnosis prints it with the report (28 · 28.3). --}}
         @if (! $preview && config('megis.pdf_downloads'))
-            <x-ui.button size="sm" icon="document" class="self-start" :href="$url('pdf')">{{ __('report.closing.pdf') }}</x-ui.button>
+            <x-ui.button size="sm" icon="document" class="self-start" :href="$url($standalone ? 'pdf' : 'appendix.pdf')">{{ __('report.closing.pdf') }}</x-ui.button>
         @endif
     </div>
 </x-layouts::client>

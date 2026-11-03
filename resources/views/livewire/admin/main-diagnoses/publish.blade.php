@@ -128,6 +128,23 @@
             </div>
         @endif
 
+        @if ($feedback)
+            {{-- Magatokra ismertek? taken together (28 · 28.1). --}}
+            <section class="flex flex-col gap-2" aria-labelledby="feedback-title">
+                <h2 id="feedback-title" class="text-lg font-semibold">{{ __('admin.publish.feedback.title') }}</h2>
+                @if ($feedback['latest']->isEmpty())
+                    <p class="text-sm text-grey-700">{{ __('admin.publish.feedback.empty') }}</p>
+                @else
+                    <p class="font-semibold">{{ __('admin.publish.feedback.summary', ['chapters' => $feedback['chapters'], 'yes' => $feedback['counts']['yes'], 'partial' => $feedback['counts']['partial'], 'no' => $feedback['counts']['no']]) }}</p>
+                    <ul class="flex flex-col gap-1 text-sm text-grey-700">
+                        @foreach ($feedback['latest'] as $answer)
+                            <li>{{ __('report.chapters.'.$answer->chapter) }} · {{ __('report.feedback.answers.'.$answer->answer) }} · {{ $answer->user?->name ?? '–' }} · {{ $answer->created_at->format('Y.m.d.') }}@if ($answer->incorporated_at) · {{ __('admin.reading.feedback.done', ['date' => $answer->incorporated_at->format('Y.m.d.')]) }}@endif</li>
+                        @endforeach
+                    </ul>
+                @endif
+            </section>
+        @endif
+
         @if ($snapshots->isNotEmpty())
             <section class="flex flex-col gap-2" aria-labelledby="snapshots-title">
                 <h2 id="snapshots-title" class="text-lg font-semibold">{{ __('admin.publish.snapshots') }}</h2>

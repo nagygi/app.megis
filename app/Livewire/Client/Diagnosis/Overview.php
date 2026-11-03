@@ -122,6 +122,11 @@ class Overview extends Component
         session()->flash('status', __('diagnosis.home.reminded'));
     }
 
+    protected function opensWhenClosed(): bool
+    {
+        return true;
+    }
+
     public function render(StepProgress $progress): View
     {
         $main = $this->main();
@@ -129,7 +134,7 @@ class Overview extends Component
         $steps = $this->steps();
         $current = $steps->current();
 
-        $snapshot = $this->isLeader() && $main->stage === MainDiagnosisStage::Published ? app(ReportService::class)->snapshot($main) : null;
+        $snapshot = $this->isLeader() && $main->stage->isFinished() ? app(ReportService::class)->snapshot($main) : null;
 
         $view = match (true) {
             $snapshot !== null => 'livewire.client.diagnosis.overview-published',

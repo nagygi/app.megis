@@ -266,6 +266,7 @@ Route::middleware('customer')->name('client.')->group(function () {
                     Route::get('zarolap', 'closing')->name('closing');
                     Route::get('melleklet', 'appendix')->name('appendix');
                     Route::get('pdf', [ReportPdfController::class, 'report'])->name('pdf');
+                    Route::get('melleklet/pdf', [ReportPdfController::class, 'appendix'])->name('appendix.pdf');
                     Route::get('{chapter}', 'chapter')->whereIn('chapter', array_values(ReportService::SLUGS))->name('chapter');
                     Route::get('{chapter}/{row}', 'item')->whereIn('chapter', array_values(ReportService::SLUGS))->whereNumber('row')->name('item');
                 });

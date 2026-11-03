@@ -6,9 +6,12 @@ use App\Enums\MainDiagnosisStage;
 use App\Exceptions\DiagnosisException;
 use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
+use App\Models\ReportFeedback;
 use App\Models\ReportSnapshot;
 use App\Services\Report\PublishService;
+use App\Services\Report\ReportService;
 use App\Services\Report\TakeawayBuilder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -93,7 +96,26 @@ class Publish extends Component
             'snapshots' => ReportSnapshot::query()->where('main_diagnosis_id', $main->id)->latest('sequence')->get(['id', 'sequence', 'reason', 'note', 'created_at', 'created_by']),
             'isPublished' => $main->stage === MainDiagnosisStage::Published,
             'isReading' => $main->stage === MainDiagnosisStage::Reading,
+            'feedback' => $main->stage->isFinished() ? $this->feedbackSummary($main) : null,
         ])->layout('layouts::admin')->title($this->diagnosis->name);
+    }
+
+    /**
+     * "4 fejezetből 3 Igen · 1 Részben" (28 · 28.1): the latest answer per chapter, the "Igen" too.
+     *
+     * @return array{chapters: int, counts: array<string, int>, latest: Collection<int, ReportFeedback>}
+     */
+    private function feedbackSummary(MainDiagnosis $main): array
+    {
+        $latest = ReportFeedback::query()->where('main_diagnosis_id', $main->id)->with('user')->latest('id')->get()->unique('chapter')->values();
+        $data = app(ReportService::class)->snapshot($main)?->data;
+
+        return [
+            // The snapshot asks once, on its one page.
+            'chapters' => ($data['meta']['snapshot'] ?? false) ? 1 : count($data['chapters'] ?? []),
+            'counts' => collect(ReportFeedback::ANSWERS)->mapWithKeys(fn (string $answer) => [$answer => $latest->where('answer', $answer)->count()])->all(),
+            'latest' => $latest,
+        ];
     }
 
     private function main(): MainDiagnosis
