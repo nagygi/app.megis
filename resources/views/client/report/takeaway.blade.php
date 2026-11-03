@@ -1,4 +1,5 @@
 {{-- T6 · Útravaló (29 · 29.1): experience only, no PHI, no other name. --}}
+@use('App\Services\Report\TakeawayText')
 @php
     $whole = fn ($number) => $number === null ? '–' : (int) floor($number + 0.5);
     $date = \Illuminate\Support\Carbon::parse($publishedOn)->format('m.d.');
@@ -12,21 +13,19 @@
             @if ($takeaway['strength'])
                 <li class="rounded-card bg-green p-5 text-cream on-dark">
                     <p class="text-xs font-semibold uppercase tracking-wide">1 · {{ __('takeaway.strength') }}</p>
-                    <p class="text-lg"><span class="font-semibold">{{ $takeaway['strength']['name'] }}:</span> {{ $takeaway['strength']['situations'] !== null
-                        ? __('takeaway.strength_situations', ['score' => $whole($takeaway['strength']['situations']), 'count' => $takeaway['strength']['situation_count']])
-                        : __('takeaway.strength_start', ['score' => $whole($takeaway['strength']['start'])]) }}</p>
+                    <p class="text-lg"><span class="font-semibold">{{ $takeaway['strength']['name'] }}:</span> {{ TakeawayText::strength($takeaway) }}</p>
                 </li>
             @endif
             @if ($takeaway['own_value'])
                 <li class="rounded-card bg-charcoal p-5 text-cream on-dark">
                     <p class="text-xs font-semibold uppercase tracking-wide">2 · {{ __('takeaway.own_value') }}</p>
-                    <p class="text-lg"><span class="font-semibold">{{ $takeaway['own_value']['name'] }}:</span> {{ __('takeaway.own_value_line', ['count' => \App\Services\Report\HungarianNumber::word((int) $takeaway['own_value']['team_count'])]) }}</p>
+                    <p class="text-lg"><span class="font-semibold">{{ $takeaway['own_value']['name'] }}:</span> {{ TakeawayText::ownValue($takeaway) }}</p>
                 </li>
             @endif
             @if ($takeaway['self_gap'])
                 <li class="rounded-card bg-coral p-5 text-black">
                     <p class="text-xs font-semibold uppercase tracking-wide">3 · {{ __('takeaway.self_gap') }}</p>
-                    <p class="text-lg"><span class="font-semibold">{{ $takeaway['self_gap']['name'] }}:</span> {{ __('takeaway.self_gap_line', ['start' => $whole($takeaway['self_gap']['start']), 'situations' => $whole($takeaway['self_gap']['situations'])]) }}</p>
+                    <p class="text-lg"><span class="font-semibold">{{ $takeaway['self_gap']['name'] }}:</span> {{ TakeawayText::selfGap($takeaway) }}</p>
                 </li>
             @endif
             @if ($takeaway['others_gap'])
@@ -71,7 +70,8 @@
         @if ($recommendation)
             <section class="flex flex-col gap-1 rounded-card bg-yellow-pale p-5" aria-labelledby="takeaway-recommendation">
                 <h2 id="takeaway-recommendation" class="text-lg font-semibold">{{ __('takeaway.recommendation') }}</h2>
-                <p>{{ $recommendation['text'] }}</p>
+                {{-- Written in the md editor (20 · 20.4). --}}
+                <div class="prose-megis">{!! \Illuminate\Support\Str::markdown($recommendation['text'], ['html_input' => 'escape', 'allow_unsafe_links' => false]) !!}</div>
             </section>
         @endif
 

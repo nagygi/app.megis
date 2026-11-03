@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Services\Diagnoses\DiagnosisCalculator;
 use App\Services\Diagnoses\ScoreMath;
 use App\Services\MainDiagnoses\StepProgress;
+use App\Services\Values\PersonalValueSetService;
 use Illuminate\Support\Collection;
 
 /**
@@ -36,6 +37,7 @@ class TakeawayBuilder
     public function __construct(
         private StepProgress $progress,
         private DiagnosisCalculator $calculator,
+        private PersonalValueSetService $personalValues,
     ) {}
 
     /**
@@ -76,6 +78,7 @@ class TakeawayBuilder
             ->where('main_diagnosis_id', $main->id)
             ->where('user_id', $peer->id)
             ->whereNotNull('submitted_at')
+            ->with('occasion.process')
             ->get();
         $others = $this->others($main, $peer);
 
@@ -85,6 +88,7 @@ class TakeawayBuilder
             $otherValues = $others->map(fn (Collection $rows) => $rows->get($value['value_id']))->filter(fn ($score) => $score !== null)->values()->all();
 
             return [
+                'key' => $value['key'],
                 'name' => $value['name'],
                 'start' => $start->get($value['value_id']),
                 'situations' => $situationMean,
@@ -99,15 +103,19 @@ class TakeawayBuilder
             'lower' => $row['start'] !== null && $row['situations'] !== null && $row['start'] - $row['situations'] >= 2,
         ]);
 
+        $selfGap = $rows->filter(fn (array $row) => $row['start'] !== null && $row['situations'] !== null && abs($row['start'] - $row['situations']) >= 2)
+            ->sortByDesc(fn (array $row) => abs($row['start'] - $row['situations']))
+            ->first();
+
         return [
             'peer_id' => $peer->id,
             'subject_name' => $main->subjectName(),
             'rows' => $rows->all(),
+            // "3 helyzetből 3": all the peer's situations, and those that rated the value (29 · 29.1).
+            'situation_total' => $situations->count(),
             'strength' => $this->strength($rows),
             'own_value' => $this->ownValue($peer, $values, $main->participantFor($peer, ParticipantRole::Peer)?->frozenOwnValues()),
-            'self_gap' => $rows->filter(fn (array $row) => $row['start'] !== null && $row['situations'] !== null && abs($row['start'] - $row['situations']) >= 2)
-                ->sortByDesc(fn (array $row) => abs($row['start'] - $row['situations']))
-                ->first(),
+            'self_gap' => $selfGap === null ? null : [...$selfGap, 'process' => $this->mainProcess($selfGap, $situations)],
             'others_gap' => $rows->filter(fn (array $row) => $row['start'] !== null && $row['others'] !== null)
                 ->sortByDesc(fn (array $row) => abs($row['start'] - $row['others']))
                 ->first(),
@@ -147,7 +155,42 @@ class TakeawayBuilder
 
         $item = $own->first(fn (array $item) => ! $teamIds->contains($item['value_id'] ?? null) && ! $teamNames->contains(mb_strtolower(trim($item['name']))));
 
-        return $item === null ? null : ['name' => $item['name'], 'source' => $item['source'] ?? null, 'team_count' => $values->count()];
+        if ($item === null) {
+            return null;
+        }
+
+        // "· Értéktükör · {dátum} · 2 helyzetben": where it came from and how often it shows (24 · 24.4).
+        $occurrences = isset($item['value_id']) ? $this->personalValues->occurrences($peer, [(int) $item['value_id']]) : ['counts' => []];
+        $source = $item['source'] ?? null;
+
+        return [
+            'name' => $item['name'],
+            'source' => $source,
+            'team_count' => $values->count(),
+            'mirror_on' => $source === 'mirror' ? $this->personalValues->latestMirror($peer)?->created_at?->toDateString() : null,
+            'situations' => $occurrences['counts'][(int) ($item['value_id'] ?? 0)] ?? 0,
+        ];
+    }
+
+    /**
+     * "★ fő eltérés · Ops heti": the process whose situations stand furthest
+     * from the start, by the mean of the peer's answers there (29 · 29.1).
+     *
+     * @param  array<string, mixed>  $row
+     * @param  Collection<int, OccasionExperience>  $situations
+     */
+    private function mainProcess(array $row, Collection $situations): ?string
+    {
+        return $situations
+            ->filter(fn (OccasionExperience $experience) => $experience->occasion?->process !== null)
+            ->groupBy(fn (OccasionExperience $experience) => $experience->occasion->process_id)
+            ->map(fn (Collection $group) => [
+                'name' => $group->first()->occasion->process->name,
+                'mean' => ScoreMath::mean(ScoreMath::numericAnswers($group->map(fn (OccasionExperience $experience) => $experience->answers['value:'.$row['key']] ?? null))),
+            ])
+            ->filter(fn (array $process) => $process['mean'] !== null)
+            ->sortByDesc(fn (array $process) => abs($row['start'] - $process['mean']))
+            ->first()['name'] ?? null;
     }
 
     /**

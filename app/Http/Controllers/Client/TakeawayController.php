@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Client;
 
-use App\Enums\MainDiagnosisStage;
 use App\Http\Controllers\Controller;
 use App\Models\Diagnosis;
 use App\Models\Organization;
@@ -20,7 +19,8 @@ class TakeawayController extends Controller
     {
         $main = $diagnosis->main;
         abort_if($main === null || $diagnosis->organization_id !== $organization->id, 404);
-        abort_unless($main->stage === MainDiagnosisStage::Published, 404);
+        // Published or closed: it stays while the peer's membership is active (29 · 29.2).
+        abort_unless($main->stage->isFinished(), 404);
 
         $snapshot = $reports->snapshot($main);
         $takeaway = $snapshot?->data['takeaways'][$request->user()->id] ?? null;

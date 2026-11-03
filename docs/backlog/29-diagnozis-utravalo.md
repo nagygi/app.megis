@@ -28,7 +28,7 @@ A társ csomagja a riport helyett, a publikálással (T6): a saját értékei é
 
 **Alatta:**
 
-- **A mégis javaslata a csapatnak:** a diagnózis közös javaslata (18.3), szó szerint, minden társnak ugyanaz.
+- **A mégis javaslata a csapatnak:** a diagnózis közös javaslata (18.3), szó szerint, ahogy az md-szerkesztőben készült, minden társnak ugyanaz.
 - **„A saját értékeid, újra · Értéktükör · 2 perc ›”:** a saját menüből indított tükörre visz (06 · 6.2).
 - **„Letöltöm · PDF”** (28) és „Értéktár”.
 
@@ -39,7 +39,7 @@ A társ csomagja a riport helyett, a publikálással (T6): a saját értékei é
 - Ha a társnak nincs helyzet-megélése (V11·c), a charcoal pont és a 3. blokk elmarad. Egy értéknél legalább 2 helyzet-megélés kell a „helyzeteidben” jelhez: egy helyzet még nem mintázat.
 - Ha a többiek száma a küszöb alatt van, a zöld vonás és a 4. blokk elmarad.
 - Az Útravalót csak az kapja, aki kitöltötte a T4-et, nem vonta vissza a hozzájárulását, és a publikáláskor aktív tag (02). A többiek e-mailt sem kapnak.
-- **Meddig érhető el:** amíg a diagnózis publikált, időkorlát nélkül. Ha a társ tagsága vagy a szervezet inaktív lesz (02), sem a lapot, sem a PDF-et nem éri el. Ha a diagnózist visszavonják (21.5), az Útravaló is eltűnik az újrapublikálásig.
+- **Meddig érhető el:** amíg a diagnózis publikált vagy lezárt, időkorlát nélkül. A lezárás után a társ kezdőlapja (T5) is megmarad, az Útravaló sorával. Ha a társ tagsága vagy a szervezet inaktív lesz (02), sem a lapot, sem a PDF-et nem éri el. Ha a diagnózist visszavonják (21.5), az Útravaló is eltűnik az újrapublikálásig.
 - A társ T5 kezdőlapján (25) a publikálástól az Útravaló sor él, és ide visz.
 - A blokkok kiválasztása automatikus. Az admin a publikálás előtt az előnézetben látja őket (21.1).
 
@@ -48,7 +48,3 @@ A társ csomagja a riport helyett, a publikálással (T6): a saját értékei é
 - A képesség-javaslat az Útravalóban: [NM-15](../backlog_nem_MVP/NM-15-kepesseg-es-bridge.md).
 - Útravaló a vezetőnek: ugyanezt a riport Egyén nézete adja neki (27.9).
 - Társanként személyre szabott javaslat: később, ha a mégis igényli.
-
-## Hátravan
-
-- **Útravaló lezárás után:** a diagnózis lezárásakor az Útravaló is eltűnik. Amíg a társ fiókja aktív, elérhetőnek kell maradnia.

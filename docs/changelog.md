@@ -2,6 +2,22 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.91 · {hash} · 2026-11-03
+
+Útravaló (29): a jegy hiányai pótolva.
+
+- **Lezárás után is elérhető (29.2):**
+  - **Eddig:** a diagnózis lezárásakor az Útravaló, a PDF-je és a T5 sora is eltűnt.
+  - **Most:** megmarad, amíg a társ tagsága aktív. A társ kezdőlapja (T5) a lezárt diagnózist is megnyitja, az Útravaló sorával.
+- **A blokkok szövege (29.1):**
+  - **1 · Erősség:** „a helyzeteidben 6 · 3 helyzetből 3”, a második szám eddig hiányzott.
+  - **2 · A te értéked:** „a csapat öt értékén túl · Értéktükör · 10.14. · 2 helyzetben”. A tükör dátuma és a helyzetek száma a saját értékek számolásából jön (24 · 24.4). A PDF eddig „5”-öt írt „öt” helyett.
+  - **3 · Eltérés · magadtól:** „… · ★ fő eltérés · Retró”, az a folyamat, ahol a helyzetek a legmesszebb állnak az elején adott megéléstől.
+  - A felület és a PDF ugyanazt a szöveget írja (`TakeawayText`).
+- **A mégis javaslata** markdownként jelenik meg a lapon és a PDF-ben, eddig nyers szövegként.
+- **Tesztek:** a blokkválasztás, a 2 helyzetes és a 3 fős küszöb, a visszaesés a T4-re, a coral szabály, a lezárás utáni elérés.
+- **Korábban publikált Útravaló:** a pillanatképében nincs a helyzetek teljes száma, a tükör dátuma és a folyamat neve. Ezek a részek a javításig (21.4) elmaradnak.
+
 ## 1.90 · 3a36e7b · 2026-11-03
 
 Visszajelzés, Melléklet, PDF (28): a jegy hiányai pótolva.

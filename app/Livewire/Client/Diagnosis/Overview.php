@@ -185,7 +185,7 @@ class Overview extends Component
             'preview' => false,
             'reports' => $snapshot === null ? collect() : app(ReportService::class)->reportsFor($this->user(), $this->organization),
             // The Útravaló row lives from publishing (29 · 29.2).
-            'takeawayReady' => $main->stage === MainDiagnosisStage::Published
+            'takeawayReady' => $main->stage->isFinished()
                 && isset(app(ReportService::class)->snapshot($main)?->data['takeaways'][$this->user()->id]),
         ])->layout('layouts::client', $layout)->title($layout['title']);
     }

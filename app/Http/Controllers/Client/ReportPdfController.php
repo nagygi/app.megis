@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Client;
 
-use App\Enums\MainDiagnosisStage;
 use App\Http\Controllers\Controller;
 use App\Models\Diagnosis;
 use App\Models\Organization;
@@ -77,7 +76,7 @@ class ReportPdfController extends Controller
     public function takeaway(Request $request, Organization $organization, Diagnosis $diagnosis): PdfBuilder
     {
         $main = $diagnosis->main;
-        abort_if($main === null || $diagnosis->organization_id !== $organization->id || $main->stage !== MainDiagnosisStage::Published, 404);
+        abort_if($main === null || $diagnosis->organization_id !== $organization->id || ! $main->stage->isFinished(), 404);
         $snapshot = $this->reports->snapshot($main);
         $takeaway = $snapshot?->data['takeaways'][$request->user()->id] ?? null;
         abort_if($takeaway === null, 404);
