@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.76 · {hash} · 2026-11-03
+## 1.76 · 316696b · 2026-11-03
 
 Publikálás (21 · 21.3, 24): a saját értékek listája a publikáláskor rögzül.
 
