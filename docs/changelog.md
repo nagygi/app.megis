@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.63 · ? · 2026-11-03
+## 1.63 · 74471fd · 2026-11-03
 
 Admin, szervezet *Csapatok* füle: a csapat űrlapja saját oldalra került, és a tagok felvétele keresővel megy (02 · 2.4).
 
