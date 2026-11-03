@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.66 · {hash} · 2026-11-03
+## 1.66 · 6a96bc8 · 2026-11-03
 
 Admin, *Szervezetek* lista: két új, rendezhető oszlop, a *Felvitel ideje* és az *Utolsó aktivitás* (02 · 2.2).
 
