@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.62 · {hash} · 2026-11-03
+## 1.62 · fb41ebe · 2026-11-03
 
 Admin, szervezet: „A márkád alapja” saját fület kapott, közvetlenül az *Értékek* után (08 · 8.5).
 
