@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.68 · {hash} · 2026-11-03
+## 1.68 · c4e06db · 2026-11-03
 
 „Belépek a nevében” (14 · 14.6): a felhasználó nevében dolgozó admin minden szövegmezőt diktálhat.
 
