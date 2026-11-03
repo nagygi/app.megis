@@ -2,6 +2,16 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.65 · {hash} · 2026-11-03
+
+„Belépek a nevében” (14 · 14.6): a coral sávban felül a név, alatta a pillék, jobbra a Kilépés.
+
+- **Eddig (1.61):** „{Név} nevében dolgozol”, mellette a pillék és a Kilépés, középre igazítva. Ha nem fért el, a sor bárhol tört.
+- **Most:**
+  - **Szöveg:** csak „{Név} nevében”. Ha a név hosszú, a vége levágódik.
+  - **Pillék:** a név alatt, külön sorban. Ugyanazok, mint eddig: kitöltött a címke, körvonalas a csapat. A címke és a csapat pill egyforma magas.
+  - **Kilépés:** jobbra igazítva. Telefonon (768px alatt) egy kerek X ikon, a „Kilépés” felirat tooltipként és képernyőolvasónak marad meg. Nagyobb képernyőn szövegként látszik.
+
 ## 1.64 · f32b510 · 2026-11-03
 
 Admin, szervezet *Folyamatok* füle: az *Új folyamat* saját oldalra került, morzsával.

@@ -92,18 +92,32 @@
     </a>
 
     @if ($impersonation)
-        {{-- Tags are filled pills, teams outlined ones; the label is for screen readers and the tooltip. --}}
-        <div class="sticky top-0 z-40 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 bg-coral px-4 py-1.5 text-sm text-black" role="status">
-            <span class="mr-1 font-semibold">{{ __('impersonation.banner', ['name' => $impersonation->user->name]) }}</span>
-            @foreach ($impersonationTags as $tag)
-                <span class="rounded-pill bg-black/10 px-2 py-0.5 text-xs font-semibold" title="{{ __('impersonation.tag') }}"><span class="sr-only">{{ __('impersonation.tag') }}: </span>{{ $tag }}</span>
-            @endforeach
-            @foreach ($impersonationTeams as $team)
-                <span class="rounded-pill border border-black/40 px-2 py-0.5 text-xs" title="{{ __('impersonation.team') }}"><span class="sr-only">{{ __('impersonation.team') }}: </span>{{ $team->name }}@if ($team->pivot->is_leader) · <strong>{{ __('impersonation.team_leader') }}</strong>@endif</span>
-            @endforeach
-            <form method="POST" action="{{ route('client.impersonation.end') }}" class="ml-1">
+        {{--
+            The name, under it the tags (filled pills) and teams (outlined ones); their
+            label is for screen readers and the tooltip. "Kilépés" stands on the right,
+            on a phone as an icon. .megis-mask sets its display outside the utility
+            layer, so the wrapper hides the icon.
+        --}}
+        <div class="sticky top-0 z-40 flex items-center gap-3 bg-coral px-4 py-1.5 text-black" role="status">
+            <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-semibold">{{ __('impersonation.banner', ['name' => $impersonation->user->name]) }}</p>
+                @if ($impersonationTags || $impersonationTeams->isNotEmpty())
+                    <div class="mt-0.5 flex flex-wrap gap-1 text-xs">
+                        @foreach ($impersonationTags as $tag)
+                            <span class="rounded-pill border border-transparent bg-black/10 px-2 py-0.5 font-semibold" title="{{ __('impersonation.tag') }}"><span class="sr-only">{{ __('impersonation.tag') }}: </span>{{ $tag }}</span>
+                        @endforeach
+                        @foreach ($impersonationTeams as $team)
+                            <span class="rounded-pill border border-black/40 px-2 py-0.5" title="{{ __('impersonation.team') }}"><span class="sr-only">{{ __('impersonation.team') }}: </span>{{ $team->name }}@if ($team->pivot->is_leader) · <strong>{{ __('impersonation.team_leader') }}</strong>@endif</span>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+            <form method="POST" action="{{ route('client.impersonation.end') }}" class="shrink-0">
                 @csrf
-                <button type="submit" class="font-semibold underline">{{ __('impersonation.exit') }}</button>
+                <button type="submit" class="press -mr-1 grid size-9 place-items-center rounded-pill bg-black/10 md:mr-0 md:block md:size-auto md:rounded-none md:bg-transparent md:text-sm md:font-semibold md:underline" title="{{ __('impersonation.exit') }}">
+                    <span class="flex md:hidden"><x-megis.icon name="close" /></span>
+                    <span class="max-md:sr-only">{{ __('impersonation.exit') }}</span>
+                </button>
             </form>
         </div>
     @endif

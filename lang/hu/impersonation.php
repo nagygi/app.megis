@@ -2,7 +2,7 @@
 
 return [
 
-    'banner' => ':name nevében dolgozol',
+    'banner' => ':name nevében',
     'tag' => 'Címke',
     'team' => 'Csapat',
     'team_leader' => 'vezető',

@@ -25,7 +25,7 @@ it('opens the customer side in the customer’s name with the coral bar', functi
     $this->assertAuthenticatedAs($admin, 'admin');
     $this->get(route('client.home', $organization))
         ->assertOk()
-        ->assertSee($customer->name.' nevében dolgozol');
+        ->assertSee($customer->name.' nevében');
     expect(Impersonation::query()->sole())->admin_id->toBe($admin->id)->user_id->toBe($customer->id)
         ->and(AuditEvent::query()->where('type', AuditEventType::ImpersonationStarted)->count())->toBe(1);
 });
@@ -70,7 +70,7 @@ it('opens the customer side of a customer who has not registered yet, as they wi
     $this->get(route('client.landing'))->assertRedirect(route('client.home', $organization));
     $this->get(route('client.home', $organization))
         ->assertOk()
-        ->assertSee($customer->name.' nevében dolgozol');
+        ->assertSee($customer->name.' nevében');
     expect($customer->fresh())->activated_at->toBeNull()->last_login_at->toBeNull()
         ->and($membership->fresh()->status)->toBe(MembershipStatus::Added);
 });
