@@ -67,7 +67,8 @@ it('renders the peer\'s pages from the invitation to the home', function () {
     $this->get(route('client.diagnosis.show', $parameters))->assertOk()->assertSee('Két lépés most, egy amíg fut.');
     $this->get(route('client.diagnosis.sajat-ertekek', $parameters))->assertOk()->assertSee('1 / 2');
     $this->get(route('client.diagnosis.megeles', $parameters))->assertOk()->assertSee('2 / 2');
-    $this->get(route('client.diagnosis.ki-lat-mit', $parameters))->assertForbidden();
+    // The peer reads their own version (31 · 31.5).
+    $this->get(route('client.diagnosis.ki-lat-mit', $parameters))->assertOk()->assertSee('A vezető')->assertSee('a saját válaszaid, a saját nézeted, az Útravaló');
     // The peer's home is the diagnosis they take part in (26 · 26.4).
     $this->get(route('client.home', $setup['organization']))->assertRedirect(route('client.diagnosis.show', $parameters));
 });

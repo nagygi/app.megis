@@ -161,7 +161,19 @@ return [
         'actor' => [
             'you' => 'Te',
             'peers' => 'A társak',
+            'leader' => 'A vezető',
             'megis' => 'A mégis',
+        ],
+        // The peer's own version (31 · 31.5).
+        'peer' => [
+            'you_sees' => 'a saját válaszaid, a saját nézeted, az Útravaló',
+            'you_not' => 'a riport',
+            'leader_sees' => 'a válaszaid összesítve, legalább :count kitöltőnél',
+            'leader_sees_quotes' => 'a válaszaid összesítve, legalább :count kitöltőnél, és az idézeteid szereppel és dátummal, név nélkül',
+            'leader_not' => 'a neved, az egyéni válaszaid, az idézeteid',
+            'leader_not_quotes' => 'a neved, az egyéni válaszaid',
+            'megis_not' => 'a publikálásig olvas, utána csak a vezető kérésére',
+            'informs' => 'A lap csak tájékoztat. A hozzájárulásaidat a Profilban, a „Hozzájárulásaim” alatt vonhatod vissza a publikálásig.',
         ],
         'you_sees' => 'a riport, a gyűrű, minden fejezet',
         'you_sees_quotes' => 'a riport, a gyűrű, minden fejezet, és a társak idézetei szereppel és dátummal, név nélkül',

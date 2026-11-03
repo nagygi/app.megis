@@ -8,6 +8,7 @@ use App\Livewire\Client\Diagnosis\Experience;
 use App\Livewire\Client\Diagnosis\OrganizationValues;
 use App\Livewire\Client\Diagnosis\Overview;
 use App\Livewire\Client\Diagnosis\OwnValues;
+use App\Livewire\Client\Diagnosis\Visibility;
 use App\Livewire\Client\Profile;
 use App\Livewire\Mirror\Record;
 use App\Models\AuditEvent;
@@ -211,4 +212,25 @@ it('ties a mirror from the own menu to the only running diagnosis without asking
         ->assertHasNoErrors();
 
     expect(Material::query()->latest('id')->first()->parent_diagnosis_id)->toBe($main->diagnosis_id);
+});
+
+it('shows the peer their own "Ki lát mit", linked from the Profile (31 · 31.5)', function () {
+    [$setup, $main] = runningDiagnosis();
+    $peer = $setup['peers'][0];
+    actingAsCustomer($peer);
+    Livewire::test(Overview::class, peerParams($setup, $main))->set('answersConsent', true)->call('start');
+
+    Livewire::test(Profile::class, ['organization' => $setup['organization']])
+        ->assertSeeHtml('href="'.route('client.diagnosis.ki-lat-mit', peerParams($setup, $main)).'"');
+
+    Livewire::test(Visibility::class, peerParams($setup, $main))
+        ->assertSee('a válaszaid összesítve, legalább 3 kitöltőnél')
+        ->assertSee('a neved, az egyéni válaszaid, az idézeteid')
+        ->assertDontSee('Indul a diagnózis');
+
+    Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => ConsentKind::Quotes, 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
+
+    Livewire::test(Visibility::class, peerParams($setup, $main))
+        ->assertSee('és az idézeteid szereppel és dátummal, név nélkül')
+        ->assertDontSee('a neved, az egyéni válaszaid, az idézeteid');
 });

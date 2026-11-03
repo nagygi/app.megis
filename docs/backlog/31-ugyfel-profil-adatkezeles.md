@@ -49,7 +49,7 @@ Ha nincs teendő, a blokk nem jelenik meg.
 ### 31.5 Beállítások és adatok
 
 - **Naptár:** állapot és szétkötés a 09 · 9.5 szerint („Naptár összekötve · 03.02. · a metaadat 12.21-ig él · Szétkötés”).
-- **Ki lát mit:** a V9 lapja (23.4), csak olvasható. A társ a saját változatát látja.
+- **Ki lát mit:** a V9 lapja (23.4), csak olvasható. A társ a saját változatát látja, a „Hozzájárulásaim” kártyájáról nyitva (23.4).
 - **Felvételeim:** a saját hangfelvételei (Értéktükör, elmondott helyzet, feltöltött hang), dátummal. Egyenként törölhetők: csak a hang törlődik, az átirat és a diagnózis megmarad (06 · 6.6).
 - **Hozzájárulásaim:**
   - a jogi dokumentumok elfogadása (14 · 14.5), csak olvasható;

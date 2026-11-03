@@ -1,23 +1,8 @@
-{{-- V9 · Ki lát mit (23 · 23.4). --}}
+{{-- V9 · Ki lát mit (23 · 23.4); the peer's own version from the Profile (31 · 31.5). --}}
 <div class="flex max-w-2xl flex-col gap-6">
     <x-ui.flash />
 
     <dl class="flex flex-col gap-3">
-        @php
-            $actors = [
-                'you' => [
-                    'sees' => $main->show_peer_quotes && $main->hasPeers() ? __('diagnosis.visibility.you_sees_quotes') : __('diagnosis.visibility.you_sees'),
-                    'not' => __('diagnosis.visibility.you_not'),
-                ],
-            ];
-
-            if ($main->hasPeers()) {
-                $actors['peers'] = ['sees' => __('diagnosis.visibility.peers_sees'), 'not' => __('diagnosis.visibility.peers_not')];
-            }
-
-            $actors['megis'] = ['sees' => __('diagnosis.visibility.megis_sees'), 'not' => __('diagnosis.visibility.megis_not')];
-        @endphp
-
         @foreach ($actors as $key => $lines)
             <x-ui.card padding="sm" class="flex flex-col gap-1">
                 <dt class="font-semibold">{{ __('diagnosis.visibility.actor.'.$key) }}</dt>
@@ -27,7 +12,9 @@
         @endforeach
     </dl>
 
-    @if ($main->stage->isBeforeRunning())
+    @if (! $isLeader)
+        <x-ui.notice>{{ __('diagnosis.visibility.peer.informs') }}</x-ui.notice>
+    @elseif ($main->stage->isBeforeRunning())
         <div class="flex flex-col gap-3">
             @if ($missing)
                 <x-ui.notice tone="warning">

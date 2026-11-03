@@ -2,6 +2,19 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.81 · {hash} · 2026-11-03
+
+Profil (31 · 31.5, 23 · 23.4): a társ is megnyithatja a „Ki lát mit” lapot, a saját változatában.
+
+- **Eddig:** a „Ki lát mit” csak a vezetőnek nyílt meg; a társnak a lap tiltott volt, és a Profilban sem volt rá link.
+- **Most:**
+  - **A Profil „Hozzájárulásaim” kártyáján** „Ki lát mit” link, a futás kezdetétől a lezárásig.
+  - **A társ változata**, szereplőnként:
+    - **Te:** látod a saját válaszaidat, a saját nézetedet és az Útravalót; nem látod a riportot.
+    - **A vezető:** látja a válaszaidat összesítve, legalább 3 kitöltőnél. Az idézeteidet csak akkor látja (szereppel és dátummal, név nélkül), ha az admin bekapcsolta, és te hozzájárultál; a lap a hozzájárulásod szerint írja ki. Nem látja a nevedet és az egyéni válaszaidat.
+    - **A mégis:** lát mindent, névvel; a publikálásig olvas, utána csak a vezető kérésére.
+  - **A lap csak tájékoztat:** nincs rajta gomb, a vissza-link a Profilra visz, és jelzi, hogy a hozzájárulások a Profilban vonhatók vissza a publikálásig.
+
 ## 1.80 · 28632e9 · 2026-11-03
 
 „Belépek a nevében” (14 · 14.6, 33 · 33.6): a lapokon végzett munka is a naplóba kerül, a gombok és az elhagyáskor mentett mezők is.

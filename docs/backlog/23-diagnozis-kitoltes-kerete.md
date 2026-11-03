@@ -64,6 +64,10 @@ Egy lap, a diagnózis végéig érvényes. Szereplőnként két sor: mit lát, �
   - a publikálásig olvas, utána csak a te kérésedre.
 - Magánszemélynél és társ nélküli terméknél a társak sora nem jelenik meg.
 - A lap csak tájékoztat, kapcsoló nincs rajta. Az idézetek láthatóságát az admin állítja (17.2). A Profilból (31) is elérhető, csak olvashatóan.
+- **A társ változata** (31 · 31.5): a Profil „Hozzájárulásaim” kártyájáról nyílik, a futás kezdetétől a lezárásig; gomb nincs rajta, a vissza-link a Profilra visz.
+  - **Te:** látod a saját válaszaidat, a saját nézetedet és az Útravalót; nem látod a riportot.
+  - **A vezető:** látja a válaszaidat összesítve, legalább 3 kitöltőnél, és ha az admin bekapcsolta és hozzájárultál, az idézeteidet szereppel és dátummal, név nélkül; nem látja a nevedet és az egyéni válaszaidat (és hozzájárulás nélkül az idézeteidet).
+  - **A mégis:** lát mindent, névvel; a publikálásig olvas, utána csak a vezető kérésére.
 - **Egy gomb:** „Indul a diagnózis”.
   - Előtte minden lépésnek késznek kell lennie (23.3).
   - A szakasz „Fut” lesz (17.5), a kezdőlap a V10 (26). Ha a vezető a kezdés napja előtt végez, a diagnózis azonnal fut.

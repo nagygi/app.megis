@@ -171,6 +171,10 @@
                         </li>
                     @endforeach
                 </ul>
+                {{-- The peer's own "Ki lát mit" (31 · 31.5). --}}
+                @if (! in_array($consentMain->stage, [\App\Enums\MainDiagnosisStage::Draft, \App\Enums\MainDiagnosisStage::Closed], true))
+                    <a href="{{ route('client.diagnosis.ki-lat-mit', [$consentMain->diagnosis->organization, $consentMain->diagnosis]) }}" class="self-start text-sm font-semibold">{{ __('client.profile.visibility') }}</a>
+                @endif
             </x-ui.card>
         @endforeach
     </section>
