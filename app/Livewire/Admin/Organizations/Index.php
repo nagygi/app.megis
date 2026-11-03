@@ -87,6 +87,8 @@ class Index extends Component
             'product' => Product::query()->select('name')->whereColumn('products.id', 'organizations.product_id'),
             'users' => 'memberships_counting_count',
             'contact' => User::query()->select('last_name')->whereColumn('users.id', 'organizations.contact_admin_id'),
+            'created' => 'created_at',
+            'last_activity' => 'last_activity_at',
             'status' => 'deactivated_at',
         ];
     }

@@ -2,6 +2,19 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.66 · {hash} · 2026-11-03
+
+Admin, *Szervezetek* lista: két új, rendezhető oszlop, a *Felvitel ideje* és az *Utolsó aktivitás* (02 · 2.2).
+
+- **Eddig:** a listából nem látszott, mikor vitték fel a szervezetet, és használják-e még.
+- **Most:**
+  - **Felvitel ideje:** a szervezet létrehozásának napja (pl. „2026.10.14.”).
+  - **Utolsó aktivitás:** mikor nyitotta meg a szervezetet, vagy mikor dolgozott benne utoljára egy tagja (pl. „2026.11.02. 16:45”).
+    - Bármelyik oldala vagy művelete számít: belépés, kitöltés, feltöltés, Értéktükör. Pontossága 5 perc.
+    - Az admin munkája nem számít, akkor sem, ha a tag nevében dolgozik.
+    - Ha még nincs adat: „még nem”.
+  - **Meglévő szervezetek:** a tagjaik utolsó belépésével indulnak. Ez közelítés: ha valaki több szervezetnek is tagja, a belépése mindegyiknél látszik.
+
 ## 1.65 · c0a71a2 · 2026-11-03
 
 „Belépek a nevében” (14 · 14.6): a coral sávban felül a név, alatta a pillék, jobbra a Kilépés.

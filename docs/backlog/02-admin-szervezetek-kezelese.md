@@ -23,7 +23,8 @@ Bal oldali menüpont: *Termékek*. Lista, „+ Új termék” gomb, szerkesztés
 
 Bal oldali menüpont: *Szervezetek*. A lista az NFR listaszabályai szerint működik.
 
-- Oszlopok: név, típus, termék, felhasználók (pl. „8 / 10”, limit nélkül „8”), kapcsolattartó, állapot.
+- Oszlopok: név, típus, termék, felhasználók (pl. „8 / 10”, limit nélkül „8”), kapcsolattartó, felvitel ideje, utolsó aktivitás, állapot.
+- **Utolsó aktivitás:** mikor nyitotta meg a szervezetet, vagy mikor dolgozott benne utoljára egy tagja. Bármelyik oldala vagy művelete számít, 5 perces pontossággal. Az admin munkája nem számít, akkor sem, ha a tag nevében dolgozik. Ha még nincs adat: „még nem”. A bevezetéskor a meglévő szervezetek a tagjaik utolsó belépésével indultak.
 - Kereső: név és slug.
 - Szűrők: típus, termék, kapcsolattartó, állapot.
 - „+ Új szervezet” gomb.

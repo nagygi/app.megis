@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Opens an organization's customer pages (/{slug}/…). Opening another of the
  * user's organizations switches to it; a non-member gets "Nincs jogosultságod" (15 · 15.4).
+ * Every page and action of a member counts as the organization's last activity (02 · 2.2).
  */
 class ResolveOrganization
 {
@@ -36,9 +37,14 @@ class ResolveOrganization
 
         $this->currentOrganization->set($organization);
 
-        // An admin browsing in the customer's name must not change the customer's last organization.
-        if ($user->last_organization_id !== $organization->id && ! $this->impersonation->isImpersonating()) {
-            $user->forceFill(['last_organization_id' => $organization->id])->saveQuietly();
+        // An admin browsing in the customer's name must not change the customer's last organization,
+        // nor count as the organization's activity.
+        if (! $this->impersonation->isImpersonating()) {
+            if ($user->last_organization_id !== $organization->id) {
+                $user->forceFill(['last_organization_id' => $organization->id])->saveQuietly();
+            }
+
+            $organization->recordActivity();
         }
 
         return $next($request);

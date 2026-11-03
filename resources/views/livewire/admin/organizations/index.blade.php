@@ -27,6 +27,8 @@
             <x-admin.th field="product" :sort-field="$sortField" :sort-direction="$sortDirection">{{ __('admin.organizations.product') }}</x-admin.th>
             <x-admin.th field="users" :sort-field="$sortField" :sort-direction="$sortDirection">{{ __('admin.organizations.users') }}</x-admin.th>
             <x-admin.th field="contact" :sort-field="$sortField" :sort-direction="$sortDirection">{{ __('admin.organizations.contact') }}</x-admin.th>
+            <x-admin.th field="created" :sort-field="$sortField" :sort-direction="$sortDirection">{{ __('admin.organizations.created_at') }}</x-admin.th>
+            <x-admin.th field="last_activity" :sort-field="$sortField" :sort-direction="$sortDirection">{{ __('admin.organizations.last_activity') }}</x-admin.th>
             <x-admin.th field="status" :sort-field="$sortField" :sort-direction="$sortDirection">{{ __('admin.organizations.status') }}</x-admin.th>
             <x-admin.th><span class="sr-only">{{ __('admin.common.actions') }}</span></x-admin.th>
         </x-slot:head>
@@ -41,6 +43,8 @@
                 <td class="px-3 py-2">{{ $organization->product->name }}</td>
                 <td class="px-3 py-2 whitespace-nowrap">{{ $organization->headcountLabel() }}</td>
                 <td class="px-3 py-2">{{ $organization->contactAdmin?->name ?? __('admin.common.none') }}</td>
+                <td class="px-3 py-2 whitespace-nowrap">{{ $organization->created_at->format('Y.m.d.') }}</td>
+                <td class="px-3 py-2 whitespace-nowrap">{{ $organization->last_activity_at?->format('Y.m.d. H:i') ?? __('admin.common.never') }}</td>
                 <td class="px-3 py-2">
                     <x-ui.badge :tone="$organization->isActive() ? 'green' : 'muted'">{{ $organization->isActive() ? __('admin.organizations.active') : __('admin.organizations.inactive') }}</x-ui.badge>
                 </td>
@@ -56,7 +60,7 @@
                 </td>
             </tr>
         @empty
-            <x-admin.empty-row :colspan="7">
+            <x-admin.empty-row :colspan="9">
                 {{ $filtering ? __('admin.common.empty') : __('admin.organizations.empty') }}
                 @unless ($filtering)
                     <x-slot:action>

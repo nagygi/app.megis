@@ -40,6 +40,36 @@ it('switches to another of the user’s organizations and remembers it', functio
     expect($customer->fresh()->last_organization_id)->toBe($second->id);
 });
 
+it('records a member’s visit as the organization’s last activity, at most every five minutes', function () {
+    $this->freezeSecond();
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+
+    $this->get(route('client.home', $organization))->assertOk();
+    $firstVisit = now();
+
+    $this->travel(4)->minutes();
+    $this->get(route('client.home', $organization));
+    expect($organization->fresh()->last_activity_at)->toEqual($firstVisit);
+
+    $this->travel(2)->minutes();
+    $this->get(route('client.home', $organization));
+    expect($organization->fresh())
+        ->last_activity_at->toEqual(now())
+        ->updated_at->toEqual($organization->updated_at);
+});
+
+it('does not count an admin working in the customer’s name as activity', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $customer = customerOf($organization);
+    $this->post(route('admin.impersonate', $customer));
+
+    $this->get(route('client.home', $organization))->assertOk();
+
+    expect($organization->fresh()->last_activity_at)->toBeNull();
+});
+
 it('keeps an inactive organization closed', function () {
     $organization = Organization::factory()->deactivated()->create();
     actingAsCustomer(customerOf($organization));

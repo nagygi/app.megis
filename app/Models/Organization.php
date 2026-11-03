@@ -20,6 +20,11 @@ class Organization extends Model
     use Blameable, HasFactory;
 
     /**
+     * The last activity is precise to this many minutes, so not every request writes it.
+     */
+    public const ACTIVITY_PRECISION_MINUTES = 5;
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -28,6 +33,7 @@ class Organization extends Model
             'type' => OrganizationType::class,
             'headcount_limit' => 'integer',
             'deactivated_at' => 'datetime',
+            'last_activity_at' => 'datetime',
         ];
     }
 
@@ -98,6 +104,19 @@ class Organization extends Model
     public function isActive(): bool
     {
         return $this->deactivated_at === null;
+    }
+
+    /**
+     * A member opened or worked in the organization (02 · 2.2). It is not an edit
+     * of the organization: its updated_at and updated_by stay as they were.
+     */
+    public function recordActivity(): void
+    {
+        if ($this->last_activity_at?->isAfter(now()->subMinutes(self::ACTIVITY_PRECISION_MINUTES))) {
+            return;
+        }
+
+        static::withoutTimestamps(fn () => $this->forceFill(['last_activity_at' => now()])->saveQuietly());
     }
 
     /**

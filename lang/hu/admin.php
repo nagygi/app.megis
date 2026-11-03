@@ -153,6 +153,8 @@ return [
         'headcount_limit_help' => 'Üresen hagyva nincs limit. Beleszámít minden felvett, meghívott és aktív felhasználó, a partner is.',
         'headcount_limit_too_low' => 'A limit nem lehet kisebb a jelenlegi létszámnál (:count).',
         'users' => 'Felhasználók',
+        'created_at' => 'Felvitel ideje',
+        'last_activity' => 'Utolsó aktivitás',
         'status' => 'Állapot',
         'active' => 'Aktív',
         'inactive' => 'Inaktív',
