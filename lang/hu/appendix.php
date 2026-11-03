@@ -32,6 +32,7 @@ return [
     'rows' => 'Mérőpontok · :count',
     'overrides' => 'Amit a mégis átírt',
     'override_by' => 'mégis · :date',
+    'override_sentence' => 'A mondat: „:sentence”',
     'changed_to' => 'átírva erre:',
     'no_overrides' => 'A mégis egyetlen gépi számot sem írt át.',
     'pdf_title' => 'Melléklet',

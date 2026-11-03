@@ -277,6 +277,7 @@ class DiagnosisService
             'score' => $row->automatic_score,
             'score_state' => $row->automatic_score_state,
             'override_reason' => null,
+            'override_sentence' => null,
             'overridden_by' => null,
             'overridden_at' => null,
         ])->save();

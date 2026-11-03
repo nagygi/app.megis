@@ -175,7 +175,8 @@ class ReadingDraftService
                 $text = trim((string) $text);
                 $existing = DiagnosisText::query()->where('diagnosis_id', $main->diagnosis_id)->where('key', $key)->first();
 
-                if ($text === '' || ($existing !== null && $existing->status !== self::DRAFT)) {
+                // The admin's work stays: only an untouched AI draft is drafted again (20).
+                if ($text === '' || ($existing !== null && ($existing->status !== self::DRAFT || $existing->ai_call_id === null))) {
                     continue;
                 }
 

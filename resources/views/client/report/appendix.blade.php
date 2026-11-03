@@ -109,6 +109,9 @@
                     @forelse ($appendix['overrides'] as $override)
                         <div class="flex flex-col gap-0.5 border-t border-grey-200 pt-2 text-sm first:border-t-0 first:pt-0">
                             <p class="flex flex-wrap items-center gap-1 font-semibold">{{ $override['label'] }} · {{ ReportText::decimal($override['from']) }} <x-megis.icon name="arrow-right" :label="__('appendix.changed_to')" /> {{ ReportText::decimal($override['to']) }}</p>
+                            @if (filled($override['sentence'] ?? null))
+                                <p>{{ __('appendix.override_sentence', ['sentence' => $override['sentence']]) }}</p>
+                            @endif
                             <p>{{ $override['reason'] }}</p>
                             <p class="text-xs text-grey-700">{{ __('appendix.override_by', ['date' => $date($override['date'])]) }}</p>
                         </div>

@@ -2,6 +2,35 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.85 · {hash} · 2026-11-03
+
+Olvasat (20): a jegy hiányai pótolva.
+
+- **Az admin szövege marad (20.4):**
+  - **Eddig:** ha az admin átírt és elmentett egy szöveget (összefoglaló, a márkád alapjának olvasata, a mégis javaslata, „Mit nézünk”), de még nem hagyta jóvá, egy újabb AI-vázlat (például a Beérkező „Újra” gombja) felülírta.
+  - **Most:** az újravázlat csak az érintetlen AI-vázlatot cseréli, ahogy az állításoknál.
+- **Hosszkorlát a jóváhagyáskor (20.4):**
+  - **Eddig:** a 160, illetve 600 karaktert csak a mentés nézte. Egy hosszabb AI-vázlat átírás nélkül jóváhagyható volt.
+  - **Most:** a jóváhagyás is ellenőrzi: „A riportot telefonon olvassák: legfeljebb 160 karakter lehet. Rövidítsd, mielőtt jóváhagyod.”
+- **Átírom → a mondat is (20.2):**
+  - **Eddig:** csak a PHI volt átírható.
+  - **Most:** „A sor mondata” mező, legfeljebb 160 karakter.
+    - A riport minden lapján és a PDF-ben a rés mondata helyett ez áll.
+    - A Mellékletben az átírás mellett: „A mondat: „…””.
+    - Üresen a számolt mondat marad. A „Vissza az automatikusra” ezt is törli.
+- **A rejtett társ-idézet a szerveren sem választható (31 · 31.6):**
+  - **Eddig:** csak a felület nem kínálta.
+  - **Most:** állításhoz és a terület, a fa bizonyítékául a szerver sem fogadja el.
+- **Napló és jóváhagyók (20.5):**
+  - A napló a tárgyat is megnevezi: „állítás · Nyíltság · „…””, „nyom · Nyíltság · „…””, a szöveg címe, a törölt állítás mondata. Az átírt mondat is ott áll.
+  - Az állításoknál és a szövegeknél is látszik: „jóváhagyta: {név} · {dátum}”.
+- **Felépítés (20.1, 20.3, 20.5):**
+  - A bal oszlop végén az olvasat szövegei: „Állítások · n / m”, „Szövegek · n / m”, link a szakaszukra.
+  - Az állítások fejezetenként, a riport sorrendjében.
+  - A folyamat-sorról link visz a Folyamat-diagnózisra.
+- **A jegy a kódhoz igazítva:** a jóváhagyott sor publikálás után is újranyitható, a javításhoz (21.4).
+- **Migráció:** `diagnosis_rows.override_sentence`. Csak hozzáad.
+
 ## 1.84 · 064be46 · 2026-11-03
 
 Olvasat (20 · 20.5): ha egy társ az olvasat alatt visszavonja a hozzájárulását.

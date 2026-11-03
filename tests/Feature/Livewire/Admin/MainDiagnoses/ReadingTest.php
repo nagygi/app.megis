@@ -4,6 +4,7 @@ use App\Enums\DiagnosisRowKind;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\ParticipantRole;
 use App\Enums\ScoreState;
+use App\Exceptions\DiagnosisException;
 use App\Livewire\Admin\MainDiagnoses\Reading;
 use App\Models\Consent;
 use App\Models\Diagnosis;
@@ -18,6 +19,8 @@ use App\Services\Diagnoses\DiagnosisCalculator;
 use App\Services\Diagnoses\ReadingService;
 use App\Services\MainDiagnoses\ConsentService;
 use App\Services\MainDiagnoses\StageMachine;
+use App\Services\Report\ReportBuilder;
+use App\Services\Report\ReportText;
 use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
 
@@ -108,6 +111,113 @@ it('writes a row over only with a reason, and a process row moves its process di
         ->and($processRow->override_reason)->toBe('A retrón a döntés mindig elmarad.')
         ->and($processDiagnosis->score)->toBe(2.0)
         ->and(ReviewEvent::query()->where('action', 'overridden')->sole()->payload['reason'])->toBe('A retrón a döntés mindig elmarad.');
+});
+
+it('writes the row\'s sentence over too, and the report and the Melléklet read it (20 · 20.2)', function () {
+    [, $main] = diagnosisInReading();
+    $row = rowOf($main, DiagnosisRowKind::Value);
+    $sentence = 'Szóltok a csúszásról, de csak utólag.';
+
+    Livewire::test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->call('selectRow', $row->id)
+        ->call('startOverride')
+        ->set('overrideReason', 'A beszélgetésekben más a kép.')
+        ->set('overrideSentence', str_repeat('a', 161))
+        ->call('saveOverride')
+        ->assertHasErrors(['overrideSentence'])
+        ->set('overrideSentence', $sentence)
+        ->call('saveOverride')
+        ->assertHasNoErrors()
+        ->call('selectRow', $row->id)
+        ->assertSee($sentence);
+
+    $report = app(ReportBuilder::class)->build($main->refresh());
+    $reportRow = collect($report['chapters']['values']['rows'])->firstWhere('id', $row->id);
+
+    expect($row->refresh()->override_sentence)->toBe($sentence)
+        ->and(ReportText::gap($reportRow, $report['meta']))->toBe($sentence)
+        ->and(collect($report['appendix']['overrides'])->sole()['sentence'])->toBe($sentence)
+        ->and(ReviewEvent::query()->where('action', 'overridden')->sole()->payload['sentence'])->toBe($sentence);
+});
+
+it('approves no claim or text longer than the report allows (20 · 20.4)', function () {
+    [, $main] = diagnosisInReading();
+    $trace = EvidenceTrace::query()->firstOrFail();
+    // An AI draft may run longer than the phone allows.
+    $claim = DiagnosisClaim::create(['diagnosis_id' => $main->diagnosis_id, 'diagnosis_row_id' => $trace->diagnosis_row_id, 'kind' => 'strength', 'text' => str_repeat('a', 161), 'status' => 'draft', 'trace_ids' => [$trace->id]]);
+    $text = DiagnosisText::create(['diagnosis_id' => $main->diagnosis_id, 'key' => 'brand_reading', 'text' => str_repeat('a', 601), 'status' => 'draft']);
+
+    Livewire::test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->call('approveClaim', $claim->id)
+        ->assertSee('legfeljebb 160 karakter lehet')
+        ->call('approveText', 'brand_reading')
+        ->assertSee('legfeljebb 600 karakter lehet');
+
+    expect($claim->refresh()->isApproved())->toBeFalse()
+        ->and($text->refresh()->isApproved())->toBeFalse();
+});
+
+it('takes no hidden peer quote as evidence on the server either (31 · 31.6)', function () {
+    [$setup, $main] = diagnosisInReading();
+    $row = rowOf($main, DiagnosisRowKind::Value);
+    $peerTrace = EvidenceTrace::create(['diagnosis_row_id' => $row->id, 'quote' => 'A társ idézete.', 'source_type' => 'mirror', 'role' => 'peer', 'user_id' => $setup['peers'][0]->id, 'recorded_on' => today()]);
+    $reading = app(ReadingService::class);
+
+    expect(fn () => $reading->saveClaim($main, null, ['diagnosis_row_id' => $row->id, 'kind' => 'strength', 'text' => 'Mondat.', 'trace_ids' => [$peerTrace->id]], $setup['admin']))
+        ->toThrow(DiagnosisException::class, 'Az állításhoz legalább egy nyom kell')
+        ->and(fn () => $reading->copyTrace(rowOf($main, DiagnosisRowKind::Area), $peerTrace, $setup['admin']))
+        ->toThrow(DiagnosisException::class, 'nem lehet bizonyíték');
+});
+
+it('sends a row as "Nincs elég adat", and opens an approved row again (20 · 20.2)', function () {
+    [, $main] = diagnosisInReading();
+    $row = rowOf($main, DiagnosisRowKind::Value);
+
+    $component = Livewire::test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->call('selectRow', $row->id)
+        ->call('markInsufficient');
+
+    $row->refresh();
+    expect($row->score_state)->toBe(ScoreState::InsufficientData)
+        ->and($row->score)->toBeNull()
+        ->and($row->approved_at)->not->toBeNull();
+
+    $component->call('reopen');
+
+    expect($row->refresh()->approved_at)->toBeNull()
+        ->and(ReviewEvent::query()->pluck('action')->all())->toContain('insufficient', 'reopened');
+});
+
+it('takes another row as the biggest gap when the mégis picks one (20 · 20.4)', function () {
+    [$setup, $main] = diagnosisInReading();
+    $other = rowOf($main, DiagnosisRowKind::Value, 2);
+
+    Livewire::test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->set('gapRowId', (string) $other->id)
+        ->call('approveGap');
+
+    $main->refresh();
+    expect($main->biggest_gap_row_id)->toBe($other->id)
+        ->and($main->biggest_gap_approved_by)->toBe($setup['admin']->id)
+        ->and(app(ReadingService::class)->gapRow($main)->id)->toBe($other->id);
+});
+
+it('groups the claims per chapter with who approved them, and the log names what each step was about (20 · 20.3, 20.5)', function () {
+    [$setup, $main] = diagnosisInReading();
+    $reading = app(ReadingService::class);
+    $row = rowOf($main, DiagnosisRowKind::Value)->load('value');
+    $trace = EvidenceTrace::query()->firstOrFail();
+    $claim = $reading->saveClaim($main, null, ['diagnosis_row_id' => $row->id, 'kind' => 'strength', 'text' => 'Szólnak a csúszásról.', 'trace_ids' => [$trace->id]], $setup['admin']);
+    $reading->approveClaim($claim, $setup['admin']);
+    $reading->toggleTrace($trace, $setup['admin']);
+
+    Livewire::test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->assertSeeInOrder(['id="claims-title"', 'scope="colgroup"', 'Értékek', 'Szólnak a csúszásról.'], false)
+        ->assertSee('jóváhagyta: '.$setup['admin']->name)
+        ->assertSee('állítás · '.$row->label().' · „Szólnak a csúszásról.”')
+        ->assertSee('nyom · '.$row->label().' · „Szóltam a csúszásról, mielőtt kérdezték volna.”')
+        ->call('selectRow', rowOf($main, DiagnosisRowKind::Process)->id)
+        ->assertSee('A Folyamat-diagnózis megnyitása');
 });
 
 it('scores an area by hand with a whole number and picks its evidence (20 · 20.2)', function () {
@@ -310,6 +420,8 @@ it('takes a withdrawn peer\'s traces out and lets the approved rows they touched
     $peer = $setup['peers'][0];
     $main->participantFor($peer, ParticipantRole::Peer)->update(['started_at' => now()]);
     $consent = Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => 'answers', 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
+    // With the quote consent the peer's quote can be an area's evidence (31 · 31.6).
+    Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => 'quotes', 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
     // The peer moves the second value and quotes the third without moving it: 3 and 5 there, the peer's 4.
     $material = scoredMaterial($main, null, [0 => null, 1 => 1, 2 => 4], $peer);
     $detection = $material->detections()->create(['quote' => 'A rossz hírt nálunk senki nem mondja ki.', 'free_name' => 'Nyíltság', 'strength' => 2]);

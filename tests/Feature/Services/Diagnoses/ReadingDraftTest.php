@@ -95,6 +95,8 @@ it('keeps what the admin already worked on when drafting again', function () {
     [, $main, $trace] = diagnosisWithTrace();
     $approved = DiagnosisClaim::create(['diagnosis_id' => $main->diagnosis_id, 'diagnosis_row_id' => $trace->diagnosis_row_id, 'kind' => 'crack', 'text' => 'Jóváhagyott.', 'status' => 'approved', 'trace_ids' => [$trace->id]]);
     DiagnosisText::create(['diagnosis_id' => $main->diagnosis_id, 'key' => 'summary_values', 'text' => 'A mégis mondata.', 'status' => 'approved']);
+    // Saved by the admin, not approved yet: still the admin's.
+    DiagnosisText::create(['diagnosis_id' => $main->diagnosis_id, 'key' => 'summary_brand', 'text' => 'A mégis vázlata.', 'status' => 'draft']);
     AiGateway::fake([
         structuredAnswer(['claims' => [['row_ref' => 'R1', 'kind' => 'strength', 'text' => 'Új vázlat.', 'trace_refs' => ['T'.$trace->id]]]]),
         textsAnswer(null),
@@ -105,6 +107,7 @@ it('keeps what the admin already worked on when drafting again', function () {
     expect($approved->refresh()->text)->toBe('Jóváhagyott.')
         ->and(DiagnosisClaim::query()->count())->toBe(2)
         ->and(DiagnosisText::query()->where('key', 'summary_values')->value('text'))->toBe('A mégis mondata.')
+        ->and(DiagnosisText::query()->where('key', 'summary_brand')->value('text'))->toBe('A mégis vázlata.')
         ->and(DiagnosisText::query()->where('key', 'recommendation')->value('meta'))->toBeNull();
 });
 

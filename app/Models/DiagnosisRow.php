@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'score', 'score_state', 'experience', 'experience_state',
     'experience_met_example', 'experience_unmet_example', 'reasoning', 'quotes',
     'assigned_on', 'aggregation_stats', 'manually_modified',
-    'process_id', 'area_id', 'automatic_score', 'automatic_score_state', 'override_reason', 'overridden_by', 'overridden_at',
+    'process_id', 'area_id', 'automatic_score', 'automatic_score_state', 'override_reason', 'override_sentence', 'overridden_by', 'overridden_at',
     'approved_at', 'approved_by',
 ])]
 class DiagnosisRow extends Model

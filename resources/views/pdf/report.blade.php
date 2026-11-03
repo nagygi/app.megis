@@ -83,7 +83,7 @@
         <p>{{ __('appendix.read_by_text', ['date' => $date->format('Y.m.d.')]) }} · {{ $standalone ? ReportText::standaloneSource($appendix['source']) : __('appendix.from_text', $appendix['sources']) }}</p>
         <h3>{{ __('appendix.overrides') }}</h3>
         @forelse ($appendix['overrides'] as $override)
-            <p>{{ $override['label'] }} · {{ ReportText::decimal($override['from']) }} → {{ ReportText::decimal($override['to']) }} · {{ $override['reason'] }} <span class="muted">({{ __('appendix.override_by', ['date' => \Illuminate\Support\Carbon::parse($override['date'])->format('Y.m.d.')]) }})</span></p>
+            <p>{{ $override['label'] }} · {{ ReportText::decimal($override['from']) }} → {{ ReportText::decimal($override['to']) }}@if (filled($override['sentence'] ?? null)) · {{ __('appendix.override_sentence', ['sentence' => $override['sentence']]) }}@endif · {{ $override['reason'] }} <span class="muted">({{ __('appendix.override_by', ['date' => \Illuminate\Support\Carbon::parse($override['date'])->format('Y.m.d.')]) }})</span></p>
         @empty
             <p class="muted">{{ __('appendix.no_overrides') }}</p>
         @endforelse

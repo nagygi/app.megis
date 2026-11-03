@@ -1543,6 +1543,10 @@ return [
         'hand_score_help' => 'Egész szám 1–6 között, vagy „–”, ha nincs nyoma. Indoklás nem kell.',
         'score_and_approve' => 'Pontozom és jóváhagyom',
         'reason_visible' => 'Ezt a vezető is látja a Mellékletben.',
+        'override_sentence' => 'A sor mondata',
+        'override_sentence_help' => 'A riportban a rés mondata helyett ez áll. Üresen a számolt mondat marad. Legfeljebb :max karakter.',
+        'too_long' => 'A riportot telefonon olvassák: legfeljebb :max karakter lehet. Rövidítsd, mielőtt jóváhagyod.',
+        'open_process_diagnosis' => 'A Folyamat-diagnózis megnyitása',
         'approved_by' => 'jóváhagyta: :name · :date',
         'experience_line' => 'vezető :leader · csapat :team · helyzetek :situations',
         'choose_row' => 'Válassz egy mérőpontot a bal oldalon.',
@@ -1552,6 +1556,11 @@ return [
         'gap_below_threshold' => 'Három kitöltő alatt nincs csapat-megélés, ezért rés-szám sincs; a riportban a rés helyén szürke szöveg áll.',
         'max_length' => 'Legfeljebb :max karakter.',
         'log' => 'Napló',
+        'log_subjects' => [
+            'claim' => 'állítás · :row · „:text”',
+            'trace' => 'nyom · :row · „:quote”',
+            'deleted_claim' => 'állítás · „:text”',
+        ],
         'feedback' => [
             'title' => 'Visszajelzés · :chapter · „:answer”',
             'help' => 'Javítsd a fejezetet itt, majd a Publikálás fülön publikáld a javítást: a fejezeten „frissítve · a ti visszajelzésetek alapján” jelzés áll. A visszajelzés pontot nem ír át.',
@@ -1579,6 +1588,7 @@ return [
             'block' => 'Blokk',
             'word' => 'Szó',
             'pick' => 'Bizonyíték a diagnózis nyomaiból',
+            'hidden_not_usable' => 'Ezt az idézetet a vezető nem láthatja, ezért nem lehet bizonyíték.',
             'use' => 'Hozzáteszem',
             'sources' => [
                 'conversation' => 'beszélgetés',
@@ -1621,6 +1631,7 @@ return [
         ],
         'texts' => [
             'title' => 'Az olvasat szövegei',
+            'short' => 'Szövegek',
             'saved' => 'A szöveg mentve, jóváhagyásra vár.',
             'ai_draft' => 'AI-vázlat',
             'recommendation_row' => 'A mérőpont, amit mozdítana',

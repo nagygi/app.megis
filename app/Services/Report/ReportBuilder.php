@@ -221,6 +221,8 @@ class ReportBuilder
                 'last_on' => collect($processDiagnosis->aggregation['used'] ?? [])->max('date'),
                 ...$effectiveness,
             ],
+            // The mégis' own sentence in place of the gap sentence (20 · 20.2).
+            'sentence' => $row->overridden_at === null ? null : $row->override_sentence,
             'override' => $row->overridden_at === null ? null : [
                 'from' => $row->automatic_score_state === ScoreState::Scored ? (float) $row->automatic_score : null,
                 'reason' => $row->override_reason,
@@ -348,6 +350,7 @@ class ReportBuilder
                 'label' => $row->label(),
                 'from' => $row->automatic_score_state === ScoreState::Scored ? (float) $row->automatic_score : null,
                 'to' => $row->score_state === ScoreState::Scored ? (float) $row->score : null,
+                'sentence' => $row->override_sentence,
                 'reason' => $row->override_reason,
                 'date' => $row->overridden_at->toDateString(),
             ])->values()->all(),

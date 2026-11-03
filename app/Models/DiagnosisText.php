@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\Blameable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * A text of the reading (18 · 18.3): the summary sentence per block, the
@@ -62,5 +63,13 @@ class DiagnosisText extends Model
             'meta' => 'array',
             'approved_at' => 'datetime',
         ];
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

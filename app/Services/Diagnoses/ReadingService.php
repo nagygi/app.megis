@@ -91,23 +91,27 @@ class ReadingService
     }
 
     /**
-     * "Átírom": the PHI with a mandatory reason, shown to the leader in the
-     * Melléklet (20 · 20.2, 28 · 28.2). A process row moves its process diagnosis too.
+     * "Átírom": the PHI and/or the row's sentence, with a mandatory reason
+     * shown to the leader in the Melléklet (20 · 20.2, 28 · 28.2). Without a
+     * sentence the template's gap sentence stays. A process row moves its
+     * process diagnosis too.
      */
-    public function overrideRow(DiagnosisRow $row, string $score, string $reason, User $admin): void
+    public function overrideRow(DiagnosisRow $row, string $score, string $reason, User $admin, ?string $sentence = null): void
     {
         $this->ensureOpen($row->diagnosis);
+        $sentence = filled($sentence) ? trim($sentence) : null;
+        $this->ensureLength((string) $sentence, DiagnosisText::DEFAULT_MAX_LENGTH);
 
-        DB::transaction(function () use ($row, $score, $reason, $admin): void {
+        DB::transaction(function () use ($row, $score, $reason, $admin, $sentence): void {
             $previous = $row->scoreLabel();
             $this->diagnoses->overrideRow($row, $score, $reason, $admin);
-            $row->refresh()->forceFill(['approved_at' => now(), 'approved_by' => $admin->id])->save();
+            $row->refresh()->forceFill(['override_sentence' => $sentence, 'approved_at' => now(), 'approved_by' => $admin->id])->save();
 
             if ($row->kind === DiagnosisRowKind::Process && ($processDiagnosis = $this->processDiagnosisOf($row)) !== null) {
                 $this->diagnoses->overrideScore($processDiagnosis, $score, $reason, $admin);
             }
 
-            $this->log($row->diagnosis, $row, 'overridden', $admin, ['from' => $previous, 'to' => $row->scoreLabel(), 'reason' => trim($reason)]);
+            $this->log($row->diagnosis, $row, 'overridden', $admin, ['from' => $previous, 'to' => $row->scoreLabel(), 'reason' => trim($reason), ...($sentence === null ? [] : ['sentence' => $sentence])]);
         });
     }
 
@@ -219,12 +223,18 @@ class ReadingService
     }
 
     /**
-     * Areas and the tree take their evidence from the diagnosis' traces (20 · 20.2).
+     * Areas and the tree take their evidence from the diagnosis' traces (20 · 20.2);
+     * a peer's quote the leader may not see is not offered (31 · 31.6).
      */
     public function copyTrace(DiagnosisRow $row, EvidenceTrace $source, User $admin): EvidenceTrace
     {
         $this->ensureOpen($row->diagnosis);
         abort_unless($source->row->diagnosis_id === $row->diagnosis_id, 404);
+        $main = $row->diagnosis->main;
+
+        if ($source->hiddenFromLeader($main->show_peer_quotes, $main->quotingPeerIds()) !== null) {
+            throw new DiagnosisException(__('admin.reading.traces.hidden_not_usable'));
+        }
 
         $trace = $row->traces()->firstOrCreate(
             ['raw_detection_id' => $source->raw_detection_id, 'quote' => $source->quote],
@@ -246,6 +256,7 @@ class ReadingService
 
     /**
      * A claim written or rewritten by the admin; it becomes theirs and waits for approval (20 · 20.3).
+     * A peer's quote the leader may not see is no evidence for it (31 · 31.6).
      *
      * @param  array{diagnosis_row_id: int, kind: string, text: string, trace_ids: list<int>}  $data
      */
@@ -254,7 +265,12 @@ class ReadingService
         $this->ensureOpen($main->diagnosis);
 
         $row = $main->diagnosis->rows()->findOrFail($data['diagnosis_row_id']);
-        $traceIds = EvidenceTrace::query()->where('diagnosis_row_id', $row->id)->whereIn('id', $data['trace_ids'])->pluck('id')->all();
+        $quotingPeers = $main->quotingPeerIds();
+        $traceIds = EvidenceTrace::query()->where('diagnosis_row_id', $row->id)->whereIn('id', $data['trace_ids'])->get()
+            ->filter(fn (EvidenceTrace $trace) => $trace->hiddenFromLeader($main->show_peer_quotes, $quotingPeers) === null)
+            ->pluck('id')
+            ->values()
+            ->all();
 
         if ($traceIds === []) {
             throw new DiagnosisException(__('admin.reading.claims.trace_needed'));
@@ -282,9 +298,13 @@ class ReadingService
         return $claim;
     }
 
+    /**
+     * An AI draft can be longer than the report allows; it is shortened before approval (20 · 20.4).
+     */
     public function approveClaim(DiagnosisClaim $claim, User $admin): void
     {
         $this->ensureOpen($claim->row->diagnosis);
+        $this->ensureLength($claim->text, DiagnosisText::DEFAULT_MAX_LENGTH);
 
         $claim->update(['status' => DiagnosisClaim::APPROVED, 'approved_at' => now(), 'approved_by' => $admin->id]);
         $this->log($claim->row->diagnosis, $claim, 'approved', $admin);
@@ -321,6 +341,7 @@ class ReadingService
     {
         $diagnosis = Diagnosis::query()->findOrFail($text->diagnosis_id);
         $this->ensureOpen($diagnosis);
+        $this->ensureLength($text->text, DiagnosisText::maxLength($text->key));
 
         $text->update(['status' => 'approved', 'approved_at' => now(), 'approved_by' => $admin->id]);
         $this->log($diagnosis, $text, 'approved', $admin);
@@ -432,6 +453,16 @@ class ReadingService
 
         if ($main === null || $main->stage->isBeforeRunning() || $main->stage === MainDiagnosisStage::Closed) {
             throw new DiagnosisException(__('admin.reading.closed'));
+        }
+    }
+
+    /**
+     * The report is read on a phone: 160 characters, the brand base's reading 600 (20 · 20.4).
+     */
+    private function ensureLength(string $text, int $max): void
+    {
+        if (mb_strlen($text) > $max) {
+            throw new DiagnosisException(__('admin.reading.too_long', ['max' => $max]));
         }
     }
 

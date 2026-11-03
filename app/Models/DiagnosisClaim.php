@@ -57,4 +57,12 @@ class DiagnosisClaim extends Model
     {
         return $this->belongsTo(DiagnosisRow::class, 'diagnosis_row_id');
     }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
 }

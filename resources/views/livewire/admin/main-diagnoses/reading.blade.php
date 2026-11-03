@@ -79,6 +79,19 @@
                         </ul>
                     </section>
                 @endforeach
+
+                {{-- At the end: the claims and the texts of the reading (20 · 20.1). --}}
+                <section class="flex flex-col gap-1" aria-labelledby="block-reading">
+                    <x-ui.section-header :title="__('admin.reading.texts.title')" id="block-reading" />
+                    <a href="#claims-title" class="flex min-h-10 items-center justify-between gap-2 rounded-field bg-white px-3 py-2 text-sm hover:bg-paper">
+                        <span>{{ __('admin.reading.claims.title') }}</span>
+                        <span class="font-semibold tabular-nums">{{ $progress['claims'] }} / {{ $progress['claims_total'] }}</span>
+                    </a>
+                    <a href="#texts-title" class="flex min-h-10 items-center justify-between gap-2 rounded-field bg-white px-3 py-2 text-sm hover:bg-paper">
+                        <span>{{ __('admin.reading.texts.short') }}</span>
+                        <span class="font-semibold tabular-nums">{{ $progress['texts'] }} / {{ $progress['texts_total'] }}</span>
+                    </a>
+                </section>
             </nav>
 
             {{-- Bizonyíték --}}
@@ -106,6 +119,9 @@
                             @if ($selected->override_reason)
                                 <p class="mt-1 text-sm text-grey-700">{{ __('admin.diagnoses.override.reason') }}: {{ $selected->override_reason }}</p>
                             @endif
+                            @if ($processDiagnosis)
+                                <p class="mt-1 text-sm"><a href="{{ route('admin.diagnoses.show', $processDiagnosis) }}">{{ __('admin.reading.open_process_diagnosis') }}</a></p>
+                            @endif
                         </div>
 
                         @if ($isOpen)
@@ -128,6 +144,9 @@
                         <form wire:submit="saveOverride" class="grid gap-3 rounded-field bg-paper p-4 md:grid-cols-2">
                             <x-form.input name="overrideScore" wire:model="overrideScore" :label="__('admin.diagnoses.score')" :help="__('admin.diagnoses.process_point_help')" required />
                             <x-form.textarea name="overrideReason" wire:model="overrideReason" :label="__('admin.diagnoses.override.reason')" :help="__('admin.reading.reason_visible')" rows="2" required />
+                            <div class="md:col-span-2">
+                                <x-form.textarea name="overrideSentence" wire:model="overrideSentence" :label="__('admin.reading.override_sentence')" :help="__('admin.reading.override_sentence_help', ['max' => \App\Models\DiagnosisText::DEFAULT_MAX_LENGTH])" rows="2" maxlength="{{ \App\Models\DiagnosisText::DEFAULT_MAX_LENGTH }}" />
+                            </div>
                             <div class="flex flex-wrap gap-2 md:col-span-2">
                                 <x-ui.button type="submit" size="sm">{{ __('admin.common.save') }}</x-ui.button>
                                 <x-ui.button tone="outline" size="sm" wire:click="$set('overriding', false)">{{ __('admin.common.cancel') }}</x-ui.button>
@@ -269,7 +288,9 @@
                 <h2 id="leader-reads" class="text-lg font-semibold">{{ __('admin.reading.leader_reads') }}</h2>
                 @if ($selected)
                     <p class="text-lg font-semibold">{{ $selected->label() }} · {{ $selected->scoreLabel() ?: '–' }}</p>
-                    @if (! in_array($selected->kind, [\App\Enums\DiagnosisRowKind::Area, \App\Enums\DiagnosisRowKind::Process], true))
+                    @if ($selected->overridden_at && filled($selected->override_sentence))
+                        <p>{{ $selected->override_sentence }}</p>
+                    @elseif (! in_array($selected->kind, [\App\Enums\DiagnosisRowKind::Area, \App\Enums\DiagnosisRowKind::Process], true))
                         @if ($showsExperience && $selected->gap() !== null)
                             <p>{{ __('admin.reading.gap_sentence', ['experience' => $decimal($selected->experience), 'score' => $decimal($selected->score)]) }}</p>
                         @elseif (! $showsExperience)
@@ -345,9 +366,18 @@
                     <x-admin.th>{{ __('admin.reading.claims.traces') }}</x-admin.th>
                     <x-admin.th><span class="sr-only">{{ __('admin.common.actions') }}</span></x-admin.th>
                 </x-slot:head>
-                @forelse ($claims as $item)
+                @forelse ($claimBlocks as $claimBlock)
+                    <tr wire:key="claim-block-{{ $claimBlock['kind']->value }}" class="bg-paper">
+                        <th scope="colgroup" colspan="5" class="px-3 py-2 text-left font-semibold">{{ __('admin.reading.blocks.'.$claimBlock['kind']->value) }}</th>
+                    </tr>
+                    @foreach ($claimBlock['claims'] as $item)
                     <tr wire:key="claim-{{ $item->id }}">
-                        <td class="px-3 py-2"><x-ui.badge :tone="$item->isApproved() ? 'green' : 'muted'">{{ __('admin.reading.claims.kinds.'.($main->isSnapshot() && $item->kind === 'crack' ? 'breakpoint' : $item->kind)) }}</x-ui.badge></td>
+                        <td class="px-3 py-2">
+                            <x-ui.badge :tone="$item->isApproved() ? 'green' : 'muted'">{{ __('admin.reading.claims.kinds.'.($main->isSnapshot() && $item->kind === 'crack' ? 'breakpoint' : $item->kind)) }}</x-ui.badge>
+                            @if ($item->approved_at)
+                                <span class="mt-1 block text-xs text-grey-700">{{ __('admin.reading.approved_by', ['name' => $item->approver?->name ?? '–', 'date' => $item->approved_at->format('Y.m.d. H:i')]) }}</span>
+                            @endif
+                        </td>
                         <td class="px-3 py-2">{{ $item->row->label() }}</td>
                         <td class="px-3 py-2">{{ $item->text }}</td>
                         <td class="px-3 py-2">{{ count($item->trace_ids ?? []) }}</td>
@@ -369,6 +399,7 @@
                             @endif
                         </td>
                     </tr>
+                    @endforeach
                 @empty
                     <x-admin.empty-row :colspan="5">
                         {{ __('admin.reading.claims.empty') }}
@@ -408,7 +439,12 @@
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <h3 class="text-lg font-semibold">{{ $textLabels[$key] }}</h3>
                         @if ($model)
-                            <x-ui.badge :tone="$model->isApproved() ? 'green' : 'muted'">{{ $model->isApproved() ? __('admin.reading.states.approved') : ($model->ai_call_id ? __('admin.reading.texts.ai_draft') : __('admin.reading.states.pending')) }}</x-ui.badge>
+                            <span class="flex flex-wrap items-center gap-2">
+                                @if ($model->approved_at)
+                                    <span class="text-xs text-grey-700">{{ __('admin.reading.approved_by', ['name' => $model->approver?->name ?? '–', 'date' => $model->approved_at->format('Y.m.d. H:i')]) }}</span>
+                                @endif
+                                <x-ui.badge :tone="$model->isApproved() ? 'green' : 'muted'">{{ $model->isApproved() ? __('admin.reading.states.approved') : ($model->ai_call_id ? __('admin.reading.texts.ai_draft') : __('admin.reading.states.pending')) }}</x-ui.badge>
+                            </span>
                         @endif
                     </div>
                     <div class="flex flex-col gap-1.5">
@@ -451,8 +487,14 @@
                 @forelse ($events as $event)
                     <li>
                         {{ $event->created_at->format('Y.m.d. H:i') }} · {{ $event->actor?->name ?? __('admin.versions.system') }} · {{ __('admin.reading.actions.'.$event->action) }}
-                        @if ($event->subject instanceof \App\Models\DiagnosisRow) · {{ $event->subject->label() }} @endif
+                        @if ($event->subject instanceof \App\Models\DiagnosisRow) · {{ $event->subject->label() }}
+                        @elseif ($event->subject instanceof \App\Models\DiagnosisClaim) · {{ __('admin.reading.log_subjects.claim', ['row' => $event->subject->row?->label() ?? '–', 'text' => \Illuminate\Support\Str::limit($event->subject->text, 60)]) }}
+                        @elseif ($event->subject instanceof \App\Models\DiagnosisText) · {{ \App\Services\Diagnoses\ReadingService::textLabel($event->subject->key, $rows) }}
+                        @elseif ($event->subject instanceof \App\Models\EvidenceTrace) · {{ __('admin.reading.log_subjects.trace', ['row' => $event->subject->row?->label() ?? '–', 'quote' => \Illuminate\Support\Str::limit($event->subject->quote, 60)]) }}
+                        @elseif (isset($event->payload['claim'])) · {{ __('admin.reading.log_subjects.deleted_claim', ['text' => \Illuminate\Support\Str::limit($event->payload['claim'], 60)]) }}
+                        @endif
                         @if (isset($event->payload['from']) || isset($event->payload['to'])) · {{ $event->payload['from'] ?? '–' }} <x-megis.icon name="arrow-right" class="align-middle" :label="__('appendix.changed_to')" /> {{ $event->payload['to'] ?? '–' }} @endif
+                        @if (isset($event->payload['sentence'])) · „{{ $event->payload['sentence'] }}” @endif
                         @if (isset($event->payload['reason'])) · {{ $event->payload['reason'] }} @endif
                     </li>
                 @empty

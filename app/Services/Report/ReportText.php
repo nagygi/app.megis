@@ -25,13 +25,18 @@ final class ReportText
     }
 
     /**
-     * "5-nek látjátok, 2-t mutattok.", or the grey threshold sentence (18 · 18.6).
+     * "5-nek látjátok, 2-t mutattok.", or the grey threshold sentence (18 · 18.6);
+     * the sentence the mégis wrote over goes in their place (20 · 20.2).
      *
      * @param  array<string, mixed>  $row
      * @param  array<string, mixed>  $meta
      */
     public static function gap(array $row, array $meta): ?string
     {
+        if (filled($row['sentence'] ?? null)) {
+            return $row['sentence'];
+        }
+
         if (in_array($row['kind'], ['area', 'process'], true)) {
             return null;
         }

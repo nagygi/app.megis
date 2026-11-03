@@ -58,6 +58,9 @@ class Reading extends Component
 
     public string $overrideReason = '';
 
+    /** The row's sentence written over; empty keeps the template's (20 · 20.2). */
+    public string $overrideSentence = '';
+
     public string $handScore = '';
 
     /**
@@ -108,7 +111,7 @@ class Reading extends Component
     public function selectRow(int $rowId): void
     {
         $this->selectedRowId = $this->row($rowId)->id;
-        $this->reset(['overriding', 'overrideScore', 'overrideReason', 'handScore']);
+        $this->reset(['overriding', 'overrideScore', 'overrideReason', 'overrideSentence', 'handScore']);
         $this->resetValidation();
     }
 
@@ -142,10 +145,11 @@ class Reading extends Component
         $this->overriding = true;
         $this->overrideScore = $row->score === null ? ($row->score_state?->value === 'no_trace' ? DiagnosisService::NO_TRACE : '') : number_format($row->score, 1, '.', '');
         $this->overrideReason = (string) $row->override_reason;
+        $this->overrideSentence = (string) $row->override_sentence;
     }
 
     /**
-     * "Átírom": the PHI with a reason the leader also reads (20 · 20.2, 28 · 28.2).
+     * "Átírom": the PHI and/or the sentence, with a reason the leader also reads (20 · 20.2, 28 · 28.2).
      */
     public function saveOverride(ReadingService $reading): void
     {
@@ -158,10 +162,11 @@ class Reading extends Component
                 }
             }],
             'overrideReason' => ['required', 'string', 'min:3', 'max:1000'],
-        ], attributes: ['overrideScore' => __('admin.diagnoses.score'), 'overrideReason' => __('admin.diagnoses.override.reason')]);
+            'overrideSentence' => ['nullable', 'string', 'max:'.DiagnosisText::DEFAULT_MAX_LENGTH],
+        ], attributes: ['overrideScore' => __('admin.diagnoses.score'), 'overrideReason' => __('admin.diagnoses.override.reason'), 'overrideSentence' => __('admin.reading.override_sentence')]);
 
         $this->attempt(function () use ($reading, $row): void {
-            $reading->overrideRow($row, $this->overrideScore, $this->overrideReason, $this->admin());
+            $reading->overrideRow($row, $this->overrideScore, $this->overrideReason, $this->admin(), $this->overrideSentence);
             $this->overriding = false;
             $this->selectNext($row);
         });
@@ -373,7 +378,7 @@ class Reading extends Component
         $processDiagnosis = $selected?->kind === DiagnosisRowKind::Process
             ? Diagnosis::query()->where('parent_id', $this->diagnosis->id)->where('level', DiagnosisLevel::Process)->where('process_id', $selected->process_id)->first()
             : null;
-        $claims = DiagnosisClaim::query()->where('diagnosis_id', $this->diagnosis->id)->with('row')->orderBy('diagnosis_row_id')->orderBy('id')->get();
+        $claims = DiagnosisClaim::query()->where('diagnosis_id', $this->diagnosis->id)->with(['row', 'approver'])->orderBy('diagnosis_row_id')->orderBy('id')->get();
         $byHand = $selected !== null && in_array($selected->kind, [DiagnosisRowKind::Area, DiagnosisRowKind::TreeElement], true);
         $quotingPeers = $main->quotingPeerIds();
         $shown = fn (EvidenceTrace $trace) => $trace->hiddenFromLeader($main->show_peer_quotes, $quotingPeers) === null;
@@ -388,14 +393,21 @@ class Reading extends Component
             'hiddenTraces' => $traces->mapWithKeys(fn (EvidenceTrace $trace) => [$trace->id => $trace->hiddenFromLeader($main->show_peer_quotes, $quotingPeers)])->filter(),
             'userNames' => User::query()->whereIn('id', $traces->pluck('user_id')->filter())->get()->mapWithKeys(fn ($user) => [$user->id => $user->name]),
             'occasions' => $processDiagnosis === null ? collect() : $breakdown->occasions($processDiagnosis),
+            // The sub-diagnoses open from here (20 · 20.5): a process row links to its process diagnosis.
+            'processDiagnosis' => $processDiagnosis,
             'candidates' => $byHand ? $this->candidateTraces($rows)->filter($shown)->values() : collect(),
             'byHand' => $byHand,
             'rowClaims' => $selected === null ? collect() : $claims->where('diagnosis_row_id', $selected->id)->values(),
             'claims' => $claims,
+            // Per chapter, in the order of the report (20 · 20.3).
+            'claimBlocks' => collect(ReadingService::blocks())
+                ->map(fn (DiagnosisRowKind $kind) => ['kind' => $kind, 'claims' => $claims->filter(fn (DiagnosisClaim $claim) => $claim->row?->kind === $kind)->values()])
+                ->filter(fn (array $block) => $block['claims']->isNotEmpty())
+                ->values(),
             'claimTraces' => $this->editingClaim !== null && filled($this->claim['diagnosis_row_id'])
                 ? EvidenceTrace::query()->where('diagnosis_row_id', (int) $this->claim['diagnosis_row_id'])->get()->filter($shown)->values()
                 : collect(),
-            'textModels' => DiagnosisText::query()->where('diagnosis_id', $this->diagnosis->id)->get()->keyBy('key'),
+            'textModels' => DiagnosisText::query()->where('diagnosis_id', $this->diagnosis->id)->with('approver')->get()->keyBy('key'),
             'requiredTexts' => $requiredTexts = $reading->requiredTexts($main),
             'textLabels' => collect($requiredTexts)->mapWithKeys(fn (string $key) => [$key => ReadingService::textLabel($key, $rows)]),
             'gapRow' => $reading->gapRow($main),
@@ -406,7 +418,7 @@ class Reading extends Component
             'materials' => $this->materials(),
             'events' => ReviewEvent::query()
                 ->where('diagnosis_id', $this->diagnosis->id)
-                ->with(['actor', 'subject' => fn (MorphTo $subject) => $subject->morphWith([DiagnosisRow::class => ['value', 'process', 'area']])])
+                ->with(['actor', 'subject' => fn (MorphTo $subject) => $subject->morphWith([DiagnosisRow::class => ['value', 'process', 'area'], DiagnosisClaim::class => ['row.value', 'row.process', 'row.area'], EvidenceTrace::class => ['row.value', 'row.process', 'row.area']])])
                 ->latest('id')
                 ->limit(50)
                 ->get(),
@@ -474,7 +486,7 @@ class Reading extends Component
         $next = $after->first(fn (DiagnosisRow $candidate) => $candidate->approved_at === null) ?? $rows->first(fn (DiagnosisRow $candidate) => $candidate->approved_at === null);
 
         $this->selectedRowId = $next?->id ?? $row->id;
-        $this->reset(['overriding', 'overrideScore', 'overrideReason', 'handScore']);
+        $this->reset(['overriding', 'overrideScore', 'overrideReason', 'overrideSentence', 'handScore']);
     }
 
     private function main(): MainDiagnosis
