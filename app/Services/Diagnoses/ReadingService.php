@@ -16,6 +16,7 @@ use App\Models\EvidenceTrace;
 use App\Models\MainDiagnosis;
 use App\Models\ReviewEvent;
 use App\Models\User;
+use App\Services\Inbox\InboxService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +29,7 @@ use Illuminate\Support\Facades\DB;
  */
 class ReadingService
 {
-    public function __construct(private DiagnosisService $diagnoses) {}
+    public function __construct(private DiagnosisService $diagnoses, private InboxService $inbox) {}
 
     /**
      * The order of the report's blocks (20 · 20.1).
@@ -293,18 +294,26 @@ class ReadingService
         } else {
             $claim->update($attributes);
             $this->log($main->diagnosis, $claim, 'edited', $admin);
+            // It has a trace again: the Beérkező row of the claim left without one closes.
+            $this->inbox->closeAutomatically('claim-without-trace:'.$claim->id);
         }
 
         return $claim;
     }
 
     /**
-     * An AI draft can be longer than the report allows; it is shortened before approval (20 · 20.4).
+     * An AI draft can be longer than the report allows; it is shortened before
+     * approval (20 · 20.4). A claim whose traces went, e.g. with a withdrawn
+     * peer, gets one first (20 · 20.3).
      */
     public function approveClaim(DiagnosisClaim $claim, User $admin): void
     {
         $this->ensureOpen($claim->row->diagnosis);
         $this->ensureLength($claim->text, DiagnosisText::DEFAULT_MAX_LENGTH);
+
+        if ($claim->traces()->isEmpty()) {
+            throw new DiagnosisException(__('admin.reading.claims.trace_needed'));
+        }
 
         $claim->update(['status' => DiagnosisClaim::APPROVED, 'approved_at' => now(), 'approved_by' => $admin->id]);
         $this->log($claim->row->diagnosis, $claim, 'approved', $admin);
@@ -316,6 +325,7 @@ class ReadingService
         $this->ensureOpen($diagnosis);
 
         $this->log($diagnosis, null, 'deleted', $admin, ['claim' => $claim->text, 'kind' => $claim->kind]);
+        $this->inbox->closeAutomatically('claim-without-trace:'.$claim->id);
         $claim->delete();
     }
 

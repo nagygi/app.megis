@@ -1072,6 +1072,7 @@ return [
             'threshold' => 'A küszöb veszélyben: :answered társ töltötte ki, :date-án publikálunk.',
             'publication' => 'A publikálás napja (:date) elmúlt.',
             'claim_without_trace' => 'Egy fióktörlés után az állításnak nem maradt nyoma: „:claim”.',
+            'claim_without_trace_withdrawn' => 'Egy társ visszavonta a hozzájárulását, és az állításnak nem maradt nyoma: „:claim”.',
         ],
     ],
 

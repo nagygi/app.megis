@@ -12,6 +12,7 @@ use App\Models\DiagnosisClaim;
 use App\Models\DiagnosisRow;
 use App\Models\DiagnosisText;
 use App\Models\EvidenceTrace;
+use App\Models\InboxItem;
 use App\Models\MainDiagnosis;
 use App\Models\ProcessOccasion;
 use App\Models\ReviewEvent;
@@ -462,6 +463,48 @@ it('takes a withdrawn peer\'s traces out and lets the approved rows they touched
         ->set('trace.material_id', (string) $material->id)
         ->call('addTrace')
         ->assertHasErrors(['trace.material_id']);
+});
+
+it('lets a claim on a withdrawn peer\'s trace fall back, and one left without a trace goes to the Beérkező (20 · 20.3)', function () {
+    [$setup, $main] = diagnosisInReading();
+    $reading = app(ReadingService::class);
+    $admin = $setup['admin'];
+    $peer = $setup['peers'][0];
+    $main->participantFor($peer, ParticipantRole::Peer)->update(['started_at' => now()]);
+    $consent = Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => 'answers', 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
+    Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => 'quotes', 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
+    $material = scoredMaterial($main, null, [0 => null, 1 => null, 2 => 4], $peer);
+    $detection = $material->detections()->create(['quote' => 'A rossz hírt nálunk senki nem mondja ki.', 'free_name' => 'Nyíltság', 'strength' => 2]);
+    $material->scores()->where('value_id', $main->valueSetVersion->snapshot['values'][2]['value_id'])->update(['detection_ids' => json_encode([$detection->id])]);
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    [$first, $third] = [rowOf($main, DiagnosisRowKind::Value), rowOf($main, DiagnosisRowKind::Value, 2)];
+    $peerTrace = $third->traces()->sole();
+    $ownerless = $reading->addTrace($third, ['quote' => 'Kézzel, anyag nélkül.', 'material_id' => null, 'recorded_on' => null, 'role' => 'leader', 'source_type' => 'note'], $admin);
+    $claim = fn (DiagnosisRow $row, array $traceIds) => tap(
+        $reading->saveClaim($main, null, ['diagnosis_row_id' => $row->id, 'kind' => 'strength', 'text' => 'Szólnak a rossz hírről.', 'trace_ids' => $traceIds], $admin),
+        fn (DiagnosisClaim $claim) => $reading->approveClaim($claim, $admin),
+    );
+    $both = $claim($third, [$peerTrace->id, $ownerless->id]);
+    $onlyPeer = $claim($third, [$peerTrace->id]);
+    $untouched = $claim($first, [$first->traces()->first()->id]);
+
+    app(ConsentService::class)->revoke($consent, $peer);
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    $item = InboxItem::query()->open()->where('dedupe_key', 'claim-without-trace:'.$onlyPeer->id)->sole();
+    expect($both->refresh())->status->toBe('draft')->approved_at->toBeNull()->trace_ids->toBe([$ownerless->id])
+        ->and($onlyPeer->refresh())->status->toBe('draft')->trace_ids->toBe([])
+        ->and($untouched->refresh()->status)->toBe('approved')
+        ->and(ReviewEvent::query()->where('action', 'fell_back_withdrawn')->where('subject_type', $both->getMorphClass())->pluck('subject_id')->sort()->values()->all())->toBe([$both->id, $onlyPeer->id])
+        ->and($item->summary)->toBe('Egy társ visszavonta a hozzájárulását, és az állításnak nem maradt nyoma: „Szólnak a rossz hírről.”.')
+        ->and(InboxItem::query()->where('dedupe_key', 'claim-without-trace:'.$both->id)->exists())->toBeFalse()
+        ->and(fn () => $reading->approveClaim($onlyPeer, $admin))->toThrow(DiagnosisException::class, 'Az állításhoz legalább egy nyom kell');
+
+    // With a trace again the row of the Beérkező closes.
+    $reading->saveClaim($main, $onlyPeer, ['diagnosis_row_id' => $third->id, 'kind' => 'strength', 'text' => 'Szólnak a rossz hírről.', 'trace_ids' => [$ownerless->id]], $admin);
+
+    expect($item->refresh()->closed_at)->not->toBeNull();
 });
 
 it('offers no gap numbers for the biggest gap below the threshold (Extra inputok 1)', function () {

@@ -6,6 +6,7 @@ use App\Enums\ConsentKind;
 use App\Enums\DiagnosisCreator;
 use App\Enums\DiagnosisLevel;
 use App\Enums\DiagnosisRowKind;
+use App\Enums\InboxItemType;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\MaterialStatus;
 use App\Enums\ParticipantRole;
@@ -15,6 +16,7 @@ use App\Enums\TreeElement;
 use App\Models\Area;
 use App\Models\Consent;
 use App\Models\Diagnosis;
+use App\Models\DiagnosisClaim;
 use App\Models\DiagnosisRow;
 use App\Models\DiagnosisType;
 use App\Models\EvidenceTrace;
@@ -78,10 +80,13 @@ class DiagnosisCalculator
             ->exists();
 
         DB::transaction(function () use ($main, $snapshot, $materials, $scores): void {
-            $this->withdrawnRowIds = $this->dropWithdrawnTraces($main);
+            $dropped = $this->dropWithdrawnTraces($main);
+            // A trace taken out of the report earlier does not count for the row (20 · 20.2).
+            $this->withdrawnRowIds = $dropped->whereNull('excluded_at')->pluck('diagnosis_row_id')->unique()->values()->all();
             $processDiagnoses = $this->processDiagnoses($main, $snapshot, $materials, $scores);
             $this->mainRows($main, $snapshot, $materials, $scores, $processDiagnoses);
             $this->fallBackWithdrawnRows($main->diagnosis);
+            $this->fallBackWithdrawnClaims($main, $dropped->pluck('id')->all());
             $this->summarize($main);
         });
 
@@ -131,14 +136,14 @@ class DiagnosisCalculator
      * tree (18 · 18.6, 20 · 20.5). A trace written by hand without a material
      * has no owner and stays.
      *
-     * @return list<int> the rows that lost a trace the report showed
+     * @return Collection<int, EvidenceTrace> the traces taken out
      */
-    private function dropWithdrawnTraces(MainDiagnosis $main): array
+    private function dropWithdrawnTraces(MainDiagnosis $main): Collection
     {
         $withdrawn = $this->withdrawnUserIds($main);
 
         if ($withdrawn === []) {
-            return [];
+            return collect();
         }
 
         $traces = EvidenceTrace::query()
@@ -149,7 +154,46 @@ class DiagnosisCalculator
 
         EvidenceTrace::query()->whereIn('id', $traces->pluck('id'))->delete();
 
-        return $traces->whereNull('excluded_at')->pluck('diagnosis_row_id')->unique()->values()->all();
+        return $traces;
+    }
+
+    /**
+     * A claim built on a withdrawn peer's trace waits for approval again and
+     * becomes the admin's, so a new AI draft leaves it; one left without a
+     * trace goes to the Beérkező, as after an account deletion (20 · 20.3, 20.5).
+     *
+     * @param  list<int>  $traceIds  the traces taken out
+     */
+    private function fallBackWithdrawnClaims(MainDiagnosis $main, array $traceIds): void
+    {
+        $claims = DiagnosisClaim::query()
+            ->where('diagnosis_id', $main->diagnosis_id)
+            ->get()
+            ->filter(fn (DiagnosisClaim $claim) => array_intersect($claim->trace_ids ?? [], $traceIds) !== []);
+
+        foreach ($claims as $claim) {
+            if ($claim->isApproved()) {
+                app(ReadingService::class)->log($main->diagnosis, $claim, 'fell_back_withdrawn', null);
+            }
+
+            $claim->update([
+                'trace_ids' => array_values(array_diff($claim->trace_ids, $traceIds)),
+                'status' => DiagnosisClaim::DRAFT,
+                'ai_call_id' => $claim->isApproved() ? null : $claim->ai_call_id,
+                'approved_at' => null,
+                'approved_by' => null,
+            ]);
+
+            if ($claim->trace_ids === []) {
+                app(InboxService::class)->open(
+                    InboxItemType::ProcessingError,
+                    __('admin.inbox.rows.claim_without_trace_withdrawn', ['claim' => mb_substr($claim->text, 0, 120)]),
+                    diagnosis: $main->diagnosis,
+                    subject: $claim,
+                    dedupeKey: 'claim-without-trace:'.$claim->id,
+                );
+            }
+        }
     }
 
     /**

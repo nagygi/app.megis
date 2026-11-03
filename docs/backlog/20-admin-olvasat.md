@@ -47,6 +47,7 @@ A fő diagnózis *Olvasat* füle (19.1), három oszloppal, balról jobbra:
 
 - Fejezetenként lista: típus, sor, mondat, nyomok. AI-vázlatként érkeznek (18.3).
 - Szerkeszthetők, törölhetők, új is felvehető. Mindegyik külön jóváhagyást kap.
+- Nyom nélküli állítás nem hagyható jóvá: előbb kap egy nyomot a sor nyomai közül.
 - Csak jóváhagyott állítás kerül a riportba, „a diagnózis állítása · a mégis átnézte” jelöléssel.
 
 ### 20.4 Az olvasat szövegei
@@ -66,6 +67,7 @@ A fő diagnózis *Olvasat* füle (19.1), három oszloppal, balról jobbra:
 - Ha egy társ visszavonja a hozzájárulását (T1, M6), a sorok nélküle számolódnak újra (18.6):
   - Minden nyoma kikerül: az automatikusak, a kézzel felvett nyom az ő anyagából, és a területhez vagy a fához választott nyoma is. A kézi nyom anyag-választójában az anyagai nem szerepelnek. Az anyag nélkül, kézzel felvett nyomnak nincs gazdája, ez bent marad.
   - A jóváhagyott sor visszaesik „vár” állapotba, ha az automatikus értéke ettől változik, vagy ha elveszít egy riportba kerülő nyomot. Az utóbbi az átírt és a kézzel pontozott sorra is áll.
+  - Az állítás, amely a társ nyomára épült, visszaesik vázlatba, és az adminé lesz: az újravázlat nem cseréli le. Ha nem maradt nyoma, a Beérkezőbe kerül: „Egy társ visszavonta a hozzájárulását, és az állításnak nem maradt nyoma: „…””. A Beérkező sora lezárul, amikor az állítás újra kap nyomot, vagy törlik.
   - A napló okként a visszavonást írja: „visszaesett „vár” állapotba, mert egy társ visszavonta a hozzájárulását”.
 - A részdiagnózisok (17.4) innen megnyithatók, de nem kell őket külön jóváhagyni.
 

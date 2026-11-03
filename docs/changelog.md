@@ -2,6 +2,16 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.86 · {hash} · 2026-11-03
+
+Olvasat (20 · 20.3, 20.5): az állítás, amely egy visszavont társ nyomára épült.
+
+- **Eddig:** ha egy társ az olvasat alatt visszavonta a hozzájárulását, a rá épülő jóváhagyott állítás jóváhagyva maradt, és nyom nélkül is kiment a riportba. A Beérkező erről csak fióktörlés után szólt.
+- **Most:**
+  - **Visszaesik vázlatba** az állítás, amely a társ nyomára épült, és a napló jelzi: „visszaesett „vár” állapotba, mert egy társ visszavonta a hozzájárulását”. Az adminé lesz, így egy újabb AI-vázlat nem cseréli le.
+  - **Ha nem maradt nyoma,** a Beérkezőbe kerül: „Egy társ visszavonta a hozzájárulását, és az állításnak nem maradt nyoma: „…””. A sor lezárul, amikor az állítás újra kap nyomot, vagy törlik. Ez a fióktörlés sorára is áll.
+  - **Nyom nélküli állítás nem hagyható jóvá:** „Az állításhoz legalább egy nyom kell a sor nyomai közül.”
+
 ## 1.85 · 0ab32db · 2026-11-03
 
 Olvasat (20): a jegy hiányai pótolva.
