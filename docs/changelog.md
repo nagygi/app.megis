@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.74 · {hash} · 2026-11-03
+## 1.74 · a920bda · 2026-11-03
 
 Saját értékek (24 · 24.4): a fiókhoz kötött nyilvános Értéktükör is beleszámít az állapotba.
 
