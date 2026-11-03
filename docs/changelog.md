@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.60 · – · 2026-11-03
+## 1.60 · 2859bc9 · 2026-11-03
 
 Admin, szervezet *Folyamatok* füle: alapból csak a folyamatlista látszik. A felvétel és a betöltés gombra nyílik.
 
