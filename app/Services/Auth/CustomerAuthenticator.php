@@ -26,11 +26,14 @@ class CustomerAuthenticator
 
     /**
      * Logs the customer in after a correct password, code, link or registration.
+     * Any successful login clears the failed passwords and the pause (14 · 14.2).
      */
     public function login(User $user): void
     {
         $this->guardSession->login(GuardSession::WEB, $user);
-        $user->forceFill(['last_login_at' => now()])->saveQuietly();
+        $user->forceFill(['last_login_at' => now(), 'failed_password_attempts' => 0, 'password_paused_until' => null])->saveQuietly();
+        $this->cache->forget($this->failureKey($user->email));
+        $this->cache->forget($this->failureKey($user->email).':paused');
 
         Log::channel('auth')->info('Customer logged in.', ['user_id' => $user->id]);
     }
@@ -95,7 +98,7 @@ class CustomerAuthenticator
      */
     private function recordFailureWithoutAccount(string $email): LoginOutcome
     {
-        $key = 'customer-password:'.sha1(Str::lower(trim($email)));
+        $key = $this->failureKey($email);
 
         if ($this->cache->has($key.':paused')) {
             return LoginOutcome::PasswordPaused;
@@ -113,5 +116,10 @@ class CustomerAuthenticator
         $this->cache->put($key.':paused', true, now()->addMinutes(self::PAUSE_MINUTES));
 
         return LoginOutcome::PasswordPaused;
+    }
+
+    private function failureKey(string $email): string
+    {
+        return 'customer-password:'.sha1(Str::lower(trim($email)));
     }
 }

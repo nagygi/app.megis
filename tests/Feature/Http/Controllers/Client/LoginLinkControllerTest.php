@@ -28,6 +28,17 @@ it('logs in when the button is pressed', function () {
     $this->assertAuthenticatedAs($customer, 'web');
 });
 
+it('clears the failed passwords and the pause on a link login (14 · 14.2)', function () {
+    $customer = customerOf();
+    $customer->forceFill(['failed_password_attempts' => 4, 'password_paused_until' => now()->addMinutes(10)])->save();
+    $token = app(TokenService::class)->issue($customer, TokenPurpose::LoginCode)->plainToken;
+
+    $this->post(route('client.login.link.store', $token));
+
+    expect($customer->refresh()->failed_password_attempts)->toBe(0)
+        ->and($customer->password_paused_until)->toBeNull();
+});
+
 it('shows "Ez a link már lejárt" for a used link', function () {
     $customer = customerOf();
     $token = app(TokenService::class)->issue($customer, TokenPurpose::LoginCode)->plainToken;

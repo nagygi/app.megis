@@ -30,6 +30,17 @@ it('logs in with the e-mailed code and lands on the organization home', function
     expect($customer->tokens()->sole()->consumed_at)->not->toBeNull();
 });
 
+it('clears the failed passwords and the pause on a code login (14 · 14.2)', function () {
+    $customer = customerOf();
+    $customer->forceFill(['failed_password_attempts' => 7, 'password_paused_until' => now()->addMinutes(10)])->save();
+
+    postLoginCode($customer, issueLoginCode($customer));
+
+    $this->assertAuthenticatedAs($customer, 'web');
+    expect($customer->refresh()->failed_password_attempts)->toBe(0)
+        ->and($customer->password_paused_until)->toBeNull();
+});
+
 it('rejects a wrong code', function () {
     $customer = customerOf();
     issueLoginCode($customer);

@@ -48,7 +48,7 @@ Az admin belépése külön működik: 01.
 - Rate limit e-mail és IP alapján:
   - kódkérés: óránként legfeljebb 5;
   - belépési próbálkozás: percenként legfeljebb 5.
-- 10 egymást követő hibás jelszó után a jelszavas belépés 15 percre szünetel. Kóddal közben is be lehet lépni. A számlálót a sikeres belépés nullázza.
+- 10 egymást követő hibás jelszó után a jelszavas belépés 15 percre szünetel. Kóddal közben is be lehet lépni. Bármely sikeres belépés (jelszó, kód, link, regisztráció) nullázza a számlálót, és a futó szünetet is megszünteti.
   - A szünet ismeretlen és jelszó nélküli címre is ugyanígy jár, így az üzenetből sem derül ki, kinek van fiókja.
 
 **Session**

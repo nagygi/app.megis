@@ -2,6 +2,16 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.72 · {hash} · 2026-11-03
+
+Belépés (14 · 14.2): a kódos és a linkes belépés is nullázza a hibás jelszavak számlálóját.
+
+- **Eddig:** csak a helyes jelszó nullázta. Ha valaki 7-szer elrontotta a jelszavát, aztán kóddal lépett be, a következő 3 hibás jelszó után 15 percre szünetelt a jelszavas belépése.
+- **Most:** bármely sikeres belépés nullázza: jelszó, kód, link, meghívós regisztráció, az Értéktükör megerősítése és a tükör lapján belépés.
+  - **A futó szünet is megszűnik:** aki a 15 perces szünetben kóddal belép, utána rögtön használhatja a jelszavát.
+  - **Jelszó nélküli címnél** ugyanígy: a kódos belépés törli a hibás próbák számát.
+  - **„Belépek a nevében”:** nem számít belépésnek, nem nulláz.
+
 ## 1.71 · a3c6859 · 2026-11-03
 
 Értékmérés az alkalmak anyagain (13 · 13.2): a motor tudja, melyik folyamatról szól az anyag, és a nem illeszkedő értékek sem vesznek el.

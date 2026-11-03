@@ -4,6 +4,7 @@ use App\Http\Controllers\Client\CustomerLoginController;
 use App\Mail\LoginCodeMail;
 use App\Models\Organization;
 use App\Models\User;
+use App\Services\Auth\CustomerAuthenticator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\TestResponse;
@@ -119,6 +120,23 @@ it('pauses an address without a password account the same way, so the pause tell
     'unknown' => fn () => 'nobody@example.com',
     'without a password' => fn () => tap(customerOf(), fn (User $customer) => $customer->forceFill(['password' => null])->save())->email,
 ]);
+
+it('lets a code login clear the pause of an address without a password (14 · 14.2)', function () {
+    fakeTurnstile();
+    $customer = customerOf();
+    $customer->forceFill(['password' => null])->save();
+    foreach (range(1, 10) as $attempt) {
+        $this->travel(61)->seconds();
+        postCustomerLogin(['email' => $customer->email, 'password' => 'wrong-password']);
+    }
+
+    app(CustomerAuthenticator::class)->login($customer);
+    $this->post(route('client.logout'));
+    $this->travel(61)->seconds();
+
+    postCustomerLogin(['email' => $customer->email, 'password' => 'wrong-password'])
+        ->assertSessionHasErrors(['password' => 'Hibás e-mail cím vagy jelszó.']);
+});
 
 it('says on B1 who invited an existing account and where, from a signed link only (14 · 14.2)', function () {
     $organization = Organization::factory()->create(['name' => 'Acme Kft.']);
