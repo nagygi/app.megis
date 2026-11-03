@@ -35,7 +35,7 @@ Négy sor. Amíg nincs meg mind, a „Publikálom” gomb szürke, és a hiányz
 - A riport a publikálás napjára fagy („diagnózis-nézet · 04.18.”).
 - E-mail megy a vezetőnek, és az Útravalóval azoknak a társaknak, akik kitöltötték a T4-et, és nem vonták vissza a hozzájárulásukat. A többi társ nem kap e-mailt.
 - Ami ettől kezdve csak olvasható:
-  - a saját értékek és a megélés (V2, V5, T3, T4);
+  - a saját értékek és a megélés (V2, V5, T3, T4). A saját értékek listája a publikáláskor verziót kap, a diagnózis ezt mutatja (24 · 24.2);
   - a helyzetek és a feltöltések (12 · 12.5);
   - a diagnózishoz rögzített folyamatlista (11 · 11.5) és a Folyamat-diagnózisok (13 · 13.4);
   - a hozzájárulás erre a diagnózisra már nem vonható vissza (T1, M6).

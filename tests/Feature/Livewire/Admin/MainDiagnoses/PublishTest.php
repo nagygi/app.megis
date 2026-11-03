@@ -2,8 +2,10 @@
 
 use App\Enums\DiagnosisStatus;
 use App\Enums\MainDiagnosisStage;
+use App\Enums\ParticipantRole;
 use App\Jobs\RecalculateMainDiagnosis;
 use App\Livewire\Admin\MainDiagnoses\Publish;
+use App\Livewire\Client\Diagnosis\OwnValues;
 use App\Mail\DiagnosisNoticeMail;
 use App\Models\ChapterUpdate;
 use App\Models\DiagnosisClaim;
@@ -70,6 +72,29 @@ it('publishes, freezes the report and mails the leader and the peers (21 · 21.3
     $this->get(route('client.diagnosis.takeaway', [$setup['organization'], $main->diagnosis]))->assertOk()->assertSee('Útravaló · a te értékeid');
     actingAsCustomer($setup['peers'][1]);
     $this->get(route('client.diagnosis.takeaway', [$setup['organization'], $main->diagnosis]))->assertNotFound();
+});
+
+it('freezes the own values at publishing, so a later change stays out of the report (21 · 21.3, 24)', function () {
+    [$setup, $main] = approvedReading();
+    $peer = $setup['peers'][0];
+    $set = confirmOwnValues($peer);
+    $frozenName = $set->items()->sole()->name;
+
+    app(PublishService::class)->publish($main, $setup['admin']);
+
+    expect($main->participantFor($peer, ParticipantRole::Peer)->personal_value_set_version_id)->toBe($set->latestVersion()->first()->id)
+        ->and($main->participantFor($setup['leader'], ParticipantRole::Leader)->personal_value_set_version_id)->not->toBeNull()
+        ->and(ReportSnapshot::query()->sole()->data['takeaways'][$peer->id]['own_value']['name'])->toBe($frozenName);
+
+    $set->items()->update(['name' => 'Később átírt érték']);
+    app(PublishService::class)->publishCorrection($main->refresh(), $setup['admin']);
+
+    expect(ReportSnapshot::query()->latest('sequence')->first()->data['takeaways'][$peer->id]['own_value']['name'])->toBe($frozenName);
+
+    actingAsCustomer($peer);
+    Livewire::test(OwnValues::class, peerParams($setup, $main))
+        ->assertSee($frozenName)
+        ->assertDontSee('Később átírt érték');
 });
 
 it('publishes a correction with the "frissítve" mark on the changed chapter (21 · 21.4)', function () {

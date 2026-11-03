@@ -95,7 +95,7 @@ class TakeawayBuilder
             'subject_name' => $main->subjectName(),
             'rows' => $rows->all(),
             'strength' => $this->strength($rows),
-            'own_value' => $this->ownValue($peer, $values),
+            'own_value' => $this->ownValue($peer, $values, $main->participantFor($peer, ParticipantRole::Peer)?->frozenOwnValues()),
             'self_gap' => $rows->filter(fn (array $row) => $row['start'] !== null && $row['situations'] !== null && abs($row['start'] - $row['situations']) >= 2)
                 ->sortByDesc(fn (array $row) => abs($row['start'] - $row['situations']))
                 ->first(),
@@ -121,21 +121,24 @@ class TakeawayBuilder
     }
 
     /**
-     * One own value beyond the team's ones (24, 29 · 29.1).
+     * One own value beyond the team's ones (24, 29 · 29.1): from the list
+     * frozen at publishing, the live one before it (21 · 21.3).
      *
      * @param  Collection<int, array<string, mixed>>  $values
+     * @param  list<array<string, mixed>>|null  $frozen
      * @return array<string, mixed>|null
      */
-    private function ownValue(User $peer, Collection $values): ?array
+    private function ownValue(User $peer, Collection $values, ?array $frozen): ?array
     {
-        $set = PersonalValueSet::query()->where('user_id', $peer->id)->first();
+        $own = $frozen !== null
+            ? collect($frozen)
+            : (PersonalValueSet::query()->where('user_id', $peer->id)->first()?->items()->get()->map(fn ($item) => $item->only(['value_id', 'name', 'source'])) ?? collect());
         $teamNames = $values->pluck('name')->map(fn ($name) => mb_strtolower(trim($name)));
         $teamIds = $values->pluck('value_id')->filter();
 
-        $item = $set?->items()->orderBy('position')->get()
-            ->first(fn ($item) => ! $teamIds->contains($item->value_id) && ! $teamNames->contains(mb_strtolower(trim($item->name))));
+        $item = $own->first(fn (array $item) => ! $teamIds->contains($item['value_id'] ?? null) && ! $teamNames->contains(mb_strtolower(trim($item['name']))));
 
-        return $item === null ? null : ['name' => $item->name, 'source' => $item->source, 'team_count' => $values->count()];
+        return $item === null ? null : ['name' => $item['name'], 'source' => $item['source'] ?? null, 'team_count' => $values->count()];
     }
 
     /**

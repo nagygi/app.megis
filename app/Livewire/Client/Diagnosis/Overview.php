@@ -157,7 +157,10 @@ class Overview extends Component
             'current' => $current,
             'stepUrl' => fn ($step) => $this->stepUrl($step),
             'withdrawn' => $participant->hasWithdrawn(),
-            'ownValues' => PersonalValueSet::query()->where('user_id', $this->user()->id)->first()?->items()->pluck('name') ?? collect(),
+            // After publishing the list as it was frozen (21 · 21.3).
+            'ownValues' => $participant->frozenOwnValues() !== null
+                ? collect($participant->frozenOwnValues())->pluck('name')
+                : (PersonalValueSet::query()->where('user_id', $this->user()->id)->first()?->items()->pluck('name') ?? collect()),
             'experience' => $progress->experienceDiagnosis($main, $this->user()),
             'leaderName' => $main->leader->name,
             'otherRoles' => $this->otherRoles(),

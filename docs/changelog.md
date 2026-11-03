@@ -2,6 +2,17 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.76 · {hash} · 2026-11-03
+
+Publikálás (21 · 21.3, 24): a saját értékek listája a publikáláskor rögzül.
+
+- **Eddig:** a diagnózis nem rögzítette, melyik volt a vezető és a társak saját értékeinek listája. Az Útravaló „A te értéked” sora, a T5 és a publikálás utáni, csak olvasható V2/T3 az élő listát olvasta. Ha valaki publikálás után módosította a saját értékeit (például az Értéktárban), a javítás és az újrapublikálás már az új listát vitte a riportba.
+- **Most:**
+  - **Az első publikáláskor** a vezető és minden társ listája verziót kap, és a diagnózis ezt őrzi.
+  - **Ezt mutatja:** az Útravaló „A te értéked” sora, a társ T5 lapja és a csak olvasható saját értékek lépés (V2, T3).
+  - **A javítás és az újrapublikálás** a rögzített listát használja (21.5: a zárolások érvényben maradnak).
+  - **A publikálás előtti előnézet** továbbra is az élő listát mutatja.
+
 ## 1.75 · 8712806 · 2026-11-03
 
 Riport és olvasat (31 · 31.6, 17 · 17.2, 25 · 25.2): a társ idézete csak akkor jelenik meg a vezetőnek, ha az A1 kapcsolója be van kapcsolva, és a társ hozzájárult.

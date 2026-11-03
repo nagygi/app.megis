@@ -32,6 +32,7 @@ Kapcsolódik: 03, 06, 08, 17.
 - A × kiveszi az értéket a listából.
 - „+ Új érték” a lista alján.
 - **Hány érték:** legalább 1, legfeljebb 5, a felület hármat ajánl. Magánszemélynél 3–5, mert itt a saját értékek a szervezet értékei is (08).
+- **Rögzítés a publikáláskor (21.3):** az első publikáláskor a vezető és minden társ listája verziót kap, és a diagnózis ezt őrzi. Az Útravaló „A te értéked” sora, a T5 és a csak olvasható V2/T3 ezt mutatja; a későbbi módosítás a publikált diagnózist nem változtatja meg, a javítás és az újrapublikálás sem.
 - **Verzió:** a lista a lépés elhagyásakor („Tovább”) és az Értéktár „Hozzáadom a sajátjaimhoz” gombjánál (30) új verziót kap, ahogy a szervezet értékszettje (08 · 8.4).
 - **Mikor kész:** minden változás menti a listát, a lépés a mentett lista szerint kész (23.3), „Tovább” nélkül is. Ha kiveszi az utolsó értéket, a lépés újra nyitott. Magánszemélynél a szervezet értékei minden mentéskor követik a listát. A verziójuk a „Tovább”-nál jön létre.
 
@@ -81,4 +82,3 @@ Kapcsolódik: 03, 06, 08, 17.
 ## Hátravan
 
 - **Szerkesztés a diagnózison kívül:** a Tárak → Értéktár (30) csak olvashatóan mutatja a saját értékeket. A „Szerkesztem” csak egy olyan diagnózis lépését nyitja meg, amely még fogad bevitelt.
-- **Rögzítés a publikáláskor:** a diagnózis nem rögzíti, melyik verzió volt a lista (21.3). A `personal_value_set_version_id` sosem íródik, az Útravaló az élő listát olvassa.

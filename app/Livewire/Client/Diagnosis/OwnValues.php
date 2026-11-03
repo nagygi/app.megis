@@ -62,7 +62,11 @@ class OwnValues extends Component
             return;
         }
 
-        $this->items = $this->itemsOf($sets->forUser($this->user()));
+        $frozen = $this->participant()->frozenOwnValues();
+        // After publishing the step shows the list frozen with the report (21 · 21.3, 30 · 30.3).
+        $this->items = $frozen !== null && ! $this->main()->ownValuesEditable()
+            ? array_map(fn (array $value) => $this->frozenItem($value), $frozen)
+            : $this->itemsOf($sets->forUser($this->user()));
         $requested = (string) request()->query('lap', '');
         $this->screen = match (true) {
             $requested === self::PAGES['add'] => 'add',
@@ -358,6 +362,29 @@ class OwnValues extends Component
             'source' => $item->source,
             'quotes' => $item->quotes,
         ])->all();
+    }
+
+    /**
+     * An item of the list frozen at publishing (21 · 21.3); the version keeps no quotes.
+     *
+     * @param  array<string, mixed>  $value
+     * @return array<string, mixed>
+     */
+    private function frozenItem(array $value): array
+    {
+        return [
+            'key' => $value['key'],
+            'value_id' => $value['value_id'] ?? null,
+            'source_version_id' => $value['source_version_id'] ?? null,
+            'name' => $value['name'],
+            'meaning' => (string) ($value['meaning'] ?? ''),
+            'non_meaning' => (string) ($value['non_meaning'] ?? ''),
+            'low_example' => (string) ($value['low_example'] ?? ''),
+            'high_example' => (string) ($value['high_example'] ?? ''),
+            'example' => (string) ($value['example'] ?? ''),
+            'source' => $value['source'] ?? PersonalValueSetItem::SOURCE_NEW,
+            'quotes' => null,
+        ];
     }
 
     private function resetDraft(): void

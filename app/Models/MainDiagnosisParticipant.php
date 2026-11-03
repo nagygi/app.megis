@@ -55,6 +55,25 @@ class MainDiagnosisParticipant extends Model
     }
 
     /**
+     * @return BelongsTo<Version, $this>
+     */
+    public function personalValueSetVersion(): BelongsTo
+    {
+        return $this->belongsTo(Version::class);
+    }
+
+    /**
+     * The own values as they were at publishing (21 · 21.3, 24), or null
+     * before it; the same keys as the list's items.
+     *
+     * @return list<array<string, mixed>>|null
+     */
+    public function frozenOwnValues(): ?array
+    {
+        return $this->personalValueSetVersion?->snapshot['values'] ?? null;
+    }
+
+    /**
      * The peer's current consent of a kind, if given and not withdrawn (25 · 25.2).
      */
     public function consent(ConsentKind $kind): ?Consent

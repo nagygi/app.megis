@@ -11,7 +11,9 @@ use App\Mail\DiagnosisNoticeMail;
 use App\Models\CapabilityAssessment;
 use App\Models\ChapterUpdate;
 use App\Models\MainDiagnosis;
+use App\Models\MainDiagnosisParticipant;
 use App\Models\Material;
+use App\Models\PersonalValueSet;
 use App\Models\ReportFeedback;
 use App\Models\ReportSnapshot;
 use App\Models\User;
@@ -99,6 +101,7 @@ class PublishService
 
         $snapshot = DB::transaction(function () use ($main, $admin, $first): ReportSnapshot {
             $this->stages->transition($main, MainDiagnosisStage::Published, $admin);
+            $this->freezeOwnValues($main);
 
             return $this->snapshot($main->refresh(), $first ? ReportSnapshot::PUBLISHED : ReportSnapshot::REPUBLISHED, $admin);
         });
@@ -159,6 +162,30 @@ class PublishService
 
         // Back in Draft the diagnosis follows its materials again, also the ones that came meanwhile (13 · 13.4).
         RecalculateMainDiagnosis::dispatch($main);
+    }
+
+    /**
+     * Each participant's own values as they are at the first publishing
+     * (21 · 21.3, 24): the list gets a version, the participant keeps it. A
+     * republication keeps the first one (21 · 21.5).
+     */
+    private function freezeOwnValues(MainDiagnosis $main): void
+    {
+        $main->participants()
+            ->whereNull('excluded_at')
+            ->whereNull('replaced_at')
+            ->whereNull('personal_value_set_version_id')
+            ->get()
+            ->each(function (MainDiagnosisParticipant $participant): void {
+                $set = PersonalValueSet::query()->where('user_id', $participant->user_id)->first();
+
+                if ($set === null) {
+                    return;
+                }
+
+                $set->recordVersion();
+                $participant->update(['personal_value_set_version_id' => $set->latestVersion()->first()?->id]);
+            });
     }
 
     private function snapshot(MainDiagnosis $main, string $reason, ?User $admin, ?string $note = null): ReportSnapshot
