@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.73 · {hash} · 2026-11-03
+## 1.73 · 27b7a2c · 2026-11-03
 
 Naptár (09 · 9.5): az időablak végén a feltöltött ICS fájl és a megszakadt kapcsolat is szétkötődik.
 
