@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.59 · {hash} · 2026-11-03
+## 1.59 · 4a320c4 · 2026-11-03
 
 Képességek lépés (NM-12): egy szabad szöveg a kártyák helyett; a képességeket ebből a Képességtár alapján olvassuk ki.
 
