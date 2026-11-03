@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.88 · {hash} · 2026-11-03
+## 1.88 · 5626c56 · 2026-11-03
 
 A társ útja (25): a jegy hiányai pótolva.
 
