@@ -1,5 +1,5 @@
-{{-- A short list ordered by hand, edited in place: it keeps the form width. --}}
-<div class="flex max-w-3xl flex-col gap-6">
+{{-- A short list ordered by hand, edited in place. --}}
+<div class="flex flex-col gap-6">
     <x-ui.flash />
 
     <x-admin.page-header :title="__('admin.support_questions.title')" :description="__('admin.support_questions.help')" :spaced="false">
@@ -9,7 +9,7 @@
     </x-admin.page-header>
 
     @if ($showForm)
-        <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-4">
+        <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-4 *:max-w-3xl">
             <x-form.input name="text" wire:model="text" :label="__('admin.support_questions.text')" maxlength="255" required />
             <x-form.toggle name="is_active" wire:model="is_active" :label="__('admin.support_questions.active')" :help="__('admin.support_questions.active_help')" />
             <div class="flex flex-wrap gap-3">

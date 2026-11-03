@@ -1,6 +1,6 @@
 @php($tones = ['ok' => 'green', 'warning' => 'yellow', 'error' => 'coral'])
 
-<div class="max-w-5xl" wire:poll.60s>
+<div wire:poll.60s>
     <x-admin.page-header :title="__('admin.system.health_title')" />
 
     <x-ui.card as="dl" bordered padding="lg" class="mb-6 grid gap-4 sm:grid-cols-3">

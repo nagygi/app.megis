@@ -55,7 +55,7 @@
     </section>
 
     @if ($main)
-        <x-ui.card as="form" bordered padding="lg" wire:submit="storeOccasion" class="flex max-w-3xl flex-col gap-4">
+        <x-ui.card as="form" bordered padding="lg" wire:submit="storeOccasion" class="flex flex-col gap-4 *:max-w-3xl">
             <h2 class="text-lg font-semibold">{{ __('admin.occasions.add') }}</h2>
             <p class="text-sm text-grey-700">{{ __('admin.occasions.add_help', ['diagnosis' => $main->diagnosis->name]) }}</p>
             <div class="flex flex-col gap-1.5">

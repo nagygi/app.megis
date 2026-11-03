@@ -1,4 +1,4 @@
-<div class="flex max-w-5xl flex-col gap-6">
+<div class="flex flex-col gap-6">
     <x-ui.flash />
 
     @if ($user->isAnonymized())
@@ -38,7 +38,7 @@
     </x-admin.page-header>
 
     @if ($editing)
-        <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-5">
+        <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-5 *:max-w-3xl">
             <div class="grid gap-5 sm:grid-cols-2">
                 <x-form.input name="last_name" wire:model="last_name" :label="__('admin.members.last_name')" />
                 <x-form.input name="first_name" wire:model="first_name" :label="__('admin.members.first_name')" />

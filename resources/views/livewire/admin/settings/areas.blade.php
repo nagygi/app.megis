@@ -1,5 +1,5 @@
 {{-- Beállítások → Területek (18 · 18.1). --}}
-<div class="flex max-w-3xl flex-col gap-6">
+<div class="flex flex-col gap-6">
     <x-ui.flash />
 
     <x-admin.page-header :title="__('admin.areas.title')" :description="__('admin.areas.lead')" :spaced="false" />
@@ -8,7 +8,7 @@
         @foreach ($areas as $area)
             <x-ui.card as="li" bordered wire:key="area-{{ $area->id }}">
                 @if ($editingId === $area->id)
-                    <form wire:submit="save" class="flex flex-col gap-4">
+                    <form wire:submit="save" class="flex flex-col gap-4 *:max-w-3xl">
                         <x-form.input name="name" wire:model="name" :label="__('admin.areas.name')" required />
                         <x-form.textarea name="whatWeLookAt" wire:model="whatWeLookAt" :label="__('admin.areas.what_we_look_at')" :help="__('admin.areas.what_we_look_at_help')" rows="2" />
                         <x-form.textarea name="trace" wire:model="trace" :label="__('admin.areas.trace')" :help="__('admin.areas.trace_help')" rows="2" />

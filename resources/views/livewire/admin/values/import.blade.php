@@ -2,12 +2,12 @@
     $fieldLabel = fn (string $field) => __('admin.values.fields.'.$field);
 @endphp
 
-<div class="flex max-w-3xl flex-col gap-6">
+<div class="flex flex-col gap-6">
     <x-ui.flash />
 
     <x-admin.page-header :title="__('admin.values.import.title')" :spaced="false" />
 
-    <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4">
+    <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4 *:max-w-3xl">
         @unless ($canImport)
             {{-- Only a superadmin loads (03 · 3.6); the page stays readable. --}}
             <x-ui.notice tone="warning">{{ __('admin.values.import.superadmin_only') }}</x-ui.notice>
@@ -46,7 +46,7 @@
 
     @if ($preview !== null)
         {{-- Előnézet: new, changed, unchanged, with the changed fields (03 · 3.6) --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="import-preview">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-3xl" aria-labelledby="import-preview">
             <h2 id="import-preview" class="text-lg font-semibold">{{ __('admin.values.import.preview_title') }}</h2>
 
             @if ($preview['errors'] !== [])
@@ -121,7 +121,7 @@
         </x-ui.card>
     @endif
 
-    <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-3" aria-labelledby="import-history">
+    <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-3 *:max-w-3xl" aria-labelledby="import-history">
         <h2 id="import-history" class="text-lg font-semibold">{{ __('admin.values.import.history') }}</h2>
         @forelse ($imports as $import)
             <p wire:key="import-{{ $import->id }}" class="text-sm">

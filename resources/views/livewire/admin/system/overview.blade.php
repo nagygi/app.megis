@@ -1,4 +1,4 @@
-<div class="max-w-3xl">
+<div>
     <x-admin.page-header :title="__('admin.system.title')" :description="__('admin.system.overview_lead')" />
 
     <ul class="grid gap-4 sm:grid-cols-2">

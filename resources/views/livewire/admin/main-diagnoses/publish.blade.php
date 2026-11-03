@@ -13,7 +13,7 @@
 <div class="flex flex-col gap-6">
     <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
 
-    <div class="flex max-w-7xl flex-col gap-6">
+    <div class="flex flex-col gap-6">
         <x-ui.flash />
 
         {{-- Ellenőrzőlista (21 · 21.2) --}}

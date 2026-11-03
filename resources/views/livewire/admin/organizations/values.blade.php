@@ -3,7 +3,7 @@
     $requiredFields = ['low_example', 'high_example'];
 @endphp
 
-<div class="flex max-w-3xl flex-col gap-6">
+<div class="flex flex-col gap-6">
     <x-admin.page-header :title="__('admin.organizations.tabs.values')" :spaced="false" />
     <x-ui.flash />
 
@@ -99,7 +99,7 @@
                 @endforeach
 
                 {{-- At five values the adding stays in place, greyed out with the reason (08 · 8.1). --}}
-                <x-ui.card :bordered="false" class="flex flex-col gap-4 border border-dashed border-grey-350">
+                <x-ui.card :bordered="false" class="flex flex-col gap-4 border border-dashed border-grey-350 *:max-w-3xl">
                     <x-form.inline>
                         <x-form.select name="pickedValueId" wire:model="pickedValueId" :label="__('admin.value_sets.library')" :disabled="$isFull">
                             <option value="">{{ __('admin.value_sets.library_select') }}</option>

@@ -1,4 +1,4 @@
-<div class="max-w-5xl">
+<div>
     <x-ui.flash class="mb-6" />
 
     @include('livewire.admin.capabilities.partials.header', ['capability' => $capability])

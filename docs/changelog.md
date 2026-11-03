@@ -2,6 +2,25 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.58 · {hash} · 2026-11-03
+
+Admin: minden oldal kitölti a szélességet; nagyon nagy monitoron az oldal legfeljebb 1920 px széles.
+
+- **Eddig (1.25 óta):**
+  - Minden oldal maga döntötte el a szélességét:
+    - a listák kitöltöttek;
+    - az űrlapok 768 px-esek voltak, pl. a szervezet *Adatok* füle;
+    - az adatlapok 1024 px-esek;
+    - a fődiagnózis fülei 1280 px-esek. A fülsor viszont kitöltött, így a tartalom alatta félbemaradt.
+  - Széles monitoron emiatt fülről fülre ugrott a szélesség.
+  - Nagy monitoron a listák a képernyő széléig nyúltak.
+- **Most:**
+  - **Minden oldal kitölt:** a táblázatok, a kártyák és a fődiagnózis fülei egy vonalban állnak a fejléccel.
+  - **Űrlapok:** a fehér kártya kitölt, a mezők megtartják a szélességüket: 768 px, az érték- és a képesség-űrlap szakaszaiban 1024 px. A gombok így a mezők mellett maradnak, pl. a Slug mellett a „Szerkesztem”, és a mentés.
+  - **A hosszabb szövegek** (leírások, bevezetők) továbbra is 768 px-ig tartanak, hogy olvashatók maradjanak.
+  - **Nagyon nagy monitoron** a menü és a tartalom együtt legfeljebb 1920 px széles, középen, két oldalt sötétebb szürke sávval. 1920 px-es monitorig ebből nem látszik semmi.
+  - Az ügyfélfelület nem változott.
+
 ## 1.57 · e6064d0 · 2026-11-03
 
 Admin felhasználólisták: színes állapotjelzés, az Inaktív kiemelve; a címkék chipként.

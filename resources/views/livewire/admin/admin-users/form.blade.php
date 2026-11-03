@@ -1,11 +1,11 @@
-<div class="max-w-3xl">
+<div>
     <x-admin.page-header :title="$isEditing ? __('admin.admins.edit_title') : __('admin.admins.invite_title')" />
 
     @unless ($canEdit)
         <x-ui.notice class="mb-6">{{ __('admin.admins.superadmin_readonly') }}</x-ui.notice>
     @endunless
 
-    <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-5">
+    <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-5 *:max-w-3xl">
         <fieldset @disabled(! $canEdit) class="flex flex-col gap-5">
             <div class="grid gap-5 sm:grid-cols-2">
                 <x-form.input name="last_name" wire:model="last_name" :label="__('admin.admins.last_name')" autocomplete="family-name" required />

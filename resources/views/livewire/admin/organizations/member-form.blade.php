@@ -1,7 +1,7 @@
-<div class="max-w-3xl">
+<div>
     <x-admin.page-header :title="$isEditing ? __('admin.members.edit_title') : __('admin.members.invite_title')" />
 
-    <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-6">
+    <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-6 *:max-w-3xl">
         @if ($isEditing)
             <div class="flex flex-col gap-1">
                 <span class="text-sm font-medium">{{ __('admin.members.email') }}</span>

@@ -69,6 +69,9 @@
     /* 15 · 15.6: mobile below 768px (Tailwind md), tablet 768–1199px, desktop from 1200px. */
     --breakpoint-desktop: 75rem;
 
+    /* The admin's box (max-w-admin): up to a 1920px screen the menu and the pages fill it, beyond it stands in the middle. */
+    --container-admin: 120rem;
+
     --ease-standard: cubic-bezier(0.2, 0.6, 0.2, 1);
     --ease-brand-out: cubic-bezier(0, 0.6, 0.3, 1);
 }

@@ -1,4 +1,4 @@
-<div class="flex max-w-3xl flex-col gap-6">
+<div class="flex flex-col gap-6">
     <x-ui.flash />
 
     <x-admin.page-header :title="__('admin.legal.title')" :spaced="false" />
@@ -32,7 +32,7 @@
             </div>
 
             @if ($uploadingType === $type->value)
-                <form wire:submit="storeVersion" class="mt-6 flex flex-col gap-5 border-t border-grey-200 pt-6">
+                <form wire:submit="storeVersion" class="mt-6 flex flex-col gap-5 border-t border-grey-200 pt-6 *:max-w-3xl">
                     <div class="flex flex-col gap-1.5">
                         <x-form.file name="file" id="legal-file" wire:model="file" accept="application/pdf" :label="__('admin.legal.file')" :help="__('admin.legal.file_help')" required />
                         <div wire:loading wire:target="file" class="text-sm text-grey-700" role="status">{{ __('admin.upload.uploading') }}</div>

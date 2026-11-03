@@ -9,7 +9,7 @@
     ])->filter()->implode(' · ');
 @endphp
 
-<div class="flex max-w-5xl flex-col gap-6" @if ($status->isWorking()) wire:poll.5s @endif>
+<div class="flex flex-col gap-6" @if ($status->isWorking()) wire:poll.5s @endif>
     <x-ui.flash />
 
     <x-admin.page-header :title="$material->original_name ?? $material->context->label()" :description="$meta" :spaced="false">
@@ -31,7 +31,7 @@
 
     @if ($status === \App\Enums\MaterialStatus::AwaitingSpeakers)
         {{-- 06 · 6.3: each speaker to a user of the organization, or skipped --}}
-        <x-ui.card as="form" bordered wire:submit="assign" class="flex flex-col gap-4">
+        <x-ui.card as="form" bordered wire:submit="assign" class="flex flex-col gap-4 *:max-w-5xl">
             <x-ui.section-header :title="__('admin.materials.speakers')" :description="__('admin.materials.speakers_help')" />
             <x-form.error name="assignments" id="assignments" />
 

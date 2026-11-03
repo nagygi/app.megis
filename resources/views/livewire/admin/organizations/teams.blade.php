@@ -14,7 +14,7 @@
     </x-admin.page-header>
 
     @if ($showForm)
-        <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="mb-6 flex max-w-3xl flex-col gap-5">
+        <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="mb-6 flex flex-col gap-5 *:max-w-3xl">
             <x-form.input name="name" wire:model="name" :label="__('admin.teams.name')" required autofocus />
             <x-form.textarea name="description" wire:model="description" :label="__('admin.teams.description')" rows="3" />
 

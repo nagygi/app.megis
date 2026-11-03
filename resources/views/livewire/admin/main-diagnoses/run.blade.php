@@ -8,7 +8,7 @@
 <div class="flex flex-col gap-6">
     <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
 
-    <div class="flex max-w-7xl flex-col gap-6">
+    <div class="flex flex-col gap-6">
         <x-ui.flash />
 
         {{-- The threshold (19 · 19.4): a decision waiting for the admin, so a warning note that stays a labelled region. --}}

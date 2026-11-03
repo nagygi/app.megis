@@ -6,12 +6,12 @@
 @endphp
 
 {{-- A main diagnosis starts with its band (title, stage, tabs), like its other tab pages (17); any other diagnosis is a detail page. --}}
-<div @class(['flex flex-col gap-6', 'max-w-5xl' => ! $main])>
+<div class="flex flex-col gap-6">
     @if ($main)
         <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
     @endif
 
-    <div class="flex max-w-7xl flex-col gap-6">
+    <div class="flex flex-col gap-6">
         <x-ui.flash />
 
         {{-- Header: the basic data and the status steps (04 · 4.3) --}}

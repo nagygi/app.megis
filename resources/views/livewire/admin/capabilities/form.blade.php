@@ -1,7 +1,6 @@
 @php($marks = fn (string $field) => view('livewire.admin.capabilities.partials.marks', ['capability' => $capability, 'field' => $field]))
 
-{{-- The same width as the Verziók tab, so the header does not jump between the tabs. --}}
-<div class="max-w-5xl">
+<div>
     <x-ui.flash class="mb-6" />
 
     @if ($capability)
@@ -13,7 +12,7 @@
     {{-- About 25 fields: one card per section, so the form reads in parts. --}}
     <form wire:submit="save" class="flex flex-col gap-6">
         {{-- Azonosítás --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="capability-identity">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl" aria-labelledby="capability-identity">
             <x-ui.section-header id="capability-identity" :title="__('admin.capabilities.sections.identity')" />
 
             <div class="grid gap-5 md:grid-cols-2">
@@ -54,7 +53,7 @@
         </x-ui.card>
 
         {{-- Besorolás --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="capability-classification">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl" aria-labelledby="capability-classification">
             <x-ui.section-header id="capability-classification" :title="__('admin.capabilities.sections.classification')" />
 
             <div class="grid gap-5 md:grid-cols-2">
@@ -104,7 +103,7 @@
         </x-ui.card>
 
         {{-- Definíció és határ --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="capability-definition">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl" aria-labelledby="capability-definition">
             <x-ui.section-header id="capability-definition" :title="__('admin.capabilities.sections.definition')" />
 
             <div class="flex flex-col gap-1">
@@ -127,7 +126,7 @@
         </x-ui.card>
 
         {{-- Megjelenés szintenként --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="capability-appearances">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl" aria-labelledby="capability-appearances">
             <x-ui.section-header id="capability-appearances" :title="__('admin.capabilities.fields.appearances')" />
 
             @foreach (\App\Enums\CapabilityLevel::cases() as $level)
@@ -139,7 +138,7 @@
         </x-ui.card>
 
         {{-- Felismerés --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="capability-recognition">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl" aria-labelledby="capability-recognition">
             <x-ui.section-header id="capability-recognition" :title="__('admin.capabilities.sections.recognition')" />
 
             <fieldset class="flex flex-col gap-2">
@@ -171,7 +170,7 @@
         </x-ui.card>
 
         {{-- Lépcsők --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="capability-stages">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl" aria-labelledby="capability-stages">
             <x-ui.section-header id="capability-stages" :title="__('admin.capabilities.fields.stages')" />
 
             @foreach (\App\Models\Capability::STAGES as $stage)
@@ -183,7 +182,7 @@
         </x-ui.card>
 
         {{-- The note belongs to the version this save makes, so it sits with the buttons. --}}
-        <x-ui.card bordered padding="lg" class="flex flex-col gap-5">
+        <x-ui.card bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl">
             <x-form.input name="note" wire:model="note" :label="__('admin.capabilities.fields.note')" :help="__('admin.capabilities.help.note')" />
 
             <div class="flex flex-wrap gap-3">
@@ -195,7 +194,7 @@
 
     @if ($capability)
         {{-- The other fields of the Sheet, read only (07 · 7.2) --}}
-        <x-ui.card as="section" bordered padding="lg" class="mt-6 flex flex-col gap-3" aria-labelledby="capability-details">
+        <x-ui.card as="section" bordered padding="lg" class="mt-6 flex flex-col gap-3 *:max-w-5xl" aria-labelledby="capability-details">
             <x-ui.section-header id="capability-details" :title="__('admin.capabilities.fields.details')" :description="__('admin.capabilities.help.details')" />
 
             @if ($capability->details === [])

@@ -32,7 +32,7 @@
     @livewireStyles
     @stack('head')
 </head>
-<body class="min-h-dvh bg-grey-100 text-charcoal">
+<body class="min-h-dvh bg-grey-200 text-charcoal">
     <a href="#main" class="sr-only rounded-pill no-underline bg-charcoal px-4 py-2 text-cream focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50">
         {{ __('ui.skip_to_content') }}
     </a>
@@ -40,9 +40,10 @@
     {{--
         Below 1024px the menu is a drawer: closed it is moved out and invisible,
         so its links leave the tab order; open, the focus stays inside and Esc
-        or the backdrop closes it.
+        or the backdrop closes it. Every page fills the box; on a screen wider
+        than it (1920px), the box stands in the middle on a darker ground.
     --}}
-    <div x-data="{ navOpen: false }" @keydown.escape.window="navOpen = false" class="lg:flex lg:min-h-dvh">
+    <div x-data="{ navOpen: false }" @keydown.escape.window="navOpen = false" class="mx-auto min-h-dvh max-w-admin bg-grey-100 lg:flex">
         <aside
             id="admin-nav"
             class="fixed inset-y-0 left-0 z-40 w-64 overflow-y-auto border-r border-grey-250 bg-white transition-[translate] duration-200 ease-standard max-lg:invisible max-lg:-translate-x-full lg:static"

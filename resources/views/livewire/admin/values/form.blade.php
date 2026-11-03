@@ -1,5 +1,4 @@
-{{-- The same width as the Verziók tab, so the header does not jump between the tabs. --}}
-<div class="max-w-5xl">
+<div>
     <x-ui.flash class="mb-6" />
 
     @if ($value)
@@ -11,7 +10,7 @@
     {{-- One card per section, so the long form reads in parts. --}}
     <form wire:submit="save" class="flex flex-col gap-6">
         {{-- Azonosítás --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="value-identity">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl" aria-labelledby="value-identity">
             <x-ui.section-header id="value-identity" :title="__('admin.values.sections.identity')" />
 
             <div class="grid gap-5 md:grid-cols-2">
@@ -52,7 +51,7 @@
         </x-ui.card>
 
         {{-- Definíció és határ --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="value-definition">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl" aria-labelledby="value-definition">
             <x-ui.section-header id="value-definition" :title="__('admin.values.sections.definition')" />
 
             <x-form.textarea name="definition" wire:model="definition" :label="__('admin.values.fields.definition')" :help="__('admin.values.help.definition')" rows="2" />
@@ -64,7 +63,7 @@
         </x-ui.card>
 
         {{-- Skála --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="value-scale">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl" aria-labelledby="value-scale">
             <x-ui.section-header id="value-scale" :title="__('admin.values.sections.scale')" />
 
             <x-admin.list-editor name="high_examples" :items="$high_examples" :label="__('admin.values.fields.high_examples')" :help="__('admin.values.help.high_examples')" marker="6" marker-tone="green" required />
@@ -72,7 +71,7 @@
         </x-ui.card>
 
         {{-- Felismerés --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="value-recognition">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl" aria-labelledby="value-recognition">
             <x-ui.section-header id="value-recognition" :title="__('admin.values.sections.recognition')" />
 
             <x-admin.list-editor name="examples" :items="$examples" :label="__('admin.values.fields.examples')" :help="__('admin.values.help.examples')" />
@@ -80,7 +79,7 @@
         </x-ui.card>
 
         {{-- Szakirodalom és minősítés --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="value-literature">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-5xl" aria-labelledby="value-literature">
             <x-ui.section-header id="value-literature" :title="__('admin.values.sections.literature')" />
 
             <x-admin.list-editor name="literature" :items="$literature" :label="__('admin.values.fields.literature')" :help="__('admin.values.help.literature')" :max-length="\App\Models\Value::LITERATURE_ITEM_MAX_LENGTH" />

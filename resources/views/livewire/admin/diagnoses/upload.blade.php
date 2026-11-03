@@ -1,7 +1,7 @@
-<div class="max-w-3xl">
+<div>
     <x-admin.page-header :title="__('admin.upload.title')" />
 
-    <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-5">
+    <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-5 *:max-w-3xl">
         <x-form.select name="organization_id" wire:model.live="organization_id" :label="__('admin.diagnoses.organization')" required>
             <option value="">{{ __('admin.diagnoses.organization_select') }}</option>
             <x-admin.organization-options :organizations="$organizations" />

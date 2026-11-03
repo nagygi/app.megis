@@ -5,12 +5,12 @@
 @endphp
 
 {{-- Képességek of a diagnosis (NM-12): a tab of a main diagnosis, a detail page of any other. --}}
-<div @class(['flex flex-col gap-6', 'max-w-5xl' => ! $main])>
+<div class="flex flex-col gap-6">
     @if ($main)
         <x-admin.main-diagnosis-tabs :diagnosis="$diagnosis" />
     @endif
 
-    <div class="flex max-w-7xl flex-col gap-6">
+    <div class="flex flex-col gap-6">
         <x-ui.flash />
 
         @unless ($main)

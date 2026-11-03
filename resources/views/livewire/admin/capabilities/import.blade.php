@@ -3,12 +3,12 @@
     $patternFieldLabel = fn (string $field) => __('admin.patterns.fields.'.$field);
 @endphp
 
-<div class="flex max-w-3xl flex-col gap-6">
+<div class="flex flex-col gap-6">
     <x-ui.flash />
 
     <x-admin.page-header :title="__('admin.capabilities.import.title')" :spaced="false" />
 
-    <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4">
+    <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4 *:max-w-3xl">
         <p>{{ __('admin.capabilities.import.lead') }}</p>
         <p class="text-sm text-grey-700">{{ __('admin.capabilities.import.rules') }}</p>
 
@@ -36,7 +36,7 @@
 
     @if ($preview !== null)
         {{-- Előnézet: new, changed, unchanged, with the changed fields (07 · 7.6) --}}
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5" aria-labelledby="import-preview">
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-5 *:max-w-3xl" aria-labelledby="import-preview">
             <h2 id="import-preview" class="text-lg font-semibold">{{ __('admin.capabilities.import.preview_title') }}</h2>
             <div class="flex flex-col gap-1">
                 <p class="text-lg">{{ __('admin.capabilities.import.summary', ['created' => count($preview['created']), 'updated' => count($preview['updated']), 'unchanged' => count($preview['unchanged'])]) }}</p>
@@ -156,7 +156,7 @@
         </x-ui.card>
     @endif
 
-    <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-3" aria-labelledby="import-history">
+    <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-3 *:max-w-3xl" aria-labelledby="import-history">
         <h2 id="import-history" class="text-lg font-semibold">{{ __('admin.capabilities.import.history') }}</h2>
         @forelse ($imports as $import)
             <p wire:key="import-{{ $import->id }}" class="text-sm">

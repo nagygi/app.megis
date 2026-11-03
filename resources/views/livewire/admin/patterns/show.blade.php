@@ -3,7 +3,7 @@
     $none = __('admin.common.none');
 @endphp
 
-<div class="flex max-w-5xl flex-col gap-6">
+<div class="flex flex-col gap-6">
     @include('livewire.admin.patterns.partials.header', ['pattern' => $pattern])
 
     {{-- Azonosítás --}}
