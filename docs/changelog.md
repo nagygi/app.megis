@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.65 · {hash} · 2026-11-03
+## 1.65 · c0a71a2 · 2026-11-03
 
 „Belépek a nevében” (14 · 14.6): a coral sávban felül a név, alatta a pillék, jobbra a Kilépés.
 
