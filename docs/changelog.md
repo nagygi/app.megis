@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.55 · {hash} · 2026-11-03
+## 1.55 · 286b88d · 2026-11-03
 
 Admin: „Szervezetek › szervezet” a fejlécben, a morzsa a fültől az aktuális oldalig; az A1 vezetői előnézete megszűnt.
 
