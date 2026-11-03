@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.78 · {hash} · 2026-11-03
+## 1.78 · dd574ef · 2026-11-03
 
 Saját értékek (24 · 24.1): az „Elmondom” után a tükör értékei visszajönnek a listába.
 
