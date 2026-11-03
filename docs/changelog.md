@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.64 · – · 2026-11-03
+## 1.64 · f32b510 · 2026-11-03
 
 Admin, szervezet *Folyamatok* füle: az *Új folyamat* saját oldalra került, morzsával.
 
