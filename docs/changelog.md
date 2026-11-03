@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.81 · {hash} · 2026-11-03
+## 1.81 · a057bca · 2026-11-03
 
 Profil (31 · 31.5, 23 · 23.4): a társ is megnyithatja a „Ki lát mit” lapot, a saját változatában.
 
