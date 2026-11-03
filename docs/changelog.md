@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.82 · {hash} · 2026-11-03
+## 1.82 · b915d94 · 2026-11-03
 
 Admin, *Publikálás* fül (21 · 21.1): a vezető nézetének előnézete a kezdőlapon (V12, snapshotnál V12·b) nyílik.
 
