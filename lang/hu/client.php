@@ -38,6 +38,11 @@ return [
         'home' => 'Kezdőlap',
     ],
 
+    // The foot of every page: "powered by mégis" and the legal documents (05 · 5.2).
+    'footer' => [
+        'powered_by' => 'powered by',
+    ],
+
     'value_library' => [
         'title' => 'Értéktár',
         'question' => 'Mit jelentenek nálatok az értékek?',

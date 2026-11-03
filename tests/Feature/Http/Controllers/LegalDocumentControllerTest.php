@@ -2,6 +2,7 @@
 
 use App\Enums\LegalDocumentType;
 use App\Models\LegalDocumentVersion;
+use App\Models\Organization;
 use Illuminate\Support\Facades\Storage;
 
 it('serves the version in force at the permanent address', function () {
@@ -46,4 +47,29 @@ it('has no footer while no document is uploaded', function () {
     $response = $this->get(route('public.home'));
 
     $response->assertOk()->assertDontSee('<footer', escape: false);
+});
+
+it('links the uploaded documents in the customer footer, in a new tab', function () {
+    LegalDocumentVersion::factory()->ofType(LegalDocumentType::Terms)->create();
+    LegalDocumentVersion::factory()->ofType(LegalDocumentType::PrivacyPolicy)->create();
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+
+    $response = $this->get(route('client.home', $organization));
+
+    $response->assertOk()
+        ->assertSee('powered by')
+        ->assertSee('aria-label="Jogi dokumentumok"', escape: false)
+        ->assertSee('href="'.route('legal.show', 'aszf').'" target="_blank"', escape: false)
+        ->assertSee('href="'.route('legal.show', 'adatkezelesi-tajekoztato').'" target="_blank"', escape: false)
+        ->assertDontSee('/cookie-tajekoztato', escape: false);
+});
+
+it('keeps the powered by line in the customer footer while no document is uploaded', function () {
+    $response = $this->get(route('client.login'));
+
+    $response->assertOk()
+        ->assertSee('<footer', escape: false)
+        ->assertSee('powered by')
+        ->assertDontSee('aria-label="Jogi dokumentumok"', escape: false);
 });

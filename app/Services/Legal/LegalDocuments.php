@@ -29,6 +29,18 @@ class LegalDocuments
     }
 
     /**
+     * The documents that have a version in force, in the order of the footers (05 · 5.2).
+     *
+     * @return Collection<int, LegalDocumentType>
+     */
+    public function available(): Collection
+    {
+        return collect(LegalDocumentType::cases())
+            ->filter(fn (LegalDocumentType $type): bool => $this->current($type) !== null)
+            ->values();
+    }
+
+    /**
      * The versions in force of the documents that have to be accepted (ÁSZF, privacy policy).
      *
      * @return Collection<int, LegalDocumentVersion>

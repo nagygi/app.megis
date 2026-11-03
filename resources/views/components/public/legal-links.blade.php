@@ -1,10 +1,7 @@
 {{-- The footer of every public page: links to the legal documents in force; a document not uploaded yet has no link, and with none there is no footer (05 · 5.2). --}}
 @props(['tone' => 'cream'])
 
-@php
-    $legalDocuments = app(\App\Services\Legal\LegalDocuments::class);
-    $documents = collect(\App\Enums\LegalDocumentType::cases())->filter(fn ($type) => $legalDocuments->current($type) !== null);
-@endphp
+@php($documents = app(\App\Services\Legal\LegalDocuments::class)->available())
 
 @if ($documents->isNotEmpty())
     <footer @class([

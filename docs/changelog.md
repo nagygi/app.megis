@@ -2,6 +2,16 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.92 · {hash} · 2026-11-03
+
+Ügyfél-app lábléc (05 · 5.2, a kártyán érkezett kérés).
+
+- **Eddig:** a regisztrációkor elfogadott ÁSZF és adatkezelési tájékoztató utána az ügyfél-appban sehonnan nem volt elérhető, csak a publikus lapok láblécéből.
+- **Most:**
+  - **Minden ügyfél-lap alján lábléc áll,** a belépéstől és a regisztrációtól a riportig: „powered by mégis”, mellette a feltöltött jogi dokumentumok (Adatkezelési tájékoztató, ÁSZF, Cookie tájékoztató).
+  - **A dokumentumok új lapon nyílnak,** így egy félig kitöltött lap nem vész el. A még fel nem töltött dokumentumnak nincs linkje; ha egy sincs, a „powered by mégis” akkor is ott áll.
+  - **Rövid lapon telefonon is** a képernyő alján van a lábléc. A korall plusz gomb fölött hagy helyet, nem takarja ki.
+
 ## 1.91 · 0a3c45b · 2026-11-03
 
 Útravaló (29): a jegy hiányai pótolva.

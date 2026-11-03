@@ -122,7 +122,7 @@
         </div>
     @endif
 
-    <div x-data="{ menuOpen: false }" @keydown.escape.window="menuOpen = false" class="desktop:flex desktop:min-h-dvh">
+    <div x-data="{ menuOpen: false }" @keydown.escape.window="menuOpen = false" class="flex min-h-dvh">
         @if ($user)
             {{--
                 Below 1200px the closed menu is moved out and invisible, so its links
@@ -292,13 +292,12 @@
                 </div>
             </header>
 
-            {{-- With the plus button, the page ends above it. --}}
-            <main id="main" @class([
-                'mx-auto w-full max-w-3xl flex-1 px-6 py-6 desktop:max-w-5xl',
-                'pb-28' => $plus || $close,
-            ])>
+            <main id="main" class="mx-auto w-full max-w-3xl flex-1 px-6 py-6 desktop:max-w-5xl">
                 {{ $slot }}
             </main>
+
+            {{-- With the plus button, the page ends above it. --}}
+            <x-client.footer :clear="$plus || $close" />
         </div>
     </div>
 

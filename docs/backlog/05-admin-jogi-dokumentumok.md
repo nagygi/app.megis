@@ -36,8 +36,9 @@ Bal oldali menüpont: *Beállítások → Jogi dokumentumok*. Egy lap, dokumentu
 - Ezekre linkelnek:
   - az Értéktükör ET2 lapja (06),
   - minden publikus oldal lábléce: a kezdőlap és az Értéktükör nyilvános lapjai,
+  - az ügyfél-app minden lapjának lábléce (15), a belépéstől a riportig, hogy a regisztrációkor elfogadott dokumentumok később is elérhetők legyenek. Bal oldalt „powered by mégis” áll, mellette a dokumentumok. Új lapon nyílnak, így egy félig kitöltött lap nem vész el.
   - a regisztráció (14).
-- Ha a dokumentum még nincs feltöltve, a link nem jelenik meg. Ha egy sincs feltöltve, lábléc sincs. A regisztrációnál a feltöltött dokumentum linkje akkor is megjelenik, ha a másik még hiányzik; a hiányzó neve link nélkül áll.
+- Ha a dokumentum még nincs feltöltve, a link nem jelenik meg. Ha egy sincs feltöltve, a publikus lapokon lábléc sincs; az ügyfél-appban a „powered by mégis” akkor is ott áll. A regisztrációnál a feltöltött dokumentum linkje akkor is megjelenik, ha a másik még hiányzik; a hiányzó neve link nélkül áll.
 
 ## Nincs benne
 
