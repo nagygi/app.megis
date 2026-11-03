@@ -17,6 +17,7 @@
         ->filter(fn ($chapterKeys) => $chapterKeys->isNotEmpty());
 @endphp
 <x-layouts::client
+    :dots="$dots"
     :title="__('report.pages.compare')"
     color="green"
     symbol="mycelium"

@@ -176,9 +176,10 @@ class ReportBuilder
             ->sortBy(fn (EvidenceTrace $trace) => [$trace->highlighted_at === null ? 1 : 0, -($trace->recorded_on?->timestamp ?? 0)])
             ->values();
         $score = $row->score_state === ScoreState::Scored ? (float) $row->score : null;
-        $experience = $showsExperience && ! in_array($row->kind, [DiagnosisRowKind::Area, DiagnosisRowKind::Process], true) ? $row->experience : null;
-        // Without peers the gap is between the self-image and the situations (18 · 18.4).
-        $against = $main->hasPeers() ? $score : ($stats['situations'] ?? null);
+        // A process row's experience is the one given after its occasions (V11·c, 13 · 13.3, R3·b).
+        $experience = $showsExperience && $row->kind !== DiagnosisRowKind::Area ? $row->experience : null;
+        // Without peers the gap is between the self-image and the situations (18 · 18.4); a process sets it against its PHI.
+        $against = $main->hasPeers() || $row->kind === DiagnosisRowKind::Process ? $score : ($stats['situations'] ?? null);
         $gap = $against !== null && $experience !== null ? round($experience - $against, 1) : null;
         $definition = $row->kind === DiagnosisRowKind::Value ? $definitions->get($row->value_id) : null;
         $processDiagnosis = $row->kind === DiagnosisRowKind::Process ? $processDiagnoses->get($row->process_id) : null;
@@ -283,7 +284,7 @@ class ReportBuilder
         foreach ($rows as $row) {
             foreach ($row['claims'] as $claim) {
                 if ($claim['kind'] === $kind) {
-                    return ['row' => $row['label'], 'chapter' => $row['chapter'], 'text' => $claim['text'], 'quote' => $claim['traces'][0]['quote'] ?? null];
+                    return ['row' => $row['label'], 'row_id' => $row['id'], 'chapter' => $row['chapter'], 'text' => $claim['text'], 'quote' => $claim['traces'][0]['quote'] ?? null];
                 }
             }
         }

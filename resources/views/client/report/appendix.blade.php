@@ -6,6 +6,7 @@
     $standalone = $report['meta']['standalone'] ?? false;
 @endphp
 <x-layouts::client
+    :dots="$dots"
     :title="__('appendix.pdf_title')"
     color="light-yellow"
     symbol="circle"

@@ -7,9 +7,13 @@ use App\Models\DiagnosisClaim;
 use App\Models\DiagnosisText;
 use App\Models\EvidenceTrace;
 use App\Models\Membership;
+use App\Models\Process;
+use App\Models\Product;
 use App\Services\Diagnoses\ReadingService;
+use App\Services\Report\HungarianNumber;
 use App\Services\Report\PublishService;
 use App\Services\Report\ReportBuilder;
+use App\Services\Report\ReportText;
 use Illuminate\Support\Facades\Queue;
 
 beforeEach(fn () => Queue::fake());
@@ -202,4 +206,86 @@ it('shows a peer quote to the leader only with the A1 switch and the peer consen
     $main->update(['show_peer_quotes' => false]);
     expect($quotes())->not->toContain('A társ idézete.', 'Kézzel felvett társ-nyom.')
         ->toContain('Szóltam a csúszásról, mielőtt kérdezték volna.');
+});
+
+it('follows the view switcher on the deep pages too (27 · 27.9)', function () {
+    [$setup, $main] = publishedReport();
+    actingAsCustomer($setup['leader']);
+    $value = $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Value)->orderBy('position')->first()->load('value');
+    $url = route('client.report.item', [$setup['organization'], $main->diagnosis, 'ertekek', $value->id]);
+    // The leader brought one material: too few for their own view (ViewDataBuilder::INDIVIDUAL_MINIMUM).
+    $individual = __('report.question.item', ['score' => __('report.insufficient'), 'label' => $value->label()]);
+
+    $this->get($url)->assertOk()->assertDontSee($individual);
+    $this->get($url.'?nezet=egyen')->assertOk()->assertSee($individual)->assertSee('a te anyagaidból');
+    $this->get($url.'?nezet=szervezet')->assertOk()->assertDontSee($individual)->assertSee('a szervezet publikált diagnózisaiból');
+});
+
+it('gives a process its experience after the occasions and its gap on R3·b (27 · 27.6)', function () {
+    [, $main] = approvedReading();
+    $main->update(['calculation' => [...$main->calculation, 'peers_answered' => 3]]);
+    $process = $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Process)->sole();
+    $process->update(['experience' => 5]);
+
+    $report = app(ReportBuilder::class)->build($main->refresh());
+    $row = collect($report['chapters']['processes']['rows'])->sole();
+
+    expect($row['experience_whole'])->toBe(5)
+        ->and(ReportText::gap($row, $report['meta']))->toBe(__('report.gap_sentence', ['experience' => HungarianNumber::dative(5), 'score' => HungarianNumber::accusative($row['score_whole'])]));
+});
+
+it('lists the processes not measured apart, without a point (27 · 27.6)', function () {
+    [$setup, $main] = approvedReading();
+    Process::factory()->accepted()->for($setup['organization'])->create(['name' => 'Negyedéves tervezés']);
+    app(PublishService::class)->publish($main, $setup['admin']);
+    actingAsCustomer($setup['leader']);
+
+    $this->get(route('client.report.chapter', [$setup['organization'], $main->diagnosis, 'folyamatok']))
+        ->assertOk()
+        ->assertSeeInOrder(['Nem mért folyamatok', 'Negyedéves tervezés']);
+});
+
+it('drops the processes chapter when the leader skipped them, keeping the count (27 · 27.6)', function () {
+    [$setup, $main] = approvedReading();
+    $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Process)->delete();
+    app(PublishService::class)->publish($main->refresh(), $setup['admin']);
+    actingAsCustomer($setup['leader']);
+    $parameters = [$setup['organization'], $main->diagnosis];
+
+    $this->get(route('client.report.show', $parameters))->assertOk()->assertDontSee('href="'.route('client.report.chapter', [...$parameters, 'folyamatok']).'"', false);
+    $this->get(route('client.report.chapter', [...$parameters, 'ertekek']))->assertOk()
+        ->assertSee('2 / 8 · Értékek')
+        ->assertSee('href="'.route('client.report.chapter', [...$parameters, 'teruletek']).'"', false);
+    $this->get(route('client.report.chapter', [...$parameters, 'folyamatok']))->assertNotFound();
+});
+
+it('shows the chapter dots on the deep pages and links the evidence of R1·b (27 · 27.1)', function () {
+    [$setup, $main] = publishedReport();
+    actingAsCustomer($setup['leader']);
+    $parameters = [$setup['organization'], $main->diagnosis];
+    $strength = EvidenceTrace::query()->firstOrFail()->diagnosis_row_id;
+    $value = $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Value)->orderBy('position')->first();
+
+    $this->get(route('client.report.item', [...$parameters, 'ertekek', $value->id]))->assertOk()
+        ->assertSee('href="'.route('client.report.chapter', [...$parameters, 'folyamatok']).'"', false);
+    $this->get(route('client.report.internal', $parameters))->assertOk()
+        ->assertSee('href="'.route('client.report.item', [...$parameters, 'ertekek', $strength]).'"', false);
+});
+
+it('shows the snapshot on one page, with the yellow proposal and the evidence link (27 · 27.10)', function () {
+    [$setup, $main] = approvedReading();
+    $main->update(['product_key' => Product::SNAPSHOT_INTERNAL]);
+    app(PublishService::class)->publish($main->refresh(), $setup['admin']);
+    actingAsCustomer($setup['leader']);
+    $parameters = [$setup['organization'], $main->diagnosis];
+    $strength = EvidenceTrace::query()->firstOrFail()->diagnosis_row_id;
+
+    $this->get(route('client.report.show', $parameters))->assertOk()
+        ->assertSee('Mennyire lesz nálatok az értékekből tett?')
+        ->assertSee('Nálatok szólnak a csúszásról.')
+        ->assertSee('A recommendation mondata.')
+        ->assertSee('rounded-[18px] bg-yellow', false)
+        ->assertSee('href="'.route('client.report.item', [...$parameters, 'ertekek', $strength]).'"', false)
+        ->assertSee('Magatokra ismertek?');
+    $this->get(route('client.report.summary', $parameters))->assertNotFound();
 });

@@ -95,7 +95,7 @@ A lista gépi javaslat, jóváhagyásra. Négy csoportja van: Erős minta · Biz
   - Értéket a felelős, a vezető vagy az admin rögzít, dátummal. A folyamat lapján az utolsó érték és a korábbiak listája látszik.
   - A PHI-be nem számít.
 - **Gombok:** „Kész” · „Vissza a listához”. Az adatlap bármikor visszanyitható az M4-ből.
-- „A folyamat lapja” link csak publikálás után jelenik meg (R3·b).
+- „A folyamat lapja” link a diagnózisban a folyamat Tárak → Folyamatok lapjára visz, a prototípus V6·e-je szerint (1.35).
 
 ### 11.4 Összegzés (V6·f)
 

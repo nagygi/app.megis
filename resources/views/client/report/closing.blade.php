@@ -8,6 +8,7 @@
     $gap = $report['biggest_gap'];
 @endphp
 <x-layouts::client
+    :dots="$dots"
     :title="ReportText::copy('pages.closing', $meta)"
     color="light-yellow"
     symbol="growth-rings"

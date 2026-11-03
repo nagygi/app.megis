@@ -11,19 +11,31 @@
         'areas' => 'growth-rings',
         default => 'root',
     };
-    $whole = $item['score_whole'] ?? null;
+    // Egyén · Szervezet: the same row in that view, its PHI and gap; the evidence stays the diagnosis' (27 · 27.9).
+    $teamView = $mode === 'csapat' || $meta['snapshot'] || ($meta['standalone'] ?? false);
+    $viewItem = $teamView ? null : ($mode === 'egyen' ? $individual : $organizationView)
+        ->first(fn (array $row) => $row['kind'] === $item['kind'] && mb_strtolower($row['label']) === mb_strtolower($item['label']));
+    $score = $teamView ? $item['score'] : ($viewItem['score'] ?? null);
+    $whole = $teamView ? ($item['score_whole'] ?? null) : ($viewItem['score_whole'] ?? null);
+    $scoreLabel = match (true) {
+        $teamView => ReportText::score($item),
+        ($viewItem['score_state'] ?? null) === 'insufficient_data' => __('report.insufficient'),
+        default => $whole ?? '–',
+    };
     $experienceLine = match (true) {
+        $key === 'processes' => __('report.experience_occasions'),
         $meta['has_peers'] => __('report.experience_line', ['leader' => ReportText::decimal($item['leader']), 'peers' => ReportText::decimal($item['peers']), 'count' => $item['peer_count']]),
         $item['situations'] !== null => __('report.experience_self', ['leader' => ReportText::decimal($item['leader']), 'situations' => ReportText::decimal($item['situations'])]),
         default => null,
     };
 @endphp
 <x-layouts::client
+    :dots="$dots"
     :title="$item['label']"
     :color="$key === 'brand' ? 'light-yellow' : 'green'"
     :symbol="$symbol"
     :label="$item['label']"
-    :subtitle="__('report.question.item', ['score' => ReportText::score($item), 'label' => $item['label']])"
+    :subtitle="__('report.question.item', ['score' => $scoreLabel, 'label' => $item['label']])"
     :badge="__('report.diagnosis_view')"
     :note="__('report.item_meta', ['date' => \Illuminate\Support\Carbon::parse($meta['published_on'])->format('m.d.'), 'area' => __('report.item_area.'.$key), 'chapter' => __('report.item_chapter.'.$key)])"
     :back="$chapterUrl"
@@ -37,12 +49,18 @@
         <section class="flex items-center gap-3.5" aria-label="{{ __('report.phi') }}">
             <p class="flex shrink-0 flex-col items-center">
                 <span class="text-xs font-semibold tracking-[.07em] text-grey-700">{{ __('report.phi') }}</span>
-                <span @class(['text-5xl leading-none font-extrabold tabular-nums', 'text-coral-ink' => $whole !== null && $whole <= 2])>{{ ReportText::score($item) }}</span>
+                <span @class(['text-5xl leading-none font-extrabold tabular-nums', 'text-coral-ink' => $whole !== null && $whole <= 2])>{{ $scoreLabel }}</span>
             </p>
-            <x-report.ladder class="min-w-0 flex-1" :value="$item['score']" marker="charcoal" />
+            <x-report.ladder class="min-w-0 flex-1" :value="$score" marker="charcoal" />
         </section>
 
-        @if (in_array($key, ['values', 'brand', 'processes'], true))
+        @if (! $teamView)
+            @if ($viewItem === null)
+                <p class="text-grey-700">{{ __('report.view_no_row') }}</p>
+            @elseif ($sentence = ReportText::viewGap($viewItem, $mode, $meta))
+                <p class="font-semibold text-coral-ink">{{ $sentence }}</p>
+            @endif
+        @elseif (in_array($key, ['values', 'brand', 'processes'], true))
             @if ($item['experience'] !== null && $meta['shows_experience'])
                 <div class="flex flex-col border-t border-grey-200">
                     <x-report.row :title="__('report.experience')" :meta="$experienceLine" :bar="false" :number="$item['experience_whole']" />

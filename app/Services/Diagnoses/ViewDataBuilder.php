@@ -174,7 +174,10 @@ class ViewDataBuilder
             'kind' => $row->kind->value,
             'key' => $this->commonKey($row),
             'label' => $row->label(),
+            // The tree circle draws the view too (27 · 27.9).
+            'element' => $row->tree_element?->value,
             'score' => $score,
+            'score_whole' => $score === null ? null : (int) floor($score + 0.5),
             'score_state' => $state?->value,
             'experience' => $experience,
             'gap' => $gap,

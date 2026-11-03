@@ -72,7 +72,9 @@
         @endif
 
         @if ($key === 'brand')
-            <x-report.tree-circle :rows="$chapter['rows']" :average="$chapter['average']" />
+            {{-- In the Egyén and the Szervezet view the circle draws that view's elements (27 · 27.9). --}}
+            @php($circleRows = $viewRows === null ? collect($chapter['rows']) : $viewRows->filter(fn (array $row) => isset($row['element'])))
+            <x-report.tree-circle :rows="$circleRows->all()" :average="$viewRows === null ? $chapter['average'] : $circleRows->where('score_state', 'scored')->avg('score')" />
 
             @if (filled($report['texts']['brand_reading'] ?? null))
                 <x-ui.card as="section" :bordered="false" padding="sm" class="flex flex-col gap-2 border-2 border-coral" aria-labelledby="brand-reading">
@@ -87,15 +89,10 @@
             {{-- One person's or the organization's view: no deepening, the gap speaks to one person. --}}
             <div class="flex flex-col">
                 @forelse ($viewRows as $row)
-                    @php
-                        $whole = $row['score'] === null ? null : (int) floor($row['score'] + 0.5);
-                        $rowMeta = $row['gap'] !== null && $row['experience'] !== null && $whole !== null
-                            ? __($mode === 'egyen' || ! $meta['has_peers'] ? 'report.gap_sentence_self' : 'report.gap_sentence', ['experience' => \App\Services\Report\HungarianNumber::dative((int) floor($row['experience'] + 0.5)), 'score' => \App\Services\Report\HungarianNumber::accusative($whole)])
-                            : null;
-                    @endphp
+                    @php($whole = $row['score'] === null ? null : (int) floor($row['score'] + 0.5))
                     <x-report.row
                         :title="$row['label']"
-                        :meta="$rowMeta"
+                        :meta="ReportText::viewGap($row, $mode, $meta)"
                         :value="$row['score']"
                         :number="$row['score_state'] === 'insufficient_data' ? __('report.insufficient') : ($whole ?? '–')"
                         :low="$whole !== null && $whole <= 2"
@@ -130,13 +127,13 @@
                                 @if ($sentence = ReportText::gap($row, $meta))
                                     <p class="text-sm">{{ $sentence }}</p>
                                 @endif
-                                @forelse ($row['claims'] as $claim)
+                                @foreach ($row['claims'] as $claim)
                                     <p class="text-sm">{{ $claim['text'] }}</p>
-                                @empty
-                                    @if ($row['traces'][0] ?? null)
-                                        @include('client.report.partials.quote', ['trace' => $row['traces'][0]])
-                                    @endif
-                                @endforelse
+                                @endforeach
+                                {{-- 1–2 pieces of evidence, the rest on the element's page (27 · 27.8). --}}
+                                @foreach (array_slice($row['traces'], 0, 2) as $trace)
+                                    @include('client.report.partials.quote', ['trace' => $trace])
+                                @endforeach
                             </div>
                             <p class="flex items-center gap-2 text-xs font-semibold tracking-[.08em] text-green uppercase">{{ __('report.tree.outside') }} <x-report.soon /></p>
                             <a href="{{ $url('item', [$slug, $row['id']]) }}" class="self-start text-sm font-semibold text-charcoal">{{ __('report.element_evidence') }} <x-megis.icon name="chevron-right" class="inline size-3.5 align-middle" /></a>
@@ -160,6 +157,21 @@
                     />
                 @endforeach
             </div>
+
+            @if ($key === 'processes' && $report['processes']['others'] !== [])
+                {{-- The processes not measured stand apart, without a point (27 · 27.6). --}}
+                <section class="flex flex-col gap-1" aria-labelledby="not-measured">
+                    <h2 id="not-measured" class="text-xs font-semibold tracking-[.08em] text-green uppercase">{{ __('report.not_measured') }}</h2>
+                    <ul class="flex flex-col">
+                        @foreach ($report['processes']['others'] as $process)
+                            <li class="flex items-baseline justify-between gap-3 border-b border-grey-200 py-2.5 last:border-b-0">
+                                <span class="font-semibold">{{ $process['name'] }}</span>
+                                <span class="shrink-0 text-sm text-grey-700">{{ $process['in_calendar'] ? __('report.not_measured_point') : __('report.not_in_calendar') }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endif
         @endif
 
         {{-- The claims of the chapter with their first quote; at the tree, the cracks between the sides. --}}

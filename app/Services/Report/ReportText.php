@@ -37,7 +37,7 @@ final class ReportText
             return $row['sentence'];
         }
 
-        if (in_array($row['kind'], ['area', 'process'], true)) {
+        if ($row['kind'] === 'area') {
             return null;
         }
 
@@ -47,6 +47,14 @@ final class ReportText
 
         if ($row['experience_whole'] === null || $row['gap_against_whole'] === null) {
             return null;
+        }
+
+        // A process: the experience after its occasions against its PHI (R3·b).
+        if ($row['kind'] === 'process') {
+            return self::copy('gap_sentence', $meta, [
+                'experience' => HungarianNumber::dative($row['experience_whole']),
+                'score' => HungarianNumber::accusative($row['gap_against_whole']),
+            ]);
         }
 
         // A standalone diagnosis sets the own experience against the score (04 · 4.4).
@@ -60,6 +68,27 @@ final class ReportText
         return __($meta['has_peers'] ? 'report.gap_sentence' : 'report.gap_sentence_self', [
             'experience' => HungarianNumber::dative($row['experience_whole']),
             'score' => $meta['has_peers'] ? HungarianNumber::accusative($row['gap_against_whole']) : HungarianNumber::dative($row['gap_against_whole']),
+        ]);
+    }
+
+    /**
+     * The gap of a row in the Egyén or the Szervezet view (27 · 27.9): one
+     * person's, or the organization's speaking to all.
+     *
+     * @param  array<string, mixed>  $row  a row of the view (ViewDataBuilder)
+     * @param  array<string, mixed>  $meta
+     */
+    public static function viewGap(array $row, string $mode, array $meta): ?string
+    {
+        $whole = $row['score'] === null ? null : (int) floor($row['score'] + 0.5);
+
+        if ($row['gap'] === null || $row['experience'] === null || $whole === null) {
+            return null;
+        }
+
+        return __($mode === 'egyen' || ! $meta['has_peers'] ? 'report.gap_sentence_self' : 'report.gap_sentence', [
+            'experience' => HungarianNumber::dative((int) floor($row['experience'] + 0.5)),
+            'score' => HungarianNumber::accusative($whole),
         ]);
     }
 

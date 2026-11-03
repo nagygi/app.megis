@@ -287,7 +287,7 @@
                     <p class="text-lg font-semibold">{{ $selected->label() }} · {{ $selected->scoreLabel() ?: '–' }}</p>
                     @if ($selected->overridden_at && filled($selected->override_sentence))
                         <p>{{ $selected->override_sentence }}</p>
-                    @elseif (! in_array($selected->kind, [\App\Enums\DiagnosisRowKind::Area, \App\Enums\DiagnosisRowKind::Process], true))
+                    @elseif ($selected->kind !== \App\Enums\DiagnosisRowKind::Area)
                         @if ($showsExperience && $selected->gap() !== null)
                             <p>{{ __('admin.reading.gap_sentence', ['experience' => $decimal($selected->experience), 'score' => $decimal($selected->score)]) }}</p>
                         @elseif (! $showsExperience)

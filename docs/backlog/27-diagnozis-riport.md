@@ -18,7 +18,7 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 - **Egy fejezet, egy kérdés:** minden lap tetején a kérdés áll, a vezető nyelvén.
 - **A szám soha nem áll egyedül:** mellette a lépcső, a rés vagy a nyíl oda, ahonnan jött.
 - **Mélyülés minden fejezetben ugyanígy:** gyűrű → csoport → tétel → bizonyíték.
-- **A lap tetején** kilenc fejezet-pötty (R0–R8), link a meglévő lapokra. A Brand riport, a Képesség és a Bridge pöttye szaggatott, „hamarosan” (1.31).
+- **A lap tetején** kilenc fejezet-pötty (R0–R8), link a meglévő lapokra. A Brand riport, a Képesség és a Bridge pöttye szaggatott, „hamarosan” (1.31). Minden lapon ott vannak: a mélyítő lapon a fejezete, az R1·b-n és az R1·c-n az R1 pöttye a kiemelt; a zárólapon és a Mellékletben egyik sem. A Belső snapshot egy lapján nincsenek.
 - **A lap alján** a fejezet-lépegető: „{k} / 8 · {fejezet}” (pl. „2 / 8 · Értékek”), és a következő lap. A márkád alapja után a zárólap jön.
 - **A mélyítő lapon** „diagnózis-nézet · {publikálás dátuma}” címke áll: a lap a publikálás napjára fagyott (21.3).
 - **Fejlécszín** (15 · 15.2): zöld a Belső működés lapjain, világossárga a válasznál, az összefoglalónál és a márkád alapjánál.
@@ -34,24 +34,25 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 - Kérdés: „Mennyire lesz nálatok az értékekből tett?”
 - **Egy gyűrű:** Belső működés, %-kal, „{pont} / {max} pont · {n} mérőpont”, coral vonással 80%-nál.
 - Mellette a „Mit jelent a % és a pontok?” link a Bölcsességtárba (BT4, 32).
-- **Sáv:** „1 nincs · {lépcső} · 6 beépült”. A „–” (nincs nyoma) sorok nem számítanak bele (18.4).
+- **Sáv:** „0 nincs nyoma · {lépcső} · 6 beépült”, a prototípus szerint (1.31). A „–” (nincs nyoma) sorok nem számítanak bele (18.4).
 - **Bontás négy sorban**, pontokkal, mindegyik a fejezetére visz: Értékek · Folyamatok · Területek · A márkád alapja.
-- „összefoglaló ›” az R1-re visz.
+- A Belső működés csoport „összefoglaló ›” linkje a csoport összes mérőpontjára, az R1·b-re visz. Az R1-re a lábléc lép.
 
 ### 27.3 Vezetői összefoglaló (R1)
 
-- Kérdés: „Mi tartja a diagnózist?”
-- Négy színes blokk, mindegyik a saját lapjára nyílik:
+- Kérdés: „Mi tartja a diagnózist, öt blokkban?”
+- Öt blokk, a prototípus R1-e szerint, a színesek a saját lapjukra nyílnak:
   - **A legnagyobb rés** (charcoal, az egyetlen nagybetűs mondat);
   - **A márkád alapja** (sárga): a fa olvasata, „PHI {x}”;
   - **Belső működés** (zöld): egy erősség és egy repedés;
-  - **A mégis javaslata** (sárga doboz): „Hol kezdenénk” mondat és mérőpont (18.3).
+  - **Brand riport:** „hamarosan”;
+  - **Képesség** (fehér, coral kerettel, NM-12): a jóváhagyott képességek, ha vannak. A vonal alatt **a mégis javaslata**: „Hol kezdenénk:” mondat és mérőpont (18.3).
 
 ### 27.4 Belső működés (R1·b)
 
 - Minden belső mérőpont egy lapon, csoportonként csökkenő PHI-sorrendben: értékek · folyamatok · területek · a fa négy eleme.
 - A sorok jelzései: „a legnagyobb rés”, „repedés”. A „repedés” akkor jelenik meg, ha a sorhoz van jóváhagyott repedés-állítás (18.3). Számszabály nincs, mert a repedés a mégis olvasata. Így van a fejezetek soraiban is.
-- Egy erősség és egy repedés, egy-egy idézettel.
+- Egy erősség és egy repedés, egy-egy idézettel, alattuk „a diagnózis állítása · a mégis átnézte · bizonyítékok ›” a sor mélyítő lapjára.
 - Nézetváltó és „összevetés ›” (27.9).
 
 ### 27.5 Értékek (R2, R2·b)
@@ -72,13 +73,13 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 - **R3:**
   - elöl a folyamattérkép, chipekkel: mért, nincs a naptárban;
   - soronként: név, „{n} alkalom · eredményes {k} · részben {j} · nem {i}” (13 · 13.3), PHI;
-  - a nem mért folyamatok külön állnak, pont nélkül.
+  - a nem mért folyamatok külön állnak, pont nélkül: „Nem mért folyamatok”, soronként „nincs pontja” vagy „nincs a naptárban”.
 - **R3·b:**
   - „Miért {p} a {folyamat}?”;
-  - PHI, megélés (V11·c, 13.3) és rés;
+  - PHI, megélés és rés. A megélés az alkalmak után adott megélés átlaga (V11·c, 13.3), a rés ennek és a PHI-nek a különbsége;
   - „Mit nézünk ebben a rutinban” (18.2);
   - a nyomok az alkalmakból.
-- A 11 · 11.3 adatlap „A folyamat lapja” linkje ide visz.
+- A 11 · 11.3 adatlap „A folyamat lapja” linkje a Tárak → Folyamatok lapjára visz, a prototípus V6·e-je szerint (1.35).
 - **Ha a vezető kihagyta a folyamatokat** (11 · 11.1 „Kihagyom”), a fejezet kimarad: a lépegető átugorja, és az R0 bontásában sem jelenik meg. A számláló a helyeket megtartja („/ 8”), a Folyamatok pöttye szaggatott, link nélkül.
 
 ### 27.7 Területek (R4, R4·b)
@@ -89,17 +90,18 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 ### 27.8 A márkád alapja (R5, R5·b)
 
 - Kérdés: „Mit mond a fa belülről?”
-- A fa kilenc eleme egy körön, a prototípus szerint (1.31), és a fa PHI-je. A nem mért elem szaggatott kör „–”-vel: a „nincs elég adat” elem és a még nem mért öt elem is.
+- A fa kilenc eleme egy körön, a prototípus szerint (1.31), és a fa PHI-je. A nem mért elem szaggatott kör „–”-vel: a „nincs elég adat” elem és a még nem mért öt elem is. Egyén és Szervezet nézetben a kör a nézet elemeit rajzolja (27.9).
 - Két elem között coral vonal, ha legalább két fokkal eltérnek.
 - A fa olvasata (18.3) „A mégis olvasata” címmel (a prototípusban „A Coach olvasata”), „a mégis átnézte” jelöléssel.
-- **Elemenként lenyitható sor:** egy bekezdés PHI-vel, 1–2 bizonyíték, és „Az elem összes bizonyítéka ›” (R5·b).
-- A kívül-oldal nem jelenik meg (18.4).
+- **Elemenként lenyitható sor:** egy bekezdés PHI-vel, az állítás, legfeljebb 2 bizonyíték, és „Az elem összes bizonyítéka ›” (R5·b).
+- A kívül-oldal nem számít bele (18.4). Csak „hamarosan” helyőrzőként áll: szaggatott „k –” jel a sorban, „Kívül · hamarosan” a lenyitott sorban és a mélyítő lapon, és a kör legendájában (1.31).
 - „Mi a küldetésfa?” link a Bölcsességtárba (BT2, 32).
 
 ### 27.9 Nézetváltó és összevetés (R1·c)
 
 - **Hol áll:** karcsú váltó a lap tetején: „Egyén · Csapat · Szervezet”, az R1·b, R2, R2·b, R3, R3·b, R4, R4·b, R5 és R5·b lapokon. A válaszon, az összefoglalón és a zárólapon nincs.
 - **Alapnézet:** Csapat. Az adatok a 18.5 szerint.
+- **A mélyítő lapon** a nézet a PHI-t, a lépcsőt és a rés mondatát váltja, a bizonyíték a diagnózisé marad. Ha a nézetben nincs ilyen sor: „Ebben a nézetben ennek a sornak nincs adata.”
 - **A Csapat szürke és nem kattintható,** ha 3-nál kevesebb társ töltötte ki a megélést, vagy ha az admin a „csapat-szám nélkül” döntést hozta (18.6).
 - **Összevetés (R1·c):**
   - három oszlop („Te · Csapat · Szerv.”) az értékekre, a folyamatokra és a területekre;
@@ -115,7 +117,8 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
   - a gyűrű és a lépcső;
   - bontás csoportonként: értékek, a fa, folyamat(ok);
   - egy erősség és egy töréspont;
-  - a mégis javaslata és a mérőpont („Mi mutatja: Vezetői kör · 2 → 3”);
+  - a mégis javaslata és a mérőpont („Mi mutatja: Vezetői kör · 2 → 3”), sárga dobozban;
+  - az erősség és a töréspont alatt „bizonyítékok ›” a sor mélyítő lapjára;
   - „A márkád alapjának belső oldala ›” (S1·b);
   - „Magatokra ismertek?” egyszer, a lap végén (28).
 - **S1·b:** a fa négy eleme, a PHI, az olvasat és lenyitható sorok, kívül-oldal nélkül.

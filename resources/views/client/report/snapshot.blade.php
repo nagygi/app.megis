@@ -63,7 +63,13 @@
                 <div class="flex flex-col gap-1">
                     <p class="text-xs font-semibold tracking-[.08em] text-green uppercase">{{ ReportText::claimKind($kind, $meta) }} · {{ __('report.nouns.'.$report[$kind]['chapter']) }} · {{ $report[$kind]['row'] }}</p>
                     <p class="text-lg leading-snug font-semibold">{{ $report[$kind]['text'] }}</p>
-                    <p class="text-xs text-grey-700"><span class="font-semibold text-green">{{ __('report.claim_marker_short') }}</span> · {{ __('report.claim_reviewed') }}</p>
+                    <p class="text-xs text-grey-700">
+                        <span class="font-semibold text-green">{{ __('report.claim_marker_short') }}</span> · {{ __('report.claim_reviewed') }}
+                        {{-- "bizonyítékok ›" to the row's deep page (27 · 27.1); a report frozen before it has no row id. --}}
+                        @isset($report[$kind]['row_id'])
+                            · <a href="{{ $url('item', [\App\Services\Report\ReportService::SLUGS[$report[$kind]['chapter']], $report[$kind]['row_id']]) }}" class="font-semibold text-charcoal">{{ __('report.evidence_link') }} <x-megis.icon name="chevron-right" class="inline size-3 align-middle" /></a>
+                        @endisset
+                    </p>
                     @if ($report[$kind]['quote'])
                         <figure class="mt-1 rounded-[18px] bg-grey-100 px-3.5 py-3 text-sm">„{{ $report[$kind]['quote'] }}”</figure>
                     @endif
@@ -72,11 +78,12 @@
         @endforeach
 
         @if ($recommendation)
-            <section class="flex flex-col gap-1 rounded-[18px] bg-grey-100 px-3.5 py-3" aria-labelledby="snapshot-recommendation">
-                <h2 id="snapshot-recommendation" class="flex items-center gap-1.5 text-xs font-semibold tracking-[.07em] text-green uppercase"><x-megis.symbol name="spiral" class="size-4 text-green" />{{ __('report.recommendation') }}</h2>
+            {{-- The yellow box: the mégis proposal (27 · 27.1). --}}
+            <section class="flex flex-col gap-1 rounded-[18px] bg-yellow px-3.5 py-3" aria-labelledby="snapshot-recommendation">
+                <h2 id="snapshot-recommendation" class="flex items-center gap-1.5 text-xs font-semibold tracking-[.07em] uppercase"><x-megis.symbol name="spiral" class="size-4" />{{ __('report.recommendation') }}</h2>
                 <div class="prose-megis leading-snug font-semibold">{!! \Illuminate\Support\Str::markdown($recommendation['text'], ['html_input' => 'escape', 'allow_unsafe_links' => false]) !!}</div>
                 @if ($recommendation['row'])
-                    <p class="text-sm text-grey-700">{{ __('report.recommendation_point', ['row' => $recommendation['row'], 'from' => $recommendation['from'] ?? '–', 'to' => $recommendation['to'] ?? '–']) }}</p>
+                    <p class="text-sm font-semibold">{{ __('report.recommendation_point', ['row' => $recommendation['row'], 'from' => $recommendation['from'] ?? '–', 'to' => $recommendation['to'] ?? '–']) }}</p>
                 @endif
             </section>
         @endif

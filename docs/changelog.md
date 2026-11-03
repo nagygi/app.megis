@@ -2,6 +2,29 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.89 · {hash} · 2026-11-03
+
+Riport (27): a jegy hiányai pótolva.
+
+- **Nézetváltó a mélyítő lapokon (27.9):**
+  - **Eddig:** az R2·b–R5·b lapon ott volt az „Egyén · Csapat · Szervezet” váltó, de a lap mindig a Csapat számát mutatta. Az R5 fa-köre sem követte a nézetet.
+  - **Most:** a nézet a PHI-t, a lépcsőt és a rés mondatát váltja, a bizonyíték a diagnózisé marad. Ha a nézetben nincs ilyen sor: „Ebben a nézetben ennek a sornak nincs adata.” A fa-kör a nézet elemeit rajzolja.
+- **R3·b: a folyamat megélése és rése (27.6):**
+  - **Eddig:** a folyamat-soron nem volt megélés és rés.
+  - **Most:** a megélés az alkalmak után adott megélés átlaga (V11·c), „az alkalmak után adott megélés” sorral, és a rés mondata a PHI-hez képest. Az olvasat „Amit a vezető olvas” oszlopa is mutatja.
+- **R3: „Nem mért folyamatok” (27.6):** a nem mért folyamatok eddig csak chipként álltak a térképen, most külön blokkban is, pont nélkül.
+- **„bizonyítékok ›” az R1·b-n és az S1-en (27.4, 27.10):** az erősség és a repedés (töréspont) alatt is ott a link a sor mélyítő lapjára. A korábban publikált riportokban nincs, mert a pillanatképük nem tárolta a sort.
+- **Fejezet-pöttyök (27.1):** a mélyítő lapokon, az R1·b-n, az R1·c-n, a zárólapon és a Mellékletben is ott vannak, eddig csak az R0, az R1 és a fejezetek lapjain.
+- **R5 elemsor (27.8):** az állítás mellett legfeljebb 2 bizonyíték, eddig legfeljebb egy, és az is csak állítás nélkül.
+- **S1 (27.10):** a mégis javaslata sárga dobozban áll, nem szürkében.
+- **Tesztek:** az S1, a kihagyott folyamatok (a fejezet kimarad, a számláló „/ 8” marad), a nézetváltó a mélyítő lapon és a nem mért folyamatok.
+- **A jegy a kódhoz igazítva:**
+  - az R1 öt blokkja a prototípus szerint: a javaslat a Képesség-kártyában van, „Hol kezdenénk:” sorral (1.32);
+  - a sáv „0 nincs nyoma · … · 6 beépült” (1.31);
+  - a Belső működés „összefoglaló ›” az R1·b-re visz;
+  - a fa „kívül” oldala „hamarosan” helyőrző (1.31, a 18.4 is);
+  - a 11.3 „A folyamat lapja” a Tárak → Folyamatokba visz (1.35, a 11-es jegy is).
+
 ## 1.88 · 5626c56 · 2026-11-03
 
 A társ útja (25): a jegy hiányai pótolva.

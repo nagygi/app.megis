@@ -68,7 +68,7 @@ A 04 · 4.4 mezőin felül:
 - **Területek:** kézzel. Az admin az olvasatban (20) adja meg a PHI-t, és a diagnózis nyomai közül választja ki a bizonyítékot. Az AI-pontozás: [NM-17](../backlog_nem_MVP/NM-17-ai-pontozas-teruletek-fa.md).
 - **A márkád alapja:** kézzel, ugyanígy. Az elem mércéje a vezető válasza (V4).
 - **Megélés és rés:** a csapat-megélés a vezető (V5) és a társak (T4) megélés-részdiagnózisainak egyenlő súlyú átlaga (a vezető egy főnek számít), a „nem tudom” válaszok nélkül; a rés ennek és a PHI-nek a különbsége. Magánszemélynél és az egyfős, cégen belüli diagnózisnál (17.2) a rés az önkép (V5) és a helyzetenkénti megélések (V11·c) átlaga között van. Soronként külön is látszik a vezető és a társak átlaga, kitöltőszámmal („vezető 5 · társak 5 (4 kitöltő)”).
-- **Gyűrű-%:** a sorok PHI-jének összege osztva a mérőpontok számának hatszorosával, a „–” sorok nélkül, egészre kerekítve. Az optimális állapot 80%, ez átlag 4,8. Egy gyűrű van (Belső működés), a fa kívül-oldala sehol nem jelenik meg, szaggatott helyőrzőként sem.
+- **Gyűrű-%:** a sorok PHI-jének összege osztva a mérőpontok számának hatszorosával, a „–” sorok nélkül, egészre kerekítve. Az optimális állapot 80%, ez átlag 4,8. Egy gyűrű van (Belső működés), a fa kívül-oldala nem számít bele. A riportban csak „hamarosan” helyőrzőként áll (27 · 27.8).
 - **Lépcső:** az átlagos PHI lefelé kerekítve (1 nincs … 6 beépült).
 - **Kerekítés a riportban:** soronként egészre (a ,5 felfelé), az összesítőknél egy tizedes, a % egész. A % és a lépcső a kerekítetlen értékekből számol. A kézi pontok egészek.
 - Az AI-eredmények modell- és promptverzióval mentődnek (16).

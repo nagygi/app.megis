@@ -69,10 +69,11 @@ class ReportPages
             'show' => $snapshot ? 'client.report.snapshot' : 'client.report.answer',
             default => 'client.report.'.$page,
         };
+        // The chapter dots on every page of the report, the snapshot's single page aside (27 · 27.1).
         $current = match ($page) {
-            'show' => $snapshot ? null : 'answer',
-            'summary' => 'summary',
-            'chapter' => $snapshot ? null : $key,
+            'show' => 'answer',
+            'summary', 'internal', 'compare' => 'summary',
+            'chapter', 'item' => $key,
             default => null,
         };
 
@@ -91,7 +92,7 @@ class ReportPages
             'organizationView' => collect($data['views']['organization'] ?? []),
             'chapterKeys' => array_keys($data['chapters']),
             'updates' => $main === null ? collect() : ChapterUpdate::query()->where('main_diagnosis_id', $main->id)->latest('id')->get()->unique('chapter')->keyBy('chapter'),
-            'dots' => $current === null ? null : $this->dots($data, $url, $current, $hasSummary),
+            'dots' => $snapshot ? null : $this->dots($data, $url, $current, $hasSummary),
             // The Képesség card of R0 and R1 lists the approved capabilities of a published diagnosis (NM-12).
             'capabilities' => $this->capabilities($main, $viewerId, $preview),
             'nav' => $this->nav($page, $data, $url, $key, $extra, $hasSummary),
@@ -122,7 +123,7 @@ class ReportPages
      * @param  array<string, mixed>  $data
      * @return list<array{label: string, href: ?string, current: bool, soon: bool}>
      */
-    private function dots(array $data, Closure $url, string $current, bool $hasSummary): array
+    private function dots(array $data, Closure $url, ?string $current, bool $hasSummary): array
     {
         return collect(self::STEPS)->map(fn (string $step) => [
             'label' => __('report.dots.'.$step),
