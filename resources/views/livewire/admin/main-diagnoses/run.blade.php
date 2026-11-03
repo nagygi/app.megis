@@ -121,7 +121,7 @@
                     @if ($missingPeers > 0)
                         <x-ui.notice tone="warning">{{ __('admin.run.threshold_missing', ['count' => $missingPeers]) }}</x-ui.notice>
                     @endif
-                    <details class="group text-sm">
+                    <details open class="group text-sm">
                         <summary class="inline-flex min-h-10 cursor-pointer list-none items-center gap-1 font-semibold [&::-webkit-details-marker]:hidden">
                             {{ __('admin.run.by_name') }}
                             <x-megis.icon name="chevron-down" class="transition-transform duration-200 group-open:rotate-180" />
