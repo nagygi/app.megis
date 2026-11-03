@@ -1,4 +1,8 @@
-{{-- V12, V12·b · the leader's home after publishing (26 · 26.3), from the frozen report. --}}
+{{--
+    V12, V12·b · the leader's home after publishing (26 · 26.3), from the frozen report.
+    The admin's preview includes it too (21 · 21.1, client/report/home): no wire: here,
+    and every report link goes through $reportUrl.
+--}}
 @use('App\Services\Report\ReportText')
 @php
     $organization = $main->diagnosis->organization;
@@ -8,19 +12,23 @@
     $snapshot = $report['meta']['snapshot'];
 @endphp
 <div class="flex max-w-2xl flex-col gap-6">
-    <x-ui.flash />
+    @unless ($preview)
+        <x-ui.flash />
+    @endunless
 
     <x-ui.card as="section" padding="lg" class="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left" aria-label="{{ __('report.ring.label') }}">
         <x-report.ring :percent="$ring['percent']" />
         <div class="flex flex-col items-center gap-1 sm:items-start">
             <p class="text-lg font-semibold">{{ __('report.ring.label') }}</p>
             <p class="text-grey-700">{{ __('diagnosis.published_home.points', ['points' => $ring['points'], 'max' => $ring['max']]) }}</p>
-            <x-ui.button tone="ghost" size="sm" :href="route('client.wisdom.show', [$organization, 'szazalek-es-pontok'])">{{ __('report.ring.what') }}</x-ui.button>
+            @unless ($preview)
+                <x-ui.button tone="ghost" size="sm" :href="route('client.wisdom.show', [$organization, 'szazalek-es-pontok'])">{{ __('report.ring.what') }}</x-ui.button>
+            @endunless
         </div>
     </x-ui.card>
 
     @if ($gap)
-        <a href="{{ route('client.report.item', [$organization, $diagnosis, \App\Services\Report\ReportService::SLUGS[$gap['chapter']], $gap['id']]) }}" class="press on-dark flex items-start justify-between gap-3 rounded-card bg-charcoal p-5 text-cream no-underline hover:bg-grey-700">
+        <a href="{{ $reportUrl('item', [\App\Services\Report\ReportService::SLUGS[$gap['chapter']], $gap['id']]) }}" class="press on-dark flex items-start justify-between gap-3 rounded-card bg-charcoal p-5 text-cream no-underline hover:bg-grey-700">
             <span class="flex flex-col gap-2">
                 <span class="text-xs font-semibold tracking-wide text-coral-light uppercase">{{ __('report.biggest_gap') }}</span>
                 <span>{{ __('report.biggest_gap_sentence', ['label' => $gap['label'], 'sentence' => ReportText::gap($gap, $report['meta']) ?? '']) }}</span>
@@ -28,7 +36,7 @@
             <x-megis.icon name="chevron-right" class="mt-6 shrink-0" />
         </a>
     @elseif ($snapshot && $report['crack'])
-        <a href="{{ route('client.report.show', [$organization, $diagnosis]) }}" class="press on-dark flex items-start justify-between gap-3 rounded-card bg-charcoal p-5 text-cream no-underline hover:bg-grey-700">
+        <a href="{{ $reportUrl('show') }}" class="press on-dark flex items-start justify-between gap-3 rounded-card bg-charcoal p-5 text-cream no-underline hover:bg-grey-700">
             <span class="flex flex-col gap-2">
                 <span class="text-xs font-semibold tracking-wide text-coral-light uppercase">{{ __('report.breakpoint_marker') }}</span>
                 <span>{{ $report['crack']['text'] }}</span>
@@ -44,7 +52,7 @@
     @endif
 
     {{-- Képesség (NM-12): what to build on and what is missing, once the mégis approved them --}}
-    @if ($capabilities['rows'] !== [])
+    @if (($capabilities['rows'] ?? []) !== [])
         <x-report.capability-card :overview="$capabilities" :href="route('client.capabilities', $organization)" />
     @endif
 
@@ -52,14 +60,14 @@
     <ul class="flex flex-col gap-2">
         <li>
             @unless ($snapshot)
-                <x-ui.link-row tone="green" :href="route('client.report.internal', [$organization, $diagnosis])" :title="__('diagnosis.published_home.internal')" />
+                <x-ui.link-row tone="green" :href="$reportUrl('internal')" :title="__('diagnosis.published_home.internal')" />
             @else
-                <x-ui.link-row tone="green" :href="route('client.report.show', [$organization, $diagnosis])" :title="__('diagnosis.published_home.snapshot')" />
+                <x-ui.link-row tone="green" :href="$reportUrl('show')" :title="__('diagnosis.published_home.snapshot')" />
             @endunless
         </li>
         @if (isset($report['chapters']['brand']))
             <li>
-                <x-ui.link-row tone="yellow" :href="route('client.report.chapter', [$organization, $diagnosis, 'markad-alapja'])" :title="__('diagnosis.published_home.brand')" />
+                <x-ui.link-row tone="yellow" :href="$reportUrl('chapter', ['markad-alapja'])" :title="__('diagnosis.published_home.brand')" />
             </li>
         @endif
     </ul>
@@ -69,11 +77,15 @@
         <h2 id="reports-title" class="text-lg font-semibold">{{ __('report.menu.reports') }}</h2>
         <ul class="flex flex-col gap-2">
             @foreach ($reports as $reportMain)
+                {{-- This diagnosis with the report's date: in the preview it is not published yet (21 · 21.1). --}}
+                @php($isThis = $reportMain->is($main))
                 <x-ui.card as="li" padding="none" class="flex flex-wrap items-center justify-between gap-2 py-2 pr-2 pl-5">
-                    <span>{{ $reportMain->product_name }} · {{ $reportMain->published_at?->format('Y.m.d.') }}</span>
+                    <span>{{ $reportMain->product_name }} · {{ $isThis ? \Illuminate\Support\Carbon::parse($report['meta']['published_on'])->format('Y.m.d.') : $reportMain->published_at?->format('Y.m.d.') }}</span>
                     <span class="flex flex-wrap gap-1">
-                        <x-ui.button tone="ghost" size="sm" icon-right="chevron-right" :href="route('client.report.show', [$organization, $reportMain->diagnosis])">{{ __('diagnosis.published_home.open') }}</x-ui.button>
-                        @if (config('megis.pdf_downloads') && Route::has('client.report.pdf'))
+                        @if ($isThis || ! $preview)
+                            <x-ui.button tone="ghost" size="sm" icon-right="chevron-right" :href="$isThis ? $reportUrl('show') : route('client.report.show', [$organization, $reportMain->diagnosis])">{{ __('diagnosis.published_home.open') }}</x-ui.button>
+                        @endif
+                        @if (! $preview && config('megis.pdf_downloads') && Route::has('client.report.pdf'))
                             <x-ui.button tone="ghost" size="sm" icon="document" :href="route('client.report.pdf', [$organization, $reportMain->diagnosis])">{{ __('diagnosis.published_home.pdf') }}</x-ui.button>
                         @endif
                     </span>

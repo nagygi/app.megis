@@ -145,6 +145,25 @@ it('withdraws with a reason and republishes without e-mails (21 · 21.5)', funct
     Mail::assertNothingQueued();
 });
 
+it('opens the leader\'s preview on the home, linked with the report (21 · 21.1)', function () {
+    [$setup, $main] = approvedReading();
+    actingAsAdmin($setup['admin']);
+    $home = route('admin.main-diagnoses.preview', [$main->diagnosis, 'kezdolap']);
+
+    Livewire::test(Publish::class, ['diagnosis' => $main->diagnosis])->assertSeeHtml('src="'.$home.'"');
+
+    $this->get($home)->assertOk()
+        ->assertSee('A ti diagnózisotok')
+        ->assertSee($main->product_name.' · publikálva '.today()->format('m.d.'))
+        ->assertSee('Belső működés · értékek · folyamatok · területek')
+        ->assertSee(route('admin.main-diagnoses.preview', [$main->diagnosis, 'belso-mukodes']), false)
+        ->assertSee($main->product_name.' · '.today()->format('Y.m.d.'))
+        ->assertDontSee(route('client.report.show', [$setup['organization'], $main->diagnosis]), false);
+
+    // The report's back link returns to the home.
+    $this->get(route('admin.main-diagnoses.preview', $main->diagnosis))->assertSee('href="'.$home.'"', false);
+});
+
 it('previews the leader\'s report and a peer\'s Útravaló from the live data (21 · 21.1)', function () {
     [$setup, $main] = approvedReading();
     actingAsAdmin($setup['admin']);

@@ -172,6 +172,9 @@ class Overview extends Component
             // V12 · the Képesség card from the approved rows (NM-12).
             'capabilities' => $view === 'livewire.client.diagnosis.overview-published' ? app(CapabilityOverview::class)->for($main, $this->user()) : null,
             'report' => $snapshot?->data,
+            // V12 links into the report; the admin's preview passes its own (21 · 21.1).
+            'reportUrl' => fn (string $name, array $parameters = []) => route('client.report.'.$name, [$this->organization, $this->diagnosis, ...$parameters]),
+            'preview' => false,
             'reports' => $snapshot === null ? collect() : app(ReportService::class)->reportsFor($this->user(), $this->organization),
             // The Útravaló row lives from publishing (29 · 29.2).
             'takeawayReady' => $main->stage === MainDiagnosisStage::Published

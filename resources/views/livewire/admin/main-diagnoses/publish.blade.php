@@ -68,7 +68,7 @@
                 <div class="flex flex-col gap-2">
                     <h3 class="text-lg font-semibold">{{ __('admin.publish.leader_view') }}</h3>
                     <iframe
-                        src="{{ route('admin.main-diagnoses.preview', $diagnosis) }}"
+                        src="{{ route('admin.main-diagnoses.preview', [$diagnosis, 'kezdolap']) }}"
                         title="{{ __('admin.publish.leader_view') }}"
                         @class(['h-[44rem] rounded-card border border-grey-250 bg-white', 'w-[390px] max-w-full' => $device === 'phone', 'w-full' => $device === 'desktop'])
                     ></iframe>

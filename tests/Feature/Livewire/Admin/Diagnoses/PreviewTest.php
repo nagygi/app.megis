@@ -63,6 +63,8 @@ it('renders the standalone report in the frame, clickable, before publishing', f
     $this->get(route('admin.main-diagnoses.preview', [$diagnosis, 'ertekek', $row->id]))->assertOk();
     $this->get(route('admin.main-diagnoses.preview', [$diagnosis, 'zarolap']))->assertOk()->assertDontSee('Letöltöm · PDF');
     $this->get(route('admin.main-diagnoses.preview', [$diagnosis, 'osszefoglalo']))->assertNotFound();
+    // A standalone diagnosis has no leader's home (21 · 21.1).
+    $this->get(route('admin.main-diagnoses.preview', [$diagnosis, 'kezdolap']))->assertNotFound();
 });
 
 it('has no preview page for a main diagnosis or a subdiagnosis', function () {

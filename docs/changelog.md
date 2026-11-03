@@ -2,6 +2,27 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.82 · {hash} · 2026-11-03
+
+Admin, *Publikálás* fül (21 · 21.1): a vezető nézetének előnézete a kezdőlapon (V12, snapshotnál V12·b) nyílik.
+
+- **Eddig:** a bal oldali előnézet a riporttal (R0) kezdődött. A vezető kezdőlapja, amit a publikálás után elsőként lát, nem volt benne.
+- **Most:**
+  - **A kezdőlap az előnézet első lapja**, ugyanabból a nézetből, amit a vezető publikálás után lát:
+    - a gyűrű a pontokkal;
+    - a legnagyobb rés (snapshotnál a töréspont mondata);
+    - a mélyítés (Belső működés, A márkád alapja);
+    - a Riportok sora;
+    - az Értékmérés-ajánló.
+  - **Kattintható:** a rés, a mélyítés és a Riportok „Megnyitom” gombja a riport előnézetébe visz. A riport vissza-linkje a kezdőlapra hoz.
+  - **Publikálás előtt** a dátum a mai nap („Teljes · publikálva 11.03.”).
+  - **Ami nincs benne:**
+    - a Képesség-kártya, mert az a mégis jóváhagyása után jelenik meg, ahogy a riport előnézetében is;
+    - a Bölcsességtár-link;
+    - a PDF.
+    - A vezető korábbi riportjai gomb nélkül állnak.
+  - **Az önálló diagnózis előnézete** változatlanul a riporttal kezdődik.
+
 ## 1.81 · a057bca · 2026-11-03
 
 Profil (31 · 31.5, 23 · 23.4): a társ is megnyithatja a „Ki lát mit” lapot, a saját változatában.

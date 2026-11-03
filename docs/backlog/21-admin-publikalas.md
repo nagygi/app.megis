@@ -13,6 +13,8 @@ Szuperadmin és Admin egyaránt használhatja (01).
 A fő diagnózis *Publikálás* füle (19.1).
 
 - **Balra a vezető nézete**, telefon-szélességben, kattintható: a kezdőlap (V12, snapshotnál V12·b) és a riport.
+  - A kezdőlapon nyílik; a gyűrű, a legnagyobb rés, a mélyítés és a Riportok sora a riport előnézetébe visz, a riport vissza-linkje a kezdőlapra.
+  - A dátum publikálás előtt a mai nap. A Képesség-kártya és a Bölcsességtár-link nincs benne (a kártya a mégis jóváhagyása után jelenik meg), a vezető korábbi riportjai gomb nélkül állnak.
 - **Jobbra a társak Útravalója** (T6), egy választóval társanként.
 - Az előnézet ugyanaz a nézet, ami publikáláskor kimegy, nem másolat.
 - Mindkét előnézet fölött telefon · asztali váltó.

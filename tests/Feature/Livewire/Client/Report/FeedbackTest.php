@@ -200,6 +200,7 @@ it('shows the leader\'s home after publishing (26 · 26.3)', function () {
         ->assertOk()
         ->assertSee('publikálva')
         ->assertSee('Belső működés · értékek · folyamatok · területek')
+        ->assertSee(route('client.report.internal', [$setup['organization'], $main->diagnosis]), false)
         ->assertSee('Értékmérés · a diagnózis után kapcsolható be');
 
     actingAsCustomer($setup['peers'][0]);
