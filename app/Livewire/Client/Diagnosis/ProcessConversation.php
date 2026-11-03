@@ -4,6 +4,7 @@ namespace App\Livewire\Client\Diagnosis;
 
 use App\Enums\DiagnosisStep;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
+use App\Livewire\Concerns\NotesImpersonatedChanges;
 use App\Livewire\Concerns\WithDictation;
 use App\Models\Diagnosis;
 use App\Models\Organization;
@@ -21,7 +22,7 @@ use Livewire\WithFileUploads;
  */
 class ProcessConversation extends Component
 {
-    use InteractsWithMainDiagnosis, WithDictation, WithFileUploads;
+    use InteractsWithMainDiagnosis, NotesImpersonatedChanges, WithDictation, WithFileUploads;
 
     /**
      * @var array<int, string>
@@ -55,6 +56,7 @@ class ProcessConversation extends Component
         ]);
 
         $conversations->answer($this->conversation(), $question, (string) $value);
+        $this->noteChange('answers');
         $this->dispatch('saved');
     }
 

@@ -5,6 +5,7 @@ namespace App\Livewire\Client;
 use App\Enums\MembershipStatus;
 use App\Enums\MetricRhythm;
 use App\Enums\ParticipantRole;
+use App\Livewire\Concerns\NotesImpersonatedChanges;
 use App\Livewire\Concerns\WithDictation;
 use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
@@ -28,7 +29,7 @@ use Livewire\WithFileUploads;
  */
 class ProcessSheet extends Component
 {
-    use WithDictation, WithFileUploads;
+    use NotesImpersonatedChanges, WithDictation, WithFileUploads;
 
     public const DESCRIPTION_MAX = 2000;
 
@@ -85,6 +86,7 @@ class ProcessSheet extends Component
         $this->validate(['description' => ['nullable', 'string', 'max:'.self::DESCRIPTION_MAX]], attributes: ['description' => __('processes.list.fields.description')]);
 
         $processes->setDescription($this->process, $this->description);
+        $this->noteChange('description');
         $this->dispatch('saved');
     }
 
@@ -95,6 +97,7 @@ class ProcessSheet extends Component
         $this->validate(['responsibleId' => ['nullable', Rule::in($this->members()->pluck('id'))]]);
 
         $processes->setResponsible($this->process, $this->responsibleId === null ? null : User::query()->find($this->responsibleId));
+        $this->noteChange('responsibleId');
         $this->dispatch('saved');
     }
 
@@ -104,6 +107,7 @@ class ProcessSheet extends Component
         $this->authorizeEdit();
 
         $processes->syncTeams($this->process, array_map('intval', $this->teamIds));
+        $this->noteChange('teamIds');
         $this->dispatch('saved');
     }
 

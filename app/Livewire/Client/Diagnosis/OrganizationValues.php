@@ -5,6 +5,7 @@ namespace App\Livewire\Client\Diagnosis;
 use App\Enums\DiagnosisStep;
 use App\Enums\StepMark;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
+use App\Livewire\Concerns\NotesImpersonatedChanges;
 use App\Livewire\Concerns\WithDictation;
 use App\Models\Diagnosis;
 use App\Models\Organization;
@@ -31,7 +32,7 @@ use Livewire\WithFileUploads;
  */
 class OrganizationValues extends Component
 {
-    use InteractsWithMainDiagnosis, WithDictation, WithFileUploads;
+    use InteractsWithMainDiagnosis, NotesImpersonatedChanges, WithDictation, WithFileUploads;
 
     /**
      * @var list<array<string, mixed>>
@@ -136,6 +137,7 @@ class OrganizationValues extends Component
         }
 
         $this->persist(app(OrganizationValueSetService::class));
+        $this->noteChange('items');
     }
 
     /**

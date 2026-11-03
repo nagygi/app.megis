@@ -4,6 +4,7 @@ namespace App\Livewire\Mirror;
 
 use App\Enums\MirrorInsightStatus;
 use App\Livewire\Concerns\ChecksTurnstile;
+use App\Livewire\Concerns\NotesImpersonatedChanges;
 use App\Models\MainDiagnosis;
 use App\Models\MirrorSession;
 use App\Models\Organization;
@@ -32,7 +33,7 @@ use Livewire\Component;
  */
 class Result extends Component
 {
-    use ChecksTurnstile;
+    use ChecksTurnstile, NotesImpersonatedChanges;
 
     public const STEPS = ['values', 'value', 'full'];
 
@@ -184,6 +185,7 @@ class Result extends Component
     {
         $this->ensureOwner();
         $this->saveCuriosity();
+        $this->noteChange('curiosity');
     }
 
     /**

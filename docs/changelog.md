@@ -2,6 +2,19 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.80 · {hash} · 2026-11-03
+
+„Belépek a nevében” (14 · 14.6, 33 · 33.6): a lapokon végzett munka is a naplóba kerül, a gombok és az elhagyáskor mentett mezők is.
+
+- **Eddig:** az ügyfél adatlapjának naplójában a „nevében” munkából csak az indítás, a befejezés és a sima űrlapküldések (például a hozzájárulás elfogadása) látszottak.
+  - A lapokon belüli gombok (például egy saját érték kivétele) sosem kerültek a naplóba. A naplózás a Livewire-kérésnél a lap betöltésének módjával, a komponens lefutása előtt futott, ezért mindig kimaradt.
+  - Az elhagyáskor mentett mezők sem: név a Profilban, A márkád alapja, a szervezet értékei, a megélés, a Képességek szövege, a folyamat-beszélgetés válaszai, a folyamat adatlapja (leírás, felelős, csapatok), a tükör kíváncsisági kérdései.
+- **Most:**
+  - **Gombnyomás:** a lap neve és a művelet, például „Diagnózis · saját értékek (remove)”.
+  - **Mentett mező:** a lap neve és a mező, például „Profil (last_name)”.
+  - **Egy kérés egy sor:** ha egy kérésben több minden történt, egy sorban állnak.
+  - **Nem kerül a naplóba:** az olvasás, a Livewire saját hívásai és az időzített frissítések (például a diktálás állapota), a tiltott vagy hibára futott művelet, és az admin saját lapjai.
+
 ## 1.79 · 55e766b · 2026-11-03
 
 Profil (14 · 14.3, 31 · 31.1, 31.7): aki elfelejtette a jelszavát, friss kóddal állíthat újat, és kóddal törölheti a fiókját.

@@ -2,14 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\AuditEventType;
 use App\Models\Impersonation;
 use App\Models\User;
-use App\Services\Audit\AuditLogger;
 use App\Services\Auth\AdminSessionState;
 use App\Services\Auth\GuardSession;
 use App\Services\Auth\ImpersonationService;
-use App\Support\CurrentOrganization;
 use Closure;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Http\Request;
@@ -26,7 +23,6 @@ class AuthenticateCustomer implements AuthenticatesRequests
         private GuardSession $guardSession,
         private ImpersonationService $impersonation,
         private AdminSessionState $adminSession,
-        private AuditLogger $audit,
     ) {}
 
     /**
@@ -74,7 +70,7 @@ class AuthenticateCustomer implements AuthenticatesRequests
         $changed = $response->isSuccessful() || $response->isRedirection();
 
         if ($impersonation !== null && $changed && $this->impersonation->isImpersonating()) {
-            $this->logChange($request, $impersonation);
+            $this->logChange($request);
         }
 
         return $response;
@@ -91,47 +87,17 @@ class AuthenticateCustomer implements AuthenticatesRequests
     }
 
     /**
-     * Records which admin changed what in the customer's name. Reads are not changes;
-     * Livewire requests count only when they call an action, not when they sync a field.
+     * Records which admin changed what in the customer's name; reads are not
+     * changes. A Livewire update is logged after its components ran
+     * (AppServiceProvider): here, as persistent middleware, it runs before
+     * them and with the page's GET method.
      */
-    private function logChange(Request $request, Impersonation $impersonation): void
+    private function logChange(Request $request): void
     {
-        if ($request->isMethodSafe()) {
+        if ($request->isMethodSafe() || $request->hasHeader('X-Livewire')) {
             return;
         }
 
-        $actions = $request->hasHeader('X-Livewire')
-            ? $this->livewireActions($request)
-            : [$request->route()?->getName() ?? $request->path()];
-
-        if ($actions === []) {
-            return;
-        }
-
-        $this->audit->record(
-            AuditEventType::ImpersonationAction,
-            $impersonation->user,
-            $impersonation->admin,
-            ['actions' => $actions],
-            $impersonation,
-            app(CurrentOrganization::class)->get(),
-        );
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function livewireActions(Request $request): array
-    {
-        return collect($request->input('components', []))
-            ->flatMap(function (array $component): array {
-                $name = json_decode($component['snapshot'] ?? '{}', true)['memo']['name'] ?? 'livewire';
-
-                return collect($component['calls'] ?? [])
-                    ->map(fn (array $call): string => $name.'::'.($call['method'] ?? '?'))
-                    ->all();
-            })
-            ->values()
-            ->all();
+        $this->impersonation->logActions([$request->route()?->getName() ?? $request->path()]);
     }
 }

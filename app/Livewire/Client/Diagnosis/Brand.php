@@ -7,6 +7,7 @@ use App\Enums\MainDiagnosisSubject;
 use App\Enums\StepMark;
 use App\Enums\TreeElement;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
+use App\Livewire\Concerns\NotesImpersonatedChanges;
 use App\Livewire\Concerns\WithDictation;
 use App\Models\Diagnosis;
 use App\Models\Organization;
@@ -24,7 +25,7 @@ use Livewire\WithFileUploads;
  */
 class Brand extends Component
 {
-    use InteractsWithMainDiagnosis, WithDictation, WithFileUploads;
+    use InteractsWithMainDiagnosis, NotesImpersonatedChanges, WithDictation, WithFileUploads;
 
     public string $purpose = '';
 
@@ -58,6 +59,7 @@ class Brand extends Component
         if (in_array($property, OrganizationValueSet::BRAND_FIELDS, true) && $this->canEdit()) {
             $this->validateOnly($property, [$property => ['nullable', 'string', 'max:500']], attributes: [$property => __('enums.tree_element.'.$this->elementOf($property)->value)]);
             $this->persist(app(OrganizationValueSetService::class));
+            $this->noteChange($property);
 
             if (filled($this->{$property}) && $this->editing === $property) {
                 $this->editing = null;

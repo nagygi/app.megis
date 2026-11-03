@@ -6,6 +6,7 @@ use App\Enums\DiagnosisStep;
 use App\Enums\ParticipantRole;
 use App\Enums\StepMark;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
+use App\Livewire\Concerns\NotesImpersonatedChanges;
 use App\Livewire\Concerns\WithDictation;
 use App\Models\Diagnosis;
 use App\Models\Organization;
@@ -23,7 +24,7 @@ use Livewire\WithFileUploads;
  */
 class Capabilities extends Component
 {
-    use InteractsWithMainDiagnosis, WithDictation, WithFileUploads;
+    use InteractsWithMainDiagnosis, NotesImpersonatedChanges, WithDictation, WithFileUploads;
 
     public string $answer = '';
 
@@ -54,6 +55,7 @@ class Capabilities extends Component
         ]);
 
         app(CapabilityStoryService::class)->save($this->main(), $this->user(), (string) $value);
+        $this->noteChange('answer');
         $this->dispatch('saved');
     }
 

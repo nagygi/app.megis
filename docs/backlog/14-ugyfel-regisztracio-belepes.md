@@ -115,6 +115,7 @@ További szabályok:
   - A mért saját hang nem vehető fel a nevében: az Értéktükör felvétele és az „Egy helyzet” elmondva.
 - **Napló:**
   - Rögzítjük az indítást, a befejezést, és minden módosításnál, hogy melyik admin végezte a felhasználó nevében.
+  - Módosítás: minden kérés, ami nem olvasás, és a lap minden gombnyomása (például „Profil (save)”), valamint az elhagyáskor mentett mező (például „Profil (last_name)”, „Diagnózis · a márkád alapja (purpose)”). A Livewire saját hívásai és az időzített frissítések nem számítanak; a tiltott vagy hibára futott művelet nem kerül a naplóba.
   - A napló a felhasználó adatlapján (33) látszik az adminban. A felhasználó nem látja.
 - A munkamenet a „Kilépés” gombbal, az admin kijelentkezésével vagy az admin session lejártával (01) ér véget.
 

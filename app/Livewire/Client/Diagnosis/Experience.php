@@ -4,6 +4,7 @@ namespace App\Livewire\Client\Diagnosis;
 
 use App\Enums\DiagnosisStep;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
+use App\Livewire\Concerns\NotesImpersonatedChanges;
 use App\Models\Diagnosis;
 use App\Models\Organization;
 use App\Models\Version;
@@ -20,7 +21,7 @@ use Livewire\Component;
  */
 class Experience extends Component
 {
-    use InteractsWithMainDiagnosis;
+    use InteractsWithMainDiagnosis, NotesImpersonatedChanges;
 
     /**
      * @var array<string, string>
@@ -53,6 +54,7 @@ class Experience extends Component
         );
 
         $this->participant()->update(['experience_draft' => $this->answers]);
+        $this->noteChange('answers');
         $this->dispatch('saved');
     }
 

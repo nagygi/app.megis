@@ -3,12 +3,14 @@
 use App\Enums\AuditEventType;
 use App\Enums\LegalDocumentType;
 use App\Enums\MembershipStatus;
+use App\Livewire\Client\Diagnosis\OwnValues;
 use App\Livewire\Client\Profile;
 use App\Models\AuditEvent;
 use App\Models\Impersonation;
 use App\Models\LegalDocumentVersion;
 use App\Models\Membership;
 use App\Models\Organization;
+use App\Models\PersonalValueSet;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\Auth\GuardSession;
@@ -107,6 +109,8 @@ it('logs each change made in the customer’s name, but not reads or refusals', 
 
     $this->get('/_test/olvasas')->assertOk();
     $this->post('/_test/tiltott')->assertForbidden();
+    // A Livewire update is logged after its components, not by the middleware.
+    $this->post('/_test/valtoztatas', ['components' => [['snapshot' => json_encode(['memo' => ['name' => 'client.profile']]), 'updates' => [], 'calls' => [['method' => 'save']]]]], ['X-Livewire' => '1'])->assertOk();
     $this->post('/_test/valtoztatas')->assertOk();
 
     $action = AuditEvent::query()->where('type', AuditEventType::ImpersonationAction)->sole();
@@ -139,6 +143,47 @@ it('forbids changing the password in the customer’s name', function () {
         ->set('password_confirmation', 'uj-jelszo-1234')
         ->call('savePassword')
         ->assertForbidden();
+
+    expect(AuditEvent::query()->where('type', AuditEventType::ImpersonationAction)->exists())->toBeFalse();
+});
+
+it('logs a field saved in the customer’s name with the page and the field (14 · 14.6)', function () {
+    $admin = actingAsAdmin();
+    $organization = Organization::factory()->create();
+    $customer = customerOf($organization);
+    $this->post(route('admin.impersonate', $customer));
+
+    Livewire\Livewire::test(Profile::class, ['organization' => $organization])
+        ->set('current_password', 'nem mentődik')
+        ->set('last_name', 'Kovács');
+
+    $action = AuditEvent::query()->where('type', AuditEventType::ImpersonationAction)->sole();
+    expect($action->actor_id)->toBe($admin->id)
+        ->and($action->subject_user_id)->toBe($customer->id)
+        ->and($action->payload)->toBe(['actions' => ['client.profile::last_name']])
+        ->and($action->actionLabels())->toBe(['Profil (last_name)']);
+});
+
+it('logs a Livewire action called in the customer’s name (14 · 14.6)', function () {
+    [$setup, $main] = runningDiagnosis();
+    actingAsAdmin($setup['admin']);
+    $this->post(route('admin.impersonate', $setup['leader']));
+    $key = PersonalValueSet::query()->where('user_id', $setup['leader']->id)->sole()->items()->sole()->key;
+
+    Livewire\Livewire::test(OwnValues::class, ['organization' => $setup['organization'], 'diagnosis' => $main->diagnosis])
+        ->call('remove', $key);
+
+    expect(AuditEvent::query()->where('type', AuditEventType::ImpersonationAction)->sole()->payload)
+        ->toBe(['actions' => ['client.diagnosis.own-values::remove']]);
+});
+
+it('logs nothing for the customer’s own saves (14 · 14.6)', function () {
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+
+    Livewire\Livewire::test(Profile::class, ['organization' => $organization])->set('last_name', 'Kovács');
+
+    expect(AuditEvent::query()->where('type', AuditEventType::ImpersonationAction)->exists())->toBeFalse();
 });
 
 it('ends the work with "Kilépés" and returns to the customer datasheet', function () {

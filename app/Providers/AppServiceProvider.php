@@ -135,6 +135,19 @@ class AppServiceProvider extends ServiceProvider
             EnsureLegalAcceptance::class,
             ForbidWhileImpersonating::class,
         ]);
+
+        $this->logImpersonatedLivewireChanges();
+    }
+
+    /**
+     * After the components of a Livewire update ran: what the admin changed
+     * in the customer's name (14 · 14.6). A request that failed changed nothing.
+     */
+    private function logImpersonatedLivewireChanges(): void
+    {
+        Livewire::listen('response', function (): void {
+            $this->app->make(ImpersonationService::class)->logLivewireRequest((array) request()->input('components', []));
+        });
     }
 
     /**

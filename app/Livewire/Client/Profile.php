@@ -7,6 +7,7 @@ use App\Enums\MainDiagnosisStage;
 use App\Enums\ParticipantRole;
 use App\Enums\TokenPurpose;
 use App\Exceptions\DiagnosisException;
+use App\Livewire\Concerns\NotesImpersonatedChanges;
 use App\Mail\PasswordChangedMail;
 use App\Mail\PasswordConfirmationCodeMail;
 use App\Models\CalendarConnection;
@@ -40,6 +41,8 @@ use Livewire\Component;
  */
 class Profile extends Component
 {
+    use NotesImpersonatedChanges;
+
     public Organization $organization;
 
     public string $last_name = '';
@@ -93,6 +96,7 @@ class Profile extends Component
         ]);
 
         auth()->user()->fill($validated)->save();
+        $this->noteChange($property);
         $this->nameSaved = true;
     }
 

@@ -6,6 +6,7 @@ use App\Enums\AuditEventType;
 use App\Models\Impersonation;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
+use App\Support\CurrentOrganization;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Log;
 
@@ -19,7 +20,19 @@ class ImpersonationService
 {
     public const SESSION_KEY = 'impersonation_id';
 
+    /**
+     * Livewire actions that change nothing, called on a timer (14 · 14.6).
+     */
+    private const NOT_CHANGES = ['pollDictations'];
+
     private ?Impersonation $current = null;
+
+    /**
+     * The fields saved in the customer's name during this request.
+     *
+     * @var list<string>
+     */
+    private array $changes = [];
 
     public function __construct(
         private Session $session,
@@ -67,6 +80,76 @@ class ImpersonationService
     public function isImpersonating(): bool
     {
         return $this->current() !== null;
+    }
+
+    /**
+     * A field saved in the customer's name: logged with its request (14 · 14.6).
+     */
+    public function noteChange(string $change): void
+    {
+        if ($this->isImpersonating()) {
+            $this->changes[] = $change;
+        }
+    }
+
+    /**
+     * Records which admin changed what in the customer's name: the actions
+     * of the request and the fields it saved (14 · 14.6, 33 · 33.6).
+     *
+     * @param  list<string>  $actions
+     */
+    public function logActions(array $actions): void
+    {
+        $actions = array_values(array_unique([...$actions, ...$this->changes]));
+        $this->changes = [];
+        $impersonation = $this->current();
+
+        if ($impersonation === null || $actions === []) {
+            return;
+        }
+
+        $this->audit->record(
+            AuditEventType::ImpersonationAction,
+            $impersonation->user,
+            $impersonation->admin,
+            ['actions' => $actions],
+            $impersonation,
+            app(CurrentOrganization::class)->get(),
+        );
+    }
+
+    /**
+     * A Livewire update, after its components ran without an error: the
+     * actions it called and the fields its hooks saved. Livewire's own calls
+     * ($refresh, $set, _startUpload…) and the polls are no changes, and an
+     * admin page is not the customer's (14 · 14.6).
+     *
+     * @param  array<int, mixed>  $components
+     */
+    public function logLivewireRequest(array $components): void
+    {
+        $actions = collect($components)
+            ->filter(fn ($component) => is_array($component))
+            ->flatMap(function (array $component): array {
+                $name = json_decode($component['snapshot'] ?? '{}', true)['memo']['name'] ?? 'livewire';
+
+                if (str_starts_with($name, 'admin.')) {
+                    return [];
+                }
+
+                return collect($component['calls'] ?? [])
+                    ->pluck('method')
+                    ->filter(fn ($method) => is_string($method)
+                        && ! str_starts_with($method, '$')
+                        && ! str_starts_with($method, '_')
+                        && ! in_array($method, self::NOT_CHANGES, true))
+                    ->map(fn (string $method): string => $name.'::'.$method)
+                    ->all();
+            })
+            ->values()
+            ->all();
+
+        $this->logActions($actions);
     }
 
     /**
