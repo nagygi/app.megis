@@ -64,8 +64,9 @@ class ReportBuilder
         $gapRow = $this->reading->gapRow($main);
         $processDiagnoses = Diagnosis::query()->where('parent_id', $diagnosis->id)->where('level', DiagnosisLevel::Process)->get()->keyBy('process_id');
         $areas = Area::query()->get()->keyBy('id');
+        $quotingPeers = $main->quotingPeerIds();
 
-        $rowData = $rows->map(fn (DiagnosisRow $row) => $this->row($row, $main, $definitions, $claims->get($row->id, collect()), $showsExperience, $gapRow, $processDiagnoses, $areas))->values();
+        $rowData = $rows->map(fn (DiagnosisRow $row) => $this->row($row, $main, $definitions, $claims->get($row->id, collect()), $showsExperience, $gapRow, $processDiagnoses, $areas, $quotingPeers))->values();
 
         $chapters = collect(self::CHAPTERS)
             ->map(fn (DiagnosisRowKind $kind, string $chapter) => self::chapter($chapter, $rowData->where('kind', $kind->value)->values()))
@@ -163,12 +164,14 @@ class ReportBuilder
      * @param  Collection<int, DiagnosisClaim>  $claims
      * @param  Collection<int|string, Diagnosis>  $processDiagnoses
      * @param  Collection<int|string, Area>  $areas
+     * @param  list<int>  $quotingPeers  a peer's quote only with the switch and the consent (31 · 31.6)
      * @return array<string, mixed>
      */
-    private function row(DiagnosisRow $row, MainDiagnosis $main, Collection $definitions, Collection $claims, bool $showsExperience, ?DiagnosisRow $gapRow, Collection $processDiagnoses, Collection $areas): array
+    private function row(DiagnosisRow $row, MainDiagnosis $main, Collection $definitions, Collection $claims, bool $showsExperience, ?DiagnosisRow $gapRow, Collection $processDiagnoses, Collection $areas, array $quotingPeers): array
     {
         $stats = $row->aggregation_stats ?? [];
         $traces = $row->traces->whereNull('excluded_at')
+            ->filter(fn (EvidenceTrace $trace) => $trace->hiddenFromLeader($main->show_peer_quotes, $quotingPeers) === null)
             ->sortBy(fn (EvidenceTrace $trace) => [$trace->highlighted_at === null ? 1 : 0, -($trace->recorded_on?->timestamp ?? 0)])
             ->values();
         $score = $row->score_state === ScoreState::Scored ? (float) $row->score : null;

@@ -20,6 +20,7 @@ A fő diagnózis *Olvasat* füle (19.1), három oszloppal, balról jobbra:
   - fent számláló: „14 / 19 jóváhagyva”.
 - **Bizonyíték:**
   - a kiválasztott sor nyomai (18.2), forrással, szereppel, dátummal és névvel;
+  - a társ idézete, amit a vezető nem láthat, szürkén áll, az okkal: „Nem jelenik meg a vezetőnek · nincs idézet-hozzájárulás” (31 · 31.6), vagy „· a társak idézetei ki vannak kapcsolva” (17 · 17.2). Nem számít a nyomok közé, állításhoz és bizonyítéknak nem választható, az AI-vázlat sem kapja meg. A kézzel felvett társ-nyomnál csak a kapcsoló számít;
   - az anyag megnyitható: átirat, hang, dokumentum;
   - csapatnál külön: „vezető 5 · csapat 3 · helyzetek 2,4”;
   - folyamatnál az alkalmak listája (13 · 13.5).

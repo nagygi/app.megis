@@ -151,10 +151,14 @@
                     @endif
 
                     <div class="flex flex-col gap-2">
-                        <h3 class="text-lg font-semibold">{{ __('admin.reading.traces.title', ['count' => $traces->whereNull('excluded_at')->count()]) }}</h3>
+                        <h3 class="text-lg font-semibold">{{ __('admin.reading.traces.title', ['count' => $traces->whereNull('excluded_at')->whereNotIn('id', $hiddenTraces->keys())->count()]) }}</h3>
                         @forelse ($traces as $trace)
-                            <article wire:key="trace-{{ $trace->id }}" @class(['flex flex-col gap-1 rounded-field border p-3 text-sm', 'border-grey-250 bg-grey-100 text-grey-600' => $trace->excluded_at, 'border-yellow bg-yellow-pale' => $trace->highlighted_at, 'border-grey-250' => ! $trace->excluded_at && ! $trace->highlighted_at])>
+                            @php($hiddenReason = $hiddenTraces->get($trace->id))
+                            <article wire:key="trace-{{ $trace->id }}" @class(['flex flex-col gap-1 rounded-field border p-3 text-sm', 'border-grey-250 bg-grey-100 text-grey-600' => $trace->excluded_at || $hiddenReason, 'border-yellow bg-yellow-pale' => $trace->highlighted_at && ! $hiddenReason, 'border-grey-250' => ! $trace->excluded_at && ! $trace->highlighted_at && ! $hiddenReason])>
                                 <p>„{{ $trace->quote }}”</p>
+                                @if ($hiddenReason)
+                                    <p class="text-xs font-medium">{{ __('admin.reading.traces.hidden.'.$hiddenReason) }}</p>
+                                @endif
                                 <p class="text-xs text-grey-700">
                                     {{ __('admin.reading.traces.sources.'.$trace->source_type) }}
                                     · {{ $trace->role ? __('admin.reading.traces.roles.'.$trace->role) : '–' }}

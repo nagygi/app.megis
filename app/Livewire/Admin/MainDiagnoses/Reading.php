@@ -374,6 +374,8 @@ class Reading extends Component
             : null;
         $claims = DiagnosisClaim::query()->where('diagnosis_id', $this->diagnosis->id)->with('row')->orderBy('diagnosis_row_id')->orderBy('id')->get();
         $byHand = $selected !== null && in_array($selected->kind, [DiagnosisRowKind::Area, DiagnosisRowKind::TreeElement], true);
+        $quotingPeers = $main->quotingPeerIds();
+        $shown = fn (EvidenceTrace $trace) => $trace->hiddenFromLeader($main->show_peer_quotes, $quotingPeers) === null;
 
         return view('livewire.admin.main-diagnoses.reading', [
             'main' => $main,
@@ -381,14 +383,16 @@ class Reading extends Component
             'rows' => $rows,
             'selected' => $selected,
             'traces' => $traces,
+            // The admin sees every trace; a peer's quote without the switch or the consent is greyed out (31 · 31.6).
+            'hiddenTraces' => $traces->mapWithKeys(fn (EvidenceTrace $trace) => [$trace->id => $trace->hiddenFromLeader($main->show_peer_quotes, $quotingPeers)])->filter(),
             'userNames' => User::query()->whereIn('id', $traces->pluck('user_id')->filter())->get()->mapWithKeys(fn ($user) => [$user->id => $user->name]),
             'occasions' => $processDiagnosis === null ? collect() : $breakdown->occasions($processDiagnosis),
-            'candidates' => $byHand ? $this->candidateTraces($rows) : collect(),
+            'candidates' => $byHand ? $this->candidateTraces($rows)->filter($shown)->values() : collect(),
             'byHand' => $byHand,
             'rowClaims' => $selected === null ? collect() : $claims->where('diagnosis_row_id', $selected->id)->values(),
             'claims' => $claims,
             'claimTraces' => $this->editingClaim !== null && filled($this->claim['diagnosis_row_id'])
-                ? EvidenceTrace::query()->where('diagnosis_row_id', (int) $this->claim['diagnosis_row_id'])->get()
+                ? EvidenceTrace::query()->where('diagnosis_row_id', (int) $this->claim['diagnosis_row_id'])->get()->filter($shown)->values()
                 : collect(),
             'textModels' => DiagnosisText::query()->where('diagnosis_id', $this->diagnosis->id)->get()->keyBy('key'),
             'requiredTexts' => $reading->requiredTexts($main),

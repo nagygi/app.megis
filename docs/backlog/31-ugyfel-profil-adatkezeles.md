@@ -62,7 +62,7 @@ Ha nincs teendő, a blokk nem jelenik meg.
 - **Ha a kötelező hozzájárulást vonja vissza** („A válaszaim…”):
   - megerősítést kér: „Ha visszavonod, a válaszaid és a helyzeteid kikerülnek a {Csapat} diagnózisából, és Útravalót sem kapsz.”;
   - utána a 25 · 25.6 szerint kerül ki a diagnózisból.
-- **Ha csak az idézetekről szólót vonja vissza:** a válaszai a diagnózisban maradnak, csak az idézetei nem jelennek meg a vezetőnek. Az olvasatban ezek a nyomok kikerülnek (20).
+- **Ha csak az idézetekről szólót vonja vissza:** a válaszai a diagnózisban maradnak, csak az idézetei nem jelennek meg a vezetőnek: a riportból, a Mellékletből és a PDF-ből kimaradnak. Az olvasatban az admin szürkén látja őket, „Nem jelenik meg a vezetőnek · nincs idézet-hozzájárulás” jelzéssel; állításhoz és bizonyítéknak nem választhatók, és az AI-vázlat sem kapja meg őket (20 · 20.1).
 - Rögzítjük, ki és mikor vonta vissza.
 - **Ugyanabba a diagnózisba nem tér vissza:** az adatai már kikerültek, a kitöltése lezárult.
 

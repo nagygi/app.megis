@@ -52,6 +52,28 @@ class EvidenceTrace extends Model
     }
 
     /**
+     * Why the leader does not see the trace, or null when it is shown: a
+     * peer's quote needs the A1 switch and the peer's quotes consent
+     * (17 · 17.2, 25 · 25.2, 31 · 31.6). A peer trace added by hand has no
+     * user, so only the switch counts for it.
+     *
+     * @param  list<int>  $quotingPeerIds  {@see MainDiagnosis::quotingPeerIds()}
+     * @return 'quotes_off'|'no_consent'|null
+     */
+    public function hiddenFromLeader(bool $peerQuotes, array $quotingPeerIds): ?string
+    {
+        if ($this->role !== 'peer') {
+            return null;
+        }
+
+        if (! $peerQuotes) {
+            return 'quotes_off';
+        }
+
+        return $this->user_id === null || in_array($this->user_id, $quotingPeerIds, true) ? null : 'no_consent';
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array

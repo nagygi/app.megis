@@ -160,6 +160,26 @@ it('takes a trace out, highlights one and adds one by hand (20 · 20.2)', functi
         ->and($trace->refresh()->highlighted_at)->not->toBeNull();
 });
 
+it('greys out a peer quote the leader may not see, and keeps it out of the claims (31 · 31.6)', function () {
+    [$setup, $main] = diagnosisInReading();
+    $row = rowOf($main, DiagnosisRowKind::Value);
+    $peerTrace = EvidenceTrace::create(['diagnosis_row_id' => $row->id, 'quote' => 'A társ idézete.', 'source_type' => 'mirror', 'role' => 'peer', 'user_id' => $setup['peers'][0]->id, 'recorded_on' => today()]);
+
+    Livewire::test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->call('selectRow', $row->id)
+        ->assertSee('A társ idézete.')
+        ->assertSee('Nem jelenik meg a vezetőnek · nincs idézet-hozzájárulás')
+        ->assertSee('Bizonyíték · 1 nyom')
+        ->call('newClaim')
+        ->assertViewHas('claimTraces', fn ($traces) => ! $traces->contains('id', $peerTrace->id) && $traces->isNotEmpty());
+
+    $main->update(['show_peer_quotes' => false]);
+
+    Livewire::test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->call('selectRow', $row->id)
+        ->assertSee('Nem jelenik meg a vezetőnek · a társak idézetei ki vannak kapcsolva');
+});
+
 it('keeps a claim to the traces of its own row and approves it (20 · 20.3)', function () {
     [, $main] = diagnosisInReading();
     $row = rowOf($main, DiagnosisRowKind::Value);

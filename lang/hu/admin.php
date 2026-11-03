@@ -1592,6 +1592,10 @@ return [
                 'peer' => 'társ',
                 'external' => 'külsős',
             ],
+            'hidden' => [
+                'quotes_off' => 'Nem jelenik meg a vezetőnek · a társak idézetei ki vannak kapcsolva',
+                'no_consent' => 'Nem jelenik meg a vezetőnek · nincs idézet-hozzájárulás',
+            ],
         ],
         'claims' => [
             'title' => 'Állítások',

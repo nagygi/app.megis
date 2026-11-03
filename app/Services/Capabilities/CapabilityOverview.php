@@ -5,14 +5,12 @@ namespace App\Services\Capabilities;
 use App\Enums\CapabilityConfidence;
 use App\Enums\CapabilityLevel;
 use App\Enums\CapabilityState;
-use App\Enums\ConsentKind;
 use App\Enums\FindingStatus;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\MainDiagnosisSubject;
 use App\Models\CapabilityAssessment;
 use App\Models\CapabilityFinding;
 use App\Models\CapabilityTrace;
-use App\Models\Consent;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\User;
@@ -121,9 +119,7 @@ class CapabilityOverview
         }
 
         $materials = Material::query()->where('parent_diagnosis_id', $main->diagnosis_id)->whereNotNull('user_id')->get(['id', 'user_id'])->keyBy('id');
-        $quotingPeers = $main->show_peer_quotes
-            ? Consent::query()->where('main_diagnosis_id', $main->id)->where('kind', ConsentKind::Quotes)->whereNull('revoked_at')->pluck('user_id')->all()
-            : [];
+        $quotingPeers = $main->quotingPeerIds();
         $visible = fn (?int $userId) => $userId === $viewer->id || ($userId !== $main->leader_id && in_array($userId, $quotingPeers, true));
 
         $findings = CapabilityFinding::query()

@@ -1,7 +1,9 @@
 <?php
 
 use App\Enums\DiagnosisRowKind;
+use App\Models\Consent;
 use App\Models\DiagnosisClaim;
+use App\Models\EvidenceTrace;
 use App\Models\Membership;
 use App\Services\Report\PublishService;
 use App\Services\Report\ReportBuilder;
@@ -118,4 +120,27 @@ it('switches to the individual and the organization view (27 · 27.9)', function
 
     $this->get($url.'?nezet=egyen')->assertOk()->assertSee('a te anyagaidból');
     $this->get($url.'?nezet=szervezet')->assertOk()->assertSee('a szervezet publikált diagnózisaiból');
+});
+
+it('shows a peer quote to the leader only with the A1 switch and the peer consent (31 · 31.6, 17 · 17.2)', function () {
+    [$setup, $main] = approvedReading();
+    $peer = $setup['peers'][0];
+    $row = $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Value)->orderBy('position')->first();
+    EvidenceTrace::create(['diagnosis_row_id' => $row->id, 'quote' => 'A társ idézete.', 'source_type' => 'mirror', 'role' => 'peer', 'user_id' => $peer->id, 'recorded_on' => today()]);
+    EvidenceTrace::create(['diagnosis_row_id' => $row->id, 'quote' => 'Kézzel felvett társ-nyom.', 'source_type' => 'note', 'role' => 'peer', 'recorded_on' => today(), 'created_by' => $setup['admin']->id]);
+    $quotes = fn () => collect(app(ReportBuilder::class)->build($main->refresh())['rows'])->flatMap(fn (array $row) => $row['traces'])->pluck('quote');
+
+    expect($quotes())->toContain('Szóltam a csúszásról, mielőtt kérdezték volna.', 'Kézzel felvett társ-nyom.')
+        ->not->toContain('A társ idézete.');
+
+    $consent = Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => 'quotes', 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
+    expect($quotes())->toContain('A társ idézete.');
+
+    $consent->update(['revoked_at' => now()]);
+    expect($quotes())->not->toContain('A társ idézete.');
+
+    $consent->update(['revoked_at' => null]);
+    $main->update(['show_peer_quotes' => false]);
+    expect($quotes())->not->toContain('A társ idézete.', 'Kézzel felvett társ-nyom.')
+        ->toContain('Szóltam a csúszásról, mielőtt kérdezték volna.');
 });

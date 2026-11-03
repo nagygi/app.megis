@@ -81,8 +81,9 @@ class ReadingDraftService
             return $main->diagnosis->claims()->get();
         }
 
+        $quotingPeers = $main->quotingPeerIds();
         $result = $this->ai->run(new DraftClaimsTask(
-            $refs->map(fn (DiagnosisRow $row, string $ref) => [...$this->rowInput($ref, $row), 'nyomok' => $this->tracesInput($row)])->values()->all(),
+            $refs->map(fn (DiagnosisRow $row, string $ref) => [...$this->rowInput($ref, $row), 'nyomok' => $this->tracesInput($row, $main, $quotingPeers)])->values()->all(),
             $main->isSnapshot(),
         ), $context);
 
@@ -204,13 +205,16 @@ class ReadingDraftService
     }
 
     /**
-     * Quotes with source, role and date; never a name (18 · 18.2).
+     * Quotes with source, role and date; never a name (18 · 18.2). A peer's
+     * quote the leader may not see is left out (31 · 31.6).
      *
+     * @param  list<int>  $quotingPeers
      * @return list<array<string, mixed>>
      */
-    private function tracesInput(DiagnosisRow $row): array
+    private function tracesInput(DiagnosisRow $row, MainDiagnosis $main, array $quotingPeers): array
     {
         return $row->traces
+            ->filter(fn (EvidenceTrace $trace) => $trace->hiddenFromLeader($main->show_peer_quotes, $quotingPeers) === null)
             ->sortByDesc('recorded_on')
             ->take(self::TRACES_PER_ROW)
             ->map(fn (EvidenceTrace $trace) => [

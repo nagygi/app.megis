@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ConsentKind;
 use App\Enums\DiagnosisStep;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\MainDiagnosisSubject;
@@ -330,6 +331,21 @@ class MainDiagnosis extends Model
     public function isLeader(User $user): bool
     {
         return $this->leader_id === $user->id;
+    }
+
+    /**
+     * The peers whose quotes the leader may see: the A1 switch is on and the
+     * peer's quotes consent is active (17 · 17.2, 25 · 25.2, 31 · 31.6).
+     *
+     * @return list<int>
+     */
+    public function quotingPeerIds(): array
+    {
+        if (! $this->show_peer_quotes) {
+            return [];
+        }
+
+        return $this->consents()->where('kind', ConsentKind::Quotes)->whereNull('revoked_at')->pluck('user_id')->all();
     }
 
     /**

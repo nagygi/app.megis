@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.75 · {hash} · 2026-11-03
+
+Riport és olvasat (31 · 31.6, 17 · 17.2, 25 · 25.2): a társ idézete csak akkor jelenik meg a vezetőnek, ha az A1 kapcsolója be van kapcsolva, és a társ hozzájárult.
+
+- **Eddig:** a hozzájárulás és a kapcsoló csak a Képességeknél számított. Az értékriportban (R0/S1, Belső működés, fejezetek, mélyítő lapok, Melléklet, PDF) a társak idézetei akkor is megjelentek, ha a társ nem adott idézet-hozzájárulást, visszavonta, vagy ha az admin az A1-ben kikapcsolta a társak idézeteit.
+- **Most:**
+  - **A riport minden lapján** (a publikálás előnézetében és a fagyasztott riportban is) a társ idézete csak bekapcsolt kapcsolóval és élő idézet-hozzájárulással jelenik meg. A vezető és a külsős forrás idézetei változatlanok.
+  - **Az olvasatban** az admin továbbra is lát minden nyomot, névvel. A vezető elől rejtett idézet szürkén áll, az okkal: „Nem jelenik meg a vezetőnek · nincs idézet-hozzájárulás”, vagy „· a társak idézetei ki vannak kapcsolva”.
+    - Nem számít bele a „Bizonyíték · {n} nyom” számba.
+    - Állításhoz és a területek, a fa bizonyítékául nem választható.
+    - Az AI állítás-vázlata sem kapja meg.
+  - **Kézzel felvett társ-nyom:** nincs hozzá felhasználó, ezért csak a kapcsoló számít.
+- **Már publikált riportok:** a korábbi pillanatképek nem változnak. Ha kell, javítással (21.4) újra kiadhatók.
+
 ## 1.74 · a920bda · 2026-11-03
 
 Saját értékek (24 · 24.4): a fiókhoz kötött nyilvános Értéktükör is beleszámít az állapotba.
