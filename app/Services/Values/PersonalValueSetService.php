@@ -209,7 +209,8 @@ class PersonalValueSetService
     /**
      * "erősen jelen" in at least two thirds of the user's own materials,
      * "részben" in at least one, otherwise "még nincs beépítve" (24 · 24.4).
-     * Only a match of step B counts, never a name (06 · 6.4).
+     * A public mirror tied to the account counts too. Only a match of step B
+     * counts, never a name (06 · 6.4).
      *
      * @param  list<int>  $valueIds
      * @return array{total: int, counts: array<int, int>}
@@ -218,7 +219,7 @@ class PersonalValueSetService
     {
         $materialIds = Material::query()
             ->where('user_id', $user->id)
-            ->where('context', MaterialContext::Mirror)
+            ->whereIn('context', [MaterialContext::Mirror, MaterialContext::PublicMirror])
             ->where('status', MaterialStatus::Processed)
             ->pluck('id');
 

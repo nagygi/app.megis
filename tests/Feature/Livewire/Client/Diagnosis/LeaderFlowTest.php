@@ -219,6 +219,24 @@ it('brings the values of the Értéktükör, leaving out "nem az enyém"', funct
         ->assertDontSee('Humor');
 });
 
+it('counts a public Értéktükör tied to the account in the state (24 · 24.4)', function () {
+    $setup = diagnosisTeam();
+    $main = startMainDiagnosis($setup);
+    $value = app(ValueService::class)->create(['name' => 'Egyenesség', 'meanings' => ['Kimondom.']]);
+    $material = Material::factory()->create(['context' => 'public_mirror', 'user_id' => $setup['leader']->id, 'organization_id' => $setup['organization']->id, 'status' => 'processed']);
+    $detection = $material->detections()->create(['speaker' => 'Beszélő 1', 'quote' => 'inkább most mondom', 'free_name' => 'Egyenesség', 'reasoning' => 'R']);
+    $detection->matches()->create(['value_id' => $value->id, 'confidence' => 0.9]);
+    MirrorSession::factory()->create(['material_id' => $material->id, 'user_id' => $setup['leader']->id, 'status' => MirrorStatus::Claimed, 'claimed_at' => now()]);
+    actingAsCustomer($setup['leader']);
+
+    Livewire::test(OwnValues::class, leaderParams($setup, $main))->call('importMirror');
+
+    Livewire::test(OwnValues::class, leaderParams($setup, $main))
+        ->assertSee('erősen jelen')
+        ->assertSee('az Értéktükörből · 1 helyzetedből 1')
+        ->assertDontSee('még nincs beépítve');
+});
+
 it('lets a non-leader of the organization only read the organization values', function () {
     $setup = diagnosisTeam(organizationLeader: false);
     $main = startMainDiagnosis($setup);

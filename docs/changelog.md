@@ -2,6 +2,14 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.74 · {hash} · 2026-11-03
+
+Saját értékek (24 · 24.4): a fiókhoz kötött nyilvános Értéktükör is beleszámít az állapotba.
+
+- **Eddig:** ha a felhasználó a nyilvános tükrét kötötte a fiókjához, és onnan hozta a saját értékeit, a kártyán mindig „még nincs beépítve” és „az Értéktükörből · 0 helyzetedből 0” állt. Az Értéktárban (Tárak → Értéktár, 30) is így. A számláló csak a belépve készített tükröt nézte (teszt-forgatókönyv I-3).
+- **Most:** a fiókhoz kötött nyilvános tükör is a felhasználó saját anyaga. Az állapot és a forrássor ezt is számolja, például „erősen jelen · az Értéktükörből · 1 helyzetedből 1”.
+  - A még gazdátlan nyilvános tükör (24 órán belül, megerősítés nélkül) továbbra sem számít.
+
 ## 1.73 · 27b7a2c · 2026-11-03
 
 Naptár (09 · 9.5): az időablak végén a feltöltött ICS fájl és a megszakadt kapcsolat is szétkötődik.

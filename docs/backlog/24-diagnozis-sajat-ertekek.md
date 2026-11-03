@@ -57,6 +57,7 @@ Kapcsolódik: 03, 06, 08, 17.
   - **erősen jelen:** az anyagai legalább kétharmadában megjelenik az érték;
   - **részben:** legalább egyben megjelenik;
   - **még nincs beépítve:** egyikben sem.
+- Az Értéktükrök közé a belépve készített és a fiókhoz kötött nyilvános tükör (06 · 6.1) is beletartozik.
 - Az illesztés a 06-os motor B lépcsője szerint megy, az Értéktár értékére. Ha az értéket nem az Értéktárból választotta, névegyezésre nem illesztünk (06 · 6.4); ilyenkor a kártyán „még nincs róla helyzet” áll.
 
 ### 24.5 Átvétel az Értéktükörből
