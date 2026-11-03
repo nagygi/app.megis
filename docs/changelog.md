@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.92 · {hash} · 2026-11-03
+## 1.92 · f8d5e9b · 2026-11-03
 
 Ügyfél-app lábléc (05 · 5.2, a kártyán érkezett kérés).
 
