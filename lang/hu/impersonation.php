@@ -3,8 +3,9 @@
 return [
 
     'banner' => ':name nevében dolgozol',
-    'tags' => 'Címkék: :tags',
-    'teams' => 'Csapatok: :teams',
+    'tag' => 'Címke',
+    'team' => 'Csapat',
+    'team_leader' => 'vezető',
     'exit' => 'Kilépés',
     'start' => 'Belépek a nevében',
     'forbidden' => 'Ezt a felhasználó nevében nem teheted meg.',

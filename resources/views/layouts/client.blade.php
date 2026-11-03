@@ -64,12 +64,10 @@
     $position = $membership?->position;
 
     // The coral bar tells the admin in which role they work: the tags and teams in this organization.
-    $impersonationTags = $impersonation ? implode(', ', $membership?->tagLabels() ?? []) : '';
+    $impersonationTags = $impersonation ? ($membership?->tagLabels() ?? []) : [];
     $impersonationTeams = $impersonation && $currentOrganization
         ? $user->teams()->where('teams.organization_id', $currentOrganization->id)->orderBy('teams.name')->get()
-            ->map(fn (\App\Models\Team $team): string => $team->pivot->is_leader ? $team->name.' ('.__('enums.membership_tag.team_leader').')' : $team->name)
-            ->implode(', ')
-        : '';
+        : collect();
 @endphp
 
 <!DOCTYPE html>
@@ -94,17 +92,18 @@
     </a>
 
     @if ($impersonation)
-        <div class="sticky top-0 z-40 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-coral px-4 py-2 text-sm font-semibold text-black" role="status">
-            <span>{{ __('impersonation.banner', ['name' => $impersonation->user->name]) }}</span>
-            @if ($impersonationTags !== '')
-                <span class="font-normal">{{ __('impersonation.tags', ['tags' => $impersonationTags]) }}</span>
-            @endif
-            @if ($impersonationTeams !== '')
-                <span class="font-normal">{{ __('impersonation.teams', ['teams' => $impersonationTeams]) }}</span>
-            @endif
-            <form method="POST" action="{{ route('client.impersonation.end') }}">
+        {{-- Tags are filled pills, teams outlined ones; the label is for screen readers and the tooltip. --}}
+        <div class="sticky top-0 z-40 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 bg-coral px-4 py-1.5 text-sm text-black" role="status">
+            <span class="mr-1 font-semibold">{{ __('impersonation.banner', ['name' => $impersonation->user->name]) }}</span>
+            @foreach ($impersonationTags as $tag)
+                <span class="rounded-pill bg-black/10 px-2 py-0.5 text-xs font-semibold" title="{{ __('impersonation.tag') }}"><span class="sr-only">{{ __('impersonation.tag') }}: </span>{{ $tag }}</span>
+            @endforeach
+            @foreach ($impersonationTeams as $team)
+                <span class="rounded-pill border border-black/40 px-2 py-0.5 text-xs" title="{{ __('impersonation.team') }}"><span class="sr-only">{{ __('impersonation.team') }}: </span>{{ $team->name }}@if ($team->pivot->is_leader) · <strong>{{ __('impersonation.team_leader') }}</strong>@endif</span>
+            @endforeach
+            <form method="POST" action="{{ route('client.impersonation.end') }}" class="ml-1">
                 @csrf
-                <button type="submit" class="underline">{{ __('impersonation.exit') }}</button>
+                <button type="submit" class="font-semibold underline">{{ __('impersonation.exit') }}</button>
             </form>
         </div>
     @endif

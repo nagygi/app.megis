@@ -43,8 +43,8 @@ it('shows the customer’s tags and teams in this organization on the coral bar'
 
     $this->get(route('client.home', $organization))
         ->assertOk()
-        ->assertSee('Címkék: szervezet vezetője')
-        ->assertSee('Csapatok: Sales, Value Core Team (csapat vezető)')
+        ->assertSeeText('Címke: szervezet vezetője')
+        ->assertSeeTextInOrder(['Csapat: Sales', 'Csapat: Value Core Team · vezető'])
         ->assertDontSee('Másik szervezet csapata');
 });
 

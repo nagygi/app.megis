@@ -2,6 +2,17 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.61 · {hash} · 2026-11-03
+
+„Belépek a nevében” (14 · 14.6): a coral sávban a címkék és a csapatok pillékként jelennek meg, így a sáv kisebb.
+
+- **Eddig (1.56):** „Címkék: szervezet vezetője” és „Csapatok: Él csapat” szöveggel. Egy keskenyebb ablakban a sáv két sorba tört.
+- **Most:**
+  - **Címkék:** kitöltött pillék, pl. *szervezet vezetője*.
+  - **Csapatok:** körvonalas pillék, ábécérendben. Ha a felhasználó vezeti a csapatot, a pillben ott áll: *Él csapat · **vezető***.
+  - A „Címke” és „Csapat” szót a képernyőolvasó felolvassa, egérrel tooltipként látszik.
+  - A sáv alacsonyabb, a pillék kisebb betűsek, a „Címkék:”/„Csapatok:” felirat nem foglal helyet. Ha nem fér el, továbbra is több sorba törik.
+
 ## 1.60 · 2859bc9 · 2026-11-03
 
 Admin, szervezet *Folyamatok* füle: alapból csak a folyamatlista látszik. A felvétel és a betöltés gombra nyílik.
