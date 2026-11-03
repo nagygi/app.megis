@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.84 · {hash} · 2026-11-03
+## 1.84 · 064be46 · 2026-11-03
 
 Olvasat (20 · 20.5): ha egy társ az olvasat alatt visszavonja a hozzájárulását.
 
