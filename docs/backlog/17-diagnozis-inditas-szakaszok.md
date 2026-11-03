@@ -62,7 +62,7 @@ A lépések a V1 sorrendjében.
 | 2 · A szervezet értékei | ✅ | – (a saját értékekből, 08) | ✅ | – |
 | 3 · A márkád alapja | ✅ | ✅ | ✅ | ✅ |
 | 4 · A megélésed | ✅ | ✅ | ✅ | ✅ |
-| Képességek (NM-12) | ✅ 1 helyzet | ✅ 1 helyzet | ✅ 3 helyzet | ✅ 3 helyzet |
+| Képességek (NM-12) | ✅ 1 szöveg | ✅ 1 szöveg | ✅ 1 szöveg | ✅ 1 szöveg |
 | 5 · Folyamatok | ✅ | ✅ | ✅ | ✅ |
 | 8 · Ki lát mit | ✅ | ✅ | ✅ | ✅ |
 

@@ -7,11 +7,9 @@ use App\Enums\ParticipantRole;
 use App\Enums\StepMark;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
 use App\Livewire\Concerns\WithDictation;
-use App\Models\CapabilityStory;
 use App\Models\Diagnosis;
 use App\Models\Organization;
 use App\Services\Capabilities\CapabilityStoryService;
-use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -19,20 +17,17 @@ use Livewire\WithFileUploads;
 
 /**
  * Képességek (NM-12), the leader's step after the Megélés and the peer's
- * after T4: situations told to the values, typed or spoken. The user does
- * not score; the capability measurement reads the situations. Three cards
- * in a Teljes, one in a snapshot and for a peer; "Kihagyom" also closes it.
+ * after T4: recent situations in one text, typed, spoken or uploaded. The
+ * user does not score and sees no capability; the capability measurement
+ * reads the text against the Képességtár. "Kihagyom" also closes the step.
  */
 class Capabilities extends Component
 {
     use InteractsWithMainDiagnosis, WithDictation, WithFileUploads;
 
-    /**
-     * @var array<int, string> story id => answer
-     */
-    public array $answers = [];
+    public string $answer = '';
 
-    public function mount(Organization $organization, Diagnosis $diagnosis): void
+    public function mount(Organization $organization, Diagnosis $diagnosis, CapabilityStoryService $stories): void
     {
         $this->bootDiagnosis($organization, $diagnosis);
 
@@ -45,76 +40,41 @@ class Capabilities extends Component
             return;
         }
 
-        $this->loadAnswers();
+        $this->answer = (string) $stories->storyFor($this->main(), $this->user())?->answer;
     }
 
-    public function updatedAnswers(mixed $value, string $key): void
+    public function updatedAnswer(mixed $value): void
     {
         if (! $this->acceptsInput()) {
             return;
         }
 
-        $story = $this->story((int) $key);
-        $this->validateOnly('answers.'.$story->id, ['answers.'.$story->id => ['nullable', 'string', 'max:3000']], attributes: [
-            'answers.'.$story->id => $story->value_name,
+        $this->validateOnly('answer', ['answer' => ['nullable', 'string', 'max:'.$this->maxCharacters()]], attributes: [
+            'answer' => __('capabilities.step.label'),
         ]);
 
-        app(CapabilityStoryService::class)->save($story, (string) $value);
-        $this->dispatch('saved');
-    }
-
-    public function changeValue(int $storyId, string $key, CapabilityStoryService $stories): void
-    {
-        $this->authorizeInput();
-
-        $stories->changeValue($this->story($storyId), $key);
+        app(CapabilityStoryService::class)->save($this->main(), $this->user(), (string) $value);
         $this->dispatch('saved');
     }
 
     /**
-     * "+ Még egy helyzet" (at most five).
-     */
-    public function addStory(CapabilityStoryService $stories): void
-    {
-        $this->authorizeInput();
-
-        $stories->add($this->main(), $this->user());
-        $this->loadAnswers();
-    }
-
-    /**
-     * ×: one card always stays.
-     */
-    public function removeStory(int $storyId, CapabilityStoryService $stories): void
-    {
-        $this->authorizeInput();
-
-        if ($this->stories()->count() <= 1) {
-            return;
-        }
-
-        $stories->remove($this->story($storyId));
-        unset($this->answers[$storyId]);
-    }
-
-    /**
-     * "Tovább": at least one situation, told in a few sentences.
+     * "Tovább": a text of a few sentences; an emptied one is taken back first.
      */
     public function submit(CapabilityStoryService $stories): void
     {
         $this->authorizeInput();
         abort_unless($this->ensurePeerStarted(), 403);
         $this->resetErrorBag();
+        $this->validate(['answer' => ['nullable', 'string', 'max:'.$this->maxCharacters()]], attributes: [
+            'answer' => __('capabilities.step.label'),
+        ]);
 
-        foreach ($this->stories() as $story) {
-            $stories->save($story, (string) ($this->answers[$story->id] ?? ''));
+        $stories->save($this->main(), $this->user(), $this->answer);
+
+        if (! $stories->submit($this->main(), $this->user(), ParticipantRole::from($this->role))) {
+            throw ValidationException::withMessages(['answer' => __('capabilities.step.one_needed', ['count' => (int) config('diagnosis.capability_stories.min_characters')])]);
         }
 
-        if ($this->stories()->filter(fn (CapabilityStory $story) => $story->hasAnswer())->isEmpty()) {
-            throw ValidationException::withMessages(['answers' => __('capabilities.step.one_needed', ['count' => (int) config('diagnosis.capability_stories.min_characters')])]);
-        }
-
-        $stories->submit($this->main(), $this->user(), ParticipantRole::from($this->role));
         $this->redirect($this->nextUrl(DiagnosisStep::Capabilities), navigate: false);
     }
 
@@ -132,27 +92,17 @@ class Capabilities extends Component
 
     public function render(): View
     {
-        $stories = app(CapabilityStoryService::class);
-        $role = ParticipantRole::from($this->role);
-
         return view('livewire.client.diagnosis.capabilities', [
-            'stories' => $this->stories(),
-            'values' => $stories->valuesFor($this->main(), $this->user()),
-            'suggested' => $stories->suggestedCount($this->main(), $role),
-            'max' => (int) config('diagnosis.capability_stories.max'),
+            'maxCharacters' => $this->maxCharacters(),
             'minCharacters' => (int) config('diagnosis.capability_stories.min_characters'),
             'editable' => $this->acceptsInput(),
-            'isPeer' => $role === ParticipantRole::Peer,
+            'isPeer' => ParticipantRole::from($this->role) === ParticipantRole::Peer,
         ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Capabilities, __('capabilities.step.question')))->title(DiagnosisStep::Capabilities->label());
     }
 
     protected function canDictate(string $field): bool
     {
-        if (! $this->acceptsInput() || $this->isImpersonating() || preg_match('/^answers\.(\d+)$/', $field, $match) !== 1) {
-            return false;
-        }
-
-        return $this->stories()->contains('id', (int) $match[1]);
+        return $field === 'answer' && $this->acceptsInput() && ! $this->isImpersonating();
     }
 
     protected function dictationOrganization(): ?Organization
@@ -162,30 +112,16 @@ class Capabilities extends Component
 
     protected function dictationLimit(string $field): ?int
     {
-        return 3000;
+        return $this->maxCharacters();
     }
 
     protected function dictated(string $field): void
     {
-        $story = $this->story((int) substr($field, strlen('answers.')));
-        app(CapabilityStoryService::class)->save($story, (string) $this->answers[$story->id]);
+        app(CapabilityStoryService::class)->save($this->main(), $this->user(), $this->answer);
     }
 
-    /**
-     * @return Collection<int, CapabilityStory>
-     */
-    private function stories(): Collection
+    private function maxCharacters(): int
     {
-        return app(CapabilityStoryService::class)->storiesFor($this->main(), $this->user(), ParticipantRole::from($this->role));
-    }
-
-    private function story(int $id): CapabilityStory
-    {
-        return $this->main()->capabilityStories()->where('user_id', $this->user()->id)->findOrFail($id);
-    }
-
-    private function loadAnswers(): void
-    {
-        $this->answers = $this->stories()->mapWithKeys(fn (CapabilityStory $story) => [$story->id => (string) $story->answer])->all();
+        return (int) config('diagnosis.capability_stories.max_characters');
     }
 }

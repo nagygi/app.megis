@@ -2,6 +2,24 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.59 · {hash} · 2026-11-03
+
+Képességek lépés (NM-12): egy szabad szöveg a kártyák helyett; a képességeket ebből a Képességtár alapján olvassuk ki.
+
+- **Eddig (1.32):**
+  - A lépésen értékkártyák voltak, a Megélés alapján javasolva: Teljesben 3, Snapshotban és társnál 1. Minden kártya egy értékhez kért egy helyzetet.
+  - Az utolsó kártyát nem lehetett törölni: kiürült listánál a javasolt kártyák újra létrejöttek.
+- **Most:**
+  - **Egy szöveg kitöltőnként:** leírva, elmondva vagy feltöltve, legfeljebb 10 000 karakter. A kérdés: „Mi történt nálatok mostanában? Mesélj el egy-két friss helyzetet…”, alatta témajavaslatok (döntés, rutin, vita, terhelés, ügyfél).
+  - **Nem vezetjük a választ:** a lépés nem nevez meg képességet, és az eredményt sem mutatja vissza (Részletes leírás 8.1, 8.8). A mérés a háttérben fut a teljes Képességtár ellen; az admin a diagnózis Képességek fülén látja, a kitöltő a jóváhagyott eredményt publikálás után.
+  - **Limit:** 10 000 karakterig a diktálás nyers átirat marad. A limit fölött az AI tömörít, és a tömörített szöveg már feldolgozott forrás.
+  - **Tovább:** legalább 40 karakter kell, vagy „Kihagyom”. A megváltozott szöveget újraméri, a kiürítettet a nyomaival együtt visszavonja.
+  - **V10:** „Képességek · 2 kitöltő mesélt · ebből 1 társ”.
+  - **Kikerült:** az értékkártyák, a javaslatok, a „Másik értékről mesélnék” és a „Még egy helyzet”, így a törlési hiba is.
+- **Adatbázis:**
+  - A `capability_stories` táblán felhasználónként egy sor (egyedi index), az érték-oszlopok törlődtek.
+  - A régi kártyák tesztadatok voltak: az anyagaikkal együtt törlődnek, és az érintett diagnózisok képesség-sorai újraszámolódnak.
+
 ## 1.58 · 6e2a49e · 2026-11-03
 
 Admin: minden oldal kitölti a szélességet; nagyon nagy monitoron az oldal legfeljebb 1920 px széles.

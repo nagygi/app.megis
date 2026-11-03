@@ -9,33 +9,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * A situation told to a value on the Képességek step (NM-12): the question
- * asked, the answer typed or spoken, and once sent the material the
- * capability measurement reads. The user does not score; the situation does.
+ * The text of a user on the Képességek step (NM-12), one per main diagnosis:
+ * the question asked, the situations typed, spoken or uploaded, and once sent
+ * the material the capability measurement reads against the Képességtár.
+ * The user does not score; the situations do.
  */
-#[Fillable([
-    'main_diagnosis_id', 'user_id', 'value_source', 'value_key', 'value_name', 'value_meaning',
-    'kind', 'question', 'answer', 'material_id', 'position', 'submitted_at',
-])]
+#[Fillable(['main_diagnosis_id', 'user_id', 'question', 'answer', 'material_id', 'submitted_at'])]
 class CapabilityStory extends Model
 {
     /** @use HasFactory<CapabilityStoryFactory> */
     use HasFactory;
-
-    public const SOURCE_OWN = 'own';
-
-    public const SOURCE_ORGANIZATION = 'organization';
-
-    /** The value was tested: when did it cost something? */
-    public const KIND_TESTED = 'tested';
-
-    /** The value was missed: when should it have been there, and was not? */
-    public const KIND_MISSED = 'missed';
-
-    /** An own value: when did you hold to it? */
-    public const KIND_OWN = 'own';
-
-    public const KINDS = [self::KIND_TESTED, self::KIND_MISSED, self::KIND_OWN];
 
     /**
      * @return array<string, string>
@@ -43,7 +26,6 @@ class CapabilityStory extends Model
     protected function casts(): array
     {
         return [
-            'position' => 'integer',
             'submitted_at' => 'datetime',
         ];
     }

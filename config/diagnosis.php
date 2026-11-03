@@ -54,14 +54,12 @@ return [
         'visibility' => 1,
     ],
 
-    // Képességek (NM-12): the situations suggested on the step, by product and
-    // for a peer; at most "max", and an answer counts from "min_characters".
+    // Képességek (NM-12): one text per user, counted from "min_characters". Up to
+    // "max_characters" a dictation stays the raw transcript; above it the AI
+    // condenses it, and a condensed text is processed, not raw (RL 8.1).
     'capability_stories' => [
-        'full' => 3,
-        'snapshot_internal' => 1,
-        'peer' => 1,
-        'max' => 5,
         'min_characters' => 40,
+        'max_characters' => 10000,
     ],
 
     // What the leader sees after publishing (V12, M3): at most this many

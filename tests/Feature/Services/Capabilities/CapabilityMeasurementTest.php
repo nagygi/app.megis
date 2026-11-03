@@ -366,7 +366,7 @@ it('never measures while the switch is off, so the value tests stay as they are 
 function presenceSituation(MainDiagnosis $main, User $user, array $library, string $quote): Material
 {
     $material = app(MaterialStore::class)->fromTurns([
-        ['speaker' => 'mégis (kérdés)', 'text' => 'Mikor került valamibe nemrég ez az érték?'],
+        ['speaker' => 'mégis (kérdés)', 'text' => 'Mi történt nálatok mostanában?'],
         ['speaker' => 'Vezető', 'text' => $quote],
     ], MaterialContext::CapabilityStory, $user, $main->diagnosis->organization);
     $material->update(['parent_diagnosis_id' => $main->diagnosis_id, 'status' => MaterialStatus::Processed]);
@@ -390,7 +390,7 @@ it('reads a situation of the Képességek step for capabilities only, as self-re
     $inputs = [];
     fakeCapabilityAi($inputs);
     $material = app(MaterialStore::class)->fromTurns([
-        ['speaker' => 'mégis (kérdés)', 'text' => 'Mikor került valamibe nemrég ez az érték?'],
+        ['speaker' => 'mégis (kérdés)', 'text' => 'Mi történt nálatok mostanában?'],
         ['speaker' => 'Vezető', 'text' => 'A heti alkalom fél éve fut, és minden héten döntünk a következő lépésről.'],
     ], MaterialContext::CapabilityStory, $setup['leader'], $setup['organization']);
     $material->update(['parent_diagnosis_id' => $main->diagnosis_id]);

@@ -8,42 +8,30 @@ return [
     // Képességek, the step after the Megélés (NM-12).
     'step' => [
         'question' => 'Hol lesz az értékeitekből tett?',
-        'count' => '{1} :count helyzet · leírva vagy elmondva|[2,*] :count helyzet · leírva vagy elmondva',
-        'lead' => 'Egy érték akkor képesség, ha nem kell kérni érte. Mesélj el egy-egy friss helyzetet: nem pontozod, a helyzetekből olvassuk ki, mire építhettek, és mi hiányzik.',
-        'lead_peer' => 'Egy érték akkor képesség, ha nem kell kérni érte. Mesélj el egy friss helyzetet a csapatból: nem pontozod, a helyzetekből olvassuk ki. A vezető nem látja, mit írtál.',
-        'questions' => [
-            'tested' => 'Mikor került valamibe nemrég ez az érték? Mi történt, ki mit tett, és mi lett belőle?',
-            'missed' => 'Mikor kellett volna nemrég ez az érték, és nem úgy ment? Mi történt, és mi lett utána?',
-            'own' => 'Mikor tartottad magad nemrég ehhez az értékhez, akkor is, ha kényelmetlen volt? Mi történt, és ki látta rajtad kívül?',
-        ],
-        'source' => [
-            'organization' => 'a szervezeté',
-            'own' => 'a tiéd',
-            'yours_too' => 'a tiéd is',
-        ],
+        'format' => 'Egy szöveg · leírva, elmondva vagy feltöltve',
+        'lead' => 'Egy érték akkor képesség, ha nem kell kérni érte. Mesélj el néhány friss helyzetet a munkából: nem pontozod, a szövegből olvassuk ki a Képességtár alapján, mire építhettek, és mi hiányzik.',
+        'lead_peer' => 'Egy érték akkor képesség, ha nem kell kérni érte. Mesélj el néhány friss helyzetet a csapatból: nem pontozod, a szövegből olvassuk ki a Képességtár alapján. A vezető nem látja, mit írtál.',
+        // The question of the material too; the topics name no capability, so the answer is not led.
+        'prompt' => 'Mi történt nálatok mostanában? Mesélj el egy-két friss helyzetet: mi történt, ki döntött, ki mit tett, és mi lett belőle.',
+        'hints' => 'Például: egy döntés, és hogy ki hozta · valami, ami rendszeresen megy, vagy épp nem · egy vita, elakadás vagy eszkaláció · amikor sok volt a munka, vagy kevés az idő · egy ügyfél, partner vagy beszállító.',
+        'label' => 'A helyzeteid',
         'placeholder' => 'Mikor, hol, ki mit tett, és mi lett belőle…',
-        'other_value' => 'Másik értékről mesélnék',
-        'value_label' => 'Melyik értékről?',
-        'add' => 'Még egy helyzet',
-        'remove' => ':name helyzetének törlése',
-        'remove_confirm' => 'Törlöd ezt a helyzetet? Amit írtál, elvész.',
-        'remove_yes' => 'Törlöm',
         'privacy' => 'Pár mondat elég, legalább :count karakter. Név helyett szerepet írj (pl. „a projektvezető”). Egészségről, magánéletről ne írj.',
-        'one_needed' => 'Legalább egy helyzetet mesélj el, legalább :count karakterben, vagy hagyd ki a lépést.',
+        'one_needed' => 'Mesélj el legalább egy helyzetet, legalább :count karakterben, vagy hagyd ki a lépést.',
         'submit' => 'Tovább',
         'skip' => 'Kihagyom',
         // The material the measurement reads: the question is the mégis', the answer the user's.
         'speaker_question' => 'mégis (kérdés)',
         'speaker_leader' => 'Vezető',
         'speaker_peer' => 'Társ',
-        'engine_note' => 'Helyzet a Képességek lépésről: a kitöltő saját leírása (önbevallás), a „mégis (kérdés)” sor a mégis kérdése, abból nem lehet nyom.',
+        'engine_note' => 'Szöveg a Képességek lépésről, friss helyzetekről: a kitöltő saját leírása (önbevallás), a „mégis (kérdés)” sor a mégis kérdése, abból nem lehet nyom.',
     ],
 
-    // V10: the situations told while it runs, numbers only.
+    // V10: who told their situations while it runs, numbers only.
     'home' => [
         'title' => 'Képességek',
-        'count' => '{0} Még nincs elmondott helyzet|{1} :count helyzet elmondva|[2,*] :count helyzet elmondva',
-        'count_with_peers' => ':total helyzet elmondva · ebből :peers a társaktól',
+        'count' => '{0} Még senki nem mesélt|[1,*] :count kitöltő mesélt',
+        'count_with_peers' => ':total kitöltő mesélt · ebből :peers társ',
     ],
 
     // V12, R0, R1: the Képesség card with the approved capabilities.
