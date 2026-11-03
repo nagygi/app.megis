@@ -63,7 +63,7 @@ class Index extends Component
             return $this->garden();
         }
 
-        $query = Diagnosis::query()->with(['organization', 'team', 'user', 'type', 'creator', 'main']);
+        $query = Diagnosis::query()->with(['organization', 'team', 'user', 'process', 'type', 'creator', 'main']);
 
         if ($term = $this->searchTerm()) {
             $query->whereLike('name', $term);

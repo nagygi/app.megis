@@ -52,8 +52,21 @@ class StageMachine
 
             if ($toStatus !== $fromStatus) {
                 $diagnosis->update(['status' => $toStatus]);
-                Diagnosis::query()->where('parent_id', $diagnosis->id)->update(['status' => $toStatus]);
             }
+
+            // The subdiagnoses follow, each with its line in its own log (17 · 17.4, 13 · 13.1).
+            Diagnosis::query()
+                ->where('parent_id', $diagnosis->id)
+                ->where('status', '!=', $toStatus)
+                ->get()
+                ->each(function (Diagnosis $subdiagnosis) use ($toStatus, $actor): void {
+                    $subdiagnosis->transitions()->create([
+                        'from_status' => $subdiagnosis->status,
+                        'to_status' => $toStatus,
+                        'created_by' => $actor?->id ?? auth()->id(),
+                    ]);
+                    $subdiagnosis->update(['status' => $toStatus]);
+                });
 
             $diagnosis->transitions()->create([
                 'from_status' => $fromStatus,

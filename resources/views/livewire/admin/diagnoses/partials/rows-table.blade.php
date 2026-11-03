@@ -31,10 +31,15 @@
                     @if ($stats['insufficient'] ?? false)
                         <x-ui.badge tone="coral">{{ __('admin.diagnoses.process_few', ['count' => $stats['n'] ?? 0]) }}</x-ui.badge>
                     @endif
+                    @if ($stats['single_occasion'] ?? false)
+                        <x-ui.badge tone="yellow">{{ __('admin.diagnoses.process_single') }}</x-ui.badge>
+                    @endif
                     @foreach ($stats['warnings'] ?? [] as $warning)
-                        <x-ui.badge tone="coral">{{ $warning === 'few_users'
-                            ? __('admin.diagnoses.aggregation.few_users', ['count' => $stats['n']])
-                            : __('admin.diagnoses.aggregation.divided') }}</x-ui.badge>
+                        <x-ui.badge tone="coral">{{ match ($warning) {
+                            'few_users' => __('admin.diagnoses.aggregation.few_users', ['count' => $stats['n']]),
+                            'few_occasions' => __('admin.diagnoses.aggregation.few_occasions', ['count' => $stats['n']]),
+                            default => __('admin.diagnoses.aggregation.divided'),
+                        } }}</x-ui.badge>
                     @endforeach
                 </span>
                 @if ($row->overridden_at)
@@ -71,7 +76,7 @@
                 {{ $row->scoreLabel() }}
                 @if (array_key_exists('n', $stats))
                     @php($deviation = $stats['score_deviation'] ?? $stats['deviation'] ?? null)
-                    <span class="block text-xs font-normal text-grey-700">n ={{ $stats['n'] }}@if (array_key_exists('score_deviation', $stats) || array_key_exists('deviation', $stats)) · {{ __('admin.diagnoses.aggregation.deviation') }}: {{ $deviation === null ? '–' : number_format($deviation, 2, ',', '') }}@endif</span>
+                    <span class="block text-xs font-normal text-grey-700">n = {{ $stats['n'] }}@if (array_key_exists('score_deviation', $stats) || array_key_exists('deviation', $stats)) · {{ __('admin.diagnoses.aggregation.deviation') }}: {{ $deviation === null ? '–' : number_format($deviation, 2, ',', '') }}@endif</span>
                 @endif
             </td>
             <td class="px-3 py-2">{{ $row->experienceLabel() }}</td>

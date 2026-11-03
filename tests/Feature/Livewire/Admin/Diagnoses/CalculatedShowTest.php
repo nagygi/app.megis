@@ -1,9 +1,16 @@
 <?php
 
+use App\Enums\DiagnosisLevel;
 use App\Enums\MainDiagnosisStage;
 use App\Jobs\RecalculateMainDiagnosis;
+use App\Livewire\Admin\Diagnoses\Index;
 use App\Livewire\Admin\Diagnoses\Show;
+use App\Livewire\Admin\MainDiagnoses\Subdiagnoses;
+use App\Models\DiagnosisType;
+use App\Models\OccasionExperience;
+use App\Models\Process;
 use App\Services\Diagnoses\DiagnosisCalculator;
+use App\Services\Diagnoses\DiagnosisService;
 use App\Services\MainDiagnoses\StageMachine;
 use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
@@ -120,4 +127,103 @@ it('counts the occasions added after publishing (13 · 13.4)', function () {
 
     Livewire::test(Show::class, ['diagnosis' => processDiagnosisOf($main, $process)])
         ->assertSee('1 új alkalom a publikálás óta');
+});
+
+it('counts a calendar occasion recorded ahead once its material comes after publishing, not a new material of a used one', function () {
+    [$setup, $main, $process] = calculatedDiagnosis();
+    $used = occasionOn($process, 5);
+    scoredMaterial($main, $used, [0 => 4, 1 => 2, 2 => 3]);
+    scoredMaterial($main, occasionOn($process, 4), [0 => 4, 1 => 2, 2 => 3]);
+    $ahead = occasionOn($process, -1);
+    app(DiagnosisCalculator::class)->recalculate($main);
+    app(StageMachine::class)->transition($main, MainDiagnosisStage::Reading, $setup['admin']);
+    app(StageMachine::class)->transition($main->refresh(), MainDiagnosisStage::Published, $setup['admin']);
+    $this->travel(2)->days();
+    scoredMaterial($main, $ahead, [0 => 6, 1 => 6, 2 => 6]);
+    scoredMaterial($main, $used, [0 => 6, 1 => 6, 2 => 6]);
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Show::class, ['diagnosis' => processDiagnosisOf($main, $process)])
+        ->assertSee('1 új alkalom a publikálás óta');
+});
+
+it('shows the quotes on the value rows and the verdict of each occasion (13 · 13.3, 13.5)', function () {
+    [$setup, $main, $process] = calculatedDiagnosis();
+    $occasion = occasionOn($process, 5);
+    $material = scoredMaterial($main, $occasion, [0 => 4, 1 => 2, 2 => 3]);
+    $detection = $material->detections()->create(['quote' => 'A retrón kimondtuk, mi csúszott.', 'free_name' => 'Őszinteség', 'strength' => 3]);
+    $material->scores()->where('value_id', $main->valueSetVersion->snapshot['values'][0]['value_id'])->update(['detection_ids' => [$detection->id]]);
+    scoredMaterial($main, occasionOn($process, 1), [0 => 4, 1 => 2, 2 => 3]);
+
+    foreach ([[$setup['leader'], 'yes'], [$setup['peers'][0], 'yes'], [$setup['peers'][1], 'no']] as [$user, $effective]) {
+        OccasionExperience::create([
+            'process_occasion_id' => $occasion->id, 'user_id' => $user->id, 'main_diagnosis_id' => $main->id,
+            'answers' => [], 'effectiveness' => $effective, 'submitted_at' => now(),
+        ]);
+    }
+
+    app(DiagnosisCalculator::class)->recalculate($main);
+    $diagnosis = processDiagnosisOf($main, $process);
+    actingAsAdmin($setup['admin']);
+
+    expect($diagnosis->valueRows()->orderBy('position')->first()->quotes)->toBe([['detection_id' => $detection->id, 'quote' => 'A retrón kimondtuk, mi csúszott.']]);
+
+    Livewire::test(Show::class, ['diagnosis' => $diagnosis])
+        ->assertSee('A retrón kimondtuk, mi csúszott.')
+        ->assertSee('2 alkalom · eredményes 1 · részben 0 · nem 0')
+        ->assertSee('· 1 válasz nélkül')
+        ->assertSee('(Igen 2 · Nem 1)')
+        ->assertSee('n = 2')
+        ->assertSee('Kevés adat (2 alkalom)')
+        ->assertSee('Értékszett: v');
+});
+
+it('lists several process diagnoses without loading their processes one by one', function () {
+    [$setup, $main, $process] = calculatedDiagnosis();
+    $other = Process::factory()->accepted()->for($setup['organization'])->create(['name' => 'Heti kör']);
+    $main->processes()->sync([$process->id, $other->id]);
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Subdiagnoses::class, ['diagnosis' => $main->diagnosis])
+        ->assertSee('Folyamat · Retró')
+        ->assertSee('Folyamat · Heti kör');
+
+    Livewire::test(Index::class)
+        ->set('view', 'lista')
+        ->assertSee('Folyamat · Heti kör');
+});
+
+it('calculates the point of a Folyamat diagnosis recorded by hand from its rows, and writes it over with a reason', function () {
+    [$setup, , $process] = calculatedDiagnosis();
+    $diagnosis = app(DiagnosisService::class)->create([
+        'name' => 'Retró workshop', 'organization_id' => $setup['organization']->id, 'level' => DiagnosisLevel::Process,
+        'process_id' => $process->id, 'diagnosis_type_id' => DiagnosisType::byKey(DiagnosisType::PROCESS)->id,
+        'diagnosed_on' => today()->toDateString(),
+    ]);
+    [$first, $second] = $diagnosis->valueRows()->orderBy('position')->get();
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Show::class, ['diagnosis' => $diagnosis])
+        ->call('editRow', $first->id)
+        ->set('rowScore', '5')
+        ->call('saveRow')
+        ->assertHasNoErrors()
+        ->call('editRow', $second->id)
+        ->set('rowScore', '2')
+        ->call('saveRow')
+        ->assertHasNoErrors()
+        ->assertSee('A folyamat pontja · Retró');
+
+    expect($diagnosis->refresh()->score)->toBe(3.5);
+
+    Livewire::test(Show::class, ['diagnosis' => $diagnosis])
+        ->call('editScore')
+        ->set('scoreInput', '4')
+        ->set('scoreReason', 'A workshop összképe szerint.')
+        ->call('saveScore')
+        ->assertHasNoErrors();
+
+    expect($diagnosis->refresh()->score)->toBe(4.0)
+        ->and($diagnosis->automatic_score)->toBe(3.5);
 });

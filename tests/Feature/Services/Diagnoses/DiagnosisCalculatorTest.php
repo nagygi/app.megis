@@ -1,10 +1,16 @@
 <?php
 
+use App\Enums\DiagnosisCreator;
+use App\Enums\DiagnosisLevel;
 use App\Enums\DiagnosisRowKind;
+use App\Enums\DiagnosisStatus;
 use App\Enums\MainDiagnosisStage;
+use App\Enums\MaterialStatus;
 use App\Enums\ParticipantRole;
 use App\Enums\ScoreState;
 use App\Models\Consent;
+use App\Models\Diagnosis;
+use App\Models\DiagnosisType;
 use App\Models\Material;
 use App\Models\OccasionExperience;
 use App\Models\Process;
@@ -159,7 +165,8 @@ it('averages the occasion experiences per value, leader and peers apart (13 · 1
         ->and($row->aggregation_stats['peers'])->toEqual(4.0)
         ->and($row->aggregation_stats['peer_count'])->toBe(1)
         ->and($row->gap())->toBe(2.0)
-        ->and($diagnosis->aggregation['effectiveness'])->toBe(['yes' => 1, 'partial' => 1, 'no' => 0]);
+        // One verdict per occasion: "igen" against "részben" is a tie, so "részben"; the other occasion has no answer.
+        ->and($diagnosis->aggregation['effectiveness'])->toBe(['yes' => 0, 'partial' => 1, 'no' => 0, 'none' => 1]);
 
     // A withdrawn peer leaves the calculation (25 · 25.6).
     Consent::query()->where('user_id', $peer->id)->update(['revoked_at' => now()]);
@@ -179,4 +186,168 @@ it('does not change a published diagnosis (13 · 13.4)', function () {
     app(DiagnosisCalculator::class)->recalculate($main->refresh());
 
     expect($main->diagnosis->valueRows()->orderBy('position')->first()->score)->toBe(2.0);
+});
+
+it('moves the process point with a value row written by hand (13 · 13.3)', function () {
+    [$setup, $main, $process] = calculatedDiagnosis();
+    scoredMaterial($main, occasionOn($process, 2), [0 => 4, 1 => null, 2 => 2]);
+    scoredMaterial($main, occasionOn($process, 1), [0 => 4, 1 => null, 2 => 2]);
+    app(DiagnosisCalculator::class)->recalculate($main);
+    $diagnosis = processDiagnosisOf($main, $process);
+
+    expect($diagnosis->score)->toBe(3.0);
+
+    app(DiagnosisService::class)->overrideRow($diagnosis->valueRows()->orderBy('position')->first(), '6', 'A workshop mást mutatott.', $setup['admin']);
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    // The written row counts with its own value: (6 + 2) / 2.
+    expect($diagnosis->refresh()->score)->toBe(4.0)
+        ->and($diagnosis->automatic_score)->toBe(4.0)
+        ->and($diagnosis->aggregation['overrides'])->toHaveCount(1)
+        ->and($diagnosis->aggregation['overrides'][0])->toMatchArray(['action' => 'override', 'automatic' => '4,0', 'value' => '6,0', 'by' => $setup['admin']->name]);
+
+    // Back to the automatic value: the trace of the override stays (13 · 13.5).
+    app(DiagnosisService::class)->resetRowOverride($diagnosis->valueRows()->orderBy('position')->first());
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    expect($diagnosis->refresh()->score)->toBe(3.0)
+        ->and(collect($diagnosis->aggregation['overrides'])->pluck('action')->all())->toBe(['override', 'reset']);
+});
+
+it('gives each occasion the effectiveness most of its people answered, and counts people (13 · 13.3)', function () {
+    [$setup, $main, $process] = calculatedDiagnosis();
+    $first = occasionOn($process, 2);
+    $second = occasionOn($process, 1);
+    scoredMaterial($main, $first, [0 => 3, 1 => 3, 2 => 3]);
+    scoredMaterial($main, $second, [0 => 3, 1 => 3, 2 => 3]);
+    $key = 'value:'.$main->valueSetVersion->snapshot['values'][0]['key'];
+    [$peer, $other] = $setup['peers'];
+
+    $answers = [
+        [$first, $setup['leader'], 'no', '5'], [$first, $peer, 'yes', '3'], [$first, $other, 'yes', 'dont_know'],
+        [$second, $setup['leader'], 'partial', '6'], [$second, $peer, 'dont_know', '2'],
+    ];
+
+    foreach ($answers as [$occasion, $user, $effective, $answer]) {
+        OccasionExperience::create([
+            'process_occasion_id' => $occasion->id, 'user_id' => $user->id, 'main_diagnosis_id' => $main->id,
+            'answers' => [$key => $answer], 'effectiveness' => $effective, 'submitted_at' => now(),
+        ]);
+    }
+
+    // An answer outside this diagnosis on the same occasion does not count.
+    OccasionExperience::create([
+        'process_occasion_id' => $second->id, 'user_id' => $other->id, 'main_diagnosis_id' => null,
+        'answers' => [$key => '1'], 'effectiveness' => 'no', 'submitted_at' => now(),
+    ]);
+
+    app(DiagnosisCalculator::class)->recalculate($main);
+
+    $diagnosis = processDiagnosisOf($main, $process);
+    $row = $diagnosis->valueRows()->orderBy('position')->first();
+
+    expect($diagnosis->aggregation['effectiveness'])->toBe(['yes' => 1, 'partial' => 1, 'no' => 0, 'none' => 0])
+        // One peer on two occasions is one "kitöltő"; "nem tudom" is no answer.
+        ->and($row->aggregation_stats['peer_count'])->toBe(1)
+        ->and($row->aggregation_stats['peers'])->toEqual(2.5)
+        ->and($row->aggregation_stats['leader'])->toEqual(5.5);
+});
+
+it('lists the skipped occasions of the run once each, with the reason (13 · 13.5)', function () {
+    [, $main, $process] = calculatedDiagnosis();
+    $main->update(['starts_on' => today()->subDays(10)]);
+    $used = occasionOn($process, 6);
+    $failed = occasionOn($process, 5);
+    $empty = occasionOn($process, 4);
+    occasionOn($process, -3);
+    scoredMaterial($main, $used, [0 => 3, 1 => 3, 2 => 3]);
+    scoredMaterial($main, $used, [0 => 4, 1 => 4, 2 => 4]);
+
+    foreach ([MaterialStatus::Failed, MaterialStatus::Analyzing] as $status) {
+        scoredMaterial($main, $failed, [0 => 3])->update(['status' => $status]);
+    }
+
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    $skipped = processDiagnosisOf($main, $process)->aggregation['skipped'];
+
+    // The calendar's future occasion is not skipped yet.
+    expect(collect($skipped)->pluck('reason', 'id')->all())->toBe([$failed->id => 'failed', $empty->id => 'no_material']);
+});
+
+it('warns on few occasions and on a divided row, as 04 · 4.5 does', function () {
+    [, $main, $process] = calculatedDiagnosis();
+    scoredMaterial($main, occasionOn($process, 2), [0 => 1, 1 => 3, 2 => null]);
+    scoredMaterial($main, occasionOn($process, 1), [0 => 5, 1 => 3, 2 => null]);
+
+    app(DiagnosisCalculator::class)->recalculate($main);
+
+    $rows = processDiagnosisOf($main, $process)->valueRows()->orderBy('position')->get();
+
+    expect($rows[0]->aggregation_stats['deviation'])->toEqual(2.0)
+        ->and($rows[0]->aggregation_stats['warnings'])->toBe(['few_occasions', 'divided'])
+        ->and($rows[1]->aggregation_stats['warnings'])->toBe(['few_occasions'])
+        ->and($rows[2]->aggregation_stats['warnings'])->toBe([]);
+});
+
+it('names a process diagnosis without occasions and dates it from the start of the run', function () {
+    [, $main, $process] = calculatedDiagnosis();
+
+    app(DiagnosisCalculator::class)->recalculate($main);
+
+    $diagnosis = processDiagnosisOf($main, $process);
+
+    expect($diagnosis->name)->toBe('Retró · még nincs alkalom')
+        ->and($diagnosis->diagnosed_on->toDateString())->toBe($main->starts_on->toDateString())
+        ->and($diagnosis->creator_kind)->toBe(DiagnosisCreator::Automatic)
+        ->and($diagnosis->value_set_version_id)->toBe($main->value_set_version_id)
+        ->and($diagnosis->aggregation['period'])->toBeNull();
+});
+
+it('leaves a Folyamat diagnosis recorded by hand to the admin (13 · 13.1)', function () {
+    [$setup, $main, $process] = calculatedDiagnosis();
+    $manual = app(DiagnosisService::class)->create([
+        'name' => 'Retró workshop', 'organization_id' => $setup['organization']->id, 'level' => DiagnosisLevel::Process,
+        'process_id' => $process->id, 'diagnosis_type_id' => DiagnosisType::byKey(DiagnosisType::PROCESS)->id,
+        'diagnosed_on' => today()->toDateString(), 'parent_id' => $main->diagnosis_id,
+    ]);
+    scoredMaterial($main, occasionOn($process, 1), [0 => 5, 1 => 5, 2 => 5]);
+
+    app(DiagnosisCalculator::class)->recalculate($main);
+
+    $calculated = Diagnosis::query()->where('parent_id', $main->diagnosis_id)->where('process_id', $process->id)->where('creator_kind', DiagnosisCreator::Automatic)->sole();
+    $values = collect($main->valueSetVersion->snapshot['values'])->pluck('value_id')->sort()->values()->all();
+
+    expect($manual->refresh()->name)->toBe('Retró workshop')
+        ->and($manual->isCalculated())->toBeFalse()
+        ->and($calculated->id)->not->toBe($manual->id)
+        // Its rows are the organization's values, in the version in force (08 · 8.4).
+        ->and($manual->valueRows()->pluck('value_id')->sort()->values()->all())->toBe($values)
+        ->and($manual->value_set_version_id)->not->toBeNull()
+        ->and($manual->treeRows()->count())->toBe(0);
+});
+
+it('removes the calculated diagnosis of a process taken off the main diagnosis', function () {
+    [$setup, $main, $process] = calculatedDiagnosis();
+    $other = Process::factory()->accepted()->for($setup['organization'])->create(['name' => 'Heti kör']);
+    $main->processes()->sync([$process->id, $other->id]);
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    $main->processes()->sync([$process->id]);
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    expect(Diagnosis::query()->where('parent_id', $main->diagnosis_id)->where('level', DiagnosisLevel::Process)->pluck('process_id')->all())->toBe([$process->id]);
+});
+
+it('moves the calculated process diagnosis with the stage, logging it on its own (17 · 17.4)', function () {
+    [$setup, $main, $process] = calculatedDiagnosis();
+    app(DiagnosisCalculator::class)->recalculate($main);
+    $diagnosis = processDiagnosisOf($main, $process);
+
+    expect($diagnosis->status)->toBe(DiagnosisStatus::Draft);
+
+    app(StageMachine::class)->transition($main, MainDiagnosisStage::Reading, $setup['admin']);
+
+    expect($diagnosis->refresh()->status)->toBe(DiagnosisStatus::PendingApproval)
+        ->and($diagnosis->transitions()->latest('id')->first()->to_status)->toBe(DiagnosisStatus::PendingApproval);
 });

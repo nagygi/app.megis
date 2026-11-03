@@ -9,6 +9,7 @@ use App\Models\Diagnosis;
 use App\Models\DiagnosisType;
 use App\Models\Membership;
 use App\Models\Organization;
+use App\Models\Process;
 use App\Services\Diagnoses\DiagnosisService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -59,6 +60,14 @@ class Form extends Component
             // A main diagnosis is set on A1 (17 · 17.2).
             if ($diagnosis->main !== null) {
                 $this->redirectRoute('admin.main-diagnoses.edit', $diagnosis, navigate: false);
+
+                return;
+            }
+
+            // A calculated Folyamat diagnosis gets its data from the calculation (13 · 13.1).
+            if ($diagnosis->isCalculated()) {
+                session()->flash('error', __('admin.diagnoses.calculated_data'));
+                $this->redirectRoute('admin.diagnoses.show', $diagnosis, navigate: false);
 
                 return;
             }
@@ -123,7 +132,7 @@ class Form extends Component
             'process_id' => [
                 Rule::requiredIf($this->level === DiagnosisLevel::Process->value),
                 'nullable',
-                Rule::exists('processes', 'id')->where('organization_id', $this->organization_id),
+                Rule::in($this->processOptions()->pluck('id')),
             ],
             'diagnosis_type_id' => ['required', Rule::exists('diagnosis_types', 'id')->where(fn ($query) => $query->whereNull('key')->orWhere('key', '!=', DiagnosisType::MAIN))],
             'parent_id' => ['nullable', Rule::in($this->mainDiagnosisOptions()->pluck('id'))],
@@ -193,7 +202,7 @@ class Form extends Component
                 ->reject(fn (DiagnosisLevel $level) => $level === DiagnosisLevel::Team && $organization?->isIndividual())
                 ->values(),
             'teams' => $organization?->teams()->orderBy('name')->get(['id', 'name']) ?? collect(),
-            'processes' => $organization?->processes()->orderBy('name')->get(['id', 'name']) ?? collect(),
+            'processes' => $this->processOptions(),
             'members' => $organization === null ? collect() : Membership::query()
                 ->where('organization_id', $organization->id)
                 ->where('status', '!=', MembershipStatus::Inactive)
@@ -221,6 +230,26 @@ class Form extends Component
             ->where(fn ($query) => $query
                 ->whereHas('main', fn ($main) => $main->acceptingInput())
                 ->when($this->diagnosis?->parent_id, fn ($current, $parentId) => $current->orWhere('id', $parentId)))
+            ->orderBy('name')
+            ->get(['id', 'name']);
+    }
+
+    /**
+     * The measured processes of the organization: accepted routines on the
+     * top level (11 · 11.4), and the one already chosen.
+     *
+     * @return Collection<int, Process>
+     */
+    private function processOptions(): Collection
+    {
+        $organization = $this->selectedOrganization();
+
+        if ($organization === null) {
+            return collect();
+        }
+
+        return $organization->processes()
+            ->where(fn ($query) => $query->measured()->when($this->diagnosis?->process_id, fn ($query, int $id) => $query->orWhere('id', $id)))
             ->orderBy('name')
             ->get(['id', 'name']);
     }

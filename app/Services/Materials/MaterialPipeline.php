@@ -125,6 +125,9 @@ class MaterialPipeline
         ]);
 
         $this->mirrorSession($material)?->update(['status' => MirrorStatus::Failed]);
+
+        // The occasion shows among the skipped ones at once (13 · 13.5).
+        $this->recalculateParent($material);
     }
 
     /**

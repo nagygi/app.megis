@@ -10,11 +10,13 @@ use App\Exceptions\DiagnosisException;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisRow;
 use App\Models\DiagnosisText;
+use App\Models\RawDetection;
 use App\Models\Value;
 use App\Services\Diagnoses\DiagnosisAggregator;
 use App\Services\Diagnoses\DiagnosisService;
 use App\Services\Diagnoses\ProcessOccasionBreakdown;
 use App\Services\Materials\MaterialStore;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -239,7 +241,7 @@ class Show extends Component
     public function saveScore(DiagnosisService $diagnoses): void
     {
         Gate::authorize('update', $this->diagnosis);
-        abort_unless($this->diagnosis->isCalculated() && $this->diagnosis->level === DiagnosisLevel::Process, 404);
+        abort_unless($this->diagnosis->level === DiagnosisLevel::Process, 404);
 
         $validated = $this->validate([
             'scoreInput' => ['required', 'string', $this->scoreRule()],
@@ -318,7 +320,7 @@ class Show extends Component
     {
         $this->diagnosis->refresh()->load([
             'organization', 'team', 'user', 'type', 'creator', 'transitions.creator', 'material',
-            'main.leader', 'main.participants', 'parent', 'process', 'scoreOverrider',
+            'main.leader', 'main.participants', 'parent', 'process', 'scoreOverrider', 'valueSetVersion',
         ]);
 
         $rows = $this->diagnosis->rows()->with(['value', 'valueVersion', 'process', 'area', 'overrider'])->get();
@@ -357,14 +359,32 @@ class Show extends Component
             'preview' => $preview,
             'editingRow' => $this->editingRowId === null ? null : $rows->firstWhere('id', $this->editingRowId),
             // "Egyéb detektált értékek": what matched nothing, without a score (06 · 6.5).
-            'otherDetected' => $this->diagnosis->material === null ? collect() : $this->diagnosis->material->detections()
-                ->kept()
-                ->whereNotNull('unmatched_value_id')
-                ->when($this->diagnosis->speaker !== null, fn ($query) => $query->where('speaker', $this->diagnosis->speaker))
-                ->with('unmatchedValue')
-                ->get()
-                ->groupBy('unmatched_value_id'),
+            'otherDetected' => $this->otherDetected($breakdown),
         ])->layout('layouts::admin')->title($this->diagnosis->name);
+    }
+
+    /**
+     * "Egyéb detektált értékek": what matched nothing, without a score (06 · 6.5);
+     * for a calculated Folyamat diagnosis from the materials of its occasions (13 · 13.2).
+     *
+     * @return Collection<int, Collection<int, RawDetection>>
+     */
+    private function otherDetected(ProcessOccasionBreakdown $breakdown): Collection
+    {
+        $query = match (true) {
+            $this->diagnosis->material !== null => $this->diagnosis->material->detections()
+                ->when($this->diagnosis->speaker !== null, fn ($query) => $query->where('speaker', $this->diagnosis->speaker)),
+            $this->diagnosis->isCalculated() && $this->diagnosis->level === DiagnosisLevel::Process => RawDetection::query()
+                ->whereIn('material_id', $breakdown->materialIds($this->diagnosis)),
+            default => null,
+        };
+
+        return $query === null ? collect() : $query
+            ->kept()
+            ->whereNotNull('unmatched_value_id')
+            ->with(['unmatchedValue', 'material.occasion.process'])
+            ->get()
+            ->groupBy('unmatched_value_id');
     }
 
     /**

@@ -38,6 +38,11 @@ use Illuminate\Support\Facades\DB;
  */
 class DiagnosisCalculator
 {
+    /**
+     * Quotes shown on a value row of a process diagnosis; the traces keep all.
+     */
+    private const ROW_QUOTES = 5;
+
     public function recalculate(MainDiagnosis $main): void
     {
         $main->loadMissing('diagnosis.organization', 'valueSetVersion');
@@ -115,9 +120,20 @@ class DiagnosisCalculator
             $processes = Process::query()->whereBelongsTo($main->diagnosis->organization)->measured()->get();
         }
 
-        return $processes->mapWithKeys(fn (Process $process) => [
+        $diagnoses = $processes->mapWithKeys(fn (Process $process) => [
             $process->id => $this->processDiagnosis($main, $process, $snapshot, $materials, $scores),
         ]);
+
+        // A process taken off the diagnosis takes its calculated diagnosis with it (13 · 13.1).
+        Diagnosis::query()
+            ->where('parent_id', $main->diagnosis_id)
+            ->where('level', DiagnosisLevel::Process)
+            ->where('creator_kind', DiagnosisCreator::Automatic)
+            ->whereNotIn('id', $diagnoses->pluck('id'))
+            ->get()
+            ->each(fn (Diagnosis $orphan) => $orphan->delete());
+
+        return $diagnoses;
     }
 
     /**
@@ -135,44 +151,60 @@ class DiagnosisCalculator
             ->filter(fn (Material $material) => $material->occasion !== null && in_array($material->occasion->process_id, $processIds, true))
             ->groupBy('process_occasion_id');
         $occasions = ProcessOccasion::query()->whereIn('id', $occasionMaterials->keys())->orderBy('occurred_at')->get();
+        // The V11·c answers of this diagnosis, on the occasions it uses (12 · 12.4).
         $experiences = OccasionExperience::query()
-            ->whereIn('process_occasion_id', ProcessOccasion::query()->whereIn('process_id', $processIds)->select('id'))
+            ->where('main_diagnosis_id', $main->id)
+            ->whereIn('process_occasion_id', $occasions->pluck('id'))
             ->whereNotNull('submitted_at')
             ->whereNotIn('user_id', $this->withdrawnUserIds($main))
             ->get();
+        $usedMaterials = $occasionMaterials->flatten(1);
 
         $minimum = $main->isSnapshot() ? 1 : 2;
         $diagnosis = $this->processDiagnosisRecord($main, $process, $occasions);
         $rowScores = [];
+        $keep = [];
 
         foreach ($snapshot['values'] ?? [] as $position => $item) {
+            // One point per occasion, however many materials it has (13 · 13.2).
             $perOccasion = $occasions->map(fn (ProcessOccasion $occasion) => ScoreMath::mean(
                 $occasionMaterials->get($occasion->id, collect())
-                    ->flatMap(fn (Material $material) => $scores->get($material->id, collect()))
-                    ->where('value_id', $item['value_id'])
-                    ->where('state', ScoreResultState::Scored)
-                    ->pluck('score')
-                    ->map(fn ($score) => (float) $score)
+                    ->map(fn (Material $material) => $this->scoreOf($scores, $material, (int) $item['value_id']))
+                    ->filter(fn ($score) => $score !== null)
                     ->values()
                     ->all(),
             ))->filter(fn ($score) => $score !== null)->values()->all();
 
             $mean = ScoreMath::mean($perOccasion);
+            $deviation = ScoreMath::deviation($perOccasion);
             $experience = $this->experienceOf($experiences, 'value:'.$item['key'], $main);
 
-            if ($mean !== null) {
-                $rowScores[] = $mean;
-            }
-
-            $this->writeRow($diagnosis, ['kind' => DiagnosisRowKind::Value, 'value_id' => $item['value_id']], [
+            $row = $this->writeRow($diagnosis, ['kind' => DiagnosisRowKind::Value, 'value_id' => $item['value_id']], [
                 'value_version_id' => $item['source_version_id'] ?? null,
                 'position' => $position,
+                'quotes' => $this->quotesFor($usedMaterials, $scores, (int) $item['value_id']),
             ], $mean, [
                 'n' => count($perOccasion),
-                'deviation' => ScoreMath::round1(ScoreMath::deviation($perOccasion)),
+                // As on the aggregated rows (04 · 4.5): two decimals, with the warnings.
+                'deviation' => $deviation === null ? null : round($deviation, 2),
+                'warnings' => $this->occasionWarnings(count($perOccasion), $deviation),
                 ...$experience['stats'],
             ], $experience['value']);
+            $keep[] = $row->id;
+
+            $this->tracesForValue($row, $usedMaterials, $scores, (int) $item['value_id'], $main);
+
+            // The point is the mean of the rows; a row written by hand counts with its own value (13 · 13.3).
+            if ($row->overridden_at !== null) {
+                if ($row->score_state === ScoreState::Scored && $row->score !== null) {
+                    $rowScores[] = (float) $row->score;
+                }
+            } elseif ($mean !== null) {
+                $rowScores[] = $mean;
+            }
         }
+
+        $diagnosis->valueRows()->whereNotIn('id', $keep)->delete();
 
         $enough = $occasions->count() >= $minimum;
         $point = $enough ? ScoreMath::round1(ScoreMath::mean($rowScores)) : null;
@@ -182,18 +214,27 @@ class DiagnosisCalculator
             default => ScoreState::Scored,
         };
 
-        $effectiveness = collect(['yes', 'partial', 'no'])->mapWithKeys(fn (string $answer) => [
-            $answer => $experiences->where('effectiveness', $answer)->count(),
-        ])->all();
+        // One verdict per occasion: what most of its people answered (13 · 13.3).
+        $verdicts = $occasions->map(fn (ProcessOccasion $occasion) => ScoreMath::effectivenessVerdict(
+            $experiences->where('process_occasion_id', $occasion->id)->pluck('effectiveness')->all(),
+        ));
+        $effectiveness = [
+            ...collect(['yes', 'partial', 'no'])->mapWithKeys(fn (string $answer) => [$answer => $verdicts->filter(fn ($verdict) => $verdict === $answer)->count()])->all(),
+            'none' => $verdicts->filter(fn ($verdict) => $verdict === null)->count(),
+        ];
 
         $diagnosis->forceFill([
             'automatic_score' => $point,
             'automatic_score_state' => $pointState,
             ...($diagnosis->score_overridden_at === null ? ['score' => $point, 'score_state' => $pointState] : []),
+            // The description is saved with the diagnosis, so it reads the same later (04 · 4.5, 13 · 13.5).
             'aggregation' => [
                 'kind' => 'process',
+                'process' => $process->name,
+                'period' => $occasions->isEmpty() ? null : $diagnosis->dateLabel(),
                 'occasions' => $occasions->count(),
                 'minimum' => $minimum,
+                'method' => __('admin.diagnoses.process_aggregation.rule', ['minimum' => $minimum]),
                 'single_occasion' => $occasions->count() === 1 && $main->isSnapshot(),
                 'effectiveness' => $effectiveness,
                 'used' => $occasions->map(fn (ProcessOccasion $occasion) => [
@@ -202,12 +243,67 @@ class DiagnosisCalculator
                     'process_id' => $occasion->process_id,
                     'materials' => $occasionMaterials->get($occasion->id)->count(),
                 ])->all(),
-                'skipped' => $this->skippedOccasions($main, $processIds),
+                'skipped' => $this->skippedOccasions($main, $processIds, $occasions->pluck('id')->all()),
+                // Kept by DiagnosisService, also after going back to the automatic value.
+                'overrides' => $diagnosis->aggregation['overrides'] ?? [],
                 'calculated_at' => now()->toIso8601String(),
             ],
         ])->save();
 
         return $diagnosis;
+    }
+
+    /**
+     * The score of one value in one material; a value the AI scored twice counts once.
+     *
+     * @param  Collection<int, Collection<int, MaterialValueScore>>  $scores
+     */
+    private function scoreOf(Collection $scores, Material $material, int $valueId): ?float
+    {
+        $score = $scores->get($material->id, collect())
+            ->first(fn (MaterialValueScore $score) => $score->value_id === $valueId && $score->state === ScoreResultState::Scored)
+            ?->score;
+
+        return $score === null ? null : (float) $score;
+    }
+
+    /**
+     * "Kevés adat" under three occasions, "megosztott" over 1,5 spread (04 · 4.5).
+     *
+     * @return list<string>
+     */
+    private function occasionWarnings(int $count, ?float $deviation): array
+    {
+        return array_values(array_filter([
+            $count > 0 && $count < DiagnosisAggregator::FEW_USERS ? 'few_occasions' : null,
+            $deviation !== null && $deviation > DiagnosisAggregator::DIVIDED_DEVIATION ? 'divided' : null,
+        ]));
+    }
+
+    /**
+     * The quotes behind a value row of a process diagnosis (13 · 13.5), the latest first.
+     *
+     * @param  Collection<int, Material>  $materials
+     * @param  Collection<int, Collection<int, MaterialValueScore>>  $scores
+     * @return list<array{detection_id: int, quote: string}>
+     */
+    private function quotesFor(Collection $materials, Collection $scores, int $valueId): array
+    {
+        $ids = $materials
+            ->sortByDesc(fn (Material $material) => $material->occasion?->occurred_at?->timestamp ?? 0)
+            ->flatMap(fn (Material $material) => $scores->get($material->id, collect())
+                ->first(fn (MaterialValueScore $score) => $score->value_id === $valueId && $score->state === ScoreResultState::Scored)
+                ?->detection_ids ?? [])
+            ->unique()
+            ->values();
+        $detections = RawDetection::query()->whereIn('id', $ids)->whereNull('excluded_at')->pluck('quote', 'id');
+
+        return $ids
+            ->filter(fn (int $id) => $detections->has($id))
+            ->take(self::ROW_QUOTES)
+            ->map(fn (int $id) => ['detection_id' => $id, 'quote' => $detections->get($id)])
+            ->values()
+            ->all();
     }
 
     /**
@@ -218,19 +314,26 @@ class DiagnosisCalculator
         $parent = $main->diagnosis;
         $first = $occasions->first()?->occurred_at;
         $last = $occasions->last()?->occurred_at;
-        $period = $first === null ? today()->format('Y.m.d.') : ($first->isSameDay($last) ? $first->format('Y.m.d.') : $first->format('Y.m.d.').' – '.$last->format('Y.m.d.'));
+        $period = match (true) {
+            $first === null => __('admin.diagnoses.process_no_occasions'),
+            $first->isSameDay($last) => $first->format('Y.m.d.'),
+            default => $first->format('Y.m.d.').' – '.$last->format('Y.m.d.'),
+        };
 
         $attributes = [
             'name' => mb_substr($process->name.' · '.$period, 0, 255),
-            'diagnosed_on' => ($first ?? today())->toDateString(),
+            // The first and the last processed occasion; before any, the start of the diagnosis.
+            'diagnosed_on' => ($first ?? $main->starts_on ?? today())->toDateString(),
             'diagnosed_until' => $last !== null && ! $first->isSameDay($last) ? $last->toDateString() : null,
             'value_set_version_id' => $main->value_set_version_id,
         ];
 
+        // A Folyamat diagnosis recorded by hand stays the admin's (13 · 13.1).
         $diagnosis = Diagnosis::query()
             ->where('parent_id', $parent->id)
             ->where('level', DiagnosisLevel::Process)
             ->where('process_id', $process->id)
+            ->where('creator_kind', DiagnosisCreator::Automatic)
             ->first();
 
         if ($diagnosis !== null) {
@@ -250,22 +353,35 @@ class DiagnosisCalculator
     }
 
     /**
-     * Occasions with materials that were not used, and why (13 · 13.5).
+     * The occasions of the run that were not used, once each, and why (13 · 13.5):
+     * a failed or unfinished material, only a withdrawn peer's material, or none.
      *
      * @param  list<int>  $processIds
-     * @return list<array{date: string, reason: string}>
+     * @param  list<int>  $usedIds
+     * @return list<array{id: int, date: string, process_id: int, reason: string}>
      */
-    private function skippedOccasions(MainDiagnosis $main, array $processIds): array
+    private function skippedOccasions(MainDiagnosis $main, array $processIds, array $usedIds): array
     {
-        return Material::query()
-            ->where('parent_diagnosis_id', $main->diagnosis_id)
-            ->whereIn('status', [MaterialStatus::Failed, MaterialStatus::Pending, MaterialStatus::Transcribing, MaterialStatus::Analyzing])
-            ->whereHas('occasion', fn ($query) => $query->whereIn('process_id', $processIds))
-            ->with('occasion')
+        $start = ($main->starts_on ?? $main->running_at ?? $main->created_at)->copy()->startOfDay();
+        $end = $main->publishes_on !== null ? min(now(), $main->publishes_on->copy()->endOfDay()) : now();
+
+        return ProcessOccasion::query()
+            ->whereIn('process_id', $processIds)
+            ->whereNotIn('id', $usedIds)
+            ->whereBetween('occurred_at', [$start, $end])
+            ->with(['materials' => fn ($query) => $query->where('parent_diagnosis_id', $main->diagnosis_id)])
+            ->orderBy('occurred_at')
             ->get()
-            ->map(fn (Material $material) => [
-                'date' => $material->occasion->occurred_at->toDateString(),
-                'reason' => $material->status === MaterialStatus::Failed ? 'failed' : 'processing',
+            ->map(fn (ProcessOccasion $occasion) => [
+                'id' => $occasion->id,
+                'date' => $occasion->occurred_at->toDateString(),
+                'process_id' => $occasion->process_id,
+                'reason' => match (true) {
+                    $occasion->materials->contains('status', MaterialStatus::Failed) => 'failed',
+                    $occasion->materials->contains(fn (Material $material) => $material->status !== MaterialStatus::Processed) => 'processing',
+                    $occasion->materials->isNotEmpty() => 'withdrawn',
+                    default => 'no_material',
+                },
             ])
             ->values()
             ->all();
@@ -290,11 +406,8 @@ class DiagnosisCalculator
         // Értékek: the mean of the materials' scores (18 · 18.4).
         foreach ($snapshot['values'] ?? [] as $item) {
             $perMaterial = $materials
-                ->map(fn (Material $material) => $scores->get($material->id, collect())
-                    ->first(fn (MaterialValueScore $score) => $score->value_id === $item['value_id'] && $score->state === ScoreResultState::Scored)
-                    ?->score)
+                ->map(fn (Material $material) => $this->scoreOf($scores, $material, (int) $item['value_id']))
                 ->filter(fn ($score) => $score !== null)
-                ->map(fn ($score) => (float) $score)
                 ->values()
                 ->all();
             $experience = $this->teamExperience($main, $experienceDiagnoses, fn (Diagnosis $experienceDiagnosis) => $experienceDiagnosis->valueRows->firstWhere('value_id', $item['value_id']));
@@ -327,6 +440,7 @@ class DiagnosisCalculator
             ], $processDiagnosis->score_state === ScoreState::InsufficientData ? null : $processDiagnosis->score, [
                 'n' => $processDiagnosis->aggregation['occasions'] ?? 0,
                 'insufficient' => $processDiagnosis->score_state === ScoreState::InsufficientData,
+                'single_occasion' => $processDiagnosis->aggregation['single_occasion'] ?? false,
                 'process_diagnosis_id' => $processDiagnosis->id,
             ], ScoreMath::round1($experience), insufficient: $processDiagnosis->score_state === ScoreState::InsufficientData);
             $keep[] = $row->id;
@@ -484,8 +598,10 @@ class DiagnosisCalculator
      */
     private function experienceOf(Collection $experiences, string $key, MainDiagnosis $main): array
     {
-        $leader = ScoreMath::numericAnswers($experiences->where('user_id', $main->leader_id)->map(fn (OccasionExperience $answer) => $answer->answers[$key] ?? null));
-        $peers = ScoreMath::numericAnswers($experiences->where('user_id', '!=', $main->leader_id)->map(fn (OccasionExperience $answer) => $answer->answers[$key] ?? null));
+        $answered = $experiences->filter(fn (OccasionExperience $answer) => ScoreMath::numericAnswers([$answer->answers[$key] ?? null]) !== []);
+        $leader = ScoreMath::numericAnswers($answered->where('user_id', $main->leader_id)->map(fn (OccasionExperience $answer) => $answer->answers[$key]));
+        $peerAnswers = $answered->where('user_id', '!=', $main->leader_id);
+        $peers = ScoreMath::numericAnswers($peerAnswers->map(fn (OccasionExperience $answer) => $answer->answers[$key]));
 
         return [
             'value' => ScoreMath::mean([...$leader, ...$peers]),
@@ -493,7 +609,8 @@ class DiagnosisCalculator
                 'leader' => ScoreMath::round1(ScoreMath::mean($leader)),
                 'leader_count' => count($leader),
                 'peers' => ScoreMath::round1(ScoreMath::mean($peers)),
-                'peer_count' => count($peers),
+                // People, not answers: one peer on three occasions is one (13 · 13.3).
+                'peer_count' => $peerAnswers->pluck('user_id')->unique()->count(),
             ],
         ];
     }

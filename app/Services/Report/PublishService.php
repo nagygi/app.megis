@@ -6,6 +6,7 @@ use App\Enums\CapabilityState;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\MaterialContext;
 use App\Exceptions\DiagnosisException;
+use App\Jobs\RecalculateMainDiagnosis;
 use App\Mail\DiagnosisNoticeMail;
 use App\Models\CapabilityAssessment;
 use App\Models\ChapterUpdate;
@@ -155,6 +156,9 @@ class PublishService
         }
 
         $this->stages->transition($main, MainDiagnosisStage::Reading, $admin, trim($reason));
+
+        // Back in Draft the diagnosis follows its materials again, also the ones that came meanwhile (13 · 13.4).
+        RecalculateMainDiagnosis::dispatch($main);
     }
 
     private function snapshot(MainDiagnosis $main, string $reason, ?User $admin, ?string $note = null): ReportSnapshot

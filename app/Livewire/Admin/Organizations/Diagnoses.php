@@ -29,7 +29,7 @@ class Diagnoses extends Component
             'diagnoses' => Diagnosis::query()
                 ->whereBelongsTo($this->organization)
                 ->whereNull('parent_id')
-                ->with(['type', 'main', 'team', 'user'])
+                ->with(['type', 'main', 'team', 'user', 'process'])
                 ->orderByDesc('diagnosed_on')
                 ->orderByDesc('id')
                 ->get(),

@@ -62,6 +62,10 @@
                     <x-admin.diagnosis-status :status="$diagnosis->status" />
                 @endif
                 <span class="text-grey-700">{{ __('admin.diagnoses.creator') }}: {{ $diagnosis->creator_kind->label() }}@if ($diagnosis->creator) · {{ $diagnosis->creator->name }}@endif</span>
+                @if ($diagnosis->level === \App\Enums\DiagnosisLevel::Process && $diagnosis->valueSetVersion)
+                    {{-- The rows are the organization's values in this version (13 · 13.1, 08 · 8.4) --}}
+                    <span class="text-grey-700">· {{ __('admin.diagnoses.value_set_version', ['version' => $diagnosis->valueSetVersion->label()]) }}</span>
+                @endif
             </div>
             @if ($diagnosis->description)
                 <p class="max-w-3xl whitespace-pre-line text-grey-700">{{ $diagnosis->description }}</p>
@@ -190,13 +194,13 @@
                                 'yes' => $processAggregation['effectiveness']['yes'] ?? 0,
                                 'partial' => $processAggregation['effectiveness']['partial'] ?? 0,
                                 'no' => $processAggregation['effectiveness']['no'] ?? 0,
-                            ]) }}</p>
+                            ]) }}@if (($processAggregation['effectiveness']['none'] ?? 0) > 0) · {{ __('admin.diagnoses.effectiveness_none', ['count' => $processAggregation['effectiveness']['none']]) }}@endif</p>
                         @endisset
                         @if ($newOccasions > 0)
                             <p class="text-sm font-semibold">{{ __('admin.diagnoses.new_occasions', ['count' => $newOccasions]) }}</p>
                         @endif
                     </div>
-                    @if ($isEditable && $isCalculated && ! $editingScore)
+                    @if ($isEditable && ! $editingScore)
                         <div class="flex flex-wrap gap-2">
                             <x-ui.button tone="outline" size="sm" wire:click="editScore">{{ __('admin.diagnoses.override.edit') }}</x-ui.button>
                             @if ($diagnosis->score_overridden_at)
@@ -218,7 +222,7 @@
                     </form>
                 @endif
 
-                @if ($processAggregation !== [])
+                @if (($processAggregation['kind'] ?? null) === 'process')
                     @include('livewire.admin.diagnoses.partials.process-aggregation', ['description' => $processAggregation])
                 @endif
             </x-ui.card>
@@ -300,7 +304,8 @@
                             <x-ui.badge class="ml-2">{{ $detectedValue->origin->label() }}</x-ui.badge>
                             <ul class="mt-2 flex flex-col gap-1 text-sm text-grey-700">
                                 @foreach ($detections as $detection)
-                                    <li>„{{ $detection->quote }}”</li>
+                                    {{-- On a Folyamat diagnosis: which occasion it came from (13 · 13.2) --}}
+                                    <li>„{{ $detection->quote }}”@if ($detection->material?->occasion) <span class="text-xs">· {{ $detection->material->occasion->occurred_at->format('Y.m.d.') }} · {{ $detection->material->occasion->process?->name }}</span>@endif</li>
                                 @endforeach
                             </ul>
                         </x-ui.card>
@@ -364,20 +369,27 @@
                                         <li><a href="{{ route('admin.materials.show', $material) }}">{{ $material->is_situation ? __('processes.occasions.situation') : ($material->original_name ?? $material->source->label()) }}</a> · @if ($material->user)<x-admin.user-link :user="$material->user" />@else{{ $material->creator?->name ?? '–' }}@endif</li>
                                     @endforeach
                                 </ul>
-                                @if ($entry['quotes'] !== [])
-                                    <ul class="mt-2 flex flex-col gap-1 text-xs text-grey-700">
-                                        @foreach (array_slice($entry['quotes'], 0, 3) as $quote)
-                                            <li>„{{ $quote }}”</li>
-                                        @endforeach
-                                    </ul>
-                                @endif
                             </td>
                             @foreach ($valueRows as $valueRow)
-                                <td class="px-3 py-2">{{ ($entry['scores'][$valueRow->value_id] ?? null) === null ? '–' : number_format($entry['scores'][$valueRow->value_id], 1, ',', '') }}</td>
+                                <td class="px-3 py-2">
+                                    {{ ($entry['scores'][$valueRow->value_id] ?? null) === null ? '–' : number_format($entry['scores'][$valueRow->value_id], 1, ',', '') }}
+                                    @if (($entry['quotes'][$valueRow->value_id] ?? []) !== [])
+                                        {{-- The quotes behind the point of this value (13 · 13.5) --}}
+                                        <ul class="mt-1 flex flex-col gap-1 text-xs text-grey-700">
+                                            @foreach (array_slice($entry['quotes'][$valueRow->value_id], 0, 2) as $quote)
+                                                <li>„{{ $quote }}”</li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                </td>
                             @endforeach
                             <td class="px-3 py-2 font-semibold">{{ $entry['point'] === null ? '–' : number_format($entry['point'], 1, ',', '') }}</td>
                             <td class="px-3 py-2 text-sm">
-                                {{ collect($entry['effectiveness'])->filter()->map(fn ($count, $answer) => __('processes.occasions.effectiveness.'.$answer).' '.$count)->implode(' · ') ?: '–' }}
+                                {{-- One verdict per occasion, what most answered (13 · 13.3) --}}
+                                {{ $entry['effectiveness'] === null ? '–' : __('processes.occasions.effectiveness.'.$entry['effectiveness']) }}
+                                @if (array_sum($entry['answers']) > 0)
+                                    <span class="block text-xs text-grey-700">{{ __('admin.diagnoses.effectiveness_answers', ['answers' => collect($entry['answers'])->filter()->map(fn ($count, $answer) => __('processes.occasions.effectiveness.'.$answer).' '.$count)->implode(' · ')]) }}</span>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

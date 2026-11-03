@@ -171,10 +171,12 @@ class Diagnosis extends Model
     /**
      * Calculated from the materials until publishing (13, 18): the main
      * diagnosis and its process diagnoses. Rows are written over with a reason.
+     * A Folyamat diagnosis recorded by hand is not, even under a main one.
      */
     public function isCalculated(): bool
     {
-        return $this->main !== null || ($this->level === DiagnosisLevel::Process && $this->parent_id !== null);
+        return $this->main !== null
+            || ($this->level === DiagnosisLevel::Process && $this->parent_id !== null && $this->creator_kind === DiagnosisCreator::Automatic);
     }
 
     /**

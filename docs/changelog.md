@@ -2,6 +2,52 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.70 · {hash} · 2026-11-03
+
+Folyamat-diagnózis (13): a számítás és az admin oldal a jegy szerint.
+
+- **A folyamat pontja (13.3):**
+  - **Eddig:** egy kézzel átírt értéksor nem mozdította a pontot.
+  - **Most:** a pont az értéksorok átlaga, a kézzel átírt sor az átírt értékével számít.
+- **Eredményesség (13.3):**
+  - **Eddig:** a válaszokat számolta. Ha egy alkalomra hárman feleltek, az három darab volt, így a számok összege nem az alkalmak száma volt.
+  - **Most:** egy alkalomnak egy eredményessége van, a válaszok többsége a „nem tudom” nélkül, holtversenyben „részben”.
+    - A válasz nélküli alkalom külön szám: „6 alkalom · eredményes 3 · részben 2 · nem 0 · 1 válasz nélkül”.
+    - Az alkalmak táblájában az alkalom eredménye alatt a válaszok bontása: „(Igen 2 · Nem 1)”.
+- **Megélés (13.3):**
+  - Csak ennek a diagnózisnak a válaszai számítanak, a felhasznált alkalmakról. Eddig a folyamat korábbi diagnózisainak válaszai is bekerültek.
+  - A „kitöltő” az emberek száma. Eddig a válaszoké volt: egy társ három alkalommal „3 kitöltő” volt.
+- **Jelzések a soron (04 · 4.5):** 3 alkalom alatt „Kevés adat (n alkalom)”, 1,5 feletti szórásnál „megosztott”. A szórás két tizedesre, a felirat „n = 2”.
+- **Idézetek (13.5):** az értéksorok alatt a pontjuk mögötti idézetek, legfeljebb öt. Az alkalmak táblájában értékenként, a pont alatt.
+- **Kimaradt alkalmak (13.5):**
+  - **Eddig:** anyagonként jelent meg, így egy alkalom többször is. A „nincs anyag” ok soha nem jött.
+  - **Most:** alkalmonként egyszer, a futás kezdetétől máig. Az okok: feldolgozási hiba, még feldolgozás alatt, visszavont hozzájárulás, nincs anyag.
+- **Az összesítés leírása (04 · 4.5, 13.5):** a folyamat neve, az időszak és a számítás szövege a számításkor mentődik, így később is az eredeti olvasható.
+- **Kézi átírás (13.5):** a sor és a pont átírása napló a diagnózison: ki, mikor, mi volt az automatikus érték, mire írta át és miért. A *Vissza az automatikusra* után a nyom megmarad.
+- **Frissítés (13.4):**
+  - **Visszavonás Draftba:** rögtön újraszámol, a közben jött anyagokkal együtt. Eddig csak a következő eseménynél.
+  - **Sikertelen anyag:** ez is újraszámoltat, hogy a kimaradt alkalmak listája rögtön frissüljön.
+  - **„N új alkalom a publikálás óta”:** a még nem használt alkalmakat számolja, amelyeknek a publikálás után jött feldolgozott anyaga. A naptárból előre felvett alkalom is ide tartozik. Egy felhasznált alkalom új anyaga nem számít.
+- **Kézzel felvett Folyamat-diagnózis (13.1):**
+  - **Eddig:**
+    - a fő diagnózis alá kötve számoltnak látszott, a „+ Érték” eltűnt;
+    - a számítás átvehette és felülírhatta;
+    - a sorait bármely Értéktár-értékből kellett összerakni, pontja nem lehetett.
+  - **Most:**
+    - a sorai a szervezet értékei, a hatályos értékszett-verzióval;
+    - a pont a sorok átlaga, kötelező indoklással átírható;
+    - a számítás nem nyúl hozzá;
+    - a folyamatválasztó csak a mért, felső szintű folyamatokat kínálja;
+    - szintváltáskor a márka-sorok kikerülnek, illetve visszajönnek.
+- **Számolt Folyamat-diagnózis (13.1):**
+  - Az *Adatok* oldala nem nyílik meg: a szint, a folyamat, a név és az időszak a számításból jön.
+  - Amíg nincs alkalom, a neve „{Folyamat} · még nincs alkalom”, a napja a diagnózis kezdőnapja (eddig a mai nap).
+  - Ha a folyamat kikerül a fő diagnózisból, a számolt diagnózisa is törlődik. Eddig árván maradt.
+  - A státuszváltás a saját naplójába is bekerül.
+  - A fejlécben látszik a rögzített értékszett-verzió („Értékszett: v3”).
+  - Az „Egy alkalomból” jelzés a fő diagnózis folyamatsorán is látszik.
+- **Javítás:** a *Részdiagnózisok* fül és a *Diagnózisok* lista nem dob hibát, ha több folyamat-diagnózis van benne.
+
 ## 1.69 · c88e8db · 2026-11-03
 
 A visszaaktivált tag a csapata diagnózisának társa lesz (02 · 2.5, 17 · 17.2).

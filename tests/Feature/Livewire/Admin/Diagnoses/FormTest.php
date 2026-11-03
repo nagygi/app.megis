@@ -7,7 +7,9 @@ use App\Livewire\Admin\Diagnoses\Form;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisType;
 use App\Models\Organization;
+use App\Models\Process;
 use App\Models\Team;
+use App\Services\Diagnoses\DiagnosisCalculator;
 use Livewire\Livewire;
 
 it('creates a draft organization diagnosis with the four brand base rows', function () {
@@ -31,6 +33,46 @@ it('creates a draft organization diagnosis with the four brand base rows', funct
         ->created_by->toBe($admin->id)
         ->and($diagnosis->treeRows()->count())->toBe(4)
         ->and($diagnosis->transitions()->sole())->to_status->toBe(DiagnosisStatus::Draft)->created_by->toBe($admin->id);
+});
+
+it('offers only measured processes on the Folyamat level and fills the rows with the organization\'s values (13 · 13.1)', function () {
+    [$setup, $main, $process] = calculatedDiagnosis();
+    $child = Process::factory()->accepted()->for($setup['organization'])->create(['name' => 'Retró-előkészítés', 'parent_id' => $process->id]);
+    $candidate = Process::factory()->for($setup['organization'])->create(['name' => 'Még nem elfogadott']);
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Form::class)
+        ->set('name', 'Retró workshop')
+        ->set('organization_id', $setup['organization']->id)
+        ->set('level', DiagnosisLevel::Process->value)
+        ->assertSee('Retró')
+        ->assertDontSee('Retró-előkészítés')
+        ->assertDontSee('Még nem elfogadott')
+        ->set('process_id', $candidate->id)
+        ->set('diagnosis_type_id', DiagnosisType::byKey(DiagnosisType::PROCESS)->id)
+        ->call('save')
+        ->assertHasErrors(['process_id'])
+        ->set('process_id', $process->id)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $diagnosis = Diagnosis::query()->where('name', 'Retró workshop')->sole();
+
+    expect($diagnosis->creator_kind)->toBe(DiagnosisCreator::Admin)
+        ->and($diagnosis->treeRows()->count())->toBe(0)
+        ->and($diagnosis->valueRows()->count())->toBe(count($main->valueSetVersion->snapshot['values']))
+        ->and($diagnosis->value_set_version_id)->not->toBeNull()
+        ->and($child->exists)->toBeTrue();
+});
+
+it('keeps the data of a calculated process diagnosis to the calculation', function () {
+    [$setup, $main, $process] = calculatedDiagnosis();
+    app(DiagnosisCalculator::class)->recalculate($main);
+    $diagnosis = processDiagnosisOf($main, $process);
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Form::class, ['diagnosis' => $diagnosis])
+        ->assertRedirect(route('admin.diagnoses.show', $diagnosis));
 });
 
 it('requires a team of the organization on team level', function () {

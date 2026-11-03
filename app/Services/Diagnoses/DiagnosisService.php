@@ -16,6 +16,7 @@ use App\Jobs\RecalculateMainDiagnosis;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisRow;
 use App\Models\DiagnosisText;
+use App\Models\OrganizationValueSet;
 use App\Models\User;
 use App\Models\Value;
 use App\Services\Values\ValueService;
@@ -48,13 +49,13 @@ class DiagnosisService
             $diagnosis = Diagnosis::create([...$attributes, 'creator_kind' => $creator, 'status' => $status]);
 
             // A process diagnosis has no brand base block (13 · 13.1).
-            foreach ($diagnosis->level === DiagnosisLevel::Process ? [] : TreeElement::cases() as $position => $element) {
-                $diagnosis->rows()->create([
-                    'kind' => DiagnosisRowKind::TreeElement,
-                    'tree_element' => $element,
-                    'position' => $position,
-                    'assigned_on' => $diagnosis->diagnosed_on,
-                ]);
+            if ($diagnosis->level !== DiagnosisLevel::Process) {
+                $this->addTreeRows($diagnosis);
+            }
+
+            // The calculation writes the rows of its own diagnoses.
+            if ($diagnosis->level === DiagnosisLevel::Process && $creator !== DiagnosisCreator::Automatic) {
+                $this->addOrganizationValues($diagnosis);
             }
 
             $this->logTransition($diagnosis, null, $status);
@@ -70,7 +71,56 @@ class DiagnosisService
     {
         $this->ensureEditable($diagnosis);
 
-        $diagnosis->update($attributes);
+        DB::transaction(function () use ($diagnosis, $attributes): void {
+            $from = $diagnosis->level;
+            $diagnosis->update($attributes);
+
+            if ($from === $diagnosis->level) {
+                return;
+            }
+
+            // The brand base block goes with the Folyamat level, the organization's values come (13 · 13.1).
+            if ($diagnosis->level === DiagnosisLevel::Process) {
+                $diagnosis->treeRows()->delete();
+                $this->addOrganizationValues($diagnosis);
+                $this->refreshManualPoint($diagnosis);
+            } elseif ($from === DiagnosisLevel::Process) {
+                $this->addTreeRows($diagnosis);
+            }
+        });
+    }
+
+    private function addTreeRows(Diagnosis $diagnosis): void
+    {
+        foreach (TreeElement::cases() as $position => $element) {
+            $diagnosis->rows()->firstOrCreate(
+                ['kind' => DiagnosisRowKind::TreeElement, 'tree_element' => $element],
+                ['position' => $position, 'assigned_on' => $diagnosis->diagnosed_on],
+            );
+        }
+    }
+
+    /**
+     * The rows of a Folyamat diagnosis are the organization's values, in the
+     * version in force, recorded with the diagnosis (13 · 13.1, 08 · 8.4).
+     */
+    private function addOrganizationValues(Diagnosis $diagnosis): void
+    {
+        $set = OrganizationValueSet::query()->where('organization_id', $diagnosis->organization_id)->first();
+        $version = $set === null ? null : ($set->latestVersion ?? $set->recordVersion());
+
+        if ($version === null) {
+            return;
+        }
+
+        $diagnosis->update(['value_set_version_id' => $version->id]);
+
+        foreach ($version->snapshot['values'] ?? [] as $position => $item) {
+            $diagnosis->rows()->firstOrCreate(
+                ['kind' => DiagnosisRowKind::Value, 'value_id' => $item['value_id']],
+                ['value_version_id' => $item['source_version_id'] ?? null, 'position' => $position, 'assigned_on' => $diagnosis->diagnosed_on],
+            );
+        }
     }
 
     public function transition(Diagnosis $diagnosis, DiagnosisStatus $to): void
@@ -188,6 +238,7 @@ class DiagnosisService
         }
 
         $row->save();
+        $this->refreshManualPoint($row->diagnosis);
     }
 
     /**
@@ -205,6 +256,8 @@ class DiagnosisService
             'overridden_at' => now(),
         ])->save();
 
+        $this->logOverride($row->diagnosis, $row->label(), 'override', $admin, $row->automatic_score, $row->automatic_score_state, $row->score, $row->score_state, trim($reason));
+        $this->refreshManualPoint($row->diagnosis);
         $this->recalculate($row->diagnosis);
     }
 
@@ -223,6 +276,8 @@ class DiagnosisService
             'overridden_at' => null,
         ])->save();
 
+        $this->logOverride($row->diagnosis, $row->label(), 'reset', auth('admin')->user(), $row->automatic_score, $row->automatic_score_state);
+        $this->refreshManualPoint($row->diagnosis);
         $this->recalculate($row->diagnosis);
     }
 
@@ -240,6 +295,7 @@ class DiagnosisService
             'score_overridden_at' => now(),
         ])->save();
 
+        $this->logOverride($diagnosis, __('admin.diagnoses.process_point'), 'override', $admin, $diagnosis->automatic_score, $diagnosis->automatic_score_state, $diagnosis->score, $diagnosis->score_state, trim($reason));
         $this->recalculate($diagnosis);
     }
 
@@ -255,7 +311,60 @@ class DiagnosisService
             'score_overridden_at' => null,
         ])->save();
 
+        $this->logOverride($diagnosis, __('admin.diagnoses.process_point'), 'reset', auth('admin')->user(), $diagnosis->automatic_score, $diagnosis->automatic_score_state);
         $this->recalculate($diagnosis);
+    }
+
+    /**
+     * The point of a Folyamat diagnosis recorded by hand: the mean of its value
+     * rows, one decimal, unless written over (13 · 13.1, 13.3). A calculated
+     * one gets it from the calculation.
+     */
+    public function refreshManualPoint(Diagnosis $diagnosis): void
+    {
+        if ($diagnosis->level !== DiagnosisLevel::Process || $diagnosis->isCalculated()) {
+            return;
+        }
+
+        $rows = $diagnosis->valueRows()->get();
+        $scores = $rows->where('score_state', ScoreState::Scored)->pluck('score')->filter(fn ($score) => $score !== null)->map(fn ($score) => (float) $score)->values()->all();
+        $point = ScoreMath::round1(ScoreMath::mean($scores));
+        $state = match (true) {
+            $point !== null => ScoreState::Scored,
+            $rows->contains('score_state', ScoreState::NoTrace) => ScoreState::NoTrace,
+            default => null,
+        };
+
+        $diagnosis->forceFill([
+            'automatic_score' => $point,
+            'automatic_score_state' => $state,
+            ...($diagnosis->score_overridden_at === null ? ['score' => $point, 'score_state' => $state] : []),
+        ])->save();
+    }
+
+    /**
+     * Who wrote what over and when, kept with a Folyamat diagnosis even after
+     * going back to the automatic value (13 · 13.5).
+     */
+    private function logOverride(Diagnosis $diagnosis, string $target, string $action, ?User $admin, ?float $automatic, ?ScoreState $automaticState, ?float $value = null, ?ScoreState $valueState = null, ?string $reason = null): void
+    {
+        if ($diagnosis->level !== DiagnosisLevel::Process) {
+            return;
+        }
+
+        $label = fn (?float $score, ?ScoreState $state) => $state === ScoreState::Scored && $score !== null ? number_format($score, 1, ',', '') : '–';
+        $aggregation = $diagnosis->aggregation ?? [];
+        $aggregation['overrides'] = [...($aggregation['overrides'] ?? []), [
+            'target' => $target,
+            'action' => $action,
+            'by' => $admin?->name,
+            'at' => now()->toIso8601String(),
+            'automatic' => $label($automatic, $automaticState),
+            'value' => $action === 'override' ? $label($value, $valueState) : null,
+            'reason' => $reason,
+        ]];
+
+        $diagnosis->forceFill(['aggregation' => $aggregation])->save();
     }
 
     public function removeRow(DiagnosisRow $row): void
@@ -267,6 +376,7 @@ class DiagnosisService
         }
 
         $row->delete();
+        $this->refreshManualPoint($row->diagnosis);
     }
 
     /**

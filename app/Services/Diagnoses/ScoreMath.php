@@ -76,6 +76,33 @@ final class ScoreMath
     }
 
     /**
+     * The effectiveness of one occasion (13 · 13.3): the most frequent answer
+     * of its people, "nem tudom" left out; a tie is "partial", no answer null.
+     *
+     * @param  iterable<mixed>  $answers
+     */
+    public static function effectivenessVerdict(iterable $answers): ?string
+    {
+        $counts = ['yes' => 0, 'partial' => 0, 'no' => 0];
+
+        foreach ($answers as $answer) {
+            if (is_string($answer) && isset($counts[$answer])) {
+                $counts[$answer]++;
+            }
+        }
+
+        $most = max($counts);
+
+        if ($most === 0) {
+            return null;
+        }
+
+        $top = array_keys($counts, $most, true);
+
+        return count($top) === 1 ? $top[0] : 'partial';
+    }
+
+    /**
      * Experience answers: "1"…"6" count, "nem tudom" and missing do not.
      *
      * @param  iterable<mixed>  $answers

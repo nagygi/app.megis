@@ -32,3 +32,11 @@ it('leaves "–" rows out of the ring: fewer measuring points', function () {
 it('counts only 1–6 answers, not "nem tudom"', function () {
     expect(ScoreMath::numericAnswers(['4', 'dont_know', '6', null, '7']))->toBe([4.0, 6.0]);
 });
+
+it('gives an occasion the effectiveness most answered, a tie "részben" (13 · 13.3)', function () {
+    expect(ScoreMath::effectivenessVerdict(['yes', 'yes', 'no', 'dont_know']))->toBe('yes')
+        ->and(ScoreMath::effectivenessVerdict(['yes', 'no']))->toBe('partial')
+        ->and(ScoreMath::effectivenessVerdict(['no', 'no', 'partial', 'yes', 'yes']))->toBe('partial')
+        ->and(ScoreMath::effectivenessVerdict(['dont_know', null]))->toBeNull()
+        ->and(ScoreMath::effectivenessVerdict([]))->toBeNull();
+});

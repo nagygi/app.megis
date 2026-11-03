@@ -2,6 +2,7 @@
 
 use App\Enums\DiagnosisStatus;
 use App\Enums\MainDiagnosisStage;
+use App\Jobs\RecalculateMainDiagnosis;
 use App\Livewire\Admin\MainDiagnoses\Publish;
 use App\Mail\DiagnosisNoticeMail;
 use App\Models\ChapterUpdate;
@@ -106,6 +107,8 @@ it('withdraws with a reason and republishes without e-mails (21 · 21.5)', funct
     expect($main->stage)->toBe(MainDiagnosisStage::Reading)
         ->and($main->diagnosis->status)->toBe(DiagnosisStatus::Draft)
         ->and($main->diagnosis->transitions()->latest('id')->first()->reason)->toBe('Hibás folyamat-pont.');
+    // Back in Draft it follows its materials again (13 · 13.4).
+    Queue::assertPushed(RecalculateMainDiagnosis::class, fn (RecalculateMainDiagnosis $job) => $job->main->is($main));
 
     actingAsCustomer($setup['leader']);
     $this->get(route('client.report.show', [$setup['organization'], $main->diagnosis]))->assertForbidden();
