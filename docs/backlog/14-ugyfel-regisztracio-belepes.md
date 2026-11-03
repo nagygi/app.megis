@@ -110,6 +110,9 @@ További szabályok:
   - a jogi dokumentumok elfogadása és bármely hozzájárulás megadása vagy visszavonása;
   - a fiók és az adatok törlése;
   - a naptár összekötése. A vezető kérésére az admin a *Folyamatok* fülről töltheti be a naptárat, naplózva (09 · 9.2).
+- **Diktálás:** a szövegmezők a nevében is diktálhatók.
+  - A felvétel az adminé, ezért a felhasználó *Felvételeim* listáján nem látszik (31 · 31.5).
+  - A mért saját hang nem vehető fel a nevében: az Értéktükör felvétele és az „Egy helyzet” elmondva.
 - **Napló:**
   - Rögzítjük az indítást, a befejezést, és minden módosításnál, hogy melyik admin végezte a felhasználó nevében.
   - A napló a felhasználó adatlapján (33) látszik az adminban. A felhasználó nem látja.

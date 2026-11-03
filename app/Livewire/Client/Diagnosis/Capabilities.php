@@ -102,7 +102,7 @@ class Capabilities extends Component
 
     protected function canDictate(string $field): bool
     {
-        return $field === 'answer' && $this->acceptsInput() && ! $this->isImpersonating();
+        return $field === 'answer' && $this->acceptsInput();
     }
 
     protected function dictationOrganization(): ?Organization

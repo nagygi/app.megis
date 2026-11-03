@@ -117,7 +117,7 @@ class Brand extends Component
 
     protected function canDictate(string $field): bool
     {
-        return $this->canEdit() && ! $this->isImpersonating() && in_array($field, OrganizationValueSet::BRAND_FIELDS, true);
+        return $this->canEdit() && in_array($field, OrganizationValueSet::BRAND_FIELDS, true);
     }
 
     protected function dictationOrganization(): ?Organization

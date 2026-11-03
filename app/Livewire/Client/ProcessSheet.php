@@ -14,7 +14,6 @@ use App\Models\Process;
 use App\Models\ProcessMetric;
 use App\Models\ProcessParticipant;
 use App\Models\User;
-use App\Services\Auth\ImpersonationService;
 use App\Services\Processes\ProcessService;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
@@ -189,8 +188,7 @@ class ProcessSheet extends Component
     protected function canDictate(string $field): bool
     {
         return in_array($field, ['description', 'metric.description'], true)
-            && $this->canEdit()
-            && ! app(ImpersonationService::class)->isImpersonating();
+            && $this->canEdit();
     }
 
     protected function dictationOrganization(): ?Organization

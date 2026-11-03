@@ -2,6 +2,23 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.68 · {hash} · 2026-11-03
+
+„Belépek a nevében” (14 · 14.6): a felhasználó nevében dolgozó admin minden szövegmezőt diktálhat.
+
+- **Eddig:** a nevében dolgozó adminnál a mikrofon és a fájlból olvasás sehol nem látszott.
+- **Most:**
+  - **Diktálható mezők** ügyféloldalon, a felhasználó nevében is:
+    - a Beszélgetés négy kérdése (V6·c, 10 · 10.1);
+    - a folyamatlista, a „Folyamatok szövegből” és az adatlap;
+    - a szervezet értékei és a márkád alapja;
+    - a Képességek helyzetei;
+    - az alkalom megélésének jegyzete;
+    - a Tárak → Folyamatok leírása;
+    - a riport „Miben nem?” mezője (a visszajelzést beküldeni a nevében továbbra sem lehet).
+  - **A felvétel az adminé**, mint az admin *Folyamatok* fülén. A felhasználó *Felvételeim* listáján nem látszik.
+  - **Továbbra sem vehető fel a nevében** a mért saját hang: az Értéktükör felvétele és az „Egy helyzet” elmondva.
+
 ## 1.67 · b742bbb · 2026-11-03
 
 Admin, *Szervezetek* lista: alapból az utolsó aktivitás szerint rendez, a legfrissebb elöl (02 · 2.2).

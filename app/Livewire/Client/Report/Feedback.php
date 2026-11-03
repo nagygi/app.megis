@@ -114,7 +114,7 @@ class Feedback extends Component
 
     protected function canDictate(string $field): bool
     {
-        return $field === 'text' && $this->main->stage === MainDiagnosisStage::Published && ! app(ImpersonationService::class)->isImpersonating();
+        return $field === 'text' && $this->main->stage === MainDiagnosisStage::Published;
     }
 
     protected function dictationOrganization(): ?Organization

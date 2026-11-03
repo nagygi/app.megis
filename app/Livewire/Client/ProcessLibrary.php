@@ -8,7 +8,6 @@ use App\Livewire\Concerns\WithDictation;
 use App\Models\CalendarConnection;
 use App\Models\Organization;
 use App\Models\Process;
-use App\Services\Auth\ImpersonationService;
 use App\Services\Processes\ProcessService;
 use App\Services\Report\ReportService;
 use Illuminate\Validation\Rule;
@@ -113,7 +112,7 @@ class ProcessLibrary extends Component
 
     protected function canDictate(string $field): bool
     {
-        return $field === 'description' && $this->canView() && ! app(ImpersonationService::class)->isImpersonating();
+        return $field === 'description' && $this->canView();
     }
 
     protected function dictationOrganization(): ?Organization

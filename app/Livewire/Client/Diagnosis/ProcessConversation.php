@@ -112,7 +112,7 @@ class ProcessConversation extends Component
 
     protected function canDictate(string $field): bool
     {
-        return $this->acceptsInput() && ! $this->isImpersonating() && preg_match('/^answers\.[1-4]$/', $field) === 1;
+        return $this->acceptsInput() && preg_match('/^answers\.[1-4]$/', $field) === 1;
     }
 
     protected function dictationOrganization(): ?Organization

@@ -10,6 +10,7 @@ use App\Exceptions\UnreadableMaterialException;
 use App\Models\Material;
 use App\Models\Organization;
 use App\Models\User;
+use App\Services\Auth\ImpersonationService;
 use App\Services\Materials\MaterialPipeline;
 use App\Services\Materials\MaterialStore;
 use App\Services\Materials\TextCondenser;
@@ -202,10 +203,12 @@ trait WithDictation
 
     /**
      * Whose recording it is: the customer; the admin's tab says the admin.
+     * Working in the customer's name the voice is still the admin's, so it
+     * never shows among the customer's recordings (14 · 14.6, 31 · 31.5).
      */
     protected function dictationUser(): ?User
     {
-        return auth('web')->user();
+        return app(ImpersonationService::class)->current()?->admin ?? auth('web')->user();
     }
 
     abstract protected function canDictate(string $field): bool;

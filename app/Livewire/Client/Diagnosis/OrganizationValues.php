@@ -190,7 +190,6 @@ class OrganizationValues extends Component
     protected function canDictate(string $field): bool
     {
         return $this->canEdit()
-            && ! $this->isImpersonating()
             && preg_match('/^items\.\d+\.('.implode('|', OrganizationValueSetItem::TEXT_FIELDS).')$/', $field) === 1;
     }
 

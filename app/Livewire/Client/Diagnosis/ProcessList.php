@@ -208,7 +208,7 @@ class ProcessList extends Component
 
     protected function canDictate(string $field): bool
     {
-        return $this->acceptsInput() && ! $this->isImpersonating() && in_array($field, ['importText', 'description'], true);
+        return $this->acceptsInput() && in_array($field, ['importText', 'description'], true);
     }
 
     protected function dictationOrganization(): ?Organization

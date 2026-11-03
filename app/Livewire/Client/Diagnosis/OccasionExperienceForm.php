@@ -157,7 +157,7 @@ class OccasionExperienceForm extends Component
 
     protected function canDictate(string $field): bool
     {
-        return $field === 'note' && $this->acceptsInput() && ! $this->isImpersonating();
+        return $field === 'note' && $this->acceptsInput();
     }
 
     protected function dictationOrganization(): ?Organization

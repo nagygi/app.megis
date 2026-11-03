@@ -22,6 +22,7 @@ A kérdések fix sorrendben, egy lapon jelennek meg („B · 2 / 4”, 6–8 per
 4. Melyik alkalom után érzed azt, hogy ez így nem jó? (a töréspont jelöltje)
 
 - **Válasz:** beírva, vagy elmondva a 06-os felvevővel. Az átirat a mezőbe kerül, és szerkeszthető.
+  - A vezető nevében dolgozó admin is diktálhat (14 · 14.6). A felvétel ilyenkor az adminé.
 - Egy kérdés kihagyható, de a továbblépéshez legalább egy válasz kell.
 - Követő kérdés nincs.
 
