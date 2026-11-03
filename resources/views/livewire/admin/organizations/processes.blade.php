@@ -1,8 +1,110 @@
-{{-- The organization's Folyamatok tab (11 · 11.6). --}}
+{{-- The organization's Folyamatok tab (11 · 11.6): the lists, the adding and the loading open as a panel under the title. --}}
 <div class="flex flex-col gap-6" @if ($dictations !== []) wire:poll.2s="pollDictations" @endif>
     <x-ui.flash />
 
-    <x-admin.page-header :title="__('admin.organizations.tabs.processes')" :spaced="false" />
+    <x-admin.page-header :title="__('admin.organizations.tabs.processes')" :spaced="false">
+        <x-slot:actions>
+            <x-ui.button tone="outline" icon="plus" wire:click="openPanel('add')">{{ __('admin.processes.add') }}</x-ui.button>
+            <x-ui.dropdown
+                id="process-load-menu"
+                :label="__('admin.processes.load')"
+                :width="320"
+                trigger-class="press inline-flex min-h-11 items-center gap-2 rounded-pill bg-charcoal px-5 text-cream font-semibold hover:bg-green"
+            >
+                <x-slot:trigger>
+                    <x-megis.icon name="upload" />
+                    {{-- The name comes from the dropdown's label, so it is not read twice. --}}
+                    <span aria-hidden="true">{{ __('admin.processes.load') }}</span>
+                </x-slot:trigger>
+
+                @foreach (['calendar' => 'load_calendar', 'text' => 'load_text'] as $loader => $key)
+                    <x-ui.dropdown-item wire:click="openPanel('{{ $loader }}')">
+                        <span class="flex flex-col">
+                            <span class="font-semibold">{{ __('admin.processes.'.$key) }}</span>
+                            <span class="text-sm text-grey-700">{{ __('admin.processes.'.$key.'_help') }}</span>
+                        </span>
+                    </x-ui.dropdown-item>
+                @endforeach
+            </x-ui.dropdown>
+        </x-slot:actions>
+    </x-admin.page-header>
+
+    @if ($panel === 'add')
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4" aria-labelledby="add-title">
+            <div class="flex items-start justify-between gap-2">
+                <h2 id="add-title" class="text-lg font-semibold">{{ __('processes.list.add_title') }}</h2>
+                <x-ui.icon-button icon="close" class="-mt-2 -mr-2" :label="__('admin.processes.close')" wire:click="closePanel" />
+            </div>
+            <form wire:submit="addProcess" class="flex max-w-3xl flex-col gap-4">
+                <x-form.input name="newName" wire:model="newName" :label="__('processes.list.fields.name')" required />
+                <x-form.select name="newRhythm" wire:model="newRhythm" :label="__('processes.list.fields.rhythm')">
+                    <option value="">–</option>
+                    @foreach (\App\Enums\ProcessRhythm::cases() as $rhythm)
+                        <option value="{{ $rhythm->value }}">{{ $rhythm->label() }}</option>
+                    @endforeach
+                </x-form.select>
+                <x-form.select name="newParentId" wire:model="newParentId" :label="__('processes.list.fields.parent')">
+                    <option value="">{{ __('processes.list.parent_none') }}</option>
+                    @foreach ($parents as $parent)
+                        <option value="{{ $parent->id }}">{{ $parent->name }}</option>
+                    @endforeach
+                </x-form.select>
+                <x-form.textarea name="newDescription" wire:model="newDescription" :label="__('processes.sheet.description')" rows="2" maxlength="2000" />
+                <x-ui.button type="submit" icon="plus" class="self-start">{{ __('processes.list.add') }}</x-ui.button>
+            </form>
+        </x-ui.card>
+    @elseif ($panel === 'calendar')
+        {{-- At a member's request: their iCal link or exported file (09 · 9.2). --}}
+        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4" aria-labelledby="calendar-load">
+            <div class="flex items-start justify-between gap-2">
+                <div class="flex flex-col gap-1">
+                    <h2 id="calendar-load" class="text-lg font-semibold">{{ $calendarUser ? __('admin.processes.load_title', ['name' => $calendarUser->name]) : __('admin.processes.load_calendar') }}</h2>
+                    <p class="max-w-3xl text-sm text-grey-700">{{ __('admin.processes.load_help') }}</p>
+                </div>
+                <x-ui.icon-button icon="close" class="-mt-2 -mr-2" :label="__('admin.processes.close')" wire:click="closePanel" />
+            </div>
+            @if ($calendarUser)
+                <div class="flex max-w-3xl flex-col gap-4">
+                    <x-form.select name="calendarUserId" wire:model.live="calendarUserId" :label="__('admin.processes.load_for')" :help="__('admin.processes.load_for_help')" class="sm:max-w-sm">
+                        @foreach ($members as $member)
+                            <option value="{{ $member->id }}">{{ $member->name }}</option>
+                        @endforeach
+                    </x-form.select>
+                    <x-form.checkbox name="leaderAsked" wire:model="leaderAsked" :label="__('admin.processes.leader_asked', ['name' => $calendarUser->name])" :help="__('admin.processes.leader_asked_help')" />
+                    {{-- Tabs of one panel, as the mirror's ways of answering; the account link comes later. --}}
+                    <x-ui.segmented :label="__('admin.processes.calendar_source')">
+                        <x-ui.segment :selected="$calendarSource === 'url'" wire:click="$set('calendarSource', 'url')">{{ __('calendar.providers.ics_url') }}</x-ui.segment>
+                        <x-ui.segment :selected="$calendarSource === 'file'" wire:click="$set('calendarSource', 'file')">{{ __('calendar.providers.ics_file') }}</x-ui.segment>
+                        <x-ui.segment :disabled-reason="__('admin.processes.oauth_soon')">
+                            {{ __('admin.processes.source_oauth') }}
+                            <x-ui.badge tone="muted" aria-hidden="true">{{ __('admin.processes.soon') }}</x-ui.badge>
+                        </x-ui.segment>
+                    </x-ui.segmented>
+                    @if ($calendarSource === 'file')
+                        <form wire:submit="connectCalendarFile" class="flex flex-col gap-3">
+                            <x-form.file name="icsFile" id="admin-ics-file" accept=".ics,text/calendar" wire:model="icsFile" :label="__('calendar.ics_file')" :help="__('calendar.ics_file_help', ['size' => $maxMegabytes])" />
+                            <div wire:loading wire:target="connectCalendarFile,icsFile" class="text-sm" role="status">{{ __('calendar.reading') }}</div>
+                            <x-ui.button type="submit" class="self-start" wire:loading.attr="disabled" wire:target="icsFile">{{ __('admin.processes.load_file') }}</x-ui.button>
+                        </form>
+                    @else
+                        <form wire:submit="connectCalendarUrl" class="flex flex-col gap-3">
+                            <x-form.input name="icsUrl" type="url" wire:model="icsUrl" :label="__('calendar.ics_url')" :help="__('calendar.ics_url_help')" inputmode="url" />
+                            <div wire:loading wire:target="connectCalendarUrl" class="text-sm" role="status">{{ __('calendar.reading') }}</div>
+                            <x-ui.button type="submit" class="self-start">{{ __('admin.processes.load_url') }}</x-ui.button>
+                        </form>
+                    @endif
+                </div>
+            @else
+                <p class="text-sm text-grey-700">{{ __('admin.processes.no_members') }}</p>
+            @endif
+        </x-ui.card>
+    @elseif ($panel === 'text')
+        <x-processes.import :rows="$importRows" :parents="$parents" can-dictate :pending="isset($dictations['importText'])" bordered>
+            <x-slot:close>
+                <x-ui.icon-button icon="close" class="-mt-2 -mr-2" :label="__('admin.processes.close')" wire:click="closePanel" />
+            </x-slot:close>
+        </x-processes.import>
+    @endif
 
     @if ($unclassified->isNotEmpty())
         {{-- Besorolásra vár (12 · 12.6) --}}
@@ -37,58 +139,6 @@
             </ul>
         </x-ui.card>
     @endif
-
-    {{-- Naptár --}}
-    <section class="flex flex-col gap-2" aria-labelledby="calendar-rows">
-        <h2 id="calendar-rows" class="text-lg font-semibold">{{ __('admin.processes.calendar') }}</h2>
-        @forelse ($connections as $connection)
-            <x-ui.card bordered padding="none" wire:key="connection-{{ $connection->id }}" class="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
-                <span class="font-semibold">{{ $connection->providerLabel() }} · {{ $connection->user->name }}</span>
-                <span>{{ __('admin.processes.connected_since', ['date' => $connection->connected_at->format('Y.m.d.')]) }}</span>
-                @if ($connection->connectedBy)
-                    <span>{{ __('admin.processes.connected_by', ['name' => $connection->connectedBy->name]) }}</span>
-                @endif
-                <span>{{ __('processes.list.events', ['count' => $connection->event_count]) }}</span>
-                <span>{{ __('calendar.profile.metadata_until', ['date' => $connection->metadata_expires_at->format('Y.m.d.')]) }}</span>
-                <x-ui.badge :tone="$connection->status === 'active' ? 'green' : ($connection->status === 'broken' ? 'coral' : 'muted')">{{ __('calendar.statuses.'.$connection->status) }}</x-ui.badge>
-                @if ($connection->error)
-                    <span class="text-coral-ink">{{ $connection->error }}</span>
-                @endif
-            </x-ui.card>
-        @empty
-            <p class="text-sm text-grey-700">{{ __('admin.processes.no_calendar') }}</p>
-        @endforelse
-
-        {{-- At a member's request: their iCal link or exported file (09 · 9.2). --}}
-        @if ($calendarUser)
-            <x-ui.card as="section" bordered padding="sm" class="flex flex-col gap-4" aria-labelledby="calendar-load">
-                <div class="flex flex-col gap-1">
-                    <h3 id="calendar-load" class="font-semibold">{{ __('admin.processes.load_title', ['name' => $calendarUser->name]) }}</h3>
-                    <p class="text-sm text-grey-700">{{ __('admin.processes.load_help') }}</p>
-                </div>
-                <x-form.select name="calendarUserId" wire:model.live="calendarUserId" :label="__('admin.processes.load_for')" :help="__('admin.processes.load_for_help')" class="sm:max-w-sm">
-                    @foreach ($members as $member)
-                        <option value="{{ $member->id }}">{{ $member->name }}</option>
-                    @endforeach
-                </x-form.select>
-                <x-form.checkbox name="leaderAsked" wire:model="leaderAsked" :label="__('admin.processes.leader_asked', ['name' => $calendarUser->name])" :help="__('admin.processes.leader_asked_help')" />
-                <div class="grid gap-4 lg:grid-cols-2">
-                    <form wire:submit="connectCalendarUrl" class="flex flex-col gap-3">
-                        <x-form.input name="icsUrl" type="url" wire:model="icsUrl" :label="__('calendar.ics_url')" :help="__('calendar.ics_url_help')" inputmode="url" />
-                        <div wire:loading wire:target="connectCalendarUrl" class="text-sm" role="status">{{ __('calendar.reading') }}</div>
-                        <x-ui.button type="submit" size="sm" class="self-start">{{ __('admin.processes.load_url') }}</x-ui.button>
-                    </form>
-                    <form wire:submit="connectCalendarFile" class="flex flex-col gap-3">
-                        <x-form.file name="icsFile" id="admin-ics-file" accept=".ics,text/calendar" wire:model="icsFile" :label="__('calendar.ics_file')" :help="__('calendar.ics_file_help', ['size' => $maxMegabytes])" />
-                        <div wire:loading wire:target="connectCalendarFile,icsFile" class="text-sm" role="status">{{ __('calendar.reading') }}</div>
-                        <x-ui.button type="submit" size="sm" class="self-start" wire:loading.attr="disabled" wire:target="icsFile">{{ __('admin.processes.load_file') }}</x-ui.button>
-                    </form>
-                </div>
-            </x-ui.card>
-        @else
-            <p class="text-sm text-grey-700">{{ __('admin.processes.no_members') }}</p>
-        @endif
-    </section>
 
     @foreach (['main' => __('admin.processes.list'), 'review' => __('admin.processes.review')] as $block => $title)
         <section class="flex flex-col gap-2" aria-labelledby="processes-{{ $block }}">
@@ -175,32 +225,31 @@
         </section>
     @endforeach
 
-    <x-processes.import :rows="$importRows" :parents="$parents" can-dictate :pending="isset($dictations['importText'])" bordered />
+    {{-- Naptár: the connections, under the lists --}}
+    <section class="flex flex-col gap-2" aria-labelledby="calendar-rows">
+        <h2 id="calendar-rows" class="text-lg font-semibold">{{ __('admin.processes.calendar') }}</h2>
+        @forelse ($connections as $connection)
+            <x-ui.card bordered padding="none" wire:key="connection-{{ $connection->id }}" class="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm">
+                <span class="font-semibold">{{ $connection->providerLabel() }} · {{ $connection->user->name }}</span>
+                <span>{{ __('admin.processes.connected_since', ['date' => $connection->connected_at->format('Y.m.d.')]) }}</span>
+                @if ($connection->connectedBy)
+                    <span>{{ __('admin.processes.connected_by', ['name' => $connection->connectedBy->name]) }}</span>
+                @endif
+                <span>{{ __('processes.list.events', ['count' => $connection->event_count]) }}</span>
+                <span>{{ __('calendar.profile.metadata_until', ['date' => $connection->metadata_expires_at->format('Y.m.d.')]) }}</span>
+                <x-ui.badge :tone="$connection->status === 'active' ? 'green' : ($connection->status === 'broken' ? 'coral' : 'muted')">{{ __('calendar.statuses.'.$connection->status) }}</x-ui.badge>
+                @if ($connection->error)
+                    <span class="text-coral-ink">{{ $connection->error }}</span>
+                @endif
+            </x-ui.card>
+        @empty
+            <p class="text-sm text-grey-700">{{ __('admin.processes.no_calendar') }}</p>
+        @endforelse
+    </section>
 
-    <div class="grid gap-6 lg:grid-cols-2">
-        <x-ui.card as="form" bordered padding="lg" wire:submit="addProcess" class="flex flex-col gap-4">
-            <h2 class="text-lg font-semibold">{{ __('processes.list.add_title') }}</h2>
-            <x-form.input name="newName" wire:model="newName" :label="__('processes.list.fields.name')" required />
-            <x-form.select name="newRhythm" wire:model="newRhythm" :label="__('processes.list.fields.rhythm')">
-                <option value="">–</option>
-                @foreach (\App\Enums\ProcessRhythm::cases() as $rhythm)
-                    <option value="{{ $rhythm->value }}">{{ $rhythm->label() }}</option>
-                @endforeach
-            </x-form.select>
-            <x-form.select name="newParentId" wire:model="newParentId" :label="__('processes.list.fields.parent')">
-                <option value="">{{ __('processes.list.parent_none') }}</option>
-                @foreach ($parents as $parent)
-                    <option value="{{ $parent->id }}">{{ $parent->name }}</option>
-                @endforeach
-            </x-form.select>
-            <x-form.textarea name="newDescription" wire:model="newDescription" :label="__('processes.sheet.description')" rows="2" maxlength="2000" />
-            <x-ui.button type="submit" tone="outline" icon="plus" class="self-start">{{ __('processes.list.add') }}</x-ui.button>
-        </x-ui.card>
-
-        <x-ui.card as="form" bordered padding="lg" wire:submit="saveRecommendation" class="flex flex-col gap-4">
-            <h2 class="text-lg font-semibold">{{ __('admin.processes.recommendation') }}</h2>
-            <x-form.textarea name="recommendation" wire:model="recommendation" :label="__('admin.processes.recommendation')" :help="__('admin.processes.recommendation_help')" rows="3" />
-            <x-ui.button type="submit" class="self-start">{{ __('admin.common.save') }}</x-ui.button>
-        </x-ui.card>
-    </div>
+    <x-ui.card as="form" bordered padding="lg" wire:submit="saveRecommendation" class="flex flex-col gap-4 *:max-w-3xl">
+        <h2 class="text-lg font-semibold">{{ __('admin.processes.recommendation') }}</h2>
+        <x-form.textarea name="recommendation" wire:model="recommendation" :label="__('admin.processes.recommendation')" :help="__('admin.processes.recommendation_help')" rows="3" />
+        <x-ui.button type="submit" class="self-start">{{ __('admin.common.save') }}</x-ui.button>
+    </x-ui.card>
 </div>

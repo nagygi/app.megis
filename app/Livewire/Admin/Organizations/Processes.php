@@ -35,17 +35,30 @@ use Livewire\WithFileUploads;
 
 /**
  * The organization's "Folyamatok" tab (11 · 11.6): the same rules as for
- * the leader, the calendar row, uncertain and other rows apart for review,
+ * the leader, uncertain and other rows apart for review, the calendar rows,
  * "A mégis javaslata" for V6·f, and the materials waiting to be classified (12 · 12.6).
- * A member's iCal link or exported file can be loaded here at their request (09 · 9.2),
- * with or without a running diagnosis.
- * Several processes can be added at once from a written or spoken text.
+ * By default only the lists show; "Új folyamat" and the "Betöltés" menu open a
+ * panel under the title. A member's iCal link or exported file can be loaded
+ * there at their request (09 · 9.2), with or without a running diagnosis, and
+ * several processes can be added at once from a written or spoken text.
  */
 class Processes extends Component
 {
-    use WithDictation, WithFileUploads, WithProcessImport;
+    use WithDictation, WithFileUploads;
+    use WithProcessImport {
+        importProcesses as protected importParsedProcesses;
+    }
+
+    /** The panels under the title: manual adding, a calendar, a text. */
+    private const PANELS = ['add', 'calendar', 'text'];
 
     public Organization $organization;
+
+    /** The open panel, one of PANELS; without one only the lists show. */
+    public ?string $panel = null;
+
+    /** The calendar panel's tab: url or file. */
+    public string $calendarSource = 'url';
 
     public string $recommendation = '';
 
@@ -87,6 +100,25 @@ class Processes extends Component
 
         $this->organization = $organization;
         $this->recommendation = (string) $organization->process_recommendation;
+    }
+
+    public function openPanel(string $panel): void
+    {
+        if (! in_array($panel, self::PANELS, true)) {
+            return;
+        }
+
+        $this->panel = $panel;
+        $this->resetValidation();
+    }
+
+    /**
+     * What was typed stays, a dictated text too, until it is loaded.
+     */
+    public function closePanel(): void
+    {
+        $this->panel = null;
+        $this->resetValidation();
     }
 
     public function saveRecommendation(): void
@@ -170,7 +202,18 @@ class Processes extends Component
             $this->newDescription,
         );
 
+        // The panel stays open: processes are often added one after the other.
+        session()->flash('status', __('admin.processes.added', ['name' => trim($this->newName)]));
         $this->reset(['newName', 'newRhythm', 'newParentId', 'newDescription']);
+    }
+
+    /**
+     * The panel closes once the rows are added; the list shows them.
+     */
+    public function importProcesses(ProcessImporter $importer): void
+    {
+        $this->importParsedProcesses($importer);
+        $this->panel = null;
     }
 
     /**
@@ -337,7 +380,8 @@ class Processes extends Component
 
         $audit->record(AuditEventType::CalendarConnectedByAdmin, $user, $admin, ['provider' => $connection->provider], organization: $this->organization);
 
-        $this->reset(['icsUrl', 'icsFile', 'leaderAsked']);
+        // The new row shows in the calendar rows under the lists.
+        $this->reset(['icsUrl', 'icsFile', 'leaderAsked', 'panel']);
         session()->flash('status', __('admin.processes.loaded'));
     }
 

@@ -122,10 +122,18 @@ A lista gépi javaslat, jóváhagyásra. Négy csoportja van: Erős minta · Biz
 - **Lista** az NFR listaszabályai szerint:
   - Oszlopok: név, szülő, forrás (naptár / beszélgetés / kézi), konfidencia, állapot, felelős, alkalmak száma, töréspont-jelölt (10).
   - A *Bizonytalan* és az *Egyéb* sorok külön blokkban látszanak, átnézésre.
-- **Naptár sor:** forrás, mióta van összekötve, eseményszám, „a metaadat {dátum}-ig él”, hibaállapot (09). Ha admin töltötte be, ez is látszik: „betöltötte: {név}”.
-- **Naptár betöltése a vezető nevében** (09 · 9.2): futó diagnózisnál a sorok alatt az iCal cím és az .ics fájl betöltése, a „{Név} kérte, és ő adta át” jelölőnégyzettel. Futó diagnózis nélkül csak egy sor jelzi, hogy ilyenkor nem lehet betölteni.
-- **Szerkesztés:** az admin ugyanazokkal a szabályokkal szerkeszthet, vehet fel és zárhat ki folyamatot, mint a vezető. Az átnevezés nyoma itt is megmarad. A leírás a név alatt rövidítve látszik, szerkesztéskor teljes.
-- **Felvétel szövegből vagy beszédből:** ugyanaz, mint a V6·d-n (11.2), például az ügyféltől kapott leírásból. A diktálás felvétele az adminé.
+- **Alapból csak a lista látszik.** A fejlécben két gomb van:
+  - *Új folyamat*;
+  - *Betöltés*, lenyíló menü: *Naptár betöltése*, *Betöltés szövegből*.
+  - A kiválasztott űrlap panelként nyílik a cím alatt. Egyszerre egy látszik, és bezárható.
+- **Naptár sor** a lista alatt: forrás, mióta van összekötve, eseményszám, „a metaadat {dátum}-ig él”, hibaállapot (09). Ha admin töltötte be, ez is látszik: „betöltötte: {név}”.
+- **Naptár betöltése egy tag nevében** (09 · 9.2):
+  - A szervezet bármelyik tagjának nevében lehet betölteni, futó diagnózis nélkül is. A diagnózishoz csak a vezetőé kötődik.
+  - Kötelező a „{Név} kérte, és ő adta át” jelölőnégyzet.
+  - Fülek: *iCal link* · *ICS fájl* · *Google vagy Outlook fiók*. Ez utóbbi még inaktív, „hamarosan”.
+  - Sikeres betöltés után a panel bezárul.
+- **Szerkesztés:** az admin ugyanazokkal a szabályokkal szerkeszthet, vehet fel és zárhat ki folyamatot, mint a vezető. Az átnevezés nyoma itt is megmarad. A leírás a név alatt rövidítve látszik, szerkesztéskor teljes. Az *Új folyamat* panel felvétel után nyitva marad, hogy több folyamatot is fel lehessen venni egymás után.
+- **Felvétel szövegből vagy beszédből:** ugyanaz, mint a V6·d-n (11.2), például az ügyféltől kapott leírásból. A diktálás felvétele az adminé. A sorok hozzáadása után a panel bezárul.
 - **A mégis javaslata:** opcionális szöveg, legfeljebb 255 karakter. A V6·f-en jelenik meg.
 
 ## Nincs benne

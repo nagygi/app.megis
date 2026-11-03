@@ -2,16 +2,22 @@
     Several processes at once from a written, spoken or uploaded text (11 ·
     11.2, 11.6). The Livewire component uses WithProcessImport, and
     WithDictation for Elmondom and Feltöltöm; "parents" are the organization's
-    top-level processes. The rows are edited here and added together.
+    top-level processes. The rows are edited here and added together. A
+    "close" slot sits right of the title (the admin's panel).
 --}}
 @props(['rows', 'parents', 'canDictate' => false, 'pending' => false, 'bordered' => false])
 
 <x-ui.card as="section" :padding="$bordered ? 'lg' : 'md'" class="flex flex-col gap-4" aria-labelledby="import-title">
-    <div class="flex flex-col gap-1">
-        <h3 id="import-title" class="text-lg font-semibold">{{ __('processes.import.title') }}</h3>
-        <p class="text-sm text-grey-700" aria-live="polite">
-            {{ $rows === [] ? __('processes.import.lead') : trans_choice('processes.import.found', count($rows), ['count' => count($rows)]).' '.__('processes.import.review') }}
-        </p>
+    <div class="flex items-start justify-between gap-2">
+        <div class="flex flex-col gap-1">
+            <h3 id="import-title" class="text-lg font-semibold">{{ __('processes.import.title') }}</h3>
+            <p class="text-sm text-grey-700" aria-live="polite">
+                {{ $rows === [] ? __('processes.import.lead') : trans_choice('processes.import.found', count($rows), ['count' => count($rows)]).' '.__('processes.import.review') }}
+            </p>
+        </div>
+        @isset($close)
+            {{ $close }}
+        @endisset
     </div>
 
     @if ($rows === [])

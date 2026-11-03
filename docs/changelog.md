@@ -2,6 +2,31 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.60 · – · 2026-11-03
+
+Admin, szervezet *Folyamatok* füle: alapból csak a folyamatlista látszik. A felvétel és a betöltés gombra nyílik.
+
+- **Eddig:**
+  - Minden egyszerre látszott, a lista fölött a teljes naptárbetöltő kártya:
+    - a tag választó és a jelölőnégyzet;
+    - a link és a fájl egymás mellett.
+  - A lista alatt állt a „Folyamatok szövegből” kártya, az Új folyamat űrlap és a javaslat.
+- **Most:**
+  - **A fejlécben két gomb van:**
+    - *Új folyamat*;
+    - *Betöltés*, ez egy lenyíló menü: *Naptár betöltése* és *Betöltés szövegből*.
+  - **A kiválasztott űrlap panelként nyílik a cím alatt.** Egyszerre egy látszik, a × bezárja. A beírt szöveg bezáráskor megmarad, egy diktált szöveg is.
+  - **A naptár betöltése** három fület kapott:
+    - *iCal link*;
+    - *ICS fájl*;
+    - *Google vagy Outlook fiók*, ez még inaktív, „hamarosan” jelöléssel.
+    A tag választó és a „… kérte” jelölőnégyzet mindkét aktív fülre vonatkozik.
+  - **Bezárul a panel:**
+    - sikeres naptárbetöltés után;
+    - a szövegből felvett folyamatok hozzáadása után.
+  - **Nyitva marad az Új folyamat**, hogy többet is fel lehessen venni egymás után. Minden felvételről üzenet szól.
+  - **Az összekötött naptárak sorai** a lista alá kerültek, a javaslat fölé. A megszakadt naptár így betöltés nélkül is látszik.
+
 ## 1.59 · 4a320c4 · 2026-11-03
 
 Képességek lépés (NM-12): egy szabad szöveg a kártyák helyett; a képességeket ebből a Képességtár alapján olvassuk ki.

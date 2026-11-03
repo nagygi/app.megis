@@ -177,13 +177,16 @@ it('lets the admin dictate the text and add the processes', function () {
     ])]);
 
     Livewire::test(AdminProcesses::class, ['organization' => $setup['organization']])
+        ->call('openPanel', 'text')
         ->set('dictationAudio', UploadedFile::fake()->create('felvetel.webm', 200, 'audio/webm'))
         ->call('dictate', 'importText', 34)
         ->call('pollDictations')
         ->assertSet('importText', fn (string $text) => str_contains($text, 'csúszott a szállítás'))
         ->call('parseImport')
+        ->assertSet('panel', 'text')
         ->call('importProcesses')
-        ->assertHasNoErrors();
+        ->assertHasNoErrors()
+        ->assertSet('panel', null);
 
     expect(Process::query()->sole()->description)->toBe('A csúszó szállítások az ügyféllel.')
         ->and(Material::query()->sole()->user_id)->toBe($setup['admin']->id);

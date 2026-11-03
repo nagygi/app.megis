@@ -16,6 +16,34 @@ beforeEach(function () {
     AiGateway::fake(fn () => throw new RuntimeException('down'));
 });
 
+it('shows only the lists until adding or loading is opened', function () {
+    $setup = diagnosisTeam(peers: 1);
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Processes::class, ['organization' => $setup['organization']])
+        ->assertSee(__('admin.processes.list'))
+        ->assertSee(__('admin.processes.no_calendar'))
+        ->assertDontSee(__('admin.processes.load_for'))
+        ->assertDontSee(__('processes.import.title'))
+        ->assertDontSee(__('processes.list.add_title'))
+        ->call('openPanel', 'calendar')
+        ->assertSee(__('admin.processes.load_for'))
+        ->assertSee(__('calendar.ics_url'))
+        ->assertDontSee(__('calendar.ics_file'))
+        ->assertSee(__('admin.processes.oauth_soon'))
+        ->set('calendarSource', 'file')
+        ->assertSee(__('calendar.ics_file'))
+        ->assertDontSee(__('calendar.ics_url'))
+        ->call('openPanel', 'text')
+        ->assertSee(__('processes.import.title'))
+        ->assertDontSee(__('admin.processes.load_for'))
+        ->call('openPanel', 'add')
+        ->assertSee(__('processes.list.add_title'))
+        ->call('closePanel')
+        ->assertDontSee(__('processes.list.add_title'))
+        ->assertDontSee(__('processes.import.title'));
+});
+
 it("loads the leader's iCal link in their name and logs it", function () {
     $setup = diagnosisTeam(peers: 1);
     $main = startMainDiagnosis($setup);
@@ -23,10 +51,12 @@ it("loads the leader's iCal link in their name and logs it", function () {
     Http::fake(['calendar.example.com/*' => Http::response(sampleIcs($setup['leader']->email, $setup['peers'][0]->email))]);
 
     Livewire::test(Processes::class, ['organization' => $setup['organization']])
+        ->call('openPanel', 'calendar')
         ->set('icsUrl', 'https://calendar.example.com/secret.ics')
         ->set('leaderAsked', true)
         ->call('connectCalendarUrl')
         ->assertHasNoErrors()
+        ->assertSet('panel', null)
         ->assertSee(__('admin.processes.connected_by', ['name' => $admin->name]));
 
     $connection = CalendarConnection::query()->sole();
@@ -97,6 +127,7 @@ it("loads a calendar in any member's name without a running diagnosis", function
     $ics = sampleIcs($peer->email, $setup['leader']->email);
 
     Livewire::test(Processes::class, ['organization' => $setup['organization']])
+        ->call('openPanel', 'calendar')
         ->assertSee(__('admin.processes.load_for'))
         ->set('calendarUserId', $peer->id)
         ->assertSee(__('admin.processes.load_title', ['name' => $peer->name]))
