@@ -5,6 +5,7 @@ use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\Organization;
 use App\Models\Process;
+use App\Models\Team;
 use App\Models\Value;
 use App\Support\AdminBreadcrumbs;
 use App\Support\AdminLocation;
@@ -85,6 +86,23 @@ it('puts an invitation under the organization\'s Felhasználók tab, lighting it
     ])->and($location->organization->is($organization))->toBeTrue()
         ->and($location->tab)->toBe('admin.organizations.members');
 });
+
+it('puts a team\'s form under the organization\'s Csapatok tab, lighting it', function (bool $editing) {
+    $organization = Organization::factory()->create();
+    $parameters = ['organization' => $organization];
+
+    if ($editing) {
+        $parameters['team'] = Team::factory()->for($organization)->create();
+    }
+
+    $location = locate($editing ? 'admin.organizations.teams.edit' : 'admin.organizations.teams.create', $parameters);
+
+    expect(crumbs($location))->toBe([
+        'Szervezetek' => route('admin.organizations.index'),
+        $organization->name => route('admin.organizations.edit', $organization),
+        'Csapatok' => route('admin.organizations.teams', $organization),
+    ])->and($location->tab)->toBe('admin.organizations.teams');
+})->with(['new team' => false, 'editing' => true]);
 
 it('puts every tab of a main diagnosis under its organization\'s diagnoses, lighting Szervezetek and the Diagnózisok tab', function (string $routeName) {
     $main = MainDiagnosis::factory()->create();

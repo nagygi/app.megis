@@ -1,12 +1,14 @@
 {{--
     On/off switch with an explanation of what "on" does (NFR · 3).
-    A native checkbox under the hood, so it works with wire:model and keyboards.
+    A native checkbox under the hood, so it works with wire:model and keyboards;
+    "value" sets it for a wire:model array.
 --}}
 @props([
     'name',
     'label',
     'help' => null,
     'id' => null,
+    'value' => '1',
 ])
 
 @php
@@ -21,7 +23,7 @@
                 name="{{ $name }}"
                 type="checkbox"
                 role="switch"
-                value="1"
+                value="{{ $value }}"
                 @if ($help) aria-describedby="{{ $id }}-help" @endif
                 {{ $attributes->class(['peer sr-only']) }}
             >

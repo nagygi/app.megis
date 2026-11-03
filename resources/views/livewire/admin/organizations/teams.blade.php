@@ -9,48 +9,9 @@
 
     <x-admin.page-header :title="__('admin.organizations.tabs.teams')">
         <x-slot:actions>
-            <x-ui.button icon="plus" wire:click="create">{{ __('admin.teams.create') }}</x-ui.button>
+            <x-ui.button icon="plus" :href="route('admin.organizations.teams.create', $organization)">{{ __('admin.teams.create') }}</x-ui.button>
         </x-slot:actions>
     </x-admin.page-header>
-
-    @if ($showForm)
-        <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="mb-6 flex flex-col gap-5 *:max-w-3xl">
-            <x-form.input name="name" wire:model="name" :label="__('admin.teams.name')" required autofocus />
-            <x-form.textarea name="description" wire:model="description" :label="__('admin.teams.description')" rows="3" />
-
-            <fieldset class="flex flex-col gap-2">
-                <legend class="mb-1 text-sm font-medium">{{ __('admin.teams.users') }}</legend>
-                @if ($members->isEmpty())
-                    <p class="text-sm text-grey-700">{{ __('admin.teams.no_members') }}</p>
-                @else
-                    <p class="text-sm text-grey-700">{{ __('admin.teams.members_help') }}</p>
-                    <div class="flex max-h-80 flex-col gap-2 overflow-y-auto">
-                        @foreach ($members as $member)
-                            <div class="flex flex-wrap items-start gap-x-6 gap-y-2" wire:key="team-user-option-{{ $member->user_id }}">
-                                <x-form.checkbox name="userIds" :id="'team-user-'.$member->user_id" :value="$member->user_id" wire:model.live="userIds">
-                                    {{ $member->user->name }}
-                                    @if ($member->user->name !== $member->user->email)
-                                        <span class="text-grey-700">· {{ $member->user->email }}</span>
-                                    @endif
-                                    @if ($member->status === \App\Enums\MembershipStatus::Inactive)
-                                        <span class="text-grey-700">· {{ $member->status->label() }}</span>
-                                    @endif
-                                </x-form.checkbox>
-                                @if (in_array($member->user_id, array_map('intval', $userIds), true))
-                                    <x-form.checkbox name="leaderUserIds" :id="'team-leader-'.$member->user_id" :value="$member->user_id" wire:model="leaderUserIds" :label="__('admin.members.team_leader')" />
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            </fieldset>
-
-            <div class="flex flex-wrap gap-3">
-                <x-ui.button type="submit">{{ __('admin.common.save') }}</x-ui.button>
-                <x-ui.button tone="outline" wire:click="cancel">{{ __('admin.common.cancel') }}</x-ui.button>
-            </div>
-        </x-ui.card>
-    @endif
 
     <x-admin.list-toolbar />
 
@@ -66,14 +27,14 @@
         @forelse ($teams as $team)
             <tr wire:key="team-{{ $team->id }}">
                 <td class="px-3 py-2">
-                    <x-ui.button tone="ghost" size="sm" class="-ml-1.5" wire:click="edit({{ $team->id }})">{{ $team->name }}</x-ui.button>
+                    <x-ui.button tone="ghost" size="sm" class="-ml-1.5" :href="route('admin.organizations.teams.edit', [$organization, $team])">{{ $team->name }}</x-ui.button>
                 </td>
                 <td class="px-3 py-2 text-grey-700">{{ $team->description ?? __('admin.common.none') }}</td>
                 <td class="px-3 py-2">{{ $team->users_count }}</td>
                 <td class="px-3 py-2">{{ $team->leaders->pluck('name')->join(', ') ?: __('admin.common.none') }}</td>
                 <td class="px-3 py-2 text-right">
                     <x-admin.row-actions :label="__('admin.common.row_actions', ['name' => $team->name])">
-                        <x-admin.row-action wire:click="edit({{ $team->id }})">{{ __('admin.common.edit') }}</x-admin.row-action>
+                        <x-admin.row-action :href="route('admin.organizations.teams.edit', [$organization, $team])">{{ __('admin.common.edit') }}</x-admin.row-action>
                         <x-admin.row-action :href="route('admin.organizations.members.create', [$organization, 'csapat' => $team->id])">{{ __('admin.teams.invite') }}</x-admin.row-action>
                         <x-admin.row-action tone="danger" wire:click="delete({{ $team->id }})" wire:confirm="{{ __('admin.teams.confirm_delete') }}" data-confirm-tone="danger">{{ __('admin.common.delete') }}</x-admin.row-action>
                     </x-admin.row-actions>
@@ -84,7 +45,7 @@
                 {{ $filtering ? __('admin.common.empty') : __('admin.teams.empty') }}
                 @unless ($filtering)
                     <x-slot:action>
-                        <x-ui.button tone="outline" icon="plus" wire:click="create">{{ __('admin.teams.create') }}</x-ui.button>
+                        <x-ui.button tone="outline" icon="plus" :href="route('admin.organizations.teams.create', $organization)">{{ __('admin.teams.create') }}</x-ui.button>
                     </x-slot:action>
                 @endunless
             </x-admin.empty-row>

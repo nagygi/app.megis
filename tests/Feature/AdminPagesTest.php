@@ -56,6 +56,8 @@ it('renders every admin page for a superadmin with a page heading', function (Cl
     'subdiagnoses' => fn () => route('admin.main-diagnoses.subdiagnoses', MainDiagnosis::factory()->create()->diagnosis),
     'invite member' => fn (array $models) => route('admin.organizations.members.create', $models['organization']),
     'edit member' => fn (array $models) => route('admin.organizations.members.edit', [$models['organization'], $models['membership']]),
+    'new team' => fn (array $models) => route('admin.organizations.teams.create', $models['organization']),
+    'edit team' => fn (array $models) => route('admin.organizations.teams.edit', [$models['organization'], $models['team']]),
     'products' => fn () => route('admin.products.index'),
     'new product' => fn () => route('admin.products.create'),
     'edit product' => fn (array $models) => route('admin.products.edit', $models['organization']->product),

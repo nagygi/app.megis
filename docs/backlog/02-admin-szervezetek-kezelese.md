@@ -65,7 +65,9 @@ Bal oldali menüpont: *Szervezetek*. A lista az NFR listaszabályai szerint műk
 A szervezet *Csapatok* fülén. Magánszemély típusnál ez a fül nem jelenik meg.
 
 - Lista oszlopai: név, leírás, felhasználók száma, csapatvezető(k).
-- Mezők: név (kötelező, a szervezeten belül egyedi), leírás (opcionális), felhasználók (opcionális). A felhasználók a szervezet már felvett, nem inaktív felhasználói közül választhatók, és tagonként beállítható, hogy ő a csapat vezetője-e. Szerkesztéskor a jelenlegi tagok be vannak jelölve. Az időközben inaktívvá vált tag a csapatban marad, amíg ki nem veszik.
+- Az új csapat és a szerkesztés saját oldalon nyílik, a lista nélkül. Fölötte a morzsa: „Csapatok › {csapat neve}”, új csapatnál „Csapatok › Új csapat”.
+- Mezők: név (kötelező, a szervezeten belül egyedi), leírás (opcionális), felhasználók (opcionális).
+- A csapat tagjai keretes listában állnak: név, e-mail, „csapat vezető” kapcsoló, × eltávolítás. Új tag a „Felhasználó hozzáadása” keresőből jön, név vagy e-mail alapján, a szervezet már felvett, nem inaktív felhasználói közül. Az időközben inaktívvá vált tag a csapatban marad, amíg ki nem veszik.
 - Csapat törlése megerősítéssel. A felhasználók a szervezetben maradnak, csak a csapathoz rendelésük szűnik meg.
 
 ### 2.5 Felhasználók és meghívás

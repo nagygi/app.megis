@@ -94,6 +94,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('szervezetek/{organization}/felhasznalok/{membership}/szerkesztes', Admin\Organizations\MemberForm::class)
             ->name('organizations.members.edit')
             ->scopeBindings();
+        Route::livewire('szervezetek/{organization}/csapatok/uj', Admin\Organizations\TeamForm::class)->name('organizations.teams.create');
+        Route::livewire('szervezetek/{organization}/csapatok/{team}/szerkesztes', Admin\Organizations\TeamForm::class)
+            ->name('organizations.teams.edit')
+            ->scopeBindings();
 
         Route::livewire('beerkezo', Admin\Inbox\Index::class)->name('inbox.index');
         // Értékmérések: every mirror, and the Beérkező of the Értéktükör.

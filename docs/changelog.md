@@ -2,7 +2,22 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.62 · fb41ebe · 2026-11-03
+## 1.63 · ? · 2026-11-03
+
+Admin, szervezet *Csapatok* füle: a csapat űrlapja saját oldalra került, és a tagok felvétele keresővel megy (02 · 2.4).
+
+- **Eddig:**
+  - Az *Új csapat* és a szerkesztés a lista fölött nyitotta az űrlapot, alatta a csapatlistával. Morzsa nem volt.
+  - A felhasználók jelölőnégyzetes listában álltak, mellettük egy második jelölőnégyzet a csapatvezetőnek.
+  - A súgó azt írta: „Új felhasználót a csapat sorából hívhatsz meg.”
+- **Most:**
+  - **Saját oldal:** `/szervezetek/{szervezet}/csapatok/uj` és `…/csapatok/{csapat}/szerkesztes`. A fejlécben a *Csapatok* fül világít. A cím fölött a morzsa: „Csapatok › Él csapat”, illetve „Csapatok › Új csapat”. A lista nem látszik.
+  - **A csapat tagjai** keretes listában állnak: név, e-mail, az inaktívnál jelvény, a *csapat vezető* kapcsoló és egy × az eltávolításhoz.
+  - **Felhasználó hozzáadása:**
+    - név vagy e-mail alapján keres a szervezet nem inaktív felhasználói között, a találatok a mező alatt nyílnak;
+    - kattintásra vagy Enterre veszi fel az első találatot; a ↓ és ↑ a találatok között lép, az Esc bezárja.
+  - **Mentés és Mégse** után vissza a Csapatok listára. A csapat neve és a sor *Szerkesztés* menüpontja az új oldalra visz.
+  - A „csapat sorából hívhatsz meg” mondat kikerült a súgóból.
 
 Admin, szervezet: „A márkád alapja” saját fület kapott, közvetlenül az *Értékek* után (08 · 8.5).
 

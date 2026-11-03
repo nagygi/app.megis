@@ -4,6 +4,7 @@ use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
 use App\Models\Organization;
 use App\Models\Process;
+use App\Models\Team;
 use Illuminate\Testing\TestResponse;
 
 /**
@@ -40,6 +41,8 @@ it('keeps the organization\'s name and tabs on the pages under a tab, lighting t
         ->and(litHeaderTabs($response))->toBe([route($tab, $organization) => 'true']);
 })->with([
     'an invitation' => fn (Organization $organization) => [route('admin.organizations.members.create', $organization), 'admin.organizations.members'],
+    'a new team' => fn (Organization $organization) => [route('admin.organizations.teams.create', $organization), 'admin.organizations.teams'],
+    'a team' => fn (Organization $organization) => [route('admin.organizations.teams.edit', [$organization, Team::factory()->for($organization)->create()]), 'admin.organizations.teams'],
     'the occasions of a process' => fn (Organization $organization) => [route('admin.organizations.process-occasions', [$organization, Process::factory()->for($organization)->create()]), 'admin.organizations.processes'],
     'A1' => fn (Organization $organization) => [route('admin.main-diagnoses.create', ['szervezet' => $organization->id]), 'admin.organizations.diagnoses'],
     'a main diagnosis' => fn (Organization $organization) => [
@@ -56,6 +59,16 @@ it('runs the breadcrumbs above the title from the organization\'s tab down to th
 
     expect(strip_tags($nav[0] ?? ''))->toMatch('/^\s*Diagnózisok\s+Diagnózis indítása\s*$/u')
         ->and($nav[0] ?? '')->toContain('<span aria-current="page"');
+});
+
+it('runs the breadcrumbs of a team\'s form from the Csapatok tab to the team', function () {
+    $organization = Organization::factory()->create();
+    $team = Team::factory()->for($organization)->create(['name' => 'Él csapat']);
+
+    $content = $this->get(route('admin.organizations.teams.edit', [$organization, $team]))->assertOk()->getContent();
+    preg_match('/<nav aria-label="Útvonal".*?<\/nav>/s', $content, $nav);
+
+    expect(strip_tags($nav[0] ?? ''))->toMatch('/^\s*Csapatok\s+Él csapat\s*$/u');
 });
 
 it('lights the organization\'s tab as the page on the tab itself', function () {
