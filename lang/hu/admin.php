@@ -1388,8 +1388,6 @@ return [
         'close_help' => 'A lezárt diagnózis nem folytatható. Az olvasat előtt lezárt diagnózis vázlat státuszban marad.',
         'close_confirm' => 'Biztosan lezárod a diagnózist? Utána nem folytatható.',
         'closed' => 'A diagnózist lezártuk.',
-        'preview_title' => 'Amit a vezető lát az első belépéskor',
-        'preview_empty' => 'Válassz szervezetet és vezetőt.',
         'preview_peers' => '{0} Nincs társ|{1} :count társ|[2,*] :count társ',
         'summary' => 'A fő diagnózis',
         'part_of' => 'A fő diagnózis része:',

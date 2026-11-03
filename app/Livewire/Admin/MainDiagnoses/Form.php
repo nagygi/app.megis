@@ -15,7 +15,6 @@ use App\Models\Organization;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\MainDiagnoses\MainDiagnosisService;
-use App\Services\MainDiagnoses\StepState;
 use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Support\Collection;
@@ -27,9 +26,9 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 
 /**
- * A1 · starting a main diagnosis (17 · 17.2), with the live preview of what
- * the leader sees first (V1). A team's leader is the organization's leader
- * unless A1 picks someone else. After the invitation only the time window,
+ * A1 · starting a main diagnosis (17 · 17.2); what the leader sees first (V1)
+ * the admin checks with "Belépek a nevében". A team's leader is the
+ * organization's leader unless A1 picks someone else. After the invitation only the time window,
  * the peers and the quote visibility change; the leader can be replaced
  * with a confirmation, without an e-mail (17 · 17.7).
  */
@@ -316,7 +315,6 @@ class Form extends Component
             'replacementNotOrganizationLeader' => $this->replacementLeaderId !== null && ! $organizationLeaderIds->contains($this->replacementLeaderId),
             'leaderAwaitsInvitation' => $this->leaderAwaitsInvitation(),
             'peerCandidates' => $hasPeers && $team !== null ? $mainDiagnoses->teamPeerCandidates($team, $leader?->id) : collect(),
-            'preview' => $this->preview($organization, $subject, $leader, $mainDiagnoses),
             'blockers' => $this->blockers($organization, $subject, $leader, $hasFlow, $mainDiagnoses),
             'readingStartsOn' => filled($this->publishes_on)
                 ? rescue(fn () => today()->parse($this->publishes_on)->subDays((int) config('diagnosis.reading_offset_days'))->format('Y.m.d.'), null, false)
@@ -609,24 +607,6 @@ class Form extends Component
         $start = filled($this->starts_on) ? rescue(fn () => today()->parse($this->starts_on), today(), false) : today();
 
         return $start->addDays((int) $days)->toDateString();
-    }
-
-    /**
-     * What the leader sees on first entry (V1), narrowed by product and subject (17 · 17.3).
-     *
-     * @return list<array{label: string, minutes: int, readonly: bool}>
-     */
-    private function preview(?Organization $organization, ?MainDiagnosisSubject $subject, ?User $leader, MainDiagnosisService $mainDiagnoses): array
-    {
-        if ($organization === null || $subject === null) {
-            return [];
-        }
-
-        return array_map(fn (StepState $state): array => [
-            'label' => $state->step->label(),
-            'minutes' => $state->minutes,
-            'readonly' => $state->readonly,
-        ], $mainDiagnoses->previewSteps($organization, $subject, $leader)->steps);
     }
 
     /**

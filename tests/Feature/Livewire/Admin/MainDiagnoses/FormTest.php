@@ -31,7 +31,6 @@ it('starts a team diagnosis on A1 and sends the leader invitation', function () 
         ->set('peers.'.$setup['peers'][1]->id, false)
         ->set('starts_on', today()->addWeek()->toDateString())
         ->assertSet('publishes_on', today()->addWeek()->addDays(42)->toDateString())
-        ->assertSee('Saját értékek')
         ->call('sendInvitation')
         ->assertHasNoErrors()
         ->assertRedirect();

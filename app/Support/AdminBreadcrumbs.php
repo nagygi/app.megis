@@ -74,6 +74,41 @@ class AdminBreadcrumbs
     }
 
     /**
+     * The crumbs as the layout draws them. Inside an organization the first
+     * two, Szervezetek and the organization, head the page in the header; the
+     * rest open the content, above the title. The crumb of the page the admin
+     * came from leads back to it as it was left (AdminBackLink), with the
+     * list's filters and page; from anywhere else a Vissza leads there.
+     *
+     * @return array{header: list<array{label: string, url: string}>, page: list<array{label: string, url: string}>, back: ?string}
+     */
+    public function links(AdminLocation $location): array
+    {
+        $trail = $location->trail;
+        $back = null;
+
+        if ($trail !== []) {
+            $path = fn (string $url): string => trim((string) parse_url($url, PHP_URL_PATH), '/');
+            $origin = app(AdminBackLink::class)->url($location->parent()['url'], $location->home);
+            $originCrumb = collect($trail)->search(fn (array $crumb) => $path($crumb['url']) === $path($origin));
+
+            if ($originCrumb === false) {
+                $back = $origin;
+            } else {
+                $trail[$originCrumb]['url'] = $origin;
+            }
+        }
+
+        $inHeader = $location->organization === null ? 0 : count($this->organizationCrumbs($location->organization));
+
+        return [
+            'header' => array_slice($trail, 0, $inHeader),
+            'page' => array_slice($trail, $inHeader),
+            'back' => $back,
+        ];
+    }
+
+    /**
      * @param  array<string, mixed>  $parameters  the route's parameters, models or keys
      * @param  array<string, mixed>  $query
      */
@@ -193,7 +228,8 @@ class AdminBreadcrumbs
     }
 
     /**
-     * A page of an organization: its name and tabs head the page, the tab lit.
+     * A page of an organization: its name and tabs head the page, the tab
+     * lit. Its trail starts with the organization's crumbs (links()).
      *
      * @param  list<array{label: string, url: string}>  $trail
      */

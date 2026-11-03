@@ -4,6 +4,7 @@ use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\MirrorSession;
+use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Testing\TestResponse;
 
@@ -97,17 +98,24 @@ it('leads up the breadcrumbs without a Vissza when a subdiagnosis is not opened 
     'the login page' => fn () => route('admin.login'),
 ]);
 
-it('leads from a standalone diagnosis up to the diagnoses of its organization', function () {
+it('leads from a standalone diagnosis up to the diagnoses of its organization, and from the header to the organizations', function () {
     $diagnosis = Diagnosis::factory()->create();
 
     $response = $this->get(route('admin.diagnoses.show', $diagnosis));
 
     expect(backLink($response))->toBeNull()
-        ->and(pageCrumbs($response))->toBe([
-            'Szervezetek' => route('admin.organizations.index'),
-            $diagnosis->organization->name => route('admin.organizations.edit', $diagnosis->organization),
-            'Diagnózisok' => route('admin.organizations.diagnoses', $diagnosis->organization),
-        ]);
+        ->and(pageCrumbs($response))->toBe(['Diagnózisok' => route('admin.organizations.diagnoses', $diagnosis->organization)])
+        ->and($response->getContent())->toMatch('/<header.*<a href="'.preg_quote(route('admin.organizations.index'), '/').'"[^>]*>Szervezetek<\/a>.*<\/header>/s');
+});
+
+it('leads from the header back to the list of organizations as it was left', function () {
+    $organization = Organization::factory()->create();
+    $list = route('admin.organizations.index', ['kereses' => 'Alma']);
+
+    $response = $this->get(route('admin.organizations.teams', $organization), ['referer' => $list]);
+
+    expect(backLink($response))->toBeNull()
+        ->and($response->getContent())->toContain('<a href="'.e($list).'"');
 });
 
 it('leads back to a list of the breadcrumbs through its crumb, with the filters, and to anywhere else through Vissza', function () {

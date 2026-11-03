@@ -48,6 +48,16 @@ it('keeps the organization\'s name and tabs on the pages under a tab, lighting t
     ],
 ]);
 
+it('runs the breadcrumbs above the title from the organization\'s tab down to the page itself', function () {
+    $organization = Organization::factory()->create();
+
+    $content = $this->get(route('admin.main-diagnoses.create', ['szervezet' => $organization->id]))->assertOk()->getContent();
+    preg_match('/<nav aria-label="Útvonal".*?<\/nav>/s', $content, $nav);
+
+    expect(strip_tags($nav[0] ?? ''))->toMatch('/^\s*Diagnózisok\s+Diagnózis indítása\s*$/u')
+        ->and($nav[0] ?? '')->toContain('<span aria-current="page"');
+});
+
 it('lights the organization\'s tab as the page on the tab itself', function () {
     $organization = Organization::factory()->create();
 

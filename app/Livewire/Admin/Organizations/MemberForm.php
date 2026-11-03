@@ -157,7 +157,7 @@ class MemberForm extends Component
                 ->orderBy('position')
                 ->limit(200)
                 ->pluck('position'),
-        ])->layout('layouts::admin')->title($this->organization->name);
+        ])->layout('layouts::admin')->title($this->membership !== null ? __('admin.members.edit_title') : __('admin.members.invite_title'));
     }
 
     /**

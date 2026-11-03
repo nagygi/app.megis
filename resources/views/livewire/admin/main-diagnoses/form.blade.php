@@ -1,4 +1,4 @@
-{{-- A1 · starting a main diagnosis (17 · 17.2), with the leader's V1 as a live preview. --}}
+{{-- A1 · starting a main diagnosis (17 · 17.2). What the leader sees, the admin checks with "Belépek a nevében". --}}
 @php($subjectEnum = \App\Enums\MainDiagnosisSubject::tryFrom($subject))
 
 <div class="flex flex-col gap-6">
@@ -13,8 +13,7 @@
             <x-admin.page-header :title="$title" />
         @endunless
 
-        {{-- Side by side only from the desktop width: next to the admin's sidebar a 1024px screen leaves the form narrower than the preview. --}}
-        <div class="grid gap-6 desktop:grid-cols-[minmax(0,1fr)_22rem]">
+        <div class="max-w-3xl">
             <x-ui.card as="form" bordered padding="lg" wire:submit="saveDraft" class="flex flex-col gap-6">
                 {{-- Név: offered from the team, the product and the start until the admin writes their own (17 · 17.1). --}}
                 @if ($organization && $hasFlow)
@@ -264,52 +263,6 @@
                     @endif
                 @endif
             </x-ui.card>
-
-            {{-- Amit a vezető lát (V1) --}}
-            <aside class="flex flex-col gap-4 self-start rounded-card bg-charcoal p-6 text-cream desktop:sticky desktop:top-6" aria-labelledby="preview-title">
-                <p id="preview-title" class="text-sm">{{ __('admin.main_diagnoses.preview_title') }}</p>
-                @if ($preview === [])
-                    <p>{{ __('admin.main_diagnoses.preview_empty') }}</p>
-                @else
-                    <div>
-                        <p class="text-xl font-extrabold uppercase">{{ __('diagnosis.what_awaits') }}</p>
-                        <p>{{ __('diagnosis.steps_lead', ['count' => \App\Services\Report\HungarianNumber::word(count($preview))]) }}</p>
-                        <p class="text-sm text-grey-350">
-                            {{ $productName }} ·
-                            {{ __('diagnosis.minutes_until', ['minutes' => array_sum(array_column($preview, 'minutes'))]) }}
-                            {{ filled($starts_on) ? rescue(fn () => __('diagnosis.until', ['date' => today()->parse($starts_on)->format('m.d.')]), '', false) : __('diagnosis.date_open') }}
-                        </p>
-                    </div>
-                    {{-- The step line of V1 (x-diagnosis.step-list), on the dark ground. --}}
-                    <ol class="flex flex-col">
-                        @foreach ($preview as $index => $step)
-                            <li class="flex gap-3">
-                                <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
-                                    @if ($index === 0)
-                                        <span class="grid size-5.5 place-items-center rounded-pill border-2 border-coral"><span class="size-2.5 rounded-pill bg-coral"></span></span>
-                                    @else
-                                        <span class="size-5.5 rounded-pill border-[1.5px] border-grey-500"></span>
-                                    @endif
-                                    @unless ($loop->last)
-                                        <span class="mt-[3px] min-h-3.5 w-0.5 flex-1 bg-grey-700"></span>
-                                    @endunless
-                                </span>
-                                <span @class(['flex min-w-0 flex-1 items-baseline justify-between gap-3 pt-0.5', 'pb-3.5' => ! $loop->last])>
-                                    <span class="font-semibold">{{ $step['label'] }}@if ($step['readonly']) <span class="text-sm font-normal text-grey-350">· {{ __('diagnosis.readonly') }}</span>@endif</span>
-                                    <span class="shrink-0 whitespace-nowrap text-sm text-grey-350">{{ __('diagnosis.minutes', ['minutes' => $step['minutes']]) }}</span>
-                                </span>
-                            </li>
-                        @endforeach
-                    </ol>
-                    @if ($hasPeers)
-                        @php($peerCount = $peerCandidates->filter(fn ($candidate) => $peers[$candidate->id] ?? false)->count())
-                        <p class="text-sm text-grey-350">{{ trans_choice('admin.main_diagnoses.preview_peers', $peerCount, ['count' => $peerCount]) }}</p>
-                        @if ($peerCount < \App\Services\Diagnoses\ThresholdPolicy::PEERS)
-                            <p class="text-sm">{{ __('admin.main_diagnoses.peers_below_threshold') }}</p>
-                        @endif
-                    @endif
-                @endif
-            </aside>
         </div>
     </div>
 </div>

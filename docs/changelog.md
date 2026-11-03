@@ -2,6 +2,24 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.55 · {hash} · 2026-11-03
+
+Admin: „Szervezetek › szervezet” a fejlécben, a morzsa a fültől az aktuális oldalig; az A1 vezetői előnézete megszűnt.
+
+- **Eddig (1.53):**
+  - A zöld fejlécben csak a szervezet neve állt.
+  - A cím fölötti morzsa a *Szervezetek › szervezet* szinttől indult, az aktuális oldal nélkül.
+  - A Diagnózis indítása (A1) jobb oldalán ott volt a „Amit a vezető lát az első belépéskor” előnézet.
+- **Most:**
+  - **Fejléc:** *Szervezetek › szervezet*. A *Szervezetek* link a szervezetlistára visz, a szűrőkkel együtt, ha onnan jöttél.
+  - **Morzsa a cím fölött:**
+    - Szervezeten belül a fültől indul, és az aktuális oldallal zárul, pl. *Diagnózisok › Diagnózis indítása* vagy *Diagnózisok › fődiagnózis › Részdiagnózisok › részdiagnózis*.
+    - Az utolsó elem nem link.
+    - A szervezet saját fülein nincs morzsa, csak „Vissza”, ha máshonnan nyitottad meg.
+    - Mobilon továbbra is egy lépés látszik felfelé.
+  - **A1:** a vezetői előnézet kikerült. Hogy mit lát a vezető, a „Belépek a nevében” funkcióval nézhető meg. Az űrlap egy oszlopban áll.
+  - **Meghívás oldal:** a lapcíme „Meghívás”, illetve „Felhasználó szerkesztése” lett, a szervezet neve helyett.
+
 ## 1.54 · added1e · 2026-11-03
 
 Diagnózis kitöltése (V1·b, 23 · 23.3, 24 · 24.2): a Saját értékek lépés a mentett listától kész, nem kell hozzá a „Tovább”.

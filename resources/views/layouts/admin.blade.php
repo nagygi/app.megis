@@ -1,10 +1,10 @@
 {{--
     Admin layout (01). The header says where the page sits (AdminBreadcrumbs):
-    inside an organization it is green, with the organization's name and tabs
-    (02 · 2.3) on every page of it, the page's tab lit; elsewhere charcoal,
-    with the menu group. The breadcrumbs open the content, above the page's
-    title; a main diagnosis draws its own tabs under them
-    (x-admin.main-diagnosis-tabs).
+    inside an organization it is green, with "Szervezetek › organization" and
+    its tabs (02 · 2.3) on every page of it, the page's tab lit; elsewhere
+    charcoal, with the menu group. The rest of the breadcrumbs open the
+    content, down to the page itself, above its title; a main diagnosis draws
+    its own tabs under them (x-admin.main-diagnosis-tabs).
 --}}
 @props([
     'title' => null,
@@ -13,7 +13,9 @@
 @php
     $admin = auth('admin')->user();
     $mailAllowlist = app(\App\Support\MailAllowlist::class);
-    $location = app(\App\Support\AdminBreadcrumbs::class)->current();
+    $breadcrumbs = app(\App\Support\AdminBreadcrumbs::class);
+    $location = $breadcrumbs->current();
+    $crumbs = $breadcrumbs->links($location);
     $organization = $location->organization;
 @endphp
 
@@ -78,9 +80,15 @@
                         <x-megis.icon name="menu" class="size-5" :label="__('admin.menu_open')" />
                     </button>
 
-                    <p @class(['min-w-0 flex-1 truncate font-semibold', 'text-xl' => $organization, 'text-lg' => ! $organization])>
-                        {{ $organization?->name ?? $location->area ?? $title }}
-                    </p>
+                    @if ($organization)
+                        <p class="flex min-w-0 flex-1 items-center gap-2 text-lg sm:text-xl">
+                            <a href="{{ $crumbs['header'][0]['url'] }}" class="shrink-0 no-underline hover:underline">{{ $crumbs['header'][0]['label'] }}</a>
+                            <span class="flex shrink-0 opacity-60"><x-megis.icon name="chevron-right" /></span>
+                            <span class="truncate font-semibold">{{ $organization->name }}</span>
+                        </p>
+                    @else
+                        <p class="min-w-0 flex-1 truncate text-lg font-semibold">{{ $location->area ?? $title }}</p>
+                    @endif
 
                     @if ($admin)
                         <x-ui.dropdown id="admin-user-menu" :label="__('admin.user_menu.open')" :width="256" trigger-class="press -mr-1 grid size-11 place-items-center rounded-pill">
@@ -110,7 +118,7 @@
 
             {{-- Livewire pages show their own flash messages, so they update after actions too. --}}
             <main id="main" class="flex-1 px-4 py-6 lg:px-8">
-                <x-admin.breadcrumbs :location="$location" class="-mt-3 mb-3" />
+                <x-admin.breadcrumbs :trail="$crumbs['page']" :back="$crumbs['back']" :current="$title" class="-mt-3 mb-3" />
 
                 {{ $slot }}
             </main>
