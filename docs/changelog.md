@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.77 · {hash} · 2026-11-03
+## 1.77 · d574bca · 2026-11-03
 
 Értéktükör (biztonsági javítás, 17 · 17.4): a nyilvános tükör nem köthető diagnózishoz.
 
