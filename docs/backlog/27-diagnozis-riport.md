@@ -18,7 +18,7 @@ A Belső snapshotnál mindez egy lapon van (S1, S1·b). A számok és a mondatok
 - **Egy fejezet, egy kérdés:** minden lap tetején a kérdés áll, a vezető nyelvén.
 - **A szám soha nem áll egyedül:** mellette a lépcső, a rés vagy a nyíl oda, ahonnan jött.
 - **Mélyülés minden fejezetben ugyanígy:** gyűrű → csoport → tétel → bizonyíték.
-- **A lap tetején** kilenc fejezet-pötty (R0–R8), link a meglévő lapokra. A Brand riport, a Képesség és a Bridge pöttye szaggatott, „hamarosan” (1.31). Minden lapon ott vannak: a mélyítő lapon a fejezete, az R1·b-n és az R1·c-n az R1 pöttye a kiemelt; a zárólapon és a Mellékletben egyik sem. A Belső snapshot egy lapján nincsenek.
+- **A lap tetején** kilenc fejezet-pötty (R0–R8), link a meglévő lapokra. A Brand riport, a Képesség és a Bridge pöttye szaggatott, „hamarosan” (1.31). Minden lapon ott vannak: a mélyítő lapon a fejezete, az R1·b-n és az R1·c-n az R1 pöttye a kiemelt; a zárólapon és a Mellékletben egyik sincs kiemelve. A Belső snapshot egy lapján nincsenek.
 - **A lap alján** a fejezet-lépegető: „{k} / 8 · {fejezet}” (pl. „2 / 8 · Értékek”), és a következő lap. A márkád alapja után a zárólap jön.
 - **A mélyítő lapon** „diagnózis-nézet · {publikálás dátuma}” címke áll: a lap a publikálás napjára fagyott (21.3).
 - **Fejlécszín** (15 · 15.2): zöld a Belső működés lapjain, világossárga a válasznál, az összefoglalónál és a márkád alapjánál.
