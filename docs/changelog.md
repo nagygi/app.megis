@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.71 · {hash} · 2026-11-03
+## 1.71 · a3c6859 · 2026-11-03
 
 Értékmérés az alkalmak anyagain (13 · 13.2): a motor tudja, melyik folyamatról szól az anyag, és a nem illeszkedő értékek sem vesznek el.
 
