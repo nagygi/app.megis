@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.89 · {hash} · 2026-11-03
+## 1.89 · c007ff6 · 2026-11-03
 
 Riport (27): a jegy hiányai pótolva.
 
