@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.72 · {hash} · 2026-11-03
+## 1.72 · f4d5e9a · 2026-11-03
 
 Belépés (14 · 14.2): a kódos és a linkes belépés is nullázza a hibás jelszavak számlálóját.
 
