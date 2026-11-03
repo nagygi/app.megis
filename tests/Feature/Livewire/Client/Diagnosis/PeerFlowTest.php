@@ -51,6 +51,27 @@ it('asks the peer for the consents before anything else (T1)', function () {
         ->and(AuditEvent::query()->where('subject_user_id', $peer->id)->where('type', AuditEventType::ConsentGiven)->exists())->toBeTrue();
 });
 
+it('lets the peer leave T1 with "Nem most" for a calm page, the invitation kept (25 · 25.2)', function () {
+    [$setup, $main] = runningDiagnosis();
+    $peer = $setup['peers'][0];
+    actingAsCustomer($peer);
+    $later = route('client.home', [$setup['organization'], 'kesobb' => 1]);
+
+    Livewire::test(Overview::class, peerParams($setup, $main))
+        ->assertSee('Kb. '.$main->peerMinutes().' perc.')
+        ->assertSeeHtml($later);
+
+    $this->get($later)
+        ->assertOk()
+        ->assertSee('Rendben, később.')
+        ->assertSee(route('client.diagnosis.show', peerParams($setup, $main)));
+
+    // Otherwise the home opens the diagnosis, as does "Nem most" once the peer started.
+    $this->get(route('client.home', $setup['organization']))->assertRedirect(route('client.diagnosis.show', peerParams($setup, $main)));
+    $main->participantFor($peer, ParticipantRole::Peer)->update(['started_at' => now()]);
+    $this->get($later)->assertRedirect(route('client.diagnosis.show', peerParams($setup, $main)));
+});
+
 it('records the optional quote consent only when the admin turned quotes on', function () {
     [$setup, $main] = runningDiagnosis(showQuotes: false);
     actingAsCustomer($setup['peers'][0]);

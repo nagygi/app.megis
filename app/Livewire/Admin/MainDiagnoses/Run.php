@@ -220,6 +220,8 @@ class Run extends Component
             'state' => match (true) {
                 $peer->hasWithdrawn() => 'withdrawn',
                 $progress->experienceDiagnosis($main, $peer->user) !== null => 'answered',
+                // Opened T1 but pressed "Nem most" (25 · 25.2).
+                $peer->opened_at !== null && $peer->started_at === null => 'not_started',
                 $peer->opened_at !== null => 'opened',
                 $peer->invited_at !== null => 'invited',
                 default => 'waiting',

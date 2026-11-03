@@ -33,14 +33,20 @@ class InboxScanner
     ) {}
 
     /**
-     * The keys of a participant's Meghívó rows: five days unopened, and expired
-     * after fourteen, which comes as a row of its own (22 · 22.2).
+     * The keys of a participant's Meghívó rows: five days unopened, expired
+     * after fourteen, which comes as a row of its own (22 · 22.2), and a peer
+     * who opened T1 but has not started in five days (25 · 25.2).
      *
      * @return list<string>
      */
     public static function invitationKeys(int $participantId): array
     {
-        return ['invitation:'.$participantId, 'invitation:'.$participantId.':expired'];
+        return ['invitation:'.$participantId, 'invitation:'.$participantId.':expired', self::notStartedKey($participantId)];
+    }
+
+    public static function notStartedKey(int $participantId): string
+    {
+        return 'invitation:'.$participantId.':not_started';
     }
 
     /**
@@ -83,7 +89,8 @@ class InboxScanner
 
         foreach ($rows as $item) {
             $resolved = match ($item->type) {
-                InboxItemType::Invitation => ! $item->subject instanceof MainDiagnosisParticipant || ! $this->invitationOverdue($item->subject),
+                InboxItemType::Invitation => ! $item->subject instanceof MainDiagnosisParticipant
+                    || ! ($item->dedupe_key === self::notStartedKey($item->subject->id) ? $this->notStartedOverdue($item->subject) : $this->invitationOverdue($item->subject)),
                 InboxItemType::Completion => ! $item->subject instanceof MainDiagnosis || ! $this->completionOverdue($item->subject),
                 InboxItemType::Threshold => ! $item->subject instanceof MainDiagnosis || ! $this->run->thresholdAtRisk($item->subject),
                 InboxItemType::Publication => ! $item->subject instanceof MainDiagnosis || ! $this->publicationOverdue($item->subject),
@@ -120,11 +127,33 @@ class InboxScanner
             // A running diagnosis was started by its leader.
             && ($participant->role !== ParticipantRole::Leader || $main->stage->isBeforeRunning())
             && $participant->invited_at->lte(now()->subDays(self::INVITATION_DAYS))
-            && Membership::query()
-                ->where('organization_id', $main->diagnosis->organization_id)
-                ->where('user_id', $participant->user_id)
-                ->where('status', '!=', MembershipStatus::Inactive)
-                ->exists();
+            && $this->isActiveMember($participant, $main);
+    }
+
+    private function isActiveMember(MainDiagnosisParticipant $participant, MainDiagnosis $main): bool
+    {
+        return Membership::query()
+            ->where('organization_id', $main->diagnosis->organization_id)
+            ->where('user_id', $participant->user_id)
+            ->where('status', '!=', MembershipStatus::Inactive)
+            ->exists();
+    }
+
+    /**
+     * A peer opened T1 five days ago and pressed "Nem most" or left it (25 · 25.2).
+     */
+    public function notStartedOverdue(MainDiagnosisParticipant $participant): bool
+    {
+        $main = $participant->mainDiagnosis;
+
+        return $participant->role === ParticipantRole::Peer
+            && $participant->opened_at !== null
+            && $participant->started_at === null
+            && $participant->excluded_at === null
+            && $participant->replaced_at === null
+            && $main->stage === MainDiagnosisStage::Running
+            && $participant->opened_at->lte(now()->subDays(self::INVITATION_DAYS))
+            && $this->isActiveMember($participant, $main);
     }
 
     /**
@@ -146,7 +175,23 @@ class InboxScanner
     private function invitations(MainDiagnosis $main): void
     {
         foreach ($main->participants as $participant) {
-            if (! $this->invitationOverdue($participant->setRelation('mainDiagnosis', $main))) {
+            if ($this->notStartedOverdue($participant->setRelation('mainDiagnosis', $main))) {
+                $this->inbox->open(
+                    InboxItemType::Invitation,
+                    __('admin.inbox.rows.invitation_not_started', [
+                        'name' => $participant->user->name,
+                        'days' => (int) $participant->opened_at->diffInDays(now()),
+                    ]),
+                    diagnosis: $main->diagnosis,
+                    subject: $participant,
+                    dedupeKey: self::notStartedKey($participant->id),
+                    staysClosed: true,
+                );
+
+                continue;
+            }
+
+            if (! $this->invitationOverdue($participant)) {
                 continue;
             }
 

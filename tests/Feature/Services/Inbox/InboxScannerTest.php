@@ -5,6 +5,8 @@ use App\Enums\MainDiagnosisStage;
 use App\Enums\MembershipStatus;
 use App\Enums\ParticipantRole;
 use App\Livewire\Admin\Inbox\Index;
+use App\Livewire\Admin\MainDiagnoses\Run;
+use App\Livewire\Client\Diagnosis\Overview;
 use App\Mail\DiagnosisNoticeMail;
 use App\Mail\DiagnosisPeerInvitationMail;
 use App\Mail\InboxDigestMail;
@@ -230,4 +232,27 @@ it('reminds someone not registered yet with a registration link, not a login (22
     Livewire::test(Index::class)->call('remind', $item->id);
 
     Mail::assertQueued(DiagnosisNoticeMail::class, fn (DiagnosisNoticeMail $mail) => $mail->hasTo($peer->email) && str_contains($mail->url, '/meghivo/'));
+});
+
+it('opens a row for a peer who opened T1 but has not started in five days, and closes it on the start (25 · 25.2)', function () {
+    [$setup, $main] = runningDiagnosis();
+    $peer = $main->participantFor($setup['peers'][0], ParticipantRole::Peer);
+    app(MainDiagnosisService::class)->opened($main, $peer);
+
+    $this->travel(5)->days();
+    app(InboxScanner::class)->scan();
+
+    $item = InboxItem::query()->where('dedupe_key', InboxScanner::notStartedKey($peer->id))->sole();
+    expect($item->summary)->toContain('megnyitotta a meghívót, de nem kezdte el')
+        ->and(InboxItem::query()->open()->where('subject_id', $peer->id)->count())->toBe(1);
+
+    actingAsAdmin($setup['admin']);
+    Livewire::test(Run::class, ['diagnosis' => $main->diagnosis])->assertSee('megnyitotta, nem kezdte el');
+
+    actingAsCustomer($setup['peers'][0]);
+    Livewire::test(Overview::class, peerParams($setup, $main))
+        ->set('answersConsent', true)
+        ->call('start');
+
+    expect($item->refresh()->close_reason)->toBe(InboxItem::CLOSED_AUTOMATICALLY);
 });

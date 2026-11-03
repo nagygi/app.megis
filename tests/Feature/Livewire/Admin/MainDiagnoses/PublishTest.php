@@ -2,6 +2,7 @@
 
 use App\Enums\DiagnosisStatus;
 use App\Enums\MainDiagnosisStage;
+use App\Enums\MembershipStatus;
 use App\Enums\ParticipantRole;
 use App\Jobs\RecalculateMainDiagnosis;
 use App\Livewire\Admin\MainDiagnoses\Publish;
@@ -9,6 +10,7 @@ use App\Livewire\Client\Diagnosis\OwnValues;
 use App\Mail\DiagnosisNoticeMail;
 use App\Models\ChapterUpdate;
 use App\Models\DiagnosisClaim;
+use App\Models\Membership;
 use App\Models\ReportSnapshot;
 use App\Models\User;
 use App\Services\Report\PublishService;
@@ -72,6 +74,16 @@ it('publishes, freezes the report and mails the leader and the peers (21 · 21.3
     $this->get(route('client.diagnosis.takeaway', [$setup['organization'], $main->diagnosis]))->assertOk()->assertSee('Útravaló · a te értékeid');
     actingAsCustomer($setup['peers'][1]);
     $this->get(route('client.diagnosis.takeaway', [$setup['organization'], $main->diagnosis]))->assertNotFound();
+});
+
+it('makes no Útravaló and sends no e-mail to a peer whose membership is inactive (25 · 25.6, 29 · 29.2)', function () {
+    [$setup, $main] = approvedReading();
+    Membership::query()->where('organization_id', $setup['organization']->id)->where('user_id', $setup['peers'][0]->id)->update(['status' => MembershipStatus::Inactive]);
+
+    app(PublishService::class)->publish($main, $setup['admin']);
+
+    expect(ReportSnapshot::query()->sole()->data['takeaways'])->toBe([]);
+    Mail::assertNotQueued(DiagnosisNoticeMail::class, fn (DiagnosisNoticeMail $mail) => $mail->hasTo($setup['peers'][0]->email));
 });
 
 it('freezes the own values at publishing, so a later change stays out of the report (21 · 21.3, 24)', function () {

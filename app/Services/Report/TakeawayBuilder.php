@@ -2,10 +2,12 @@
 
 namespace App\Services\Report;
 
+use App\Enums\MembershipStatus;
 use App\Enums\ParticipantRole;
 use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
 use App\Models\MainDiagnosisParticipant;
+use App\Models\Membership;
 use App\Models\OccasionExperience;
 use App\Models\PersonalValueSet;
 use App\Models\User;
@@ -38,6 +40,7 @@ class TakeawayBuilder
 
     /**
      * Who gets one: the peers who sent their T4 and did not withdraw (21, question 2).
+     * An inactive member could not open it (02, 29 · 29.2): no Útravaló, no e-mail.
      *
      * @return Collection<int, User>
      */
@@ -48,9 +51,15 @@ class TakeawayBuilder
         }
 
         $withdrawn = $this->calculator->withdrawnUserIds($main);
+        $inactive = Membership::query()
+            ->where('organization_id', $main->diagnosis->organization_id)
+            ->where('status', MembershipStatus::Inactive)
+            ->pluck('user_id')
+            ->all();
 
         return $main->peers()->with('user')->get()
             ->filter(fn (MainDiagnosisParticipant $peer) => ! in_array($peer->user_id, $withdrawn, true)
+                && ! in_array($peer->user_id, $inactive, true)
                 && $this->progress->experienceDiagnosis($main, $peer->user) !== null)
             ->pluck('user')
             ->values();

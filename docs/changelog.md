@@ -2,6 +2,25 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.88 · {hash} · 2026-11-03
+
+A társ útja (25): a jegy hiányai pótolva.
+
+- **„Nem most” (25.2):**
+  - **Eddig:** a gomb a kezdőlapra vitt, az rögtön visszadobott a T1-re, így semmi nem történt.
+  - **Most:** a kezdőlap ilyenkor nem dob vissza: „Rendben, később. … bármikor folytathatod innen, vagy a meghívó linkjéről.” és „Folytatom”. A meghívó megmarad. Aki már elkezdte, annak a kezdőlap továbbra is a diagnózist nyitja.
+- **Megnyitotta, nem kezdte el (25.1, 19, 22):**
+  - **Eddig:** a Futás lapon „belépett” állt, és a Beérkező sem szólt, mert az 5 napos sor csak a meg nem nyitott meghívónál jött.
+  - **Most:**
+    - a Futás lapon „megnyitotta, nem kezdte el”;
+    - 5 nap után Meghívó-sor jön a Beérkezőben: „{név} (társ) {n} napja megnyitotta a meghívót, de nem kezdte el.”, Emlékeztetem · Új meghívó;
+    - a sor magától lezárul, amikor a társ elkezdi.
+- **Inaktivált társ (25.6, 29.2):**
+  - **Eddig:** a publikáláskor Útravaló készült neki, és e-mailt is kapott róla, de megnyitni nem tudta.
+  - **Most:** aki a publikáláskor inaktív tag, nem kap Útravalót és e-mailt sem.
+- **T1 (25.2):** „Kb. 8 perc.”, ahogy a jegy írja.
+- **A jegy a kódhoz igazítva (25.3):** a megélés lépése 3 perc, a percek a konfigurációból jönnek (23 · 23.1).
+
 ## 1.87 · c648605 · 2026-11-03
 
 Beérkező (22): a jegy hiányai pótolva.

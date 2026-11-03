@@ -101,6 +101,9 @@ return [
         'greeting' => 'Szia, :name!',
         'lead' => 'Itt fogod látni a(z) :organization diagnózisát, amint elindul.',
         'lead_not_participant' => 'Jelenleg nincs olyan diagnózis, amelyben részt veszel.',
+        // "Nem most" on T1 (25 · 25.2).
+        'later' => 'Rendben, később. :leader meghívója a(z) :subject diagnózisába megvan: bármikor folytathatod innen, vagy a meghívó linkjéről.',
+        'later_continue' => 'Folytatom',
         // The way ahead before the diagnosis opens (26 · 26.4, prototype "A vezető útja", "A csapat hangja").
         'leader_path' => 'A vezető útja',
         'team_path' => 'A csapat hangja',

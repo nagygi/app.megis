@@ -1069,6 +1069,7 @@ return [
         'rows' => [
             'invitation' => ':name (:role) :days napja nem nyitotta meg a meghívót.',
             'invitation_expired' => ':name (:role) meghívója lejárt, :days napja ment ki.',
+            'invitation_not_started' => ':name (társ) :days napja megnyitotta a meghívót, de nem kezdte el.',
             'completion' => ':name a kezdés napjáig nem indította el a diagnózist (:done / :total lépés).',
             'threshold' => 'A küszöb veszélyben: :answered társ töltötte ki, :date-án publikálunk.',
             'publication' => 'A publikálás napja (:date) elmúlt.',
@@ -1729,6 +1730,7 @@ return [
         'peers' => 'Társak',
         'peer_states' => [
             'invited' => 'meghívva',
+            'not_started' => 'megnyitotta, nem kezdte el',
             'opened' => 'belépett',
             'answered' => 'kitöltötte',
             'withdrawn' => 'visszavonta',

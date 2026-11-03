@@ -20,7 +20,7 @@
             <div class="flex flex-col gap-2">
                 <div class="flex flex-wrap items-center gap-3">
                     <x-ui.button type="submit" size="lg" icon-right="arrow-right" :disabled="! $answersConsent">{{ __('diagnosis.invitation.start') }}</x-ui.button>
-                    <x-ui.button tone="ghost" :href="route('client.home', $main->diagnosis->organization)">{{ __('diagnosis.invitation.later') }}</x-ui.button>
+                    <x-ui.button tone="ghost" :href="route('client.home', [$main->diagnosis->organization, 'kesobb' => 1])">{{ __('diagnosis.invitation.later') }}</x-ui.button>
                 </div>
                 @unless ($answersConsent)
                     <p class="text-sm text-grey-700">{{ __('diagnosis.invitation.consent_needed') }}</p>

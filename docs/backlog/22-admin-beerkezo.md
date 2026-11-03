@@ -36,6 +36,7 @@ Szuperadmin és Admin egyaránt használhatja (01).
 - **Besorolás:** a 12 · 12.6 „Besorolásra vár” sorai itt is megjelennek. Ha bármelyik helyen besorolják, mindkettőből eltűnik. Csak az „Egyikhez sem” anyagok jönnek ide; az alacsony konfidenciájú helyzet nem, mert a 12 nem bírálja felül, amit a felhasználó választott.
 - **Meghívó:** 5 nap megnyitás nélkül, vagy ha a meghívó lejárt (14 nap, 14 · 14.1). A sor akkor is megjelenik, ha a vezető a V10-en vagy az M6-on maga küldött emlékeztetőt.
   - A 14. napon a még nyitott 5 napos sor „lejárt”-ra vált. Ha az 5 napos sort kézzel lezárták, a lejárt meghívó új sorként jön.
+  - Az a társ is sort kap, aki megnyitotta a T1-et, de 5 napja nem kezdte el (25 · 25.1). Ez magától lezárul, amikor elkezdi.
   - **Emlékeztetem:** aki még nem regisztrált („Felvéve”, 02), friss regisztrációs linket kap, mert a belépő link neki nem működik. Ugyanígy a Futás lap (19) emlékeztetői.
   - Inaktív tagra nem várunk: nem nyílik róla sor, a nyitott sora magától lezárul. Az „Új meghívó” neki nem küld semmit, és ezt jelzi.
 - **Kitöltés:** ha a vezető a kezdés napjáig nem nyomta meg az „Indul a diagnózis” gombot (17.5). A sor magától lezárul, amikor a vezető elindítja a diagnózist, vagy az admin zárja le.

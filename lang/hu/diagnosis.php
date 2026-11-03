@@ -65,7 +65,7 @@ return [
 
     'invitation' => [
         'title' => 'Hogyan látod te?',
-        'lead' => ':leader meghívott a(z) :subject diagnózisába. :minutes perc.',
+        'lead' => ':leader meghívott a(z) :subject diagnózisába. Kb. :minutes perc.',
         'start' => 'Kezdem',
         'later' => 'Nem most',
         'closed' => 'A diagnózis kitöltése lezárult.',

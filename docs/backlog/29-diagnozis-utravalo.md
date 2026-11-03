@@ -38,7 +38,7 @@ A társ csomagja a riport helyett, a publikálással (T6): a saját értékei é
 - Más társ neve és a riport számai nem jelennek meg.
 - Ha a társnak nincs helyzet-megélése (V11·c), a charcoal pont és a 3. blokk elmarad. Egy értéknél legalább 2 helyzet-megélés kell a „helyzeteidben” jelhez: egy helyzet még nem mintázat.
 - Ha a többiek száma a küszöb alatt van, a zöld vonás és a 4. blokk elmarad.
-- Az Útravalót csak az kapja, aki kitöltötte a T4-et, és nem vonta vissza a hozzájárulását. A többiek e-mailt sem kapnak.
+- Az Útravalót csak az kapja, aki kitöltötte a T4-et, nem vonta vissza a hozzájárulását, és a publikáláskor aktív tag (02). A többiek e-mailt sem kapnak.
 - **Meddig érhető el:** amíg a diagnózis publikált, időkorlát nélkül. Ha a társ tagsága vagy a szervezet inaktív lesz (02), sem a lapot, sem a PDF-et nem éri el. Ha a diagnózist visszavonják (21.5), az Útravaló is eltűnik az újrapublikálásig.
 - A társ T5 kezdőlapján (25) a publikálástól az Útravaló sor él, és ide visz.
 - A blokkok kiválasztása automatikus. Az admin a publikálás előtt az előnézetben látja őket (21.1).

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Enums\MainDiagnosisStage;
+use App\Enums\ParticipantRole;
 use App\Http\Controllers\Controller;
 use App\Models\MainDiagnosis;
 use App\Models\Organization;
@@ -23,14 +24,18 @@ class HomeController extends Controller
     public function __invoke(Request $request, Organization $organization, LandingResolver $landing, HomePreview $preview): View|RedirectResponse
     {
         $user = $request->user();
+        $home = $landing->diagnosisFor($user, $organization);
+        // "Nem most" on T1 (25 · 25.2): the peer stays here; the invitation waits for its link or the next login.
+        $later = $home !== null && $request->boolean('kesobb') && $home->participantFor($user, ParticipantRole::Peer)?->started_at === null ? $home : null;
 
-        if ($home = $landing->diagnosisFor($user, $organization)) {
+        if ($home !== null && $later === null) {
             return redirect()->route('client.diagnosis.show', [$organization, $home->diagnosis]);
         }
 
         return view('client.home', [
             'organization' => $organization,
             'user' => $user,
+            'later' => $later,
             'lead' => $this->lead($organization, $user),
             'preview' => $preview->for($organization, $user),
         ]);

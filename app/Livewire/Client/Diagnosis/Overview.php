@@ -21,6 +21,8 @@ use App\Services\Audit\AuditLogger;
 use App\Services\Capabilities\CapabilityOverview;
 use App\Services\Capabilities\CapabilityStoryService;
 use App\Services\Diagnoses\ThresholdPolicy;
+use App\Services\Inbox\InboxScanner;
+use App\Services\Inbox\InboxService;
 use App\Services\MainDiagnoses\DiagnosisRunService;
 use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\MainDiagnoses\StepList;
@@ -100,6 +102,7 @@ class Overview extends Component
             }
 
             $participant->update(['started_at' => now()]);
+            app(InboxService::class)->closeAutomatically(InboxScanner::notStartedKey($participant->id));
         });
 
         // T2 has its own header (peerWelcomeHeader); a Livewire update would keep the one of T1.

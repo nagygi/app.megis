@@ -16,6 +16,7 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
 - **Új társ futás közben:** ha az admin a futás alatt új embert rendel a csapathoz, ő azonnal megkapja a meghívót, az olvasat indításáig.
 - **Újraküldés:** az admin a Beérkező (22) „Új meghívó” gombjával küldhet újat. A Futás lapon (19) emlékeztető küldhető.
 - **Ha nem nyitja meg:** 5 nap után sor jelenik meg a Beérkezőben (22), 14 nap után lejárt meghívóként. Automatikus emlékeztető nincs ([NM-20](../backlog_nem_MVP/NM-20-automatikus-emlekeztetok.md)).
+- **Ha megnyitja, de nem kezdi el** (például a „Nem most” után): 5 nap után ez is sor a Beérkezőben: „{név} (társ) {n} napja megnyitotta a meghívót, de nem kezdte el.” A Futás lapon (19) az állapota „megnyitotta, nem kezdte el”. A sor magától lezárul, amikor elkezdi.
 - A link (14 · B2) után a T1 lap nyílik.
 
 ### 25.2 A meghívó lapja és a hozzájárulás (T1)
@@ -28,14 +29,14 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
 - Rögzítjük, ki, mikor és melyik szövegváltozatot fogadta el.
 - **Gombok:**
   - „Kezdem” → T2;
-  - „Nem most”: a meghívó megmarad, a társ a linkről vagy belépéskor folytathatja.
+  - „Nem most”: a meghívó megmarad, a társ a linkről vagy belépéskor folytathatja. A kezdőlapra visz, amely ilyenkor nem dob vissza a T1-re: „Rendben, később. … bármikor folytathatod innen, vagy a meghívó linkjéről.” és „Folytatom”.
 
 ### 25.3 Mi vár rád (T2)
 
 - „Két lépés most, egy, amíg fut. Kb. 5 perc.” Képességméréssel: „Három lépés most…”.
 - Lépések:
   - Saját értékek · 2 perc (24);
-  - A megélésed · 2–3 perc (25.4);
+  - A megélésed · 3 perc (25.4). A percek a konfigurációból jönnek (23 · 23.1);
   - Képességek · 3 perc, egy szöveg friss helyzetekről (leírva, elmondva vagy feltöltve), csak ha a képességmérés be van kapcsolva (NM-12, 1.32). A vezető csak a számát látja;
   - Hozzáteszel · amíg fut, egy-egy helyzet (12).
 - **Gombok:** „Kezdjük”, és „Bővebben” a Bölcsességtárba (BT6, 32).
@@ -69,7 +70,7 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
   - az adatai kikerülnek a diagnózisból, és az olvasat sorai újraszámolódnak (18.6, 20);
   - a kitöltése lezárul, Útravalót nem kap;
   - a vezető csak a számot látja: „5 társ · 4 kitöltötte”, név és magyarázat nélkül.
-- **Inaktivált társ** (02, a futás alatt): ez nem visszavonás. A beküldött adatai a diagnózisban maradnak, de új anyagot nem küldhet, mert a szervezet lapjai aktív tagságot kérnek.
+- **Inaktivált társ** (02, a futás alatt): ez nem visszavonás. A beküldött adatai a diagnózisban maradnak, de új anyagot nem küldhet, mert a szervezet lapjai aktív tagságot kérnek. Ha a publikáláskor is inaktív, Útravalót és e-mailt sem kap (29 · 29.2), mert megnyitni sem tudná. A Beérkező nem vár rá (22).
 
 ### 25.7 Több diagnózis, több szerep
 
@@ -90,8 +91,3 @@ Egy ember lehet az egyik diagnózisban vezető, egy másikban társ, vagy két c
 - A társ meghívása a vezetőtől (V8): [NM-16](../backlog_nem_MVP/NM-16-tarsak-meghivasa-vezetotol.md).
 - Az Útravaló: 29.
 - A Coach sora a T5-ön: [NM-18](../backlog_nem_MVP/NM-18-coach.md).
-
-## Hátravan
-
-- **„Nem most” után:** a Futás lapon (19) nincs „meghívva, nem kezdte el” állapot, csak meghívva, belépett és kitöltötte. Az 5 napos Beérkező-sor (22) csak a meg nem nyitott meghívónál jön, így arról, aki megnyitotta a T1-et és a „Nem most”-ot nyomta, nem jön sor.
-- **Inaktivált társ Útravalója:** az inaktivált társnak is készül Útravaló, és a publikáláskor e-mailt kap róla. Megnyitni már nem tudja, mert a tagsága inaktív.
