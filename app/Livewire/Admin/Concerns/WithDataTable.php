@@ -89,10 +89,27 @@ trait WithDataTable
     protected function applySorting(Builder $query): Builder
     {
         [$field, $direction] = $this->currentSort();
+        $column = $this->sortableColumns()[$field];
+
+        // Databases disagree on where NULL sorts; an explicit "is null" key keeps it portable.
+        if (is_string($column) && in_array($field, $this->sortableColumnsWithEmptyLast(), true)) {
+            $query->orderByRaw($query->getQuery()->getGrammar()->wrap($column).' is null');
+        }
 
         return $query
-            ->orderBy($this->sortableColumns()[$field], $direction)
+            ->orderBy($column, $direction)
             ->orderBy($query->getModel()->getQualifiedKeyName());
+    }
+
+    /**
+     * Sortable column keys whose empty rows stay at the end in both directions,
+     * e.g. a date that shows "még nem".
+     *
+     * @return list<string>
+     */
+    protected function sortableColumnsWithEmptyLast(): array
+    {
+        return [];
     }
 
     protected function filter(string $key): ?string

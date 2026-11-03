@@ -93,8 +93,16 @@ class Index extends Component
         ];
     }
 
+    protected function sortableColumnsWithEmptyLast(): array
+    {
+        return ['last_activity'];
+    }
+
+    /**
+     * The most recently active first; where nobody has worked yet, at the end (02 · 2.2).
+     */
     protected function defaultSort(): array
     {
-        return ['name', 'asc'];
+        return ['last_activity', 'desc'];
     }
 }

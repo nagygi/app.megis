@@ -2,6 +2,16 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.67 · {hash} · 2026-11-03
+
+Admin, *Szervezetek* lista: alapból az utolsó aktivitás szerint rendez, a legfrissebb elöl (02 · 2.2).
+
+- **Eddig (1.66):** név szerint, A–Z.
+- **Most:**
+  - **Alapból:** a legutóbb aktív szervezet áll felül.
+  - **„Még nem” sorok:** azok a szervezetek, ahol még senki nem dolgozott, mindig a lista végén vannak, a fordított irányban is.
+  - A többi oszlop szerint ugyanúgy lehet rendezni, mint eddig.
+
 ## 1.66 · 6a96bc8 · 2026-11-03
 
 Admin, *Szervezetek* lista: két új, rendezhető oszlop, a *Felvitel ideje* és az *Utolsó aktivitás* (02 · 2.2).
