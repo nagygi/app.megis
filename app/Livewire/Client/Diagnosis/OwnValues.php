@@ -5,9 +5,9 @@ namespace App\Livewire\Client\Diagnosis;
 use App\Enums\DiagnosisStep;
 use App\Enums\MainDiagnosisSubject;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
+use App\Livewire\Mirror\Record;
 use App\Models\Diagnosis;
 use App\Models\Organization;
-use App\Models\PersonalValueSet;
 use App\Models\PersonalValueSetItem;
 use App\Models\Value;
 use App\Services\Mirror\MirrorService;
@@ -66,7 +66,7 @@ class OwnValues extends Component
         // After publishing the step shows the list frozen with the report (21 · 21.3, 30 · 30.3).
         $this->items = $frozen !== null && ! $this->main()->ownValuesEditable()
             ? array_map(fn (array $value) => $this->frozenItem($value), $frozen)
-            : $this->itemsOf($sets->forUser($this->user()));
+            : $sets->items($sets->forUser($this->user()));
         $requested = (string) request()->query('lap', '');
         $this->screen = match (true) {
             $requested === self::PAGES['add'] => 'add',
@@ -111,12 +111,9 @@ class OwnValues extends Component
             return;
         }
 
-        $room = max(0, (int) config('diagnosis.own_values.max') - count($this->items));
-        $this->items = [...$this->items, ...$sets->itemsFromMirror($mirror, array_values(array_filter(array_column($this->items, 'value_id'))), $room)];
-
-        $set = $sets->forUser($this->user());
-        $set->update(['imported_mirror_session_id' => $mirror->id]);
-        $this->persist($sets);
+        $sets->importMirror($this->main(), $this->user(), $mirror);
+        $this->items = $sets->items($sets->forUser($this->user()));
+        $this->dispatch('saved');
         $this->screen = 'list';
         $this->redirect($this->screenUrl('list'), navigate: false);
     }
@@ -280,7 +277,8 @@ class OwnValues extends Component
                 : collect(),
             'isIndividual' => $this->isIndividual(),
             'max' => (int) config('diagnosis.own_values.max'),
-            'recordUrl' => route('client.mirror.record', ['organization' => $this->organization, 'diagnozis' => $this->diagnosis->id]),
+            // "Elmondom": the mirror comes back here with its values (24 · 24.1).
+            'recordUrl' => route('client.mirror.record', ['organization' => $this->organization, 'diagnozis' => $this->diagnosis->id, Record::OWN_VALUES_PARAMETER => 1]),
             'canRecord' => ! $this->isImpersonating(),
         ])->layout('layouts::client', $this->screenLayout())->title(DiagnosisStep::OwnValues->label());
     }
@@ -340,28 +338,8 @@ class OwnValues extends Component
             $sets->syncOrganization($set, $this->organization, recordVersion: false);
         }
 
-        $this->items = $this->itemsOf($set->refresh());
+        $this->items = $sets->items($set->refresh());
         $this->dispatch('saved');
-    }
-
-    /**
-     * @return list<array<string, mixed>>
-     */
-    private function itemsOf(PersonalValueSet $set): array
-    {
-        return $set->items()->get()->map(fn (PersonalValueSetItem $item) => [
-            'key' => $item->key,
-            'value_id' => $item->value_id,
-            'source_version_id' => $item->source_version_id,
-            'name' => $item->name,
-            'meaning' => (string) $item->meaning,
-            'non_meaning' => (string) $item->non_meaning,
-            'low_example' => (string) $item->low_example,
-            'high_example' => (string) $item->high_example,
-            'example' => (string) $item->example,
-            'source' => $item->source,
-            'quotes' => $item->quotes,
-        ])->all();
     }
 
     /**

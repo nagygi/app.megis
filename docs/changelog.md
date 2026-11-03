@@ -2,6 +2,17 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.78 · {hash} · 2026-11-03
+
+Saját értékek (24 · 24.1): az „Elmondom” után a tükör értékei visszajönnek a listába.
+
+- **Eddig:** a V2 „Elmondom” gombja a tükörre vitt, a „Kész” után vissza a saját értékekre, de a felismert értékek nem kerültek a listába. Csak a „Honnan hozod?” → „Az Értéktükörből hozom” úton, vagy az „Új tükröd van · Átnézem” sorral jöttek át, és ez a sor csak akkor látszott, ha a lista már egyszer tükörből jött.
+- **Most:**
+  - **„Elmondom” → „Kész”:** a tükör felismert értékei a listára kerülnek, legfeljebb 5-ig, a „nem az enyém” jelölésűek nélkül, és a V2·b nyílik meg: „A tükröd elkészült: az értékei bekerültek a saját értékeid közé. Ami nem a tiéd, vedd ki.” Magánszemélynél a szervezet értékei is követik.
+  - **Más tükör nem változtatja a listát** (24.5): a menüből vagy a „Hozzáteszel”-ből indított, a diagnózishoz kötött tükör a „Kész” után az Értéktárba visz, ahogy a diagnózis nélküli tükör. Eddig ezek is a saját értékekre dobtak, érték nélkül.
+  - **A V2·c „Elmondom”-ja** is a listára tér vissza, nem az űrlapba.
+  - **Ha közben** a diagnózis már nem fogad saját értéket (olvasat, publikálás), a lista nem változik.
+
 ## 1.77 · d574bca · 2026-11-03
 
 Értéktükör (biztonsági javítás, 17 · 17.4): a nyilvános tükör nem köthető diagnózishoz.

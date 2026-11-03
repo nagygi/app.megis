@@ -12,14 +12,18 @@ use App\Livewire\Client\Diagnosis\OrganizationValues;
 use App\Livewire\Client\Diagnosis\OwnValues;
 use App\Livewire\Client\Diagnosis\Processes;
 use App\Livewire\Client\Diagnosis\Visibility;
+use App\Livewire\Mirror\Record;
+use App\Livewire\Mirror\Result;
 use App\Mail\DiagnosisPeerInvitationMail;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisType;
+use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\Membership;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\PersonalValueSet;
+use App\Models\PersonalValueSetItem;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Value;
@@ -217,6 +221,62 @@ it('brings the values of the Értéktükör, leaving out "nem az enyém"', funct
         ->assertSee('inkább most mondom')
         ->assertSee('erősen jelen')
         ->assertDontSee('Humor');
+});
+
+/**
+ * A mirror told during the diagnosis, read by hand: one quote of the value.
+ */
+function tellMirror(array $setup, MainDiagnosis $main, Value $value, bool $forOwnValues): MirrorSession
+{
+    Livewire::withQueryParams(['diagnozis' => $main->diagnosis_id, ...($forOwnValues ? [Record::OWN_VALUES_PARAMETER => 1] : [])])
+        ->test(Record::class, ['organization' => $setup['organization']])
+        ->call('setMode', 'text')
+        ->set('text', str_repeat('A héten inkább most mondom, mint csütörtökön, hogy csúszunk. ', 2))
+        ->call('submitText')
+        ->assertHasNoErrors();
+
+    $session = MirrorSession::query()->latest('id')->firstOrFail();
+    $session->material->update(['status' => 'processed']);
+    $detection = $session->material->detections()->create(['speaker' => 'Beszélő 1', 'quote' => 'inkább most mondom', 'free_name' => 'Egyenesség', 'reasoning' => 'R']);
+    $detection->matches()->create(['value_id' => $value->id, 'confidence' => 0.9]);
+    $session->update(['status' => MirrorStatus::Ready]);
+
+    return $session->refresh();
+}
+
+it('brings the values of "Elmondom" back into the own values (24 · 24.1)', function () {
+    Queue::fake();
+    $setup = diagnosisTeam();
+    $main = startMainDiagnosis($setup);
+    confirmOwnValues($setup['leader']);
+    $value = app(ValueService::class)->create(['name' => 'Egyenesség', 'meanings' => ['Kimondom.']]);
+    actingAsCustomer($setup['leader']);
+    $session = tellMirror($setup, $main, $value, forOwnValues: true);
+
+    Livewire::test(Result::class, ['session' => $session, 'organization' => $setup['organization']])
+        ->call('finish')
+        ->assertRedirect(route('client.diagnosis.sajat-ertekek', leaderParams($setup, $main)));
+
+    $set = PersonalValueSet::query()->where('user_id', $setup['leader']->id)->sole();
+    expect($set->items()->count())->toBe(2)
+        ->and($set->items()->where('value_id', $value->id)->sole()->source)->toBe(PersonalValueSetItem::SOURCE_MIRROR)
+        ->and($set->imported_mirror_session_id)->toBe($session->id);
+});
+
+it('leaves the own values alone after a mirror from the menu (24 · 24.5)', function () {
+    Queue::fake();
+    $setup = diagnosisTeam();
+    $main = startMainDiagnosis($setup);
+    confirmOwnValues($setup['leader']);
+    $value = app(ValueService::class)->create(['name' => 'Egyenesség', 'meanings' => ['Kimondom.']]);
+    actingAsCustomer($setup['leader']);
+    $session = tellMirror($setup, $main, $value, forOwnValues: false);
+
+    Livewire::test(Result::class, ['session' => $session, 'organization' => $setup['organization']])
+        ->call('finish')
+        ->assertRedirect(route('client.values', $setup['organization']));
+
+    expect(PersonalValueSet::query()->where('user_id', $setup['leader']->id)->sole()->items()->count())->toBe(1);
 });
 
 it('counts a public Értéktükör tied to the account in the state (24 · 24.4)', function () {

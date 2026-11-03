@@ -4,6 +4,7 @@ namespace App\Livewire\Mirror;
 
 use App\Enums\MirrorInsightStatus;
 use App\Livewire\Concerns\ChecksTurnstile;
+use App\Models\MainDiagnosis;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\User;
@@ -14,6 +15,7 @@ use App\Services\Auth\LoginOutcome;
 use App\Services\Mirror\MirrorInsightService;
 use App\Services\Mirror\MirrorService;
 use App\Services\Mirror\MirrorValueGroup;
+use App\Services\Values\PersonalValueSetService;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -249,16 +251,22 @@ class Result extends Component
 
     /**
      * Own menu: the ticked questions are kept, the diagnosis is already there (06 · 6.2).
+     * A mirror told with "Elmondom" goes back to the own values with its
+     * values (24 · 24.1); any other mirror leaves the list alone (24 · 24.5).
      */
-    public function finish(): void
+    public function finish(PersonalValueSetService $sets): void
     {
         $this->ensureOwner();
         $this->saveCuriosity();
 
         $parent = $this->session->material?->parent_diagnosis_id;
+        $forOwnValues = session()->pull(Record::OWN_VALUES_SESSION_KEY.'.'.$this->session->id);
+        $main = $parent !== null && $this->organization !== null && (int) $forOwnValues === $parent
+            ? MainDiagnosis::query()->where('diagnosis_id', $parent)->first()
+            : null;
 
-        // A mirror told for the own values goes back there with its values (24 · 24.1).
-        if ($parent !== null && $this->organization !== null) {
+        if ($main !== null) {
+            $sets->importMirror($main, auth('web')->user(), $this->session);
             session()->flash('status', __('mirror.back_to_diagnosis'));
             $this->redirect(route('client.diagnosis.sajat-ertekek', [$this->organization, $parent]), navigate: false);
 

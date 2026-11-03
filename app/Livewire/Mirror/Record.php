@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -40,7 +41,24 @@ class Record extends Component
     use ChecksTurnstile;
     use WithFileUploads;
 
+    /**
+     * The address parameter of "Elmondom" on the own values (24 · 24.1).
+     */
+    public const OWN_VALUES_PARAMETER = 'sajat-ertekek';
+
+    /**
+     * Mirror session id => diagnosis id of the mirrors told for the own values.
+     */
+    public const OWN_VALUES_SESSION_KEY = 'own_values_mirrors';
+
     public ?Organization $organization = null;
+
+    /**
+     * Started with "Elmondom" on the own values: its values go back to the
+     * list (24 · 24.1). Other mirrors leave the list alone (24 · 24.5).
+     */
+    #[Locked]
+    public bool $forOwnValues = false;
 
     public string $mode = 'record';
 
@@ -68,6 +86,7 @@ class Record extends Component
     public function mount(?Organization $organization = null): void
     {
         $this->organization = $organization?->exists ? $organization : null;
+        $this->forOwnValues = request()->boolean(self::OWN_VALUES_PARAMETER);
 
         $options = $this->diagnosisOptions();
 
@@ -230,6 +249,10 @@ class Record extends Component
 
         $session = $mirrors->start($material, $this->user(), $this->organization);
         session()->push('mirror_tokens', $session->token);
+
+        if ($this->forOwnValues && $this->organization !== null && $this->mainDiagnosisId !== null) {
+            session()->put(self::OWN_VALUES_SESSION_KEY.'.'.$session->id, $this->mainDiagnosisId);
+        }
 
         // The confirmation link goes out now; the mirror is read meanwhile (06 · 6.1).
         if ($this->organization === null) {

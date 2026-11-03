@@ -18,7 +18,7 @@ Kapcsolódik: 03, 06, 08, 17.
 - Kérdés: „Miben nem alkuszol, akkor sem, ha kényelmetlen?”
 - Három egyenrangú út, mindegyik ugyanabba a listába fut (24.2):
   - **„Az Értéktükörből hozom · {dátum}”:** csak akkor jelenik meg, ha volt tükre (06). Alatta: „{n} érték, idézetekkel · te döntöd el, mi marad.”
-  - **„Elmondom”:** egy helyzet a hétről, kb. 2 perc, a 06-os felvevővel. Ez egy Értéktükör (06 · 6.2), a diagnózis részdiagnózisa lesz (17.4). A végén a detektált értékekkel tér vissza ide.
+  - **„Elmondom”:** egy helyzet a hétről, kb. 2 perc, a 06-os felvevővel. Ez egy Értéktükör (06 · 6.2), a diagnózis részdiagnózisa lesz (17.4). A végén a detektált értékekkel tér vissza ide: a „Kész” után a tükör értékei a V2·b listájára kerülnek (legfeljebb 5-ig, a „nem az enyém” nélkül), és a lista ettől fogva ehhez a tükörhöz méri az „Új tükröd van” sort (24.5). Csak az innen indított tükör teszi ezt; a menüből vagy a „Hozzáteszel”-ből indított tükör nem változtatja a listát.
   - **„Hozzáadom vagy kiválasztom”:** a 24.3.
 
 ### 24.2 A lista (V2·b)
@@ -38,7 +38,7 @@ Kapcsolódik: 03, 06, 08, 17.
 
 ### 24.3 Érték hozzáadása (V2·c)
 
-- **Felül két út:** „Elmondom” (a 06-os felvevő) és „Az Értéktárból választom” (03, aktív és átnézett értékek). Mindkettő kitöltve érkezik ide. Az alap út a beírás.
+- **Felül két út:** „Elmondom” (a 06-os felvevő) és „Az Értéktárból választom” (03, aktív és átnézett értékek). Az Értéktárból választott érték kitöltve érkezik ide; az „Elmondom” tükre a felismert értékekkel a listára tér vissza (24.1). Az alap út a beírás.
 - **Mezők:**
   - Érték (név);
   - Mit jelent számodra?;

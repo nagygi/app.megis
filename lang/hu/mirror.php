@@ -162,7 +162,7 @@ return [
     // 17 · 17.6: a mirror from the own menu belongs to a running diagnosis.
     'which_diagnosis' => 'Melyik diagnózishoz tartozzon?',
     'which_diagnosis_required' => 'Válaszd ki, melyik diagnózishoz tartozzon.',
-    'back_to_diagnosis' => 'A tükröd elkészült: az új értékeidet a saját értékeid között nézheted át.',
+    'back_to_diagnosis' => 'A tükröd elkészült: az értékei bekerültek a saját értékeid közé. Ami nem a tiéd, vedd ki.',
 
     // 06 · 6.2: the earlier mirrors on the own menu's Értéktükör page.
     'previous_mirrors' => 'Korábbi tükreid',

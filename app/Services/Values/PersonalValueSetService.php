@@ -2,9 +2,11 @@
 
 namespace App\Services\Values;
 
+use App\Enums\MainDiagnosisSubject;
 use App\Enums\MaterialContext;
 use App\Enums\MaterialStatus;
 use App\Enums\MirrorStatus;
+use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\MirrorSession;
 use App\Models\Organization;
@@ -42,6 +44,52 @@ class PersonalValueSetService
     public function forUser(User $user): PersonalValueSet
     {
         return PersonalValueSet::query()->firstOrCreate(['user_id' => $user->id]);
+    }
+
+    /**
+     * The list as the own-values step edits it (24 · 24.2).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function items(PersonalValueSet $set): array
+    {
+        return $set->items()->get()->map(fn (PersonalValueSetItem $item) => [
+            'key' => $item->key,
+            'value_id' => $item->value_id,
+            'source_version_id' => $item->source_version_id,
+            'name' => $item->name,
+            'meaning' => (string) $item->meaning,
+            'non_meaning' => (string) $item->non_meaning,
+            'low_example' => (string) $item->low_example,
+            'high_example' => (string) $item->high_example,
+            'example' => (string) $item->example,
+            'source' => $item->source,
+            'quotes' => $item->quotes,
+        ])->all();
+    }
+
+    /**
+     * The values of a mirror added to the user's list, up to the maximum:
+     * "Az Értéktükörből hozom", "Átnézem" and the end of "Elmondom"
+     * (24 · 24.1, 24.5). Nothing changes once the diagnosis takes no own
+     * values (21 · 21.3); a private person's organization values follow the list (08).
+     */
+    public function importMirror(MainDiagnosis $main, User $user, MirrorSession $mirror): void
+    {
+        if (! $main->ownValuesEditable()) {
+            return;
+        }
+
+        $set = $this->forUser($user);
+        $items = $this->items($set);
+        $room = max(0, (int) config('diagnosis.own_values.max') - count($items));
+
+        $this->save($set, [...$items, ...$this->itemsFromMirror($mirror, array_values(array_filter(array_column($items, 'value_id'))), $room)], recordVersion: false);
+        $set->update(['imported_mirror_session_id' => $mirror->id]);
+
+        if ($main->subject === MainDiagnosisSubject::Individual && $main->isLeader($user)) {
+            $this->syncOrganization($set->refresh(), $main->diagnosis->organization, recordVersion: false);
+        }
     }
 
     /**
