@@ -6,12 +6,7 @@
     />
 
     <x-ui.card as="form" bordered padding="lg" wire:submit="save" class="flex flex-col gap-5 *:max-w-3xl">
-        @if ($isEditing)
-            <div class="flex flex-col gap-1.5">
-                <span class="text-sm font-medium">{{ __('admin.organizations.type') }}</span>
-                <span>{{ $organization->type->label() }}</span>
-            </div>
-        @else
+        @unless ($isEditing)
             <x-form.radio-group
                 name="type"
                 wire:model.live="type"
@@ -21,7 +16,7 @@
                 required
                 inline
             />
-        @endif
+        @endunless
 
         <x-form.input name="name" wire:model.live.debounce.400ms="name" :label="__('admin.organizations.name')" required />
 

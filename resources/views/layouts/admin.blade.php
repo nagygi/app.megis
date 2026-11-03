@@ -86,6 +86,7 @@
                             <a href="{{ $crumbs['header'][0]['url'] }}" class="shrink-0 no-underline hover:underline">{{ $crumbs['header'][0]['label'] }}</a>
                             <span class="flex shrink-0 opacity-60"><x-megis.icon name="chevron-right" /></span>
                             <span class="truncate font-semibold">{{ $organization->name }}</span>
+                            <x-ui.badge tone="green" class="shrink-0">{{ $organization->type->label() }}</x-ui.badge>
                         </p>
                     @else
                         <p class="min-w-0 flex-1 truncate text-lg font-semibold">{{ $location->area ?? $title }}</p>
