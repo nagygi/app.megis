@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.80 · {hash} · 2026-11-03
+## 1.80 · 28632e9 · 2026-11-03
 
 „Belépek a nevében” (14 · 14.6, 33 · 33.6): a lapokon végzett munka is a naplóba kerül, a gombok és az elhagyáskor mentett mezők is.
 
