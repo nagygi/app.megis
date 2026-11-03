@@ -6,6 +6,7 @@ use App\Livewire\Client\Profile;
 use App\Livewire\Client\ValueLibrary;
 use App\Mail\AccountDeletedMail;
 use App\Mail\DiagnosisNoticeMail;
+use App\Mail\PasswordConfirmationCodeMail;
 use App\Models\AuditEvent;
 use App\Models\EvidenceTrace;
 use App\Models\Material;
@@ -98,6 +99,32 @@ it('deletes the account with the password and purges the data within a day (31 �
         // The published report gets a correction without the quotes.
         ->and(ReportSnapshot::query()->latest('sequence')->first()->reason)->toBe(ReportSnapshot::CORRECTION);
     Mail::assertQueued(AccountDeletedMail::class, fn ($mail) => $mail->hasTo($email));
+});
+
+it('deletes a password account with a fresh code instead of the forgotten password (31 · 31.7)', function () {
+    Mail::fake();
+    $user = customerOf();
+    $user->forceFill(['password' => 'helyes-jelszo-123'])->save();
+    actingAsCustomer($user);
+
+    $component = Livewire::test(Profile::class, ['organization' => $user->accessibleOrganizations()->first()])
+        ->set('confirmingDeletion', true)
+        ->assertSee('Elfelejtetted? Kódot kérek helyette')
+        ->call('sendDeletionCode');
+
+    $code = null;
+    Mail::assertQueued(PasswordConfirmationCodeMail::class, function (PasswordConfirmationCodeMail $mail) use (&$code) {
+        $code = $mail->code;
+
+        return $mail->purpose === PasswordConfirmationCodeMail::FOR_DELETION
+            && str_contains($mail->render(), 'A fiókod törléséhez ezt a kódot írd be:');
+    });
+
+    $component->set('deletionCode', $code)
+        ->call('deleteAccount')
+        ->assertRedirect(route('client.login'));
+
+    expect($user->refresh()->deletion_requested_at)->not->toBeNull();
 });
 
 it('keeps the deletion out of the user\'s name (14 · 14.6)', function () {

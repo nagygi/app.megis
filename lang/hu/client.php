@@ -130,6 +130,7 @@ return [
         'password_lead_change' => 'A jelszavad cseréjéhez add meg a jelenlegit.',
         'password_lead_set' => 'Még nincs jelszavad, kóddal lépsz be. Ha jelszót állítasz be, egy e-mailben kapott kóddal erősítsd meg.',
         'send_code' => 'Kódot kérek',
+        'forgot_password' => 'Elfelejtetted? Kódot kérek helyette',
         'code_sent' => 'Elküldtük a kódot ide: :email',
         'code' => 'Megerősítő kód',
         'code_invalid' => 'Hibás vagy lejárt kód.',

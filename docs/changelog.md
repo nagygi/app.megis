@@ -2,6 +2,17 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.79 · {hash} · 2026-11-03
+
+Profil (14 · 14.3, 31 · 31.1, 31.7): aki elfelejtette a jelszavát, friss kóddal állíthat újat, és kóddal törölheti a fiókját.
+
+- **Eddig:** a jelszavas fiók a Profilban csak a jelenlegi jelszóval cserélhetett jelszót, és csak azzal erősíthette meg a fióktörlést. Aki elfelejtette a jelszavát, kóddal belépett, de új jelszót nem tudott beállítani, pedig a jegy éppen ezt írja helyette.
+- **Most:**
+  - **Jelszó:** a jelenlegi jelszó alatt „Elfelejtetted? Kódot kérek helyette”. A kód e-mailben jön, és a jelenlegi jelszó helyére lép; utána ugyanúgy megy, mint eddig: új jelszó kétszer, a többi eszközön kiléptetünk, értesítő e-mail.
+  - **Adataim törlése:** ugyanez a link a jelszó mező alatt, a kóddal is véglegesen törölhető a fiók.
+  - **A megerősítő levél** a törlésnél már a törlésről szól: „A fiókod törléséhez ezt a kódot írd be:”. Eddig a jelszó nélküli fióknál is a jelszó beállítását írta.
+  - **„Belépek a nevében”:** kódot továbbra sem lehet kérni.
+
 ## 1.78 · dd574ef · 2026-11-03
 
 Saját értékek (24 · 24.1): az „Elmondom” után a tükör értékei visszajönnek a listába.

@@ -70,7 +70,7 @@ Ha nincs teendő, a blokk nem jelenik meg.
 
 - **Megerősítés:**
   - egy lap leírja, mi törlődik és mi marad (lásd lent);
-  - a felhasználó a jelszavával vagy egy frissen kért kóddal erősít meg (14 · 14.3).
+  - a felhasználó a jelszavával vagy egy frissen kért kóddal erősít meg (14 · 14.3). Jelszavas fióknál is kérhet kódot („Elfelejtetted? Kódot kérek helyette”); a levél ilyenkor a törlésről szól: „A fiókod törléséhez ezt a kódot írd be:”.
 - **Mi törlődik:** a fiók és minden személyes adat: felvételek, átiratok, saját értékek, megélések, Értéktükrök.
 - **Mi marad:** a publikált diagnózisok összesített számai (átlagok). A szó szerinti idézetei kikerülnek a riportból, és a fejezeten „frissítve” jelzés áll (21.4). Az összesített szám már nem személyes adat, az idézet viszont az lehet.
 - **Vezető és magánszemély:**

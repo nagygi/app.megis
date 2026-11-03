@@ -85,6 +85,37 @@ it('sets a first password confirmed by an e-mailed code', function () {
         ->and($customer->tokens()->where('purpose', TokenPurpose::PasswordConfirmationCode)->sole()->consumed_at)->not->toBeNull();
 });
 
+it('lets a password user set a new password with a fresh code instead of the forgotten one (14 · 14.3)', function () {
+    fakeTurnstile();
+    Mail::fake();
+    $organization = Organization::factory()->create();
+    $customer = customerOf($organization);
+    $customer->forceFill(['password' => Hash::make('regi-jelszo')])->save();
+    actingAsCustomer($customer);
+
+    $component = Livewire::test(Profile::class, ['organization' => $organization])
+        ->assertSee('Elfelejtetted? Kódot kérek helyette')
+        ->call('sendCode');
+
+    $code = null;
+    Mail::assertQueued(PasswordConfirmationCodeMail::class, function (PasswordConfirmationCodeMail $mail) use (&$code) {
+        $code = $mail->code;
+
+        return $mail->purpose === PasswordConfirmationCodeMail::FOR_PASSWORD;
+    });
+
+    $component->set('code', '000000')
+        ->set('password', 'uj-jelszo-1')
+        ->set('password_confirmation', 'uj-jelszo-1')
+        ->call('savePassword')
+        ->assertHasErrors(['code' => 'Hibás vagy lejárt kód.'])
+        ->set('code', $code)
+        ->call('savePassword')
+        ->assertHasNoErrors();
+
+    expect(Hash::check('uj-jelszo-1', $customer->fresh()->password))->toBeTrue();
+});
+
 it('rejects a wrong confirmation code', function () {
     fakeTurnstile();
     Mail::fake();

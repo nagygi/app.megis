@@ -76,9 +76,14 @@
             @endif
 
             <form wire:submit="savePassword" class="flex flex-col gap-5">
-                @if ($hasPassword)
+                @if ($hasPassword && $codeSent)
+                    <p class="text-sm text-grey-700" role="status">{{ __('client.profile.code_sent', ['email' => $user->email]) }}</p>
+                    <x-form.input name="code" wire:model="code" :label="__('client.profile.code')" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" class="max-w-48 tracking-[0.3em] tabular-nums" required />
+                @elseif ($hasPassword)
                     <p>{{ __('client.profile.password_lead_change') }}</p>
                     <x-form.input name="current_password" type="password" wire:model="current_password" :label="__('auth_ui.current_password')" autocomplete="current-password" required />
+                    {{-- A forgotten password: a fresh code instead of it (14 · 14.3). --}}
+                    <x-ui.button tone="ghost" size="sm" class="-ml-1.5 self-start" wire:click="sendCode">{{ __('client.profile.forgot_password') }}</x-ui.button>
                 @else
                     <p>{{ __('client.profile.password_lead_set') }}</p>
                     @if ($codeSent)
@@ -213,8 +218,9 @@
                     </div>
                 </x-ui.notice>
                 <form wire:submit="deleteAccount" class="flex flex-col gap-3">
-                    @if ($hasPassword)
+                    @if ($hasPassword && ! $deletionCodeSent)
                         <x-form.input name="deletionPassword" type="password" wire:model="deletionPassword" :label="__('client.profile.current_password')" autocomplete="current-password" required />
+                        <x-ui.button tone="ghost" size="sm" class="-ml-1.5 self-start" wire:click="sendDeletionCode">{{ __('client.profile.forgot_password') }}</x-ui.button>
                     @else
                         @if ($deletionCodeSent)
                             <x-form.input name="deletionCode" wire:model="deletionCode" :label="__('client.profile.code')" autocomplete="one-time-code" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" class="max-w-48 tracking-[0.3em] tabular-nums" required />

@@ -11,15 +11,21 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * Code that confirms setting a password without knowing the old one (14 · 14.3).
+ * Code that confirms setting a password without knowing the old one
+ * (14 · 14.3), or deleting the account (31 · 31.7).
  */
 class PasswordConfirmationCodeMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    public const FOR_PASSWORD = 'password';
+
+    public const FOR_DELETION = 'deletion';
+
     public function __construct(
         public User $user,
         public string $code,
+        public string $purpose = self::FOR_PASSWORD,
     ) {
         $this->afterCommit();
     }
@@ -31,6 +37,6 @@ class PasswordConfirmationCodeMail extends Mailable implements ShouldQueue
 
     public function content(): Content
     {
-        return new Content(markdown: 'mail.password-confirmation-code');
+        return new Content(markdown: 'mail.password-confirmation-code', with: ['body' => __('mail.password_confirmation_code.body_'.$this->purpose)]);
     }
 }

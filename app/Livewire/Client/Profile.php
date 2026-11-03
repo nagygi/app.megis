@@ -97,7 +97,8 @@ class Profile extends Component
     }
 
     /**
-     * Without a password, a fresh code confirms that it is really the owner (14 · 14.3).
+     * Without a password, or with a forgotten one, a fresh code confirms that
+     * it is really the owner (14 · 14.3). Once sent, it replaces the current password.
      */
     public function sendCode(TokenService $tokens, ImpersonationService $impersonation): void
     {
@@ -115,15 +116,15 @@ class Profile extends Component
         abort_if($impersonation->isImpersonating(), 403, __('impersonation.forbidden'));
 
         $user = auth()->user();
-        $hasPassword = $user->password !== null;
+        $byCode = $user->password === null || $this->codeSent;
 
         $this->validate([
-            'current_password' => $hasPassword ? ['required', 'string', 'current_password:'.GuardSession::WEB] : [],
-            'code' => $hasPassword ? [] : ['required', 'string'],
+            'current_password' => $byCode ? [] : ['required', 'string', 'current_password:'.GuardSession::WEB],
+            'code' => $byCode ? ['required', 'string'] : [],
             'password' => ['required', 'string', 'confirmed', PasswordRules::rule()],
         ]);
 
-        if (! $hasPassword) {
+        if ($byCode) {
             $token = $tokens->pendingFor($user, TokenPurpose::PasswordConfirmationCode);
 
             if ($token === null || ! $tokens->checkCode($token, $this->code)) {
@@ -208,7 +209,7 @@ class Profile extends Component
         $user = auth()->user();
         $issued = $tokens->issue($user, TokenPurpose::PasswordConfirmationCode);
 
-        Mail::to($user->email)->queue(new PasswordConfirmationCodeMail($user, (string) $issued->plainCode));
+        Mail::to($user->email)->queue(new PasswordConfirmationCodeMail($user, (string) $issued->plainCode, PasswordConfirmationCodeMail::FOR_DELETION));
         $this->deletionCodeSent = true;
     }
 
@@ -221,14 +222,15 @@ class Profile extends Component
         abort_if($impersonation->isImpersonating(), 403, __('impersonation.forbidden'));
 
         $user = auth()->user();
-        $hasPassword = $user->password !== null;
+        // A forgotten password can be replaced by a fresh code here too (31 · 31.7).
+        $byCode = $user->password === null || $this->deletionCodeSent;
 
         $this->validate([
-            'deletionPassword' => $hasPassword ? ['required', 'string', 'current_password:'.GuardSession::WEB] : [],
-            'deletionCode' => $hasPassword ? [] : ['required', 'string'],
+            'deletionPassword' => $byCode ? [] : ['required', 'string', 'current_password:'.GuardSession::WEB],
+            'deletionCode' => $byCode ? ['required', 'string'] : [],
         ], attributes: ['deletionPassword' => __('client.profile.current_password'), 'deletionCode' => __('client.profile.code')]);
 
-        if (! $hasPassword) {
+        if ($byCode) {
             $token = $tokens->pendingFor($user, TokenPurpose::PasswordConfirmationCode);
 
             if ($token === null || ! $tokens->checkCode($token, $this->deletionCode)) {

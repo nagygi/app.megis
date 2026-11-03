@@ -66,7 +66,8 @@ return [
 
     'password_confirmation_code' => [
         'subject' => 'Megerősítő kód: :code',
-        'body' => 'A jelszó beállításához ezt a kódot írd be:',
+        'body_password' => 'A jelszó beállításához ezt a kódot írd be:',
+        'body_deletion' => 'A fiókod törléséhez ezt a kódot írd be:',
         'validity' => 'A kód 15 percig él. Ha nem te kérted, hagyd figyelmen kívül.',
     ],
 

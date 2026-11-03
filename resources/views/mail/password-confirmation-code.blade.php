@@ -1,5 +1,5 @@
 <x-mail::message>
-{{ __('mail.password_confirmation_code.body') }}
+{{ $body }}
 
 <x-mail::panel>
 **{{ $code }}**

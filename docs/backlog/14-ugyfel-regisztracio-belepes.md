@@ -67,7 +67,7 @@ Az admin belépése külön működik: 01.
 - Szabály: legalább 8 karakter, és ismert kiszivárgott jelszó nem használható. A szabályt az űrlap kiírja.
 - Beállítás és csere a Profilban (M6, 31):
   - Ha már van jelszava, a jelenlegi jelszót kéri.
-  - Ha nincs jelszava, vagy elfelejtette, egy frissen kért kóddal erősíti meg.
+  - Ha nincs jelszava, vagy elfelejtette, egy frissen kért kóddal erősíti meg. Jelszavas fióknál a jelenlegi jelszó alatt: „Elfelejtetted? Kódot kérek helyette”; a kód ezután a jelenlegi jelszó helyére lép.
 - Külön „Elfelejtett jelszó” folyamat nincs. Aki elfelejtette, kóddal lép be, és a Profilban új jelszót állít.
 - Jelszócseréről e-mail értesítés megy.
 
