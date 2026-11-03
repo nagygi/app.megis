@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.69 · {hash} · 2026-11-03
+## 1.69 · c88e8db · 2026-11-03
 
 A visszaaktivált tag a csapata diagnózisának társa lesz (02 · 2.5, 17 · 17.2).
 
