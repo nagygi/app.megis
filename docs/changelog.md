@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.70 · {hash} · 2026-11-03
+## 1.70 · 452baa4 · 2026-11-03
 
 Folyamat-diagnózis (13): a számítás és az admin oldal a jegy szerint.
 
