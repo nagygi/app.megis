@@ -7,13 +7,14 @@ use Illuminate\Contracts\JsonSchema\JsonSchema;
 
 /**
  * Step C: "nincs adat" or 1–6 per matched value, with quote references (06 · 6.4).
+ * The situation names the process of an occasion's material (13 · 13.2).
  */
 final readonly class ScoreValuesTask implements AiTask
 {
     /**
      * @param  list<array{id: string, speaker: ?string, quote: string, values: list<string>}>  $quotes
      */
-    public function __construct(private string $values, private array $quotes) {}
+    public function __construct(private string $values, private array $quotes, private string $situation = '') {}
 
     public function key(): string
     {
@@ -22,7 +23,7 @@ final readonly class ScoreValuesTask implements AiTask
 
     public function variables(): array
     {
-        return ['values' => $this->values];
+        return ['values' => $this->values, 'context' => $this->situation];
     }
 
     public function input(): string

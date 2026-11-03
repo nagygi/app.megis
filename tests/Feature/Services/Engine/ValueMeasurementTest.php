@@ -108,14 +108,14 @@ it('reads a mirror in three steps and keeps every result with its AI call', func
     expect($session->fresh()->status)->toBe(MirrorStatus::Ready)
         ->and($material->status)->toBe(MaterialStatus::Processed)
         ->and($material->detections()->count())->toBe(2)
-        ->and($material->detections()->first()->aiCall)->prompt->toBe('ertektukor-detektalas')->prompt_version->toBe(2)
+        ->and($material->detections()->first()->aiCall)->prompt->toBe('ertektukor-detektalas')->prompt_version->toBe(3)
         ->and($material->detections()->first()->matches()->pluck('value_id')->all())->toBe([$directness->id])
         ->and($material->scores()->sole())
         ->value_id->toBe($directness->id)
         ->state->toBe(ScoreResultState::Scored)
         ->score->toBe(5.0)
         ->and(AiCall::query()->pluck('task')->all())->toBe(['mirror_detection', 'mirror_matching', 'mirror_scoring'])
-        ->and(AiCall::query()->pluck('prompt_version', 'task')->all())->toBe(['mirror_detection' => 2, 'mirror_matching' => 3, 'mirror_scoring' => 2])
+        ->and(AiCall::query()->pluck('prompt_version', 'task')->all())->toBe(['mirror_detection' => 3, 'mirror_matching' => 3, 'mirror_scoring' => 3])
         ->and(AiCall::query()->first()->public_mirror)->toBeTrue();
 });
 

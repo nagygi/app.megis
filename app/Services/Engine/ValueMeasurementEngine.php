@@ -35,12 +35,37 @@ class ValueMeasurementEngine
      */
     public function analyze(Material $material, ValueCatalog $catalog, AiContext $context, array $speakers = [null]): void
     {
-        $this->detect($material, $context);
+        $situation = $this->situation($material);
+
+        $this->detect($material, $context, $situation);
         $this->match($material, $catalog, $context);
 
         foreach ($speakers as $speaker) {
-            $this->score($material, $speaker, $catalog, $context);
+            $this->score($material, $speaker, $catalog, $context, $situation);
         }
+    }
+
+    /**
+     * Where the material of an occasion comes from: the process, its rhythm
+     * and its parent (13 · 13.2). Detection and scoring read it to understand
+     * the situation, the matching does not. Empty for anything else, so a
+     * mirror reads as before.
+     */
+    public function situation(Material $material): string
+    {
+        $process = $material->occasion?->process;
+
+        if ($process === null) {
+            return '';
+        }
+
+        $rhythm = $process->rhythm_label ?? $process->rhythm?->label();
+
+        return __('materials.engine_situation', [
+            'process' => $process->name,
+            'rhythm' => filled($rhythm) ? __('materials.engine_situation_rhythm', ['rhythm' => $rhythm]) : '',
+            'parent' => $process->parent !== null ? __('materials.engine_situation_parent', ['parent' => $process->parent->name]) : '',
+        ]);
     }
 
     /**
@@ -69,15 +94,17 @@ class ValueMeasurementEngine
     /**
      * Step A: read the transcript in parts, keep every detection raw.
      */
-    public function detect(Material $material, AiContext $context): void
+    public function detect(Material $material, AiContext $context, ?string $situation = null): void
     {
         DB::transaction(function () use ($material): void {
             $material->scores()->delete();
             $material->detections()->delete();
         });
 
+        $situation ??= $this->situation($material);
+
         foreach ($this->chunker->chunks($material->transcriptForEngine(), (int) config('megis.engine.chunk_characters')) as $chunk) {
-            $result = $this->ai->run(new DetectValuesTask($chunk), $context);
+            $result = $this->ai->run(new DetectValuesTask($chunk, $situation), $context);
 
             foreach ($result->structured['detections'] ?? [] as $detection) {
                 $quote = trim((string) ($detection['quote'] ?? ''));
@@ -187,7 +214,7 @@ class ValueMeasurementEngine
     /**
      * Step C: score the values matched in one speaker's detections.
      */
-    public function score(Material $material, ?string $speaker, ValueCatalog $catalog, AiContext $context): void
+    public function score(Material $material, ?string $speaker, ValueCatalog $catalog, AiContext $context, ?string $situation = null): void
     {
         $detections = $this->matchedDetections($material, $speaker);
 
@@ -208,14 +235,19 @@ class ValueMeasurementEngine
                 'quote' => $detection->quote,
                 'values' => $detection->matches->map(fn ($match) => $catalog->refFor($match->value_id))->filter()->values()->all(),
             ])->values()->all(),
+            $situation ?? $this->situation($material),
         ), $context);
+        $saved = [];
 
         foreach ($result->structured['scores'] ?? [] as $row) {
             $value = $catalog->resolve((string) ($row['ref'] ?? ''));
 
-            if ($value === null || ! in_array($value->id, $valueIds, true)) {
+            // A value the answer names twice keeps its first score: one row per value.
+            if ($value === null || ! in_array($value->id, $valueIds, true) || isset($saved[$value->id])) {
                 continue;
             }
+
+            $saved[$value->id] = true;
 
             $detectionIds = collect($row['detections'] ?? [])
                 ->map(fn ($code) => $byCode->get(strtoupper(trim((string) $code)))?->id)

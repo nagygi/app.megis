@@ -2,6 +2,26 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.71 · {hash} · 2026-11-03
+
+Értékmérés az alkalmak anyagain (13 · 13.2): a motor tudja, melyik folyamatról szól az anyag, és a nem illeszkedő értékek sem vesznek el.
+
+- **Folyamat-kontextus:**
+  - **Eddig:** a motor egy alkalom anyagánál sem tudta, melyik folyamatról van szó.
+  - **Most:** a detektálás és a pontozás megkapja a folyamat nevét, ritmusát és a szülő folyamatot, például: „Heti kör”, ritmusa: keddenként 9:00, a(z) „Vezetés” folyamat része.
+    - Az illesztés nem kapja meg, ott csak a definíció és a példák számítanak.
+    - Az Értéktükörnél nincs ilyen szakasz, a prompt szövege ugyanaz marad.
+  - Új promptverziók: `ertektukor-detektalas` v3, `ertektukor-pontozas` v3.
+- **Nem illeszkedő értékek (06 · 6.4):**
+  - **Eddig:** egy alkalom anyagában az, ami semmihez nem illeszkedett, nyers detektálás maradt, érték nem lett belőle.
+  - **Most:** „AI által detektált” érték lesz belőle, mint az Értéktükörnél. Ugyanez vonatkozik a besorolatlan és az *Egyéb* anyagokra.
+    - A számolt Folyamat-diagnózis oldalán az *Egyéb detektált értékek* blokk a felhasznált alkalmak anyagaiból mutatja őket, az alkalom dátumával és a folyamattal.
+- **Az érték saját neve:**
+  - **Eddig:** ha a szervezet a saját szövegében leírta az érték nevét („Az Egyenesség nálunk…”), a név bekerült az illesztés promptjába.
+  - **Most:** az érték saját neve, toldalékkal együtt, a promptban „ez az érték”. Így az illesztés a jelentés alapján dönt, a név alapján soha.
+- **Egy érték, egy pont:** ha a pontozás válasza egy értéket kétszer pontoz, az első számít. Eddig mindkét sor bekerült, és a folyamat-diagnózis mindkettőt átlagolta.
+- **Kikerült** a soha nem használt `occasion_analysis` AI-feladat. Az alkalom pontja továbbra is az anyagai pontjainak átlaga, a döntés az `mvp-terv.md`-ben van.
+
 ## 1.70 · 452baa4 · 2026-11-03
 
 Folyamat-diagnózis (13): a számítás és az admin oldal a jegy szerint.

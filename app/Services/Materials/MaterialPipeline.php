@@ -18,6 +18,7 @@ use App\Models\MirrorSession;
 use App\Models\User;
 use App\Services\Capabilities\CapabilityMeasurementPolicy;
 use App\Services\Engine\AutomaticDiagnosisBuilder;
+use App\Services\Engine\DetectedValueRegistry;
 use App\Services\Engine\ValueCatalog;
 use App\Services\Mirror\MirrorInsightService;
 use Throwable;
@@ -88,7 +89,8 @@ class MaterialPipeline
             MaterialContext::PublicMirror => $this->finishPublicMirror($material),
             MaterialContext::Mirror => $this->finishSignedInMirror($material),
             MaterialContext::AdminUpload => $this->buildUploadDiagnoses($material),
-            MaterialContext::Dictation, MaterialContext::Occasion, MaterialContext::CapabilityStory => null,
+            MaterialContext::Occasion => $this->registerUnmatched($material),
+            MaterialContext::Dictation, MaterialContext::CapabilityStory => null,
         };
 
         // ET4 · the mégis Coach's suggestions, in a job of their own (NM-06).
@@ -114,6 +116,18 @@ class MaterialPipeline
         if (app(CapabilityMeasurementPolicy::class)->appliesTo($material)) {
             $material->update(['capability_status' => CapabilityMeasurementStatus::Pending]);
             DetectCapabilities::dispatch($material, $force);
+        }
+    }
+
+    /**
+     * What matched nothing in an occasion's material becomes "AI által
+     * detektált" (06 · 6.4). The detection keeps its material, so its occasion
+     * and process are known (13 · 13.2).
+     */
+    private function registerUnmatched(Material $material): void
+    {
+        foreach ($this->diagnoses->unmatchedDetections($material, null) as $detection) {
+            app(DetectedValueRegistry::class)->register($detection, $material->organization);
         }
     }
 

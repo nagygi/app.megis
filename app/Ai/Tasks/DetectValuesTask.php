@@ -6,11 +6,12 @@ use App\Ai\Contracts\AiTask;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 
 /**
- * Step A: free value detection, without any value list (06 · 6.4).
+ * Step A: free value detection, without any value list (06 · 6.4). The
+ * situation names the process of an occasion's material (13 · 13.2).
  */
 final readonly class DetectValuesTask implements AiTask
 {
-    public function __construct(private string $transcript) {}
+    public function __construct(private string $transcript, private string $situation = '') {}
 
     public function key(): string
     {
@@ -19,7 +20,7 @@ final readonly class DetectValuesTask implements AiTask
 
     public function variables(): array
     {
-        return [];
+        return ['context' => $this->situation];
     }
 
     public function input(): string

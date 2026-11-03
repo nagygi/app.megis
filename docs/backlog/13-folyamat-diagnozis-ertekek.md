@@ -27,15 +27,16 @@ Az alkalmak anyagaiból (12) a 06-os motor kiolvassa, mennyire hordozza a folyam
 
 ### 13.2 Alkalmanként: a motor (06 · 6.4)
 
-- **Bemenet:**
-  - az alkalom összes anyaga együtt: átirat, leirat, dokumentum, elmondott helyzet;
-  - a folyamat neve és ritmusa;
-  - a szervezet értékei: definíció, az 1 és a 6, példák.
-- **A · szabad detektálás:** változatlan.
-- **B · illesztés:** a szervezet értékeire is illeszt, mellettük az Értéktárra. Az illesztés itt is csak definíció és példák alapján történik, névegyezés alapján soha.
-- **C · pontozás:** a szervezet minden értékére 1–6 vagy „nincs adat”, idézet-hivatkozással.
-- Egy alkalom értékenként egy pontot ad, akárhány anyag tartozik hozzá.
-- A nem illeszkedő értékek és a nyers detektálás a 06 szerint kezelendők, a folyamatra és az alkalomra hivatkozva.
+- **Pontozási egység:** a motor anyagonként fut egyszer (átirat, leirat, dokumentum, elmondott helyzet). Külön alkalom-szintű AI-hívás nincs, mert a dupla pontozás kétszer annyiba kerülne, és a két pont eltérhetne (`mvp-terv.md`, 15 · 3. kérdés).
+- **Bemenet anyagonként:**
+  - az anyag szövege;
+  - a folyamat neve, ritmusa és a szülő folyamat neve: ezt a detektálás (A) és a pontozás (C) kapja meg, a helyzet megértéséhez;
+  - a szervezet értékei: definíció, az 1 és a 6, példák, a fő diagnózisban rögzített verzióból.
+- **A · szabad detektálás:** a 06 szerint, a folyamat-kontextussal.
+- **B · illesztés:** a szervezet értékeire is illeszt, mellettük az Értéktárra. Az illesztés itt is csak definíció és példák alapján történik, névegyezés alapján soha. Ezért az érték saját neve a szervezet szövegeiben sem jelenik meg a promptban: helyette „ez az érték” áll.
+- **C · pontozás:** a szervezet minden értékére 1–6 vagy „nincs adat”, idézet-hivatkozással. Ha a válasz egy értéket kétszer pontoz, az első számít.
+- Egy alkalom értékenként egy pontot ad, akárhány anyag tartozik hozzá: az anyagai pontjainak átlagát, a „nincs adat” nélkül.
+- A nem illeszkedő értékek és a nyers detektálás a 06 szerint kezelendők: ami semmihez nem illeszkedett, „AI által detektált” érték lesz. A detektálás az anyagán át az alkalomra és a folyamatra hivatkozik.
 - **Besorolatlan és *Egyéb* anyagok:** a besorolatlan („Egyikhez sem”) és az *Egyéb* anyagokat is feldolgozzuk, de Folyamat szintű diagnózisba nem kerülnek.
   - A nyers detektálásuk megmarad.
   - Az olvasatban (20) nyomként használhatók.
@@ -79,6 +80,7 @@ Az alkalmak anyagaiból (12) a 06-os motor kiolvassa, mennyire hordozza a folyam
   - a számítás: számtani átlag, egyenlő súly, legalább 2 alkalom. A szöveg a számításkor mentődik, így egy későbbi módszerváltás után is az eredeti olvasható;
   - ki és mikor írt át kézzel.
 - A fejlécben látszik a rögzített értékszett-verzió („Értékszett: v3”).
+- **Egyéb detektált értékek:** a felhasznált alkalmak anyagaiból, a sornál az alkalom dátumával és a folyamattal.
 
 ## Nincs benne
 

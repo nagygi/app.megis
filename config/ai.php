@@ -84,7 +84,7 @@ return [
             'temperature' => 0.2,
             'timeout' => 120,
             'prompt' => 'ertektukor-detektalas',
-            'prompt_version' => 2,
+            'prompt_version' => 3,
         ],
         'mirror_matching' => [
             'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
@@ -102,7 +102,7 @@ return [
             'temperature' => 0.0,
             'timeout' => 120,
             'prompt' => 'ertektukor-pontozas',
-            'prompt_version' => 2,
+            'prompt_version' => 3,
         ],
         // ET4: the mégis Coach puts each value of a mirror into the user's own words (NM-06).
         'mirror_deepening' => [
@@ -151,15 +151,6 @@ return [
             'timeout' => 60,
             'prompt' => 'szoveg-tomorites',
             'prompt_version' => 1,
-        ],
-        'occasion_analysis' => [
-            'provider' => env('AI_DEFAULT_PROVIDER', 'anthropic'),
-            'model' => env('AI_DEFAULT_MODEL', 'claude-sonnet-5-5'),
-            'max_tokens' => 4096,
-            'temperature' => 0.0,
-            'timeout' => 120,
-            'prompt' => 'alkalom-elemzes',
-            'prompt_version' => null,
         ],
         'transcription' => [
             'provider' => env('AI_TRANSCRIPTION_PROVIDER', 'openai'),

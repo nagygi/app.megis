@@ -29,8 +29,9 @@ final class ValueCatalog
     /**
      * @param  Collection<int, Value>  $values  with latestVersion loaded
      * @param  array<int, array<string, list<string>>>  $definitions  value id => the organization's own words, by label
+     * @param  array<int, string>  $names  value id => the name the organization gave it
      */
-    public function __construct(Collection $values, private array $definitions = [])
+    public function __construct(Collection $values, private array $definitions = [], private array $names = [])
     {
         foreach ($values->values() as $index => $value) {
             $ref = 'E'.($index + 1);
@@ -59,8 +60,10 @@ final class ValueCatalog
     public static function forDiagnosis(Organization $organization, array $valueSetSnapshot): self
     {
         $definitions = [];
+        $names = [];
 
         foreach ($valueSetSnapshot['values'] ?? [] as $item) {
+            $names[(int) $item['value_id']] = trim((string) ($item['name'] ?? ''));
             $definitions[(int) $item['value_id']] = array_filter([
                 'Mit jelent' => array_values(array_filter([$item['meaning'] ?? null])),
                 'Mit nem jelent' => array_values(array_filter([$item['non_meaning'] ?? null])),
@@ -76,7 +79,7 @@ final class ValueCatalog
             ->orderBy('id')
             ->get();
 
-        return new self($values, $definitions);
+        return new self($values, $definitions, array_filter($names));
     }
 
     /**
@@ -160,11 +163,30 @@ final class ValueCatalog
 
         foreach ($sections as $label => $texts) {
             if ($texts !== []) {
-                $lines[] = $label.': '.implode(' | ', array_map(fn (string $text): string => $this->withoutNames($text), $texts));
+                $lines[] = $label.': '.implode(' | ', array_map(fn (string $text): string => $this->withoutOwnName($this->withoutNames($text), $value), $texts));
             }
         }
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * The organization's words often name the value itself ("Az Egyenesség
+     * nálunk…"): its own Hungarian name, with any ending, becomes "ez az
+     * érték", so the matching decides on the meaning, never on the name (13 · 13.2).
+     */
+    private function withoutOwnName(string $text, Value $value): string
+    {
+        $names = array_values(array_unique(array_filter([trim((string) $value->name), $this->names[$value->id] ?? ''])));
+
+        if ($names === []) {
+            return $text;
+        }
+
+        usort($names, fn (string $a, string $b): int => mb_strlen($b) <=> mb_strlen($a));
+        $pattern = '/(?<![\p{L}\p{N}])(?:'.implode('|', array_map(fn (string $name): string => preg_quote($name, '/'), $names)).')[\p{L}-]*/iu';
+
+        return preg_replace($pattern, 'ez az érték', $text) ?? $text;
     }
 
     /**
