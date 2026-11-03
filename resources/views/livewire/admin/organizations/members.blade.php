@@ -1,7 +1,5 @@
 @php
     [$sortField, $sortDirection] = $this->currentSort();
-    // The same status tones on every user list: clients, members, admins.
-    $statusTones = ['active' => 'green', 'added' => 'neutral', 'invited' => 'yellow', 'pending' => 'yellow', 'invitation_expired' => 'coral', 'locked' => 'coral', 'inactive' => 'muted'];
     // An empty list says "Nincs találat." only when a search or a filter hid the rows.
     $filtering = filled($search) || collect($filters)->filter(fn ($filter) => filled($filter))->isNotEmpty();
 @endphp
@@ -46,27 +44,31 @@
             @php
                 $member = $membership->user;
                 $statusKey = $membership->status === \App\Enums\MembershipStatus::Invited && ! $membership->hasPendingInvitation() ? 'invitation_expired' : $membership->status->value;
+                // An inactive member's row is greyed out, so it stands apart beside its dark badge.
+                $isInactive = $membership->status === \App\Enums\MembershipStatus::Inactive;
             @endphp
-            <tr wire:key="membership-{{ $membership->id }}">
+            <tr wire:key="membership-{{ $membership->id }}" @class(['text-grey-600' => $isInactive])>
                 <td class="px-3 py-2">
-                    <a href="{{ route('admin.clients.show', $member) }}" class="font-semibold text-charcoal">{{ $member->name }}</a>
+                    <a href="{{ route('admin.clients.show', $member) }}" @class(['font-semibold', $isInactive ? 'text-grey-600' : 'text-charcoal'])>{{ $member->name }}</a>
                     @if ($member->mail_undeliverable_at)
                         <x-ui.badge tone="coral" class="mt-1">{{ __('admin.common.mail_undeliverable') }}</x-ui.badge>
                     @endif
                 </td>
                 <td class="px-3 py-2">{{ $member->isAnonymized() ? __('admin.common.none') : $member->email }}</td>
                 <td class="px-3 py-2">{{ $membership->position ?? __('admin.common.none') }}</td>
-                <td class="px-3 py-2">{{ implode(', ', $membership->tagLabels()) }}</td>
+                <td class="px-3 py-2"><x-admin.membership-tags :membership="$membership" /></td>
                 <td class="px-3 py-2">
-                    @foreach ($member->teams as $team)
-                        <span class="block whitespace-nowrap">{{ $team->name }}@if ($team->pivot->is_leader) <span class="text-grey-700">· {{ __('admin.members.team_leader') }}</span>@endif</span>
-                    @endforeach
+                    <div class="flex flex-col gap-1">
+                        @foreach ($member->teams as $team)
+                            <span class="flex items-center gap-1.5 whitespace-nowrap">{{ $team->name }}@if ($team->pivot->is_leader)<x-ui.chip size="sm">{{ __('admin.members.team_leader') }}</x-ui.chip>@endif</span>
+                        @endforeach
+                    </div>
                 </td>
                 <td class="px-3 py-2">
-                    <x-ui.badge :tone="$statusTones[$statusKey]">{{ $membership->displayStatusLabel() }}</x-ui.badge>
+                    <x-admin.user-status :status="$statusKey">{{ $membership->displayStatusLabel() }}</x-admin.user-status>
                 </td>
                 <td class="px-3 py-2 whitespace-nowrap">{{ $member->last_login_at?->format('Y.m.d. H:i') ?? __('admin.common.never') }}</td>
-                <td class="px-3 py-2">
+                <td class="px-3 py-2 text-charcoal">
                     <div class="flex items-center justify-end gap-2">
                         {{-- A recorded user's main action is the first invitation: one button, not repeated in the menu. --}}
                         @if ($membership->status === \App\Enums\MembershipStatus::Added)

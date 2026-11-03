@@ -1,7 +1,5 @@
 @php
     [$sortField, $sortDirection] = $this->currentSort();
-    // The same status tones on every user list: clients, members, admins.
-    $statusTones = ['active' => 'green', 'added' => 'neutral', 'invited' => 'yellow', 'pending' => 'yellow', 'invitation_expired' => 'coral', 'locked' => 'coral', 'inactive' => 'muted', 'archived' => 'muted'];
     // An empty list says "Nincs találat." only when a search or a filter hid the rows.
     $filtering = filled($search) || collect($filters)->filter(fn ($filter) => filled($filter))->isNotEmpty();
 @endphp
@@ -39,7 +37,7 @@
                 {{-- A deleted user's technical address is not shown (33 · 33.7). --}}
                 <td class="px-3 py-2">{{ $client->isAnonymized() ? __('admin.common.none') : $client->email }}</td>
                 <td class="px-3 py-2">{{ $client->memberships->pluck('organization.name')->join(', ') ?: __('admin.common.none') }}</td>
-                <td class="px-3 py-2"><x-ui.badge :tone="$statusTones[$status]">{{ __('admin.clients.status_values.'.$status) }}</x-ui.badge></td>
+                <td class="px-3 py-2"><x-admin.user-status :status="$status">{{ __('admin.clients.status_values.'.$status) }}</x-admin.user-status></td>
                 <td class="px-3 py-2 whitespace-nowrap">{{ $client->last_login_at?->format('Y.m.d. H:i') ?? __('admin.common.never') }}</td>
                 <td class="px-3 py-2 text-right">
                     <x-admin.row-actions :label="__('admin.common.row_actions', ['name' => $client->name])">

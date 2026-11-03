@@ -1,8 +1,3 @@
-@php
-    // The same status tones on every user list: clients, members, admins.
-    $statusTones = ['active' => 'green', 'added' => 'neutral', 'invited' => 'yellow', 'pending' => 'yellow', 'invitation_expired' => 'coral', 'locked' => 'coral', 'inactive' => 'muted', 'archived' => 'muted'];
-@endphp
-
 <div class="flex max-w-5xl flex-col gap-6">
     <x-ui.flash />
 
@@ -16,7 +11,7 @@
         :spaced="false"
     >
         <x-slot:badges>
-            <x-ui.badge :tone="$statusTones[$status]">{{ __('admin.clients.status_values.'.$status) }}</x-ui.badge>
+            <x-admin.user-status :status="$status">{{ __('admin.clients.status_values.'.$status) }}</x-admin.user-status>
             @if ($user->mail_undeliverable_at)
                 <x-ui.badge tone="coral">{{ __('admin.common.mail_undeliverable') }}</x-ui.badge>
             @endif
@@ -72,13 +67,16 @@
                 <li class="flex flex-wrap items-start justify-between gap-4 py-3" wire:key="client-membership-{{ $membership->id }}">
                     <div>
                         <a href="{{ route('admin.organizations.members', $membership->organization) }}" class="font-semibold text-charcoal">{{ $membership->organization->name }}</a>
-                        <p class="text-sm">{{ implode(', ', $membership->tagLabels()) }}@if ($membership->position) · {{ $membership->position }}@endif</p>
+                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+                            <x-admin.membership-tags :membership="$membership" />
+                            @if ($membership->position)<span>{{ $membership->position }}</span>@endif
+                        </div>
                         @foreach ($teamsByOrganization->get($membership->organization_id, collect()) as $team)
-                            <p class="text-sm text-grey-700">{{ $team->name }}@if ($team->pivot->is_leader) · {{ __('admin.members.team_leader') }}@endif</p>
+                            <p class="mt-1 flex items-center gap-1.5 text-sm text-grey-700">{{ $team->name }}@if ($team->pivot->is_leader)<x-ui.chip size="sm">{{ __('admin.members.team_leader') }}</x-ui.chip>@endif</p>
                         @endforeach
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <x-ui.badge :tone="$statusTones[$statusKey]">{{ $membership->displayStatusLabel() }}</x-ui.badge>
+                        <x-admin.user-status :status="$statusKey">{{ $membership->displayStatusLabel() }}</x-admin.user-status>
                         @if ($membership->status === \App\Enums\MembershipStatus::Added)
                             <x-ui.button size="sm" icon="mail" wire:click="sendInvitation({{ $membership->id }})">{{ __('admin.members.send_invitation') }}</x-ui.button>
                         @elseif ($membership->status === \App\Enums\MembershipStatus::Invited)

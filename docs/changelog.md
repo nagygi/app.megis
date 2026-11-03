@@ -2,6 +2,23 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.57 · {hash} · 2026-11-03
+
+Admin felhasználólisták: színes állapotjelzés, az Inaktív kiemelve; a címkék chipként.
+
+- **Eddig:**
+  - A Felvéve, az Aktív és az Inaktív jelzés szinte egyformán szürke volt. Az Inaktív volt a leghalványabb.
+  - A Címkék oszlopban vesszővel elválasztott sima szöveg állt, a csapatvezetés „· csapat vezető” szövegként.
+- **Most:**
+  - **Állapot:** minden állapotjelzés előtt színes pötty áll.
+    - Aktív: zöld.
+    - Felvéve, Meghívva és Meghívás alatt: sárga.
+    - Meghívó lejárt és Zárolva: korall.
+    - **Inaktív:** sötét jelzés. A szervezet Felhasználók listáján az inaktív felhasználó sora is szürkébb.
+    - Ugyanígy néz ki a szervezet Felhasználók fülén, a Felhasználók listán, a felhasználó adatlapján és az Admin felhasználók listán.
+  - **Címkék:** minden címke külön keretes jelölés. A „szervezet vezetője” sötétebb kerettel és félkövéren áll.
+  - **Csapatvezető:** a „csapat vezető” is ilyen jelölés a csapat neve mellett. Így látszik a szervezet Felhasználók fülén és a felhasználó adatlapján.
+
 ## 1.56 · 708792b · 2026-11-03
 
 „Belépek a nevében” (14 · 14.6): a coral sáv a felhasználó címkéit és csapatait is mutatja.

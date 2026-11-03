@@ -1,7 +1,5 @@
 @php
     [$sortField, $sortDirection] = $this->currentSort();
-    // The same status tones on every user list: clients, members, admins.
-    $statusTones = ['active' => 'green', 'added' => 'neutral', 'invited' => 'yellow', 'pending' => 'yellow', 'invitation_expired' => 'coral', 'locked' => 'coral', 'inactive' => 'muted'];
 @endphp
 
 <div>
@@ -44,7 +42,7 @@
                 </td>
                 <td class="px-3 py-2">{{ $user->email }}</td>
                 <td class="px-3 py-2"><x-ui.badge :tone="$user->isSuperadmin() ? 'dark' : 'neutral'">{{ $user->role->label() }}</x-ui.badge></td>
-                <td class="px-3 py-2"><x-ui.badge :tone="$statusTones[$status->value]">{{ $status->label() }}</x-ui.badge></td>
+                <td class="px-3 py-2"><x-admin.user-status :status="$status->value">{{ $status->label() }}</x-admin.user-status></td>
                 <td class="px-3 py-2 whitespace-nowrap">{{ $user->last_login_at?->format('Y.m.d. H:i') ?? __('admin.common.never') }}</td>
                 <td class="px-3 py-2 text-right">
                     @canany(['updateAdmin', 'resendInvitation', 'resetPassword', 'deactivate', 'activate'], $user)
