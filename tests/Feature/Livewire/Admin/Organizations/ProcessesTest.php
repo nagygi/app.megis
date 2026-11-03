@@ -1,7 +1,9 @@
 <?php
 
 use App\Enums\AuditEventType;
+use App\Enums\ProcessSource;
 use App\Livewire\Admin\Organizations\Processes;
+use App\Livewire\Admin\Organizations\ProcessForm;
 use App\Models\AuditEvent;
 use App\Models\CalendarConnection;
 use App\Models\Process;
@@ -23,9 +25,9 @@ it('shows only the lists until adding or loading is opened', function () {
     Livewire::test(Processes::class, ['organization' => $setup['organization']])
         ->assertSee(__('admin.processes.list'))
         ->assertSee(__('admin.processes.no_calendar'))
+        ->assertSeeHtml(route('admin.organizations.processes.create', $setup['organization']))
         ->assertDontSee(__('admin.processes.load_for'))
         ->assertDontSee(__('processes.import.title'))
-        ->assertDontSee(__('processes.list.add_title'))
         ->call('openPanel', 'calendar')
         ->assertSee(__('admin.processes.load_for'))
         ->assertSee(__('calendar.ics_url'))
@@ -37,11 +39,39 @@ it('shows only the lists until adding or loading is opened', function () {
         ->call('openPanel', 'text')
         ->assertSee(__('processes.import.title'))
         ->assertDontSee(__('admin.processes.load_for'))
-        ->call('openPanel', 'add')
-        ->assertSee(__('processes.list.add_title'))
         ->call('closePanel')
-        ->assertDontSee(__('processes.list.add_title'))
         ->assertDontSee(__('processes.import.title'));
+});
+
+it('adds a process on its own page and goes back to the list', function () {
+    $setup = diagnosisTeam();
+    actingAsAdmin($setup['admin']);
+    $parent = Process::factory()->for($setup['organization'])->create();
+
+    Livewire::test(ProcessForm::class, ['organization' => $setup['organization']])
+        ->set('name', 'Heti ügyfélkör')
+        ->set('parentId', $parent->id)
+        ->set('description', 'A hét ügyfélügyei.')
+        ->call('save')
+        ->assertHasNoErrors()
+        ->assertRedirect(route('admin.organizations.processes', $setup['organization']));
+
+    $process = Process::query()->where('name', 'Heti ügyfélkör')->sole();
+    expect($process->parent_id)->toBe($parent->id)
+        ->and($process->source)->toBe(ProcessSource::Manual)
+        ->and($process->description)->toBe('A hét ügyfélügyei.');
+});
+
+it('adds no process without a name', function () {
+    $setup = diagnosisTeam();
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(ProcessForm::class, ['organization' => $setup['organization']])
+        ->call('save')
+        ->assertHasErrors(['name' => 'required'])
+        ->assertNoRedirect();
+
+    expect(Process::query()->exists())->toBeFalse();
 });
 
 it("loads the leader's iCal link in their name and logs it", function () {

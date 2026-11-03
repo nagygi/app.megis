@@ -7,7 +7,6 @@ use App\Enums\MaterialContext;
 use App\Enums\MembershipStatus;
 use App\Enums\ProcessConfidence;
 use App\Enums\ProcessKind;
-use App\Enums\ProcessRhythm;
 use App\Exceptions\DiagnosisException;
 use App\Livewire\Concerns\WithDictation;
 use App\Livewire\Concerns\WithProcessImport;
@@ -37,10 +36,11 @@ use Livewire\WithFileUploads;
  * The organization's "Folyamatok" tab (11 · 11.6): the same rules as for
  * the leader, uncertain and other rows apart for review, the calendar rows,
  * "A mégis javaslata" for V6·f, and the materials waiting to be classified (12 · 12.6).
- * By default only the lists show; "Új folyamat" and the "Betöltés" menu open a
- * panel under the title. A member's iCal link or exported file can be loaded
- * there at their request (09 · 9.2), with or without a running diagnosis, and
- * several processes can be added at once from a written or spoken text.
+ * By default only the lists show; "Új folyamat" leads to a page of its own
+ * (ProcessForm), the "Betöltés" menu opens a panel under the title. A member's
+ * iCal link or exported file can be loaded there at their request (09 · 9.2),
+ * with or without a running diagnosis, and several processes can be added at
+ * once from a written or spoken text.
  */
 class Processes extends Component
 {
@@ -49,8 +49,8 @@ class Processes extends Component
         importProcesses as protected importParsedProcesses;
     }
 
-    /** The panels under the title: manual adding, a calendar, a text. */
-    private const PANELS = ['add', 'calendar', 'text'];
+    /** The panels under the title: a calendar, a text. */
+    private const PANELS = ['calendar', 'text'];
 
     public Organization $organization;
 
@@ -68,14 +68,6 @@ class Processes extends Component
      * @var array{name: string, description: string, kind: string, accepted: bool, responsible_user_id: ?int, parent_id: ?int}
      */
     public array $edit = ['name' => '', 'description' => '', 'kind' => 'routine', 'accepted' => false, 'responsible_user_id' => null, 'parent_id' => null];
-
-    public string $newName = '';
-
-    public ?string $newRhythm = null;
-
-    public ?int $newParentId = null;
-
-    public string $newDescription = '';
 
     /**
      * "Besorolásra vár": material uuid => process id and date (12 · 12.6).
@@ -182,29 +174,6 @@ class Processes extends Component
 
         $this->editingId = null;
         session()->flash('status', __('admin.common.saved'));
-    }
-
-    public function addProcess(ProcessService $processes): void
-    {
-        Gate::authorize('update', $this->organization);
-        $this->validate([
-            'newName' => ['required', 'string', 'min:2', 'max:255'],
-            'newRhythm' => ['nullable', Rule::enum(ProcessRhythm::class)],
-            'newParentId' => ['nullable', Rule::in(Process::query()->whereBelongsTo($this->organization)->whereNull('parent_id')->pluck('id'))],
-            'newDescription' => ['nullable', 'string', 'max:2000'],
-        ], attributes: ['newName' => __('processes.list.fields.name'), 'newDescription' => __('processes.list.fields.description')]);
-
-        $processes->addManual(
-            $this->organization,
-            $this->newName,
-            filled($this->newRhythm) ? ProcessRhythm::from($this->newRhythm) : null,
-            $this->newParentId ? $this->process($this->newParentId) : null,
-            $this->newDescription,
-        );
-
-        // The panel stays open: processes are often added one after the other.
-        session()->flash('status', __('admin.processes.added', ['name' => trim($this->newName)]));
-        $this->reset(['newName', 'newRhythm', 'newParentId', 'newDescription']);
     }
 
     /**

@@ -1,10 +1,10 @@
-{{-- The organization's Folyamatok tab (11 · 11.6): the lists, the adding and the loading open as a panel under the title. --}}
+{{-- The organization's Folyamatok tab (11 · 11.6): the lists; Új folyamat has a page of its own, the loading opens as a panel under the title. --}}
 <div class="flex flex-col gap-6" @if ($dictations !== []) wire:poll.2s="pollDictations" @endif>
     <x-ui.flash />
 
     <x-admin.page-header :title="__('admin.organizations.tabs.processes')" :spaced="false">
         <x-slot:actions>
-            <x-ui.button tone="outline" icon="plus" wire:click="openPanel('add')">{{ __('admin.processes.add') }}</x-ui.button>
+            <x-ui.button tone="outline" icon="plus" :href="route('admin.organizations.processes.create', $organization)">{{ __('admin.processes.add') }}</x-ui.button>
             <x-ui.dropdown
                 id="process-load-menu"
                 :label="__('admin.processes.load')"
@@ -29,31 +29,7 @@
         </x-slot:actions>
     </x-admin.page-header>
 
-    @if ($panel === 'add')
-        <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4" aria-labelledby="add-title">
-            <div class="flex items-start justify-between gap-2">
-                <h2 id="add-title" class="text-lg font-semibold">{{ __('processes.list.add_title') }}</h2>
-                <x-ui.icon-button icon="close" class="-mt-2 -mr-2" :label="__('admin.processes.close')" wire:click="closePanel" />
-            </div>
-            <form wire:submit="addProcess" class="flex max-w-3xl flex-col gap-4">
-                <x-form.input name="newName" wire:model="newName" :label="__('processes.list.fields.name')" required />
-                <x-form.select name="newRhythm" wire:model="newRhythm" :label="__('processes.list.fields.rhythm')">
-                    <option value="">–</option>
-                    @foreach (\App\Enums\ProcessRhythm::cases() as $rhythm)
-                        <option value="{{ $rhythm->value }}">{{ $rhythm->label() }}</option>
-                    @endforeach
-                </x-form.select>
-                <x-form.select name="newParentId" wire:model="newParentId" :label="__('processes.list.fields.parent')">
-                    <option value="">{{ __('processes.list.parent_none') }}</option>
-                    @foreach ($parents as $parent)
-                        <option value="{{ $parent->id }}">{{ $parent->name }}</option>
-                    @endforeach
-                </x-form.select>
-                <x-form.textarea name="newDescription" wire:model="newDescription" :label="__('processes.sheet.description')" rows="2" maxlength="2000" />
-                <x-ui.button type="submit" icon="plus" class="self-start">{{ __('processes.list.add') }}</x-ui.button>
-            </form>
-        </x-ui.card>
-    @elseif ($panel === 'calendar')
+    @if ($panel === 'calendar')
         {{-- At a member's request: their iCal link or exported file (09 · 9.2). --}}
         <x-ui.card as="section" bordered padding="lg" class="flex flex-col gap-4" aria-labelledby="calendar-load">
             <div class="flex items-start justify-between gap-2">

@@ -44,6 +44,7 @@ it('keeps the organization\'s name and tabs on the pages under a tab, lighting t
     'a new team' => fn (Organization $organization) => [route('admin.organizations.teams.create', $organization), 'admin.organizations.teams'],
     'a team' => fn (Organization $organization) => [route('admin.organizations.teams.edit', [$organization, Team::factory()->for($organization)->create()]), 'admin.organizations.teams'],
     'the occasions of a process' => fn (Organization $organization) => [route('admin.organizations.process-occasions', [$organization, Process::factory()->for($organization)->create()]), 'admin.organizations.processes'],
+    'a new process' => fn (Organization $organization) => [route('admin.organizations.processes.create', $organization), 'admin.organizations.processes'],
     'A1' => fn (Organization $organization) => [route('admin.main-diagnoses.create', ['szervezet' => $organization->id]), 'admin.organizations.diagnoses'],
     'a main diagnosis' => fn (Organization $organization) => [
         route('admin.diagnoses.show', MainDiagnosis::factory()->create(['diagnosis_id' => Diagnosis::factory()->ofType('main')->for($organization)])->diagnosis),

@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.64 · – · 2026-11-03
+
+Admin, szervezet *Folyamatok* füle: az *Új folyamat* saját oldalra került, morzsával.
+
+- **Eddig (1.60):** az *Új folyamat* panelként nyílt a cím alatt. Alatta ott maradt a lista, a Naptár és a javaslat.
+- **Most:**
+  - **Saját oldal a fül alatt:** a morzsa „Folyamatok › Új folyamat”, a Folyamatok fül világít. Az oldalon csak az űrlap van:
+    - név;
+    - ritmus;
+    - szülő folyamat;
+    - leírás.
+  - **Mentés után** vissza a listára, az üzenettel: „{név} felkerült a listára.” A *Mégse* is a listára visz.
+  - **A két betöltő** (naptár, szöveg) továbbra is panelként nyílik a lista fölött.
+
 ## 1.63 · 74471fd · 2026-11-03
 
 Admin, szervezet *Csapatok* füle: a csapat űrlapja saját oldalra került, és a tagok felvétele keresővel megy (02 · 2.4).

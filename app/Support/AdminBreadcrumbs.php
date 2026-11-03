@@ -139,7 +139,7 @@ class AdminBreadcrumbs
         }
 
         $tab = match (true) {
-            $process !== null => 'admin.organizations.processes',
+            $process !== null, str_starts_with($routeName, 'admin.organizations.processes.') => 'admin.organizations.processes',
             str_starts_with($routeName, 'admin.organizations.teams.') => 'admin.organizations.teams',
             default => 'admin.organizations.members',
         };

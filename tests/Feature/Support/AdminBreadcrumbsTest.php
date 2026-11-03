@@ -74,6 +74,18 @@ it('puts the occasions of a process under the organization\'s Folyamatok tab, li
         ->and($location->home)->toBeNull();
 });
 
+it('puts a new process under the organization\'s Folyamatok tab, lighting it', function () {
+    $organization = Organization::factory()->create();
+
+    $location = locate('admin.organizations.processes.create', ['organization' => $organization]);
+
+    expect(crumbs($location))->toBe([
+        'Szervezetek' => route('admin.organizations.index'),
+        $organization->name => route('admin.organizations.edit', $organization),
+        'Folyamatok' => route('admin.organizations.processes', $organization),
+    ])->and($location->tab)->toBe('admin.organizations.processes');
+});
+
 it('puts an invitation under the organization\'s Felhasználók tab, lighting it', function () {
     $organization = Organization::factory()->create();
 
