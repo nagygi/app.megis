@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.58 · {hash} · 2026-11-03
+## 1.58 · 6e2a49e · 2026-11-03
 
 Admin: minden oldal kitölti a szélességet; nagyon nagy monitoron az oldal legfeljebb 1920 px széles.
 
