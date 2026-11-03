@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.57 · {hash} · 2026-11-03
+## 1.57 · e6064d0 · 2026-11-03
 
 Admin felhasználólisták: színes állapotjelzés, az Inaktív kiemelve; a címkék chipként.
 
