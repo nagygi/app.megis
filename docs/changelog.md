@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.86 · {hash} · 2026-11-03
+## 1.86 · de54a65 · 2026-11-03
 
 Olvasat (20 · 20.3, 20.5): az állítás, amely egy visszavont társ nyomára épült.
 
