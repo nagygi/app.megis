@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.79 · {hash} · 2026-11-03
+## 1.79 · 55e766b · 2026-11-03
 
 Profil (14 · 14.3, 31 · 31.1, 31.7): aki elfelejtette a jelszavát, friss kóddal állíthat újat, és kóddal törölheti a fiókját.
 
