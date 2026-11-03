@@ -177,7 +177,7 @@ return [
             'temperature' => 0.3,
             'timeout' => 180,
             'prompt' => 'diagnozis-allitasok',
-            'prompt_version' => 1,
+            'prompt_version' => 2,
         ],
         // Képességmérés (NM-12): A traces per chunk, B patterns per capability.
         'capability_detection' => [
@@ -205,7 +205,7 @@ return [
             'temperature' => 0.4,
             'timeout' => 180,
             'prompt' => 'olvasat-szovegek',
-            'prompt_version' => 2,
+            'prompt_version' => 3,
         ],
     ],
 

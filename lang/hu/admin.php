@@ -828,6 +828,7 @@ return [
         'process_select' => 'Válassz folyamatot',
         'status_follows_stage' => 'A fő diagnózis státuszát a szakasza adja, a részdiagnózis pedig a fő diagnózist követi.',
         'calculated_data' => 'A számolt folyamat-diagnózis adatai a számításból jönnek: a folyamat, az időszak és a név nem írható át. A sorok és a pont kézzel átírható, indoklással.',
+        'calculated_values' => 'A számolt diagnózis értékei a szervezet értékszettjéből jönnek, ide nem vehető fel új érték.',
         'record_earlier' => 'Korábbi diagnózist rögzítek',
         'record_earlier_help' => 'Kézzel, egy megtörtént diagnózis adataival.',
         'title' => 'Diagnózisok',
@@ -1565,6 +1566,7 @@ return [
             'include' => 'Visszateszem',
             'highlight' => 'Kiemelem',
             'open_material' => 'anyag',
+            'open_occasion' => 'alkalom',
             'by_hand' => 'kézzel',
             'add' => 'Új nyom kézzel',
             'add_button' => 'Felveszem',
@@ -1631,6 +1633,7 @@ return [
                 'summary_brand' => 'Összefoglaló · a márkád alapja',
                 'brand_reading' => 'A márkád alapjának olvasata',
                 'recommendation' => 'A mégis javaslata',
+                'what_we_look_at' => 'Mit nézünk · :process',
             ],
         ],
         'actions' => [

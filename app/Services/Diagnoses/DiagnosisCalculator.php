@@ -446,6 +446,7 @@ class DiagnosisCalculator
             $keep[] = $row->id;
 
             $this->tracesForProcess($row, $materials, $scores, $processId, $main);
+            $this->occasionTraces($row, $processDiagnosis, $main);
         }
 
         // Területek: scored by hand in the reading, Teljes only (18 · 18.1).
@@ -639,6 +640,62 @@ class DiagnosisCalculator
             ->flatMap(fn (Material $material) => $scores->get($material->id, collect())
                 ->where('state', ScoreResultState::Scored)
                 ->flatMap(fn (MaterialValueScore $score) => collect($score->detection_ids)->map(fn (int $id) => ['detection' => $id, 'material' => $material]))), $main);
+    }
+
+    /**
+     * A process row's traces from its occasions, not from a detection
+     * (18 · 18.2): what the calendar shows, and the V11·c notes of the
+     * people who were there. Kept by their key, so the admin's choices stay.
+     */
+    private function occasionTraces(DiagnosisRow $row, Diagnosis $processDiagnosis, MainDiagnosis $main): void
+    {
+        $occasionIds = collect($processDiagnosis->aggregation['used'] ?? [])->pluck('id')->all();
+        $keep = [];
+
+        $fromCalendar = ProcessOccasion::query()->whereIn('id', $occasionIds)->where('source', 'calendar')->orderBy('occurred_at')->get();
+
+        if ($fromCalendar->isNotEmpty()) {
+            $first = $fromCalendar->first()->occurred_at;
+            $last = $fromCalendar->last();
+            $keep[] = EvidenceTrace::query()->updateOrCreate(
+                ['diagnosis_row_id' => $row->id, 'auto_key' => 'calendar'],
+                [
+                    'process_occasion_id' => $last->id,
+                    'quote' => $fromCalendar->count() === 1
+                        ? __('report.trace.calendar_one', ['date' => $first->format('m.d.')])
+                        : __('report.trace.calendar', ['count' => $fromCalendar->count(), 'from' => $first->format('m.d.'), 'to' => $last->occurred_at->format('m.d.')]),
+                    'source_type' => EvidenceTrace::SOURCE_CALENDAR,
+                    'role' => null,
+                    'recorded_on' => $last->occurred_at->toDateString(),
+                ],
+            )->id;
+        }
+
+        $notes = OccasionExperience::query()
+            ->where('main_diagnosis_id', $main->id)
+            ->whereIn('process_occasion_id', $occasionIds)
+            ->whereNotNull('submitted_at')
+            ->whereNotIn('user_id', $this->withdrawnUserIds($main))
+            ->whereNotNull('note')
+            ->where('note', '!=', '')
+            ->get();
+
+        foreach ($notes as $note) {
+            $keep[] = EvidenceTrace::query()->updateOrCreate(
+                ['diagnosis_row_id' => $row->id, 'auto_key' => 'experience:'.$note->id],
+                [
+                    'material_id' => $note->material_id,
+                    'process_occasion_id' => $note->process_occasion_id,
+                    'quote' => $note->note,
+                    'source_type' => EvidenceTrace::SOURCE_EXPERIENCE,
+                    'role' => $this->roleOf($main, $note->user_id),
+                    'user_id' => $note->user_id,
+                    'recorded_on' => $note->submitted_at->toDateString(),
+                ],
+            )->id;
+        }
+
+        $row->traces()->whereNotNull('auto_key')->whereNotIn('id', $keep)->delete();
     }
 
     /**

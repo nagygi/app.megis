@@ -10,6 +10,7 @@ use App\Models\DiagnosisRow;
 use App\Models\DiagnosisText;
 use App\Models\EvidenceTrace;
 use App\Models\MainDiagnosis;
+use App\Models\ProcessOccasion;
 use App\Models\ReviewEvent;
 use App\Services\Diagnoses\DiagnosisCalculator;
 use App\Services\Diagnoses\ReadingService;
@@ -160,6 +161,18 @@ it('takes a trace out, highlights one and adds one by hand (20 · 20.2)', functi
         ->and($trace->refresh()->highlighted_at)->not->toBeNull();
 });
 
+it('links a trace to its occasion as well as its material (18 · 18.2)', function () {
+    [$setup, $main] = diagnosisInReading();
+    $row = rowOf($main, DiagnosisRowKind::Process);
+    $occasion = ProcessOccasion::query()->where('process_id', $row->process_id)->firstOrFail();
+    EvidenceTrace::create(['diagnosis_row_id' => $row->id, 'process_occasion_id' => $occasion->id, 'quote' => 'A retró jegyzete.', 'source_type' => 'note', 'role' => 'leader', 'recorded_on' => today()]);
+
+    Livewire::test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->call('selectRow', $row->id)
+        ->assertSee('A retró jegyzete.')
+        ->assertSee(route('admin.organizations.process-occasions', [$setup['organization'], $row->process_id]).'#occasion-'.$occasion->id, false);
+});
+
 it('greys out a peer quote the leader may not see, and keeps it out of the claims (31 · 31.6)', function () {
     [$setup, $main] = diagnosisInReading();
     $row = rowOf($main, DiagnosisRowKind::Value);
@@ -230,6 +243,27 @@ it('saves and approves the texts of the reading within their length (20 · 20.4)
         ->call('saveText', 'recommendation');
 
     expect(DiagnosisText::query()->where('key', 'recommendation')->sole()->meta)->toBe(['row_id' => rowOf($main, DiagnosisRowKind::Process)->id, 'from' => 2, 'to' => 3]);
+});
+
+it('needs the "Mit nézünk" sentence of every process row, within 160 characters (18 · 18.2)', function () {
+    [, $main] = diagnosisInReading();
+    $key = DiagnosisText::processKey(rowOf($main, DiagnosisRowKind::Process)->id);
+
+    expect(app(ReadingService::class)->requiredTexts($main))->toContain($key);
+
+    $component = Livewire::test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->assertSee('Mit nézünk · Retró')
+        ->set('texts.'.$key, str_repeat('a', 161))
+        ->call('saveText', $key)
+        ->assertHasErrors(['texts.'.$key])
+        ->set('texts.'.$key, 'Hogy a Nyíltság tetté válik-e: előre jön-e a rossz hír.')
+        ->call('saveText', $key)
+        ->assertHasNoErrors()
+        ->call('approveText', $key);
+
+    expect(DiagnosisText::query()->where('key', $key)->sole()->isApproved())->toBeTrue();
+
+    $component->call('saveText', DiagnosisText::processKey(rowOf($main, DiagnosisRowKind::Value)->id))->assertNotFound();
 });
 
 it('opens the Publikálás tab only when everything is approved (20 · 20.5)', function () {

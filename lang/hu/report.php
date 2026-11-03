@@ -64,7 +64,7 @@ return [
         'breakpoint' => 'Töréspont',
         'hunch' => 'Sejtés',
     ],
-    'hunch_traces' => '{1} Kevés még a nyom: :count bizonyíték.|[2,*] Kevés még a nyom: :count bizonyíték.',
+    'hunch_traces' => 'Kevés még a nyom: :traces.',
     'brand_reading' => 'A mégis olvasata',
     'brand_reading_marker' => 'a mégis átnézte',
     'recommendation' => 'A mégis javaslata',
@@ -79,6 +79,9 @@ return [
     'evidence' => '{0} Bizonyíték · még nincs nyom|{1} Bizonyíték · :count nyom|[2,*] Bizonyíték · :count nyom',
     'what_we_look_at' => 'Mit nézünk ezen a területen',
     'occasions' => ':count alkalom · eredményes :yes · részben :partial · nem :no',
+    // After the process row's "Mit nézünk" sentence (prototype R3·b).
+    'what_we_look_at_occasions' => ':count alkalom :date-ig: eredményes :yes, részben :partial, nem :no.',
+    'what_we_look_at_occasions_undated' => ':count alkalom: eredményes :yes, részben :partial, nem :no.',
     'process_map' => 'A folyamataitok',
     'measured' => 'mért',
     'not_in_calendar' => 'nincs a naptárban',
@@ -323,6 +326,10 @@ return [
             'calendar' => 'naptár',
             'experience' => 'megélés',
         ],
+        'unknown_source' => 'bizonyíték',
+        // The calculation's observation on a process row (18 · 18.2).
+        'calendar' => 'A naptár szerint :count alkalom volt :from és :to között.',
+        'calendar_one' => 'A naptár szerint egy alkalom volt, :date',
         'roles' => [
             'leader' => 'vezető',
             'peer' => 'társ',

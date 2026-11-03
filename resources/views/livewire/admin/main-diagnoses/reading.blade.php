@@ -167,6 +167,9 @@
                                     @if ($trace->material)
                                         · <a href="{{ route('admin.materials.show', $trace->material) }}">{{ __('admin.reading.traces.open_material') }}</a>
                                     @endif
+                                    @if ($trace->occasion)
+                                        · <a href="{{ route('admin.organizations.process-occasions', [$diagnosis->organization, $trace->occasion->process_id]) }}#occasion-{{ $trace->occasion->id }}">{{ __('admin.reading.traces.open_occasion') }}</a>
+                                    @endif
                                     @if ($trace->created_by) · {{ __('admin.reading.traces.by_hand') }} @endif
                                 </p>
                                 @if ($isOpen)
@@ -403,13 +406,13 @@
                 @php($model = $textModels->get($key))
                 <x-ui.card as="form" bordered wire:key="text-{{ $key }}" wire:submit="saveText('{{ $key }}')" class="flex flex-col gap-3">
                     <div class="flex flex-wrap items-center justify-between gap-2">
-                        <h3 class="text-lg font-semibold">{{ __('admin.reading.texts.keys.'.$key) }}</h3>
+                        <h3 class="text-lg font-semibold">{{ $textLabels[$key] }}</h3>
                         @if ($model)
                             <x-ui.badge :tone="$model->isApproved() ? 'green' : 'muted'">{{ $model->isApproved() ? __('admin.reading.states.approved') : ($model->ai_call_id ? __('admin.reading.texts.ai_draft') : __('admin.reading.states.pending')) }}</x-ui.badge>
                         @endif
                     </div>
                     <div class="flex flex-col gap-1.5">
-                        <label for="text-{{ $key }}" class="text-sm font-medium">{{ __('admin.reading.texts.keys.'.$key) }}</label>
+                        <label for="text-{{ $key }}" class="text-sm font-medium">{{ $textLabels[$key] }}</label>
                         {{-- EasyMDE takes over the raw textarea (x-ref="input"), so it stays raw rather than an x-form.textarea. --}}
                         <div wire:ignore x-data="markdownEditor({ max: {{ \App\Models\DiagnosisText::maxLength($key) }}, labels: @js(__('admin.markdown_editor')) })">
                             <textarea id="text-{{ $key }}" x-ref="input" wire:model="texts.{{ $key }}" rows="3" aria-describedby="text-{{ $key }}-help" @error('texts.'.$key) aria-invalid="true" @enderror class="field w-full"></textarea>

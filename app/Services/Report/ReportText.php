@@ -124,6 +124,22 @@ final class ReportText
     }
 
     /**
+     * What a hunch rests on, by source, the most first: "Kevés még a nyom:
+     * 2 felvétel, 1 jegyzet." (18 · 18.3). The noun stays singular after a number.
+     *
+     * @param  list<array<string, mixed>>  $traces
+     */
+    public static function hunchTraces(array $traces): string
+    {
+        $sources = collect($traces)
+            ->countBy(fn (array $trace) => $trace['source'] ?? 'unknown')
+            ->sortDesc()
+            ->map(fn (int $count, string $source) => $count.' '.__($source === 'unknown' ? 'report.trace.unknown_source' : 'report.trace.sources.'.$source));
+
+        return __('report.hunch_traces', ['traces' => $sources->implode(', ')]);
+    }
+
+    /**
      * "töréspont" in the internal snapshot, "repedés" otherwise (18 · 18.3).
      *
      * @param  array<string, mixed>  $meta

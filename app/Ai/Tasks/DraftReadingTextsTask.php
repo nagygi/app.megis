@@ -7,8 +7,9 @@ use Illuminate\Contracts\JsonSchema\JsonSchema;
 
 /**
  * The texts of the reading (18 · 18.3): one summary sentence per block, the
- * reading of the brand base and the mégis recommendation with the measuring
- * point it would move. The AI gets the rows and the claims, never names.
+ * reading of the brand base, the mégis recommendation with the measuring
+ * point it would move, and per process row what we look at in it (18 · 18.2).
+ * The AI gets the rows and the claims, never names.
  */
 final readonly class DraftReadingTextsTask implements AiTask
 {
@@ -53,6 +54,11 @@ final readonly class DraftReadingTextsTask implements AiTask
                 'from' => $schema->integer()->nullable()->required(),
                 'to' => $schema->integer()->nullable()->required(),
             ])->required(),
+            // "Mit nézünk ebben a rutinban" per process row (18 · 18.2, R3·b).
+            'what_we_look_at' => $schema->array()->items($schema->object([
+                'row_ref' => $schema->string()->required(),
+                'text' => $schema->string()->required(),
+            ]))->required(),
         ];
     }
 }

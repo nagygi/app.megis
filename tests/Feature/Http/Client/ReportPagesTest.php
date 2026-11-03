@@ -1,10 +1,13 @@
 <?php
 
 use App\Enums\DiagnosisRowKind;
+use App\Enums\MainDiagnosisSubject;
 use App\Models\Consent;
 use App\Models\DiagnosisClaim;
+use App\Models\DiagnosisText;
 use App\Models\EvidenceTrace;
 use App\Models\Membership;
+use App\Services\Diagnoses\ReadingService;
 use App\Services\Report\PublishService;
 use App\Services\Report\ReportBuilder;
 use Illuminate\Support\Facades\Queue;
@@ -120,6 +123,62 @@ it('switches to the individual and the organization view (27 · 27.9)', function
 
     $this->get($url.'?nezet=egyen')->assertOk()->assertSee('a te anyagaidból');
     $this->get($url.'?nezet=szervezet')->assertOk()->assertSee('a szervezet publikált diagnózisaiból');
+});
+
+it('tells what we look at in a routine, with its occasions (18 · 18.2, prototype R3·b)', function () {
+    [$setup, $main] = publishedReport();
+    actingAsCustomer($setup['leader']);
+    $process = $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Process)->sole();
+
+    $this->get(route('client.report.item', [$setup['organization'], $main->diagnosis, 'folyamatok', $process->id]))
+        ->assertOk()
+        ->assertSee('Mit nézünk ebben a rutinban')
+        ->assertSee('A '.DiagnosisText::processKey($process->id).' mondata.')
+        ->assertSee('2 alkalom '.now()->subDays(2)->format('m.d').'-ig: eredményes 0, részben 0, nem 0.');
+});
+
+it('tells what a hunch rests on, by source (18 · 18.3)', function () {
+    [$setup, $main] = approvedReading();
+    $row = $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Value)->orderBy('position')->skip(1)->firstOrFail();
+    $traceIds = collect([['recording', 'Az első felvétel.'], ['recording', 'A második felvétel.'], ['note', 'A jegyzet.']])
+        ->map(fn (array $trace) => EvidenceTrace::create(['diagnosis_row_id' => $row->id, 'quote' => $trace[1], 'source_type' => $trace[0], 'role' => 'leader', 'recorded_on' => today()])->id)
+        ->all();
+    $reading = app(ReadingService::class);
+    $reading->approveClaim($reading->saveClaim($main, null, ['diagnosis_row_id' => $row->id, 'kind' => 'hunch', 'text' => 'Talán itt is szóltok.', 'trace_ids' => $traceIds], $setup['admin']), $setup['admin']);
+    app(PublishService::class)->publish($main->refresh(), $setup['admin']);
+    actingAsCustomer($setup['leader']);
+
+    $this->get(route('client.report.item', [$setup['organization'], $main->diagnosis, 'ertekek', $row->id]))
+        ->assertOk()
+        ->assertSee('Talán itt is szóltok.')
+        ->assertSee('Kevés még a nyom: 2 felvétel, 1 jegyzet.');
+});
+
+it('greys the team view below the threshold, even as the default view (18 · 18.6)', function () {
+    [$setup, $main] = publishedReport();
+    actingAsCustomer($setup['leader']);
+
+    $response = $this->get(route('client.report.chapter', [$setup['organization'], $main->diagnosis, 'ertekek']))
+        ->assertOk()
+        ->assertSee('Még 2 társ hangja kellett volna');
+
+    expect($response->getContent())->toMatch('/<span[^>]*aria-current="page"[^>]*aria-disabled="true"[^>]*>Csapat/');
+});
+
+it('gives a private person no view switcher and no comparison (18 · 18.5)', function () {
+    [$setup, $main] = approvedReading();
+    $main->update(['subject' => MainDiagnosisSubject::Individual]);
+    app(PublishService::class)->publish($main->refresh(), $setup['admin']);
+    actingAsCustomer($setup['leader']);
+    $parameters = [$setup['organization'], $main->diagnosis];
+
+    $this->get(route('client.report.chapter', [...$parameters, 'ertekek']).'?nezet=egyen')
+        ->assertOk()
+        ->assertSee('Nálatok szólnak a csúszásról.')
+        ->assertDontSee('aria-label="Nézet"', false)
+        ->assertDontSee('a te anyagaidból')
+        ->assertDontSee(route('client.report.compare', $parameters));
+    $this->get(route('client.report.compare', $parameters))->assertNotFound();
 });
 
 it('shows a peer quote to the leader only with the A1 switch and the peer consent (31 · 31.6, 17 · 17.2)', function () {

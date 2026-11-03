@@ -352,14 +352,34 @@ class ReadingService
     }
 
     /**
-     * The texts the reading needs: the snapshot has no area block (18 · 18.3).
+     * The texts the reading needs: the snapshot has no area block (18 · 18.3),
+     * and every process row has its "Mit nézünk" sentence (18 · 18.2).
      *
      * @return list<string>
      */
     public function requiredTexts(MainDiagnosis $main): array
     {
-        return array_values(array_filter(DiagnosisText::KEYS, fn (string $key) => ! ($key === 'summary_areas' && $main->isSnapshot())
-            && ! ($key === 'summary_processes' && ! $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Process)->exists())));
+        $processRows = $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Process)->orderBy('position')->pluck('id');
+
+        return [
+            ...array_values(array_filter(DiagnosisText::KEYS, fn (string $key) => ! ($key === 'summary_areas' && $main->isSnapshot())
+                && ! ($key === 'summary_processes' && $processRows->isEmpty()))),
+            ...$processRows->map(fn ($id) => DiagnosisText::processKey((int) $id))->all(),
+        ];
+    }
+
+    /**
+     * "Összefoglaló · értékek", or "Mit nézünk · Retró" for a process row.
+     *
+     * @param  Collection<int, DiagnosisRow>  $rows
+     */
+    public static function textLabel(string $key, Collection $rows): string
+    {
+        $rowId = DiagnosisText::processRowId($key);
+
+        return $rowId === null
+            ? __('admin.reading.texts.keys.'.$key)
+            : __('admin.reading.texts.keys.what_we_look_at', ['process' => $rows->firstWhere('id', $rowId)?->label() ?? '–']);
     }
 
     /**

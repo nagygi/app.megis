@@ -180,6 +180,11 @@ class DiagnosisService
     {
         $this->ensureEditable($diagnosis);
 
+        // The rows of a calculated diagnosis come from the value set, not from "+ Érték" (18 · 18.1).
+        if ($diagnosis->isCalculated()) {
+            throw new DiagnosisException(__('admin.diagnoses.calculated_values'));
+        }
+
         if (! Value::query()->availableTo($diagnosis->organization)->whereKey($value->id)->exists()) {
             throw new DiagnosisException(__('admin.diagnoses.value_not_available', ['name' => $value->name]));
         }

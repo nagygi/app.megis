@@ -18,7 +18,7 @@
             </x-slot:head>
 
             @forelse ($occasions as $occasion)
-                <tr wire:key="occasion-{{ $occasion->id }}" class="align-top">
+                <tr wire:key="occasion-{{ $occasion->id }}" id="occasion-{{ $occasion->id }}" class="align-top target:bg-yellow-pale">
                     <td class="px-3 py-2">
                         <span class="font-semibold">{{ $occasion->occurred_at->format('Y.m.d.') }}</span>
                         <span class="block text-xs text-grey-700">

@@ -2,6 +2,7 @@
 
 namespace App\Services\Report;
 
+use App\Enums\MainDiagnosisSubject;
 use App\Models\ChapterUpdate;
 use App\Models\Diagnosis;
 use App\Models\MainDiagnosis;
@@ -43,6 +44,9 @@ class ReportPages
         $snapshot = $data['meta']['snapshot'];
         $hasSummary = ! $snapshot && ! ($data['meta']['standalone'] ?? false);
         abort_if(! $hasSummary && in_array($page, ['summary', 'internal', 'compare'], true), 404);
+        // A private person has one view: their own rows are the Egyén and the Szervezet too (18 · 18.5).
+        $singleView = ($data['meta']['standalone'] ?? false) || ($data['meta']['subject'] ?? null) === MainDiagnosisSubject::Individual->value;
+        abort_if($singleView && $page === 'compare', 404);
 
         $extra = [];
         $key = null;
@@ -80,8 +84,9 @@ class ReportPages
             'diagnosis' => $diagnosis,
             'main' => $main,
             'report' => $data,
-            // A standalone report has the one view only.
-            'mode' => in_array($mode, ['egyen', 'csapat', 'szervezet'], true) && ! ($data['meta']['standalone'] ?? false) ? $mode : 'csapat',
+            // A standalone report and a private person's have the one view only.
+            'mode' => in_array($mode, ['egyen', 'csapat', 'szervezet'], true) && ! $singleView ? $mode : 'csapat',
+            'singleView' => $singleView,
             'individual' => collect($data['views']['individual'][$viewerId] ?? []),
             'organizationView' => collect($data['views']['organization'] ?? []),
             'chapterKeys' => array_keys($data['chapters']),

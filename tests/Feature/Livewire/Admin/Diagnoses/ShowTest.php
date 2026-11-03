@@ -78,6 +78,19 @@ it('refuses archived values, values of another organization and duplicates', fun
     expect($diagnosis->valueRows()->count())->toBe(1);
 });
 
+it('refuses "+ Érték" on a main diagnosis, whose values come from the value set (18 · 18.1)', function () {
+    [$setup, $main] = runningDiagnosis();
+    actingAsAdmin($setup['admin']);
+    $rows = $main->diagnosis->rows()->count();
+
+    Livewire::test(Show::class, ['diagnosis' => $main->diagnosis])
+        ->set('newValueName', 'Bátorság')
+        ->call('addValue')
+        ->assertSee('ide nem vehető fel új érték');
+
+    expect($main->diagnosis->rows()->count())->toBe($rows);
+});
+
 it('requires the score on value rows and records "–" as no trace', function () {
     actingAsAdmin();
     $diagnosis = draftDiagnosis();

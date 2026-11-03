@@ -35,7 +35,10 @@ A 04 · 4.4 mezőin felül:
   - forrás típusa: beszélgetés, felvétel, jegyzet, dokumentum, Értéktükör, naptár, megélés;
   - az anyag és az alkalom, linkkel;
   - szerep (vezető, társ, külsős), dátum. A név csak az adminnál látszik.
+  - A folyamat-soroknál a számítás két nyomot maga is felvesz: a naptárból jött alkalmak számát és időszakát („A naptár szerint 6 alkalom volt 03.04. és 04.02. között.”), és a V11·c megjegyzéseit (megélés).
 - **Mit nézünk:** a folyamatoknál és a területeknél egy mondat a sor mércéjéről (R3·b, R4·b).
+  - A területeknél a *Beállítások → Területek* lapról jön (18.1).
+  - A folyamatoknál AI-vázlatként érkezik az olvasat indulásakor, a többi szöveggel együtt (18.3). Az admin átírja és jóváhagyja. Mögötte a riport az alkalmakat sorolja („6 alkalom 04.02-ig: eredményes 3, részben 2, nem 1.”).
 
 ### 18.3 Állítások és olvasat
 
@@ -81,7 +84,7 @@ A riport nézetváltójának adatai (a megjelenítés: 27):
 - **Csapat** (alapnézet): a fő diagnózis sorai.
 - **Egyén:** a PHI a néző saját Értéktükreiből és az általa feltöltött és elmondott anyagokból jön (a vezető feltöltött meetingjei is, akkor is, ha mások is beszélnek benne), a megélés a saját V5 vagy T4. Ha 2-nél kevesebb ilyen anyag van, a sor „nincs elég adat”. A felületen „a te anyagaidból” felirat áll.
 - **Szervezet:** a szervezet publikált fő diagnózisai, csapatonként a legutolsó, legfeljebb 12 hónapos (a 04 · 4.5 ablaka). Csak a közös sorok számítanak: értékek (azonos név esetén, verziótól függetlenül), területek, fa; a folyamat-blokk nem jelenik meg. Az egyfős, cégen belüli diagnózis nem számít bele. Amíg csak egy diagnózis van, egyezik a Csapattal.
-- Magánszemélynél nincs Csapat nézet, az Egyén és a Szervezet ugyanaz.
+- Magánszemélynél nincs Csapat nézet, az Egyén és a Szervezet ugyanaz. Ezért nézetváltó és összevetés (R1·c) sincs: a riport a saját sorait mutatja.
 
 ### 18.6 Küszöb
 

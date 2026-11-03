@@ -65,8 +65,9 @@ class ReportBuilder
         $processDiagnoses = Diagnosis::query()->where('parent_id', $diagnosis->id)->where('level', DiagnosisLevel::Process)->get()->keyBy('process_id');
         $areas = Area::query()->get()->keyBy('id');
         $quotingPeers = $main->quotingPeerIds();
+        $texts = DiagnosisText::query()->where('diagnosis_id', $diagnosis->id)->whereNotNull('approved_at')->get()->keyBy('key');
 
-        $rowData = $rows->map(fn (DiagnosisRow $row) => $this->row($row, $main, $definitions, $claims->get($row->id, collect()), $showsExperience, $gapRow, $processDiagnoses, $areas, $quotingPeers))->values();
+        $rowData = $rows->map(fn (DiagnosisRow $row) => $this->row($row, $main, $definitions, $claims->get($row->id, collect()), $showsExperience, $gapRow, $processDiagnoses, $areas, $quotingPeers, $texts))->values();
 
         $chapters = collect(self::CHAPTERS)
             ->map(fn (DiagnosisRowKind $kind, string $chapter) => self::chapter($chapter, $rowData->where('kind', $kind->value)->values()))
@@ -74,7 +75,6 @@ class ReportBuilder
             ->filter(fn (array $chapter) => $chapter['rows'] !== [])
             ->all();
 
-        $texts = DiagnosisText::query()->where('diagnosis_id', $diagnosis->id)->whereNotNull('approved_at')->get()->keyBy('key');
         $recommendation = $texts->get('recommendation');
         $recommendationRow = $recommendation?->meta['row_id'] ?? null;
         $peers = $main->peers()->count();
@@ -114,8 +114,8 @@ class ReportBuilder
             'strength' => $this->pick($rowData, 'strength'),
             'crack' => $this->pick($rowData, 'crack'),
             'texts' => [
-                // A base collection: Eloquent's except() filters by primary key.
-                ...$texts->toBase()->except('recommendation')->map(fn (DiagnosisText $text) => $text->text)->all(),
+                // A base collection: Eloquent's except() filters by primary key. A process row's sentence goes with its row.
+                ...$texts->toBase()->only(DiagnosisText::KEYS)->except('recommendation')->map(fn (DiagnosisText $text) => $text->text)->all(),
                 'recommendation' => $recommendation === null ? null : [
                     'text' => $recommendation->text,
                     'row' => $recommendationRow === null ? null : collect($rowData)->firstWhere('id', $recommendationRow)['label'] ?? null,
@@ -165,9 +165,10 @@ class ReportBuilder
      * @param  Collection<int|string, Diagnosis>  $processDiagnoses
      * @param  Collection<int|string, Area>  $areas
      * @param  list<int>  $quotingPeers  a peer's quote only with the switch and the consent (31 · 31.6)
+     * @param  Collection<string, DiagnosisText>  $texts  the approved texts of the reading
      * @return array<string, mixed>
      */
-    private function row(DiagnosisRow $row, MainDiagnosis $main, Collection $definitions, Collection $claims, bool $showsExperience, ?DiagnosisRow $gapRow, Collection $processDiagnoses, Collection $areas, array $quotingPeers): array
+    private function row(DiagnosisRow $row, MainDiagnosis $main, Collection $definitions, Collection $claims, bool $showsExperience, ?DiagnosisRow $gapRow, Collection $processDiagnoses, Collection $areas, array $quotingPeers, Collection $texts): array
     {
         $stats = $row->aggregation_stats ?? [];
         $traces = $row->traces->whereNull('excluded_at')
@@ -209,9 +210,15 @@ class ReportBuilder
                 'low' => $definition['low_example'] ?? null,
                 'high' => $definition['high_example'] ?? null,
             ],
-            'what_we_look_at' => $row->kind === DiagnosisRowKind::Area ? $areas->get($row->area_id)?->what_we_look_at : null,
+            // The area's sentence from Beállítások → Területek, the process row's from the reading (18 · 18.2).
+            'what_we_look_at' => match ($row->kind) {
+                DiagnosisRowKind::Area => $areas->get($row->area_id)?->what_we_look_at,
+                DiagnosisRowKind::Process => $texts->get(DiagnosisText::processKey($row->id))?->text,
+                default => null,
+            },
             'occasions' => $effectiveness === null ? null : [
                 'count' => $processDiagnosis->aggregation['occasions'] ?? 0,
+                'last_on' => collect($processDiagnosis->aggregation['used'] ?? [])->max('date'),
                 ...$effectiveness,
             ],
             'override' => $row->overridden_at === null ? null : [

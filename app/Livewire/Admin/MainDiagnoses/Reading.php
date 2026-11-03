@@ -309,7 +309,7 @@ class Reading extends Component
     public function saveText(string $key, ReadingService $reading): void
     {
         $this->authorizeReading();
-        abort_unless(in_array($key, DiagnosisText::KEYS, true), 404);
+        abort_unless(in_array($key, $reading->requiredTexts($this->main()), true), 404);
 
         $rules = ["texts.{$key}" => ['required', 'string', 'max:'.DiagnosisText::maxLength($key)]];
 
@@ -319,7 +319,7 @@ class Reading extends Component
             $rules['recommendation.to'] = ['nullable', 'integer', 'between:1,6'];
         }
 
-        $this->validate($rules, attributes: ["texts.{$key}" => __('admin.reading.texts.keys.'.$key)]);
+        $this->validate($rules, attributes: ["texts.{$key}" => ReadingService::textLabel($key, $this->diagnosis->rows()->with('process')->get())]);
 
         $meta = $key === 'recommendation' && filled($this->recommendation['row_id'])
             ? ['row_id' => (int) $this->recommendation['row_id'], 'from' => filled($this->recommendation['from']) ? (int) $this->recommendation['from'] : null, 'to' => filled($this->recommendation['to']) ? (int) $this->recommendation['to'] : null]
@@ -395,7 +395,8 @@ class Reading extends Component
                 ? EvidenceTrace::query()->where('diagnosis_row_id', (int) $this->claim['diagnosis_row_id'])->get()->filter($shown)->values()
                 : collect(),
             'textModels' => DiagnosisText::query()->where('diagnosis_id', $this->diagnosis->id)->get()->keyBy('key'),
-            'requiredTexts' => $reading->requiredTexts($main),
+            'requiredTexts' => $requiredTexts = $reading->requiredTexts($main),
+            'textLabels' => collect($requiredTexts)->mapWithKeys(fn (string $key) => [$key => ReadingService::textLabel($key, $rows)]),
             'gapRow' => $reading->gapRow($main),
             'gapCandidates' => $rows->filter(fn (DiagnosisRow $row) => in_array($row->kind, [DiagnosisRowKind::Value, DiagnosisRowKind::TreeElement], true))->values(),
             'progress' => $reading->progress($main),
@@ -417,7 +418,7 @@ class Reading extends Component
     {
         $texts = DiagnosisText::query()->where('diagnosis_id', $this->diagnosis->id)->get()->keyBy('key');
 
-        foreach (DiagnosisText::KEYS as $key) {
+        foreach (array_unique([...DiagnosisText::KEYS, ...app(ReadingService::class)->requiredTexts($this->main())]) as $key) {
             $this->texts[$key] = (string) $texts->get($key)?->text;
         }
 

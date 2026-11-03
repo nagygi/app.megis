@@ -1,9 +1,11 @@
 <?php
 
+use App\Enums\DiagnosisRowKind;
 use App\Enums\InboxItemType;
 use App\Enums\MainDiagnosisStage;
 use App\Jobs\DraftReading;
 use App\Models\DiagnosisClaim;
+use App\Models\DiagnosisRow;
 use App\Models\DiagnosisText;
 use App\Models\EvidenceTrace;
 use App\Models\InboxItem;
@@ -39,7 +41,10 @@ function diagnosisWithTrace(): array
     return [$setup, $main->refresh(), EvidenceTrace::query()->sole()];
 }
 
-function textsAnswer(?string $rowRef = 'R1'): StructuredTextResponse
+/**
+ * @param  list<array{row_ref: string, text: string}>  $lookAt
+ */
+function textsAnswer(?string $rowRef = 'R1', array $lookAt = []): StructuredTextResponse
 {
     return structuredAnswer([
         'summary_values' => 'Az értékeitek a tettekben is látszanak.',
@@ -48,6 +53,7 @@ function textsAnswer(?string $rowRef = 'R1'): StructuredTextResponse
         'summary_brand' => 'A fa gyökere erős.',
         'brand_reading' => 'A gyökér és a törzs összhangban van.',
         'recommendation' => ['text' => 'A retrón kezdenénk.', 'row_ref' => $rowRef, 'from' => 2, 'to' => 3],
+        'what_we_look_at' => $lookAt,
     ]);
 }
 
@@ -100,6 +106,34 @@ it('keeps what the admin already worked on when drafting again', function () {
         ->and(DiagnosisClaim::query()->count())->toBe(2)
         ->and(DiagnosisText::query()->where('key', 'summary_values')->value('text'))->toBe('A mégis mondata.')
         ->and(DiagnosisText::query()->where('key', 'recommendation')->value('meta'))->toBeNull();
+});
+
+it('drafts the "Mit nézünk" sentence of a process row from its values, and keeps an approved one (18 · 18.2)', function () {
+    [, $main] = diagnosisWithTrace();
+    $rows = $main->diagnosis->rows()->orderBy('position')->get()->values();
+    $position = $rows->search(fn (DiagnosisRow $row) => $row->kind === DiagnosisRowKind::Process);
+    $processRow = $rows->get($position);
+    $lookAt = [['row_ref' => 'R'.($position + 1), 'text' => 'Hogy a Nyíltság tetté válik-e.'], ['row_ref' => 'R1', 'text' => 'Egy értéksor nem kap ilyet.']];
+    $prompts = [];
+    AiGateway::fake(function (string $prompt) use (&$prompts, $lookAt) {
+        $prompts[] = $prompt;
+
+        return count($prompts) % 2 === 1 ? structuredAnswer(['claims' => []]) : textsAnswer(null, $lookAt);
+    });
+
+    app(ReadingDraftService::class)->draft($main);
+
+    $text = DiagnosisText::query()->where('key', DiagnosisText::processKey($processRow->id))->sole();
+    expect($text->text)->toBe('Hogy a Nyíltság tetté válik-e.')
+        ->and($text->status)->toBe('draft')
+        ->and($text->ai_call_id)->not->toBeNull()
+        ->and(DiagnosisText::query()->where('key', DiagnosisText::processKey($rows->first()->id))->exists())->toBeFalse()
+        ->and($prompts[1])->toContain('"értékek"');
+
+    $text->update(['text' => 'A mégis mércéje.', 'status' => 'approved', 'approved_at' => now()]);
+    app(ReadingDraftService::class)->draft($main->refresh());
+
+    expect($text->refresh()->text)->toBe('A mégis mércéje.');
 });
 
 it('starts the drafts when reading starts', function () {

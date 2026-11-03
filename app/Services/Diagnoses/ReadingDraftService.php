@@ -5,7 +5,9 @@ namespace App\Services\Diagnoses;
 use App\Ai\AiContext;
 use App\Ai\Tasks\DraftClaimsTask;
 use App\Ai\Tasks\DraftReadingTextsTask;
+use App\Enums\DiagnosisLevel;
 use App\Enums\DiagnosisRowKind;
+use App\Models\Diagnosis;
 use App\Models\DiagnosisClaim;
 use App\Models\DiagnosisRow;
 use App\Models\DiagnosisText;
@@ -18,7 +20,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * The AI drafts of the reading (18 · 18.3): claims on the rows, each built
  * on the row's own traces, then the summary sentences, the reading of the
- * brand base and the recommendation. Drafts the admin already touched stay.
+ * brand base, the recommendation and the processes' "Mit nézünk" sentences
+ * (18 · 18.2). Drafts the admin already touched stay.
  */
 class ReadingDraftService
 {
@@ -133,9 +136,11 @@ class ReadingDraftService
     private function draftTexts(MainDiagnosis $main, Collection $refs, Collection $claims, AiContext $context): void
     {
         $rowRefs = $refs->mapWithKeys(fn (DiagnosisRow $row, string $ref) => [$row->id => $ref]);
+        $processDiagnoses = Diagnosis::query()->where('parent_id', $main->diagnosis_id)->where('level', DiagnosisLevel::Process)
+            ->with('valueRows.value')->get()->keyBy('process_id');
 
         $result = $this->ai->run(new DraftReadingTextsTask(
-            $refs->map(fn (DiagnosisRow $row, string $ref) => $this->rowInput($ref, $row))->values()->all(),
+            $refs->map(fn (DiagnosisRow $row, string $ref) => [...$this->rowInput($ref, $row), ...$this->processInput($row, $processDiagnoses->get($row->process_id))])->values()->all(),
             $claims->map(fn (DiagnosisClaim $claim) => [
                 'sor' => $rowRefs->get($claim->diagnosis_row_id),
                 'fajta' => $claim->kind,
@@ -156,6 +161,14 @@ class ReadingDraftService
             'brand_reading' => $answer['brand_reading'] ?? null,
             'recommendation' => $recommendation['text'] ?? null,
         ];
+
+        foreach ($answer['what_we_look_at'] ?? [] as $item) {
+            $row = $refs->get((string) ($item['row_ref'] ?? ''));
+
+            if ($row?->kind === DiagnosisRowKind::Process) {
+                $texts[DiagnosisText::processKey($row->id)] = $item['text'] ?? null;
+            }
+        }
 
         DB::transaction(function () use ($main, $texts, $result, $recommendation, $recommendationRow): void {
             foreach ($texts as $key => $text) {
@@ -201,6 +214,27 @@ class ReadingDraftService
             'megélés' => $row->experience,
             'rés' => $row->gap(),
             'n' => $row->aggregation_stats['n'] ?? null,
+        ];
+    }
+
+    /**
+     * A process row's description and the values measured in it, for its
+     * "Mit nézünk" sentence (18 · 18.2).
+     *
+     * @return array<string, mixed>
+     */
+    private function processInput(DiagnosisRow $row, ?Diagnosis $processDiagnosis): array
+    {
+        if ($row->kind !== DiagnosisRowKind::Process) {
+            return [];
+        }
+
+        return [
+            'leírás' => filled($row->process?->description) ? $row->process->description : null,
+            'értékek' => $processDiagnosis?->valueRows->map(fn (DiagnosisRow $valueRow) => [
+                'név' => $valueRow->label(),
+                'phi' => $valueRow->scoreLabel() === '' ? null : $valueRow->scoreLabel(),
+            ])->values()->all() ?? [],
         ];
     }
 

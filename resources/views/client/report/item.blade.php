@@ -53,7 +53,8 @@
             @endif
         @endif
 
-        @if ($item['occasions'])
+        {{-- With its "Mit nézünk" sentence a process tells its occasions there (prototype R3·b). --}}
+        @if ($item['occasions'] && ! ($key === 'processes' && $item['what_we_look_at']))
             <p class="text-sm text-grey-700">{{ __('report.occasions', ['count' => $item['occasions']['count'], 'yes' => $item['occasions']['yes'] ?? 0, 'partial' => $item['occasions']['partial'] ?? 0, 'no' => $item['occasions']['no'] ?? 0]) }}</p>
         @endif
 
@@ -78,8 +79,19 @@
 
         @if ($item['what_we_look_at'])
             <section class="flex flex-col gap-1" aria-labelledby="look-title">
-                <h2 id="look-title" class="text-xs font-semibold tracking-[.08em] text-green uppercase">{{ __('report.what_we_look_at') }}</h2>
-                <p class="text-sm leading-relaxed">{{ $item['what_we_look_at'] }}</p>
+                <h2 id="look-title" class="text-xs font-semibold tracking-[.08em] text-green uppercase">{{ __($key === 'processes' ? 'report.what_we_look_at_process' : 'report.what_we_look_at') }}</h2>
+                <p class="text-sm leading-relaxed">
+                    {{ $item['what_we_look_at'] }}
+                    @if ($key === 'processes' && $item['occasions'])
+                        {{ __(isset($item['occasions']['last_on']) ? 'report.what_we_look_at_occasions' : 'report.what_we_look_at_occasions_undated', [
+                            'count' => $item['occasions']['count'],
+                            'date' => isset($item['occasions']['last_on']) ? \Illuminate\Support\Carbon::parse($item['occasions']['last_on'])->format('m.d') : null,
+                            'yes' => $item['occasions']['yes'] ?? 0,
+                            'partial' => $item['occasions']['partial'] ?? 0,
+                            'no' => $item['occasions']['no'] ?? 0,
+                        ]) }}
+                    @endif
+                </p>
             </section>
         @endif
 

@@ -2,6 +2,27 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.83 · {hash} · 2026-11-03
+
+Diagnózis tartalma (18): a jegy hiányai pótolva.
+
+- **Nézetváltó (18.5, 18.6):**
+  - **Magánszemélynél** nincs nézetváltó és összevetés: a riport a saját sorait mutatja, ez az Egyén és a Szervezet is. Az összevetés lapja 404.
+  - **Küszöb alatt** a Csapat gomb akkor is szürke és nem kattintható, ha épp az az alapnézet. Eddig ilyenkor aktívnak látszott.
+- **Folyamatok „Mit nézünk ebben a rutinban” (18.2, R3·b):**
+  - **Folyamat-soronként egy mondat**, AI-vázlatként az olvasat indulásakor, a többi szöveggel együtt (`olvasat-szovegek` v3). A modell megkapja a folyamat leírását és a rutinban mért értékeket.
+  - **Az olvasatban** a szövegek között áll („Mit nézünk · Retró”, legfeljebb 160 karakter). Jóváhagyás kell hozzá, különben az ellenőrzőlista nem enged publikálni.
+  - **A riport R3·b lapján** a mondat után az alkalmak állnak: „6 alkalom 04.02-ig: eredményes 3, részben 2, nem 1.” Ilyenkor a különálló alkalom-sor elmarad.
+- **Nyomok (18.2, 18.3):**
+  - **A sejtés sora** forrás szerint számol: „Kevés még a nyom: 2 felvétel, 1 jegyzet.” Eddig „2 bizonyíték” állt. Az állítások promptja (`diagnozis-allitasok` v2) már nem írja bele a mondatba, így nem ismétlődik.
+  - **Naptár- és megélés-nyom** automatikusan is keletkezik a folyamat-soron:
+    - a naptárból jött alkalmak száma és időszaka;
+    - a V11·c megjegyzései, a kitöltő szerepével.
+    - Az admin kivétele és kiemelése az újraszámolás után is megmarad. A visszavont hozzájárulású társ megjegyzése kikerül.
+  - **Az olvasatban** a nyomnál link visz az alkalomra is, a folyamat alkalomlistáján kiemelve.
+- **„+ Érték” (18.1):** a számolt diagnózisba a szerver sem enged új értéket felvenni („A számolt diagnózis értékei a szervezet értékszettjéből jönnek…”). Eddig ezt csak a nézet rejtette.
+- **Migráció:** `evidence_traces.auto_key`. A számítás saját nyomainak kulcsa, csak hozzáad.
+
 ## 1.82 · b915d94 · 2026-11-03
 
 Admin, *Publikálás* fül (21 · 21.1): a vezető nézetének előnézete a kezdőlapon (V12, snapshotnál V12·b) nyílik.

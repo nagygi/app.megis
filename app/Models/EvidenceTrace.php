@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * A trace of a diagnosis row: a quote or observation, its source, the role
  * and date; the name only for the admin (18 · 18.2).
  */
-#[Fillable(['diagnosis_row_id', 'material_id', 'process_occasion_id', 'raw_detection_id', 'quote', 'source_type', 'role', 'user_id', 'recorded_on', 'excluded_at', 'highlighted_at', 'created_by'])]
+#[Fillable(['diagnosis_row_id', 'material_id', 'process_occasion_id', 'raw_detection_id', 'auto_key', 'quote', 'source_type', 'role', 'user_id', 'recorded_on', 'excluded_at', 'highlighted_at', 'created_by'])]
 class EvidenceTrace extends Model
 {
     public const SOURCE_CONVERSATION = 'conversation';

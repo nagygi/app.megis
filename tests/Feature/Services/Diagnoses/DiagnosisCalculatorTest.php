@@ -14,6 +14,7 @@ use App\Models\DiagnosisType;
 use App\Models\Material;
 use App\Models\OccasionExperience;
 use App\Models\Process;
+use App\Models\ProcessOccasion;
 use App\Models\Product;
 use App\Services\Diagnoses\DiagnosisCalculator;
 use App\Services\Diagnoses\DiagnosisService;
@@ -173,6 +174,47 @@ it('averages the occasion experiences per value, leader and peers apart (13 · 1
     app(DiagnosisCalculator::class)->recalculate($main);
 
     expect($row->refresh()->experience)->toBe(6.0);
+});
+
+it('gives a process row a calendar trace and the V11·c notes as traces, and keeps them by their key (18 · 18.2)', function () {
+    [$setup, $main, $process] = calculatedDiagnosis();
+    $first = ProcessOccasion::create(['process_id' => $process->id, 'occurred_at' => now()->subDays(9), 'source' => 'calendar']);
+    $last = ProcessOccasion::create(['process_id' => $process->id, 'occurred_at' => now()->subDays(2), 'source' => 'calendar']);
+    scoredMaterial($main, $first, [0 => 3, 1 => 3, 2 => 3]);
+    scoredMaterial($main, $last, [0 => 4, 1 => 4, 2 => 4]);
+    scoredMaterial($main, occasionOn($process, 5), [0 => 4, 1 => 4, 2 => 4]);
+    $peer = $setup['peers'][0];
+    $main->participantFor($peer, ParticipantRole::Peer)->update(['started_at' => now()]);
+    $consent = Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => 'answers', 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
+
+    foreach ([[$setup['leader'], 'A retrón végre kimondtuk, mi csúszott.'], [$peer, 'Most először kérdezték, mit gondolok.']] as [$user, $note]) {
+        OccasionExperience::create([
+            'process_occasion_id' => $last->id, 'user_id' => $user->id, 'main_diagnosis_id' => $main->id,
+            'answers' => [], 'effectiveness' => 'yes', 'note' => $note, 'submitted_at' => now(),
+        ]);
+    }
+
+    app(DiagnosisCalculator::class)->recalculate($main);
+
+    $row = $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Process)->sole();
+    $traces = $row->traces()->whereNotNull('auto_key')->get()->keyBy('source_type');
+    expect($row->traces()->whereNotNull('auto_key')->count())->toBe(3)
+        ->and($traces['calendar'])
+        ->quote->toBe('A naptár szerint 2 alkalom volt '.$first->occurred_at->format('m.d.').' és '.$last->occurred_at->format('m.d.').' között.')
+        ->role->toBeNull()
+        ->process_occasion_id->toBe($last->id)
+        ->and($row->traces()->where('source_type', 'experience')->pluck('role', 'quote')->all())->toBe([
+            'A retrón végre kimondtuk, mi csúszott.' => 'leader',
+            'Most először kérdezték, mit gondolok.' => 'peer',
+        ]);
+
+    // The admin's choice stays; a withdrawn peer's note leaves (25 · 25.6).
+    $traces['calendar']->update(['excluded_at' => now()]);
+    $consent->update(['revoked_at' => now()]);
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    expect($traces['calendar']->refresh()->excluded_at)->not->toBeNull()
+        ->and($row->traces()->where('source_type', 'experience')->pluck('quote')->all())->toBe(['A retrón végre kimondtuk, mi csúszott.']);
 });
 
 it('does not change a published diagnosis (13 · 13.4)', function () {
