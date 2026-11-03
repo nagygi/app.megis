@@ -176,6 +176,24 @@ it('checks the e-mail part before a recording is uploaded, keeping the Turnstile
     expect(MirrorSession::query()->count())->toBe(0);
 });
 
+it('never ties a public mirror to a diagnosis, even when an id is sent (17 · 17.4)', function () {
+    Queue::fake();
+    fakeTurnstile();
+    $main = startMainDiagnosis(diagnosisTeam());
+
+    Livewire::test(Record::class)
+        ->call('setMode', 'text')
+        ->set('text', str_repeat('Múlt héten inkább most mondom, mint csütörtökön, hogy csúszunk. ', 2))
+        ->set('email', 'anna@example.com')
+        ->set('consent', true)
+        ->set('turnstileToken', 'token')
+        ->set('mainDiagnosisId', $main->diagnosis_id)
+        ->call('submitText')
+        ->assertHasNoErrors();
+
+    expect(MirrorSession::query()->sole()->material->parent_diagnosis_id)->toBeNull();
+});
+
 it('asks for no e-mail from the own menu', function () {
     $organization = Organization::factory()->create();
     actingAsCustomer(customerOf($organization));

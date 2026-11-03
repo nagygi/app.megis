@@ -2,6 +2,13 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.77 · {hash} · 2026-11-03
+
+Értéktükör (biztonsági javítás, 17 · 17.4): a nyilvános tükör nem köthető diagnózishoz.
+
+- **Eddig:** a tükör lapja a diagnózis azonosítóját a címből (`?diagnozis=`) és a böngésző üzenetéből is átvette. A belépett felhasználónál ellenőriztük, hogy az övé-e a diagnózis, a nyilvános, belépés nélküli tükörnél nem. Egy látogató így a saját nyilvános tükrét bármely diagnózishoz hozzáköthette, és az a diagnózis részdiagnózisa lett volna.
+- **Most:** diagnózishoz csak a belépve készített tükör kötődik, az ellenőrzött választás szerint. A nyilvános tükör sosem.
+
 ## 1.76 · 316696b · 2026-11-03
 
 Publikálás (21 · 21.3, 24): a saját értékek listája a publikáláskor rögzül.

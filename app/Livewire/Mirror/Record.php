@@ -223,7 +223,8 @@ class Record extends Component
 
     private function begin(Material $material, MirrorService $mirrors): void
     {
-        if ($this->mainDiagnosisId !== null) {
+        // Only a signed-in mirror belongs to a diagnosis: guard() checks the choice there (17 · 17.4, 17.6).
+        if ($this->organization !== null && $this->mainDiagnosisId !== null) {
             $material->update(['parent_diagnosis_id' => $this->mainDiagnosisId]);
         }
 
