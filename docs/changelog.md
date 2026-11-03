@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.83 · {hash} · 2026-11-03
+## 1.83 · a8c58e2 · 2026-11-03
 
 Diagnózis tartalma (18): a jegy hiányai pótolva.
 
