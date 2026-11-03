@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.75 · {hash} · 2026-11-03
+## 1.75 · 8712806 · 2026-11-03
 
 Riport és olvasat (31 · 31.6, 17 · 17.2, 25 · 25.2): a társ idézete csak akkor jelenik meg a vezetőnek, ha az A1 kapcsolója be van kapcsolva, és a társ hozzájárult.
 
