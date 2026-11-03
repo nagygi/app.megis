@@ -2,6 +2,18 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.69 · {hash} · 2026-11-03
+
+A visszaaktivált tag a csapata diagnózisának társa lesz (02 · 2.5, 17 · 17.2).
+
+- **Eddig:** aki a diagnózis indításakor inaktív volt, nem lett társ. Ha később visszaaktiválták:
+  - az admin *Beállítás* lapja bepipált társként mutatta;
+  - a kezdőlapja viszont ezt írta: „Jelenleg nincs olyan diagnózis, amelyben részt veszel.”;
+  - a „Fut” alatt meghívót sem kapott;
+  - csak a *Beállítás* lap „Mentem” gombja pótolta.
+- **Most:** az aktiválás a csapatai minden diagnózisában társnak veszi fel, olvasatig, ugyanúgy, mint egy új csapattagot. Ha a diagnózis már fut, azonnal megkapja a társ-meghívót. Akit az admin kivett a társak közül, az kivéve marad.
+- **Teendő a stagingen:** nincs. Az 1.48-as „Mentem” teendő az „Él csapat · Teljes · 2026.11.02.” diagnózisnál (ng+alma16) még nincs kész; ott a hiányzó társ-sort csak ez pótolja.
+
 ## 1.68 · c4e06db · 2026-11-03
 
 „Belépek a nevében” (14 · 14.6): a felhasználó nevében dolgozó admin minden szövegmezőt diktálhat.

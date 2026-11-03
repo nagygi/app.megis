@@ -182,6 +182,13 @@ class MembershipService
                 'status' => $membership->user->isActivated() ? MembershipStatus::Active : MembershipStatus::Added,
                 'deactivated_at' => null,
             ])->save();
+
+            // Back in their teams: a running diagnosis of the team takes them as a peer (17 · 17.2).
+            $teams = $membership->user->teams()->where('organization_id', $membership->organization_id)->get();
+
+            foreach ($teams as $team) {
+                TeamMemberAdded::dispatch($team, $membership->user);
+            }
         });
     }
 

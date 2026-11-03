@@ -182,6 +182,24 @@ it('makes a new team member a peer while the diagnosis runs, until reading start
     expect($main->participants()->where('user_id', $late->id)->exists())->toBeFalse();
 });
 
+it('makes a team member reactivated while the diagnosis runs a peer and invites them', function () {
+    $setup = diagnosisTeam(peers: 2);
+    $returning = $setup['peers'][1];
+    $membership = Membership::query()->whereBelongsTo($setup['organization'])->where('user_id', $returning->id)->firstOrFail();
+    $membership->update(['status' => MembershipStatus::Inactive]);
+
+    $main = startMainDiagnosis($setup);
+    completeLeaderSteps($main, $setup['leader']);
+    app(MainDiagnosisService::class)->start($main->refresh(), $setup['leader']);
+
+    expect($main->participants()->where('user_id', $returning->id)->exists())->toBeFalse();
+
+    app(MembershipService::class)->activate($membership);
+
+    expect($main->peers()->where('user_id', $returning->id)->whereNotNull('invited_at')->exists())->toBeTrue();
+    Mail::assertQueued(DiagnosisPeerInvitationMail::class, fn ($mail) => $mail->hasTo($returning->email));
+});
+
 it('replaces the leader without an e-mail, keeps the old leader\'s row and makes them a peer', function () {
     $setup = diagnosisTeam(peers: 2);
     $main = startMainDiagnosis($setup);
