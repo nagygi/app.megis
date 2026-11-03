@@ -61,7 +61,10 @@ A fő diagnózis *Olvasat* füle (19.1), három oszloppal, balról jobbra:
 - Az olvasat alatt a fő diagnózis 04-es státusza „Jóváhagyásra vár” (17.5).
 - Ha minden sor, állítás és szöveg jóvá van hagyva, a *Publikálás* fül (21) aktív lesz. Más játékos elem (telő évgyűrű, „felragyogó” fül) nincs.
 - Több admin dolgozhat egyszerre ugyanazon az olvasaton, zárolás nélkül. Soronként látszik, ki hagyta jóvá. Ütközésnél az utolsó mentés nyer, a napló mindkét lépést mutatja.
-- Ha egy társ visszavonja a hozzájárulását (T1, M6), az automatikus nyomai kikerülnek, és a sorok újraszámolódnak (18.6). A jóváhagyott sor, amelynek az automatikus értéke ettől változik, visszaesik „vár” állapotba, és a napló jelzi.
+- Ha egy társ visszavonja a hozzájárulását (T1, M6), a sorok nélküle számolódnak újra (18.6):
+  - Minden nyoma kikerül: az automatikusak, a kézzel felvett nyom az ő anyagából, és a területhez vagy a fához választott nyoma is. A kézi nyom anyag-választójában az anyagai nem szerepelnek. Az anyag nélkül, kézzel felvett nyomnak nincs gazdája, ez bent marad.
+  - A jóváhagyott sor visszaesik „vár” állapotba, ha az automatikus értéke ettől változik, vagy ha elveszít egy riportba kerülő nyomot. Az utóbbi az átírt és a kézzel pontozott sorra is áll.
+  - A napló okként a visszavonást írja: „visszaesett „vár” állapotba, mert egy társ visszavonta a hozzájárulását”.
 - A részdiagnózisok (17.4) innen megnyithatók, de nem kell őket külön jóváhagyni.
 
 ## Nincs benne
@@ -70,7 +73,3 @@ A fő diagnózis *Olvasat* füle (19.1), három oszloppal, balról jobbra:
 - A visszajelzések beépítése: 22.
 - A számítás és az AI-vázlat: 18.
 - Nyom kijelölése az átiratból („Nyomként felveszem”).
-
-## Hátravan
-
-- **Visszavont hozzájárulás az olvasat alatt:** a napló sora általános okot ír („az automatikus érték változott”), nem a visszavonást. A társ kézzel felvett nyomai bent maradnak. Az érintett, jóváhagyott sor jóváhagyva marad, ha az automatikus értéke nem változik.

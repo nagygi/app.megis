@@ -17,6 +17,7 @@ use App\Models\Material;
 use App\Models\ReportFeedback;
 use App\Models\ReviewEvent;
 use App\Models\User;
+use App\Services\Diagnoses\DiagnosisCalculator;
 use App\Services\Diagnoses\DiagnosisService;
 use App\Services\Diagnoses\ProcessOccasionBreakdown;
 use App\Services\Diagnoses\ReadingService;
@@ -451,11 +452,19 @@ class Reading extends Component
     }
 
     /**
+     * The materials a trace by hand can point to, without those of peers who withdrew (20 · 20.5).
+     *
      * @return Collection<int, Material>
      */
     private function materials()
     {
-        return Material::query()->where('parent_diagnosis_id', $this->diagnosis->id)->latest('id')->get(['id', 'uuid', 'original_name', 'source', 'is_situation', 'created_at']);
+        $withdrawn = app(DiagnosisCalculator::class)->withdrawnUserIds($this->main());
+
+        return Material::query()
+            ->where('parent_diagnosis_id', $this->diagnosis->id)
+            ->where(fn ($query) => $query->whereNull('user_id')->orWhereNotIn('user_id', $withdrawn))
+            ->latest('id')
+            ->get(['id', 'uuid', 'original_name', 'source', 'is_situation', 'created_at']);
     }
 
     private function selectNext(DiagnosisRow $row): void

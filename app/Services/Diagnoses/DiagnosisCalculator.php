@@ -43,6 +43,18 @@ class DiagnosisCalculator
      */
     private const ROW_QUOTES = 5;
 
+    /**
+     * The rows that lost a withdrawn peer's trace in this run (20 · 20.5).
+     *
+     * @var list<int>
+     */
+    private array $withdrawnRowIds = [];
+
+    /**
+     * Whether a peer withdrew since the last calculation: the reason in the log of what changes now (20 · 20.5).
+     */
+    private bool $consentWithdrawn = false;
+
     public function recalculate(MainDiagnosis $main): void
     {
         $main->loadMissing('diagnosis.organization', 'valueSetVersion');
@@ -59,10 +71,17 @@ class DiagnosisCalculator
             ->whereNull('speaker')
             ->get()
             ->groupBy('material_id');
+        $this->consentWithdrawn = $main->calculated_at !== null && Consent::query()
+            ->where('main_diagnosis_id', $main->id)
+            ->where('kind', ConsentKind::Answers)
+            ->where('revoked_at', '>=', $main->calculated_at)
+            ->exists();
 
         DB::transaction(function () use ($main, $snapshot, $materials, $scores): void {
+            $this->withdrawnRowIds = $this->dropWithdrawnTraces($main);
             $processDiagnoses = $this->processDiagnoses($main, $snapshot, $materials, $scores);
             $this->mainRows($main, $snapshot, $materials, $scores, $processDiagnoses);
+            $this->fallBackWithdrawnRows($main->diagnosis);
             $this->summarize($main);
         });
 
@@ -104,6 +123,50 @@ class DiagnosisCalculator
                 ->exists())
             ->pluck('user_id')
             ->all();
+    }
+
+    /**
+     * A peer who withdrew takes every trace of theirs from the reading, also
+     * those added by hand from their material or chosen for an area or the
+     * tree (18 · 18.6, 20 · 20.5). A trace written by hand without a material
+     * has no owner and stays.
+     *
+     * @return list<int> the rows that lost a trace the report showed
+     */
+    private function dropWithdrawnTraces(MainDiagnosis $main): array
+    {
+        $withdrawn = $this->withdrawnUserIds($main);
+
+        if ($withdrawn === []) {
+            return [];
+        }
+
+        $traces = EvidenceTrace::query()
+            ->whereIn('diagnosis_row_id', $main->diagnosis->rows()->select('id'))
+            ->where(fn ($query) => $query->whereIn('user_id', $withdrawn)
+                ->orWhereIn('material_id', Material::query()->whereIn('user_id', $withdrawn)->select('id')))
+            ->get(['id', 'diagnosis_row_id', 'excluded_at']);
+
+        EvidenceTrace::query()->whereIn('id', $traces->pluck('id'))->delete();
+
+        return $traces->whereNull('excluded_at')->pluck('diagnosis_row_id')->unique()->values()->all();
+    }
+
+    /**
+     * An approved row that lost a withdrawn peer's trace waits again, also when
+     * its value stays, it was written over or scored by hand (20 · 20.5). A row
+     * whose calculated value changed already fell back in {@see writeRow()}.
+     */
+    private function fallBackWithdrawnRows(Diagnosis $diagnosis): void
+    {
+        $diagnosis->rows()
+            ->whereIn('id', $this->withdrawnRowIds)
+            ->whereNotNull('approved_at')
+            ->get()
+            ->each(function (DiagnosisRow $row) use ($diagnosis): void {
+                app(ReadingService::class)->log($diagnosis, $row, 'fell_back_withdrawn', null);
+                $row->forceFill(['approved_at' => null, 'approved_by' => null])->save();
+            });
     }
 
     /**
@@ -502,7 +565,8 @@ class DiagnosisCalculator
         // An approved row whose calculated value changes waits again, with the reason in the log (20, question 5).
         if ($row->exists && $row->approved_at !== null && $row->overridden_at === null
             && ($row->automatic_score !== $rounded || $row->automatic_score_state !== $state)) {
-            app(ReadingService::class)->log($diagnosis, $row, 'fell_back', null, [
+            $withdrawn = $this->consentWithdrawn || in_array($row->id, $this->withdrawnRowIds, true);
+            app(ReadingService::class)->log($diagnosis, $row, $withdrawn ? 'fell_back_withdrawn' : 'fell_back', null, [
                 'from' => $row->automatic_score_state === ScoreState::Scored ? $row->automatic_score : '–',
                 'to' => $state === ScoreState::Scored ? $rounded : '–',
             ]);

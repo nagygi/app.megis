@@ -2,8 +2,10 @@
 
 use App\Enums\DiagnosisRowKind;
 use App\Enums\MainDiagnosisStage;
+use App\Enums\ParticipantRole;
 use App\Enums\ScoreState;
 use App\Livewire\Admin\MainDiagnoses\Reading;
+use App\Models\Consent;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisClaim;
 use App\Models\DiagnosisRow;
@@ -14,6 +16,7 @@ use App\Models\ProcessOccasion;
 use App\Models\ReviewEvent;
 use App\Services\Diagnoses\DiagnosisCalculator;
 use App\Services\Diagnoses\ReadingService;
+use App\Services\MainDiagnoses\ConsentService;
 use App\Services\MainDiagnoses\StageMachine;
 use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
@@ -298,6 +301,55 @@ it('lets an approved row fall back when its calculated value changes (20, questi
 
     expect($row->refresh()->approved_at)->toBeNull()
         ->and(ReviewEvent::query()->where('action', 'fell_back')->sole()->subject_id)->toBe($row->id);
+});
+
+it('takes a withdrawn peer\'s traces out and lets the approved rows they touched fall back (20 · 20.5)', function () {
+    [$setup, $main] = diagnosisInReading();
+    $reading = app(ReadingService::class);
+    $admin = $setup['admin'];
+    $peer = $setup['peers'][0];
+    $main->participantFor($peer, ParticipantRole::Peer)->update(['started_at' => now()]);
+    $consent = Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => 'answers', 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
+    // The peer moves the second value and quotes the third without moving it: 3 and 5 there, the peer's 4.
+    $material = scoredMaterial($main, null, [0 => null, 1 => 1, 2 => 4], $peer);
+    $detection = $material->detections()->create(['quote' => 'A rossz hírt nálunk senki nem mondja ki.', 'free_name' => 'Nyíltság', 'strength' => 2]);
+    $material->scores()->where('value_id', $main->valueSetVersion->snapshot['values'][2]['value_id'])->update(['detection_ids' => json_encode([$detection->id])]);
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    [$first, $second, $third] = [rowOf($main, DiagnosisRowKind::Value), rowOf($main, DiagnosisRowKind::Value, 1), rowOf($main, DiagnosisRowKind::Value, 2)];
+    [$area, $tree] = [rowOf($main, DiagnosisRowKind::Area), rowOf($main, DiagnosisRowKind::TreeElement)];
+    $reading->copyTrace($area, $third->traces()->sole(), $admin);
+    $reading->addTrace($tree, ['quote' => 'Kézzel a társ anyagából.', 'material_id' => $material->id, 'recorded_on' => null, 'role' => 'peer', 'source_type' => 'mirror'], $admin);
+    $ownerless = $reading->addTrace($first, ['quote' => 'Kézzel, anyag nélkül.', 'material_id' => null, 'recorded_on' => null, 'role' => 'peer', 'source_type' => 'note'], $admin);
+
+    foreach ([$first, $second, $third] as $row) {
+        $reading->approveRow($row, $admin);
+    }
+    $reading->scoreRow($area, '3', $admin);
+    $reading->scoreRow($tree, '4', $admin);
+
+    app(ConsentService::class)->revoke($consent, $peer);
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    $events = ReviewEvent::query()->where('action', 'fell_back_withdrawn')->get()->keyBy('subject_id');
+    $waiting = collect([$second, $third, $area, $tree]);
+    expect($first->refresh()->approved_at)->not->toBeNull()
+        ->and($ownerless->fresh())->not->toBeNull()
+        ->and($waiting->filter(fn (DiagnosisRow $row) => $row->refresh()->approved_at !== null))->toBeEmpty()
+        ->and($events->keys()->sort()->values()->all())->toBe($waiting->pluck('id')->sort()->values()->all())
+        ->and($events[$second->id]->payload)->toEqual(['from' => 3, 'to' => 3.7])
+        ->and($events[$third->id]->payload)->toBeNull()
+        ->and(ReviewEvent::query()->where('action', 'fell_back')->exists())->toBeFalse()
+        ->and($area->score)->toBe(3.0)
+        ->and(EvidenceTrace::query()->whereIn('diagnosis_row_id', [$third->id, $area->id, $tree->id])->exists())->toBeFalse();
+
+    Livewire::test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->assertSee('visszaesett „vár” állapotba, mert egy társ visszavonta a hozzájárulását')
+        ->call('selectRow', $tree->id)
+        ->set('trace.quote', 'Megint a társ anyagából.')
+        ->set('trace.material_id', (string) $material->id)
+        ->call('addTrace')
+        ->assertHasErrors(['trace.material_id']);
 });
 
 it('offers no gap numbers for the biggest gap below the threshold (Extra inputok 1)', function () {

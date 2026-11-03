@@ -1643,6 +1643,7 @@ return [
             'insufficient' => 'nincs elég adat',
             'reopened' => 'újranyitotta',
             'fell_back' => 'visszaesett „vár” állapotba, mert az automatikus érték változott',
+            'fell_back_withdrawn' => 'visszaesett „vár” állapotba, mert egy társ visszavonta a hozzájárulását',
             'excluded' => 'nyomot vett ki',
             'included' => 'nyomot tett vissza',
             'highlighted' => 'nyomot emelt ki',

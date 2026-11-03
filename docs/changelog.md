@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.84 · {hash} · 2026-11-03
+
+Olvasat (20 · 20.5): ha egy társ az olvasat alatt visszavonja a hozzájárulását.
+
+- **Eddig:**
+  - a napló általános okot írt („az automatikus érték változott”), nem a visszavonást;
+  - a társ kézzel felvett, valamint a területhez vagy a fához választott nyomai bent maradtak;
+  - a jóváhagyott sor jóváhagyva maradt, ha az automatikus értéke nem változott, akkor is, ha a bizonyítéka a társtól jött.
+- **Most:**
+  - **A társ minden nyoma kikerül:** az automatikusak, a kézzel felvett nyom az ő anyagából, és a területhez vagy a fához választott nyoma is. Az anyag nélkül, kézzel felvett nyomnak nincs gazdája, ez bent marad.
+  - **A kézi nyom anyag-választója** a visszavont társ anyagait nem kínálja.
+  - **A jóváhagyott sor visszaesik „vár” állapotba,** ha az automatikus értéke változik, vagy ha elveszít egy riportba kerülő nyomot. Az utóbbi az átírt és a kézzel pontozott sorra is áll.
+  - **A napló okként a visszavonást írja:** „visszaesett „vár” állapotba, mert egy társ visszavonta a hozzájárulását”. Ha a szám változott, a régi és az új érték is ott áll.
+
 ## 1.83 · a8c58e2 · 2026-11-03
 
 Diagnózis tartalma (18): a jegy hiányai pótolva.
