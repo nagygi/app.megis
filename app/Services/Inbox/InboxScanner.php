@@ -4,10 +4,12 @@ namespace App\Services\Inbox;
 
 use App\Enums\InboxItemType;
 use App\Enums\MainDiagnosisStage;
+use App\Enums\MembershipStatus;
 use App\Enums\ParticipantRole;
 use App\Models\InboxItem;
 use App\Models\MainDiagnosis;
 use App\Models\MainDiagnosisParticipant;
+use App\Models\Membership;
 use App\Services\MainDiagnoses\DiagnosisRunService;
 use App\Services\MainDiagnoses\StepProgress;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -29,6 +31,17 @@ class InboxScanner
         private DiagnosisRunService $run,
         private StepProgress $progress,
     ) {}
+
+    /**
+     * The keys of a participant's Meghívó rows: five days unopened, and expired
+     * after fourteen, which comes as a row of its own (22 · 22.2).
+     *
+     * @return list<string>
+     */
+    public static function invitationKeys(int $participantId): array
+    {
+        return ['invitation:'.$participantId, 'invitation:'.$participantId.':expired'];
+    }
 
     /**
      * @return array{opened: int, closed: int}
@@ -60,8 +73,15 @@ class InboxScanner
     public function closeResolved(): int
     {
         $closed = 0;
+        $rows = InboxItem::query()
+            ->whereIn('type', [InboxItemType::Invitation, InboxItemType::Completion, InboxItemType::Threshold, InboxItemType::Publication])
+            ->whereNotNull('dedupe_key')
+            // The open rows, and those closed by hand that still hold their key (22 · 22.1).
+            ->where(fn ($query) => $query->whereNull('closed_at')->orWhere('close_reason', InboxItem::CLOSED_MANUALLY))
+            ->with(['subject' => fn (MorphTo $subject) => $subject->morphWith([MainDiagnosisParticipant::class => ['mainDiagnosis']])])
+            ->get();
 
-        foreach (InboxItem::query()->open()->whereIn('type', [InboxItemType::Invitation, InboxItemType::Completion, InboxItemType::Threshold, InboxItemType::Publication])->with(['subject' => fn (MorphTo $subject) => $subject->morphWith([MainDiagnosisParticipant::class => ['mainDiagnosis']])])->get() as $item) {
+        foreach ($rows as $item) {
             $resolved = match ($item->type) {
                 InboxItemType::Invitation => ! $item->subject instanceof MainDiagnosisParticipant || ! $this->invitationOverdue($item->subject),
                 InboxItemType::Completion => ! $item->subject instanceof MainDiagnosis || ! $this->completionOverdue($item->subject),
@@ -70,8 +90,14 @@ class InboxScanner
                 default => false,
             };
 
-            if ($resolved && $item->dedupe_key !== null) {
+            if (! $resolved) {
+                continue;
+            }
+
+            if ($item->isOpen()) {
                 $closed += $this->inbox->closeAutomatically($item->dedupe_key);
+            } else {
+                $this->inbox->release($item);
             }
         }
 
@@ -79,7 +105,8 @@ class InboxScanner
     }
 
     /**
-     * Five days unopened, or expired after fourteen (22, question 5).
+     * Five days unopened, or expired after fourteen (22, question 5). An
+     * inactive member is not waited for: the organization's pages are closed to them (02).
      */
     public function invitationOverdue(MainDiagnosisParticipant $participant): bool
     {
@@ -92,7 +119,12 @@ class InboxScanner
             && ! in_array($main->stage, [MainDiagnosisStage::Published, MainDiagnosisStage::Closed, MainDiagnosisStage::Reading], true)
             // A running diagnosis was started by its leader.
             && ($participant->role !== ParticipantRole::Leader || $main->stage->isBeforeRunning())
-            && $participant->invited_at->lte(now()->subDays(self::INVITATION_DAYS));
+            && $participant->invited_at->lte(now()->subDays(self::INVITATION_DAYS))
+            && Membership::query()
+                ->where('organization_id', $main->diagnosis->organization_id)
+                ->where('user_id', $participant->user_id)
+                ->where('status', '!=', MembershipStatus::Inactive)
+                ->exists();
     }
 
     /**
@@ -119,17 +151,29 @@ class InboxScanner
             }
 
             $expired = $participant->invited_at->lte(now()->subDays(self::INVITATION_VALID_DAYS));
+            [$waitingKey, $expiredKey] = self::invitationKeys($participant->id);
+            $summary = __($expired ? 'admin.inbox.rows.invitation_expired' : 'admin.inbox.rows.invitation', [
+                'name' => $participant->user->name,
+                'role' => __('enums.participant_role.'.$participant->role->value),
+                'days' => (int) $participant->invited_at->diffInDays(now()),
+            ]);
+
+            // The five-day row still open turns into the expired one.
+            $waiting = $expired ? InboxItem::query()->open()->where('dedupe_key', $waitingKey)->first() : null;
+
+            if ($waiting !== null) {
+                $waiting->forceFill(['summary' => $summary, 'dedupe_key' => $expiredKey])->save();
+
+                continue;
+            }
 
             $this->inbox->open(
                 InboxItemType::Invitation,
-                __($expired ? 'admin.inbox.rows.invitation_expired' : 'admin.inbox.rows.invitation', [
-                    'name' => $participant->user->name,
-                    'role' => __('enums.participant_role.'.$participant->role->value),
-                    'days' => (int) $participant->invited_at->diffInDays(now()),
-                ]),
+                $summary,
                 diagnosis: $main->diagnosis,
                 subject: $participant,
-                dedupeKey: 'invitation:'.$participant->id,
+                dedupeKey: $expired ? $expiredKey : $waitingKey,
+                staysClosed: true,
             );
         }
     }
@@ -148,6 +192,7 @@ class InboxScanner
             diagnosis: $main->diagnosis,
             subject: $main,
             dedupeKey: 'completion:'.$main->id,
+            staysClosed: true,
         );
     }
 
@@ -163,6 +208,7 @@ class InboxScanner
             diagnosis: $main->diagnosis,
             subject: $main,
             dedupeKey: 'threshold:'.$main->id,
+            staysClosed: true,
         );
     }
 
@@ -178,6 +224,7 @@ class InboxScanner
             diagnosis: $main->diagnosis,
             subject: $main,
             dedupeKey: 'publication:'.$main->id,
+            staysClosed: true,
         );
     }
 }

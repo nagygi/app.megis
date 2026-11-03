@@ -13,7 +13,9 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Opens and closes Beérkező rows (22). An open row with the same key is not
- * opened again, and the key closes the row when its cause goes away.
+ * opened again, and the key closes the row when its cause goes away. A row of
+ * the daily scan that an admin closed by hand stays closed while its cause
+ * lasts (22 · 22.1).
  */
 class InboxService
 {
@@ -28,9 +30,11 @@ class InboxService
         ?Model $subject = null,
         array $payload = [],
         ?string $dedupeKey = null,
+        bool $staysClosed = false,
     ): InboxItem {
         if ($dedupeKey !== null) {
-            $existing = InboxItem::query()->open()->where('dedupe_key', $dedupeKey)->first();
+            $existing = InboxItem::query()->open()->where('dedupe_key', $dedupeKey)->first()
+                ?? ($staysClosed ? InboxItem::query()->closed()->where('close_reason', InboxItem::CLOSED_MANUALLY)->where('dedupe_key', $dedupeKey)->latest('id')->first() : null);
 
             if ($existing !== null) {
                 return $existing;
@@ -74,13 +78,22 @@ class InboxService
     /**
      * Closes the open row of a cause that went away, e.g. the threshold was met.
      */
-    public function closeAutomatically(string $dedupeKey): int
+    public function closeAutomatically(string ...$dedupeKeys): int
     {
-        return InboxItem::query()->open()->where('dedupe_key', $dedupeKey)->update([
+        return InboxItem::query()->open()->whereIn('dedupe_key', $dedupeKeys)->update([
             'closed_at' => now(),
             'close_reason' => InboxItem::CLOSED_AUTOMATICALLY,
             'updated_at' => now(),
         ]);
+    }
+
+    /**
+     * The cause of a row closed by hand went away: the key is free again, so
+     * the row can come back when the cause does (22 · 22.1).
+     */
+    public function release(InboxItem $item): void
+    {
+        $item->forceFill(['dedupe_key' => null])->save();
     }
 
     /**

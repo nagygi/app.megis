@@ -142,14 +142,20 @@ class Index extends Component
     }
 
     /**
-     * Meghívó: "Új meghívó", a fresh link (14 · 14.1); the row closes.
+     * Meghívó: "Új meghívó", a fresh link (14 · 14.1); the row closes. An
+     * inactive member gets no link, and the row says so.
      */
     public function reinvite(int $itemId, MainDiagnosisService $mainDiagnoses, InboxService $inbox): void
     {
         $item = $this->openItem($itemId, InboxItemType::Invitation);
         abort_unless($item->subject instanceof MainDiagnosisParticipant, 404);
 
-        $mainDiagnoses->resendInvitation($item->subject, auth()->user());
+        if (! $mainDiagnoses->resendInvitation($item->subject, auth()->user())) {
+            session()->flash('error', __('admin.inbox.reinvite_inactive'));
+
+            return;
+        }
+
         $inbox->close($item, auth()->user());
         session()->flash('status', __('admin.inbox.reinvited'));
     }
@@ -253,6 +259,8 @@ class Index extends Component
     {
         return match (true) {
             $item->type === InboxItemType::Threshold && $item->diagnosis !== null => route('admin.main-diagnoses.run', $item->diagnosis),
+            // "→ Olvasat" (22 · 22.2).
+            $item->type === InboxItemType::Publication && $item->diagnosis !== null => route('admin.main-diagnoses.reading', $item->diagnosis),
             $item->type === InboxItemType::CapabilityReview && $item->diagnosis !== null => route('admin.diagnoses.capabilities', $item->diagnosis),
             $item->subject instanceof Pattern => route('admin.patterns.show', $item->subject),
             $item->subject instanceof Material => route('admin.materials.show', $item->subject),

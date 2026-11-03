@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\DiagnosisRowKind;
 use App\Enums\InboxItemType;
 use App\Livewire\Admin\Inbox\Index as Inbox;
 use App\Livewire\Admin\MainDiagnoses\Reading;
@@ -75,7 +76,10 @@ it('builds the feedback in and marks the chapter on the correction (22 · 22.2, 
     actingAsAdmin($setup['admin']);
     Livewire::test(Inbox::class)->assertSeeHtml(route('admin.main-diagnoses.reading', [$main->diagnosis, 'visszajelzes' => $feedback->id]));
 
+    // Every row is approved: the reading opens on the feedback's chapter, the feedback next to it.
     Livewire::withQueryParams(['visszajelzes' => $feedback->id])->test(Reading::class, ['diagnosis' => $main->diagnosis])
+        ->assertSet('selectedRowId', $main->diagnosis->rows()->where('kind', DiagnosisRowKind::Value)->orderBy('position')->value('id'))
+        ->assertSee('Ide érkezett a visszajelzés.')
         ->assertSee('Ez nem így van nálunk.')
         ->call('incorporateFeedback');
 

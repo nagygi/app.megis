@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Enums\MainDiagnosisStage;
 use App\Events\MainDiagnosisStageChanged;
+use App\Services\Inbox\InboxScanner;
 use App\Services\Inbox\InboxService;
 
 /**
@@ -32,7 +33,7 @@ class CloseInboxRowsOnStageChange
         // Invitations stop mattering once reading starts.
         if (in_array($event->to, [MainDiagnosisStage::Reading, MainDiagnosisStage::Published, MainDiagnosisStage::Closed], true)) {
             foreach ($event->main->participants()->pluck('id') as $participantId) {
-                $this->inbox->closeAutomatically('invitation:'.$participantId);
+                $this->inbox->closeAutomatically(...InboxScanner::invitationKeys($participantId));
             }
         }
     }

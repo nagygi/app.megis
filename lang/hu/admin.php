@@ -1058,6 +1058,7 @@ return [
         'reminded' => 'Elküldtük az emlékeztetőt.',
         'reinvite' => 'Újra meghívom',
         'reinvited' => 'Új meghívót küldtünk.',
+        'reinvite_inactive' => 'Nem ment ki meghívó: a tagsága inaktív. A sor nyitva maradt, lezárhatod.',
         'incorporate' => 'Beépítem',
         'reply' => 'Válaszolok',
         'reply_text' => 'A válasz',
@@ -1568,6 +1569,7 @@ return [
             'mark' => 'Beépítettem',
             'done' => 'Beépítve · :date',
             'incorporated' => 'A visszajelzés beépítve; a Beérkező sora lezárult.',
+            'badge' => 'Ide érkezett a visszajelzés.',
         ],
         'traces' => [
             'title' => 'Bizonyíték · :count nyom',

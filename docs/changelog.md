@@ -2,6 +2,27 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.87 · {hash} · 2026-11-03
+
+Beérkező (22): a jegy hiányai pótolva.
+
+- **A kézzel lezárt sor nem jön vissza (22.1):**
+  - **Eddig:** a Meghívó-, a Kitöltés-, a Küszöb- és a Publikálás-sort, amit egy admin kézzel lezárt, a másnapi futás újranyitotta, ha az oka még fennállt.
+  - **Most:** amíg az oka fennáll, zárva marad. Ha az ok megszűnik (például a publikálás napja kitolódik), és később visszajön, új sor nyílik.
+- **Publikálás → Olvasat (22.2):** a sor gombja eddig a diagnózis Áttekintés fülére vitt, most az Olvasatra.
+- **Meghívó a 14. napon (22.2):**
+  - **Eddig:** a még nyitott 5 napos sor „5 napja” szöveggel maradt, a „lejárt” csak akkor jött, ha nem volt nyitott sor.
+  - **Most:** a nyitott sor „lejárt”-ra vált. Ha az 5 napos sort kézzel lezárták, a lejárt meghívó új sorként jön.
+- **Emlékeztető a még nem regisztráltnak (22.2, 19):**
+  - **Eddig:** a „Felvéve” állapotú vezető vagy társ is a belépő linket kapta, pedig neki még nincs jelszava.
+  - **Most:** friss regisztrációs linket kap. Így megy a Beérkező „Emlékeztetem”-je, a Futás lap emlékeztetői és a vezetőnek szóló értesítések is.
+- **Inaktív tag (22.2, 02):**
+  - Nem nyílik róla Meghívó-sor, a nyitott sora magától lezárul.
+  - Az „Új meghívó” eddig csendben nem küldött semmit, mégis lezárta a sort és sikert jelzett. Most nyitva hagyja: „Nem ment ki meghívó: a tagsága inaktív.”
+- **Beépítem (22.2):**
+  - **Eddig:** az Olvasat felül mutatta a visszajelzést, a fejezetet nem jelölte ki.
+  - **Most:** a fejezet első sora van kijelölve, a blokkján „Ide érkezett a visszajelzés.” áll, és a visszajelzés a jobb oldali oszlopban, „Amit a vezető olvas” fölött látszik.
+
 ## 1.86 · de54a65 · 2026-11-03
 
 Olvasat (20 · 20.3, 20.5): az állítás, amely egy visszavont társ nyomára épült.

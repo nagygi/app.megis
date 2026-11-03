@@ -14,22 +14,6 @@
             <x-ui.notice>{{ __('admin.reading.not_started') }}</x-ui.notice>
         @endunless
 
-        @if ($feedback)
-            {{-- The feedback being built in (22 · 22.2, 28 · 28.1) --}}
-            <x-ui.notice role="region" aria-labelledby="feedback-title">
-                <div class="flex flex-col gap-2">
-                    <h2 id="feedback-title" class="text-lg font-semibold">{{ __('admin.reading.feedback.title', ['chapter' => __('report.chapters.'.$feedback->chapter), 'answer' => __('report.feedback.answers.'.$feedback->answer)]) }}</h2>
-                    <p>„{{ $feedback->text }}” <span class="text-sm text-grey-700">· {{ $feedback->user?->name }} · {{ $feedback->created_at->format('Y.m.d.') }}</span></p>
-                    @if ($feedback->incorporated_at)
-                        <p class="text-sm">{{ __('admin.reading.feedback.done', ['date' => $feedback->incorporated_at->format('Y.m.d.')]) }}</p>
-                    @else
-                        <p class="text-sm text-grey-700">{{ __('admin.reading.feedback.help') }}</p>
-                        <x-ui.button size="sm" class="self-start" wire:click="incorporateFeedback">{{ __('admin.reading.feedback.mark') }}</x-ui.button>
-                    @endif
-                </div>
-            </x-ui.notice>
-        @endif
-
         <p class="flex flex-wrap items-center gap-3 text-sm" aria-live="polite">
             <strong class="text-lg">{{ __('admin.reading.counter', ['done' => $progress['rows'], 'total' => $progress['rows_total']]) }}</strong>
             <span>{{ __('admin.reading.claims_counter', ['done' => $progress['claims'], 'total' => $progress['claims_total']]) }}</span>
@@ -48,7 +32,7 @@
             <nav class="flex flex-col gap-4" aria-label="{{ __('admin.reading.points') }}">
                 @foreach ($blocks as $block)
                     <section class="flex flex-col gap-1" aria-labelledby="block-{{ $block['kind']->value }}">
-                        <x-ui.section-header :title="__('admin.reading.blocks.'.$block['kind']->value)" :id="'block-'.$block['kind']->value">
+                        <x-ui.section-header :title="__('admin.reading.blocks.'.$block['kind']->value)" :id="'block-'.$block['kind']->value" :description="$feedbackKind === $block['kind'] ? __('admin.reading.feedback.badge') : null">
                             @if ($isOpen && ! in_array($block['kind'], [\App\Enums\DiagnosisRowKind::Area, \App\Enums\DiagnosisRowKind::TreeElement], true))
                                 <x-slot:actions>
                                     <x-ui.button tone="ghost" size="sm" wire:click="approveBlock('{{ $block['kind']->value }}')" wire:confirm="{{ __('admin.reading.confirm_block') }}">{{ __('admin.reading.approve_block') }}</x-ui.button>
@@ -285,6 +269,19 @@
 
             {{-- Amit a vezető olvas --}}
             <x-ui.card as="aside" tone="paper" bordered class="flex flex-col gap-3" aria-labelledby="leader-reads">
+                @if ($feedback)
+                    {{-- The feedback being built in, next to its chapter (22 · 22.2, 28 · 28.1) --}}
+                    <section class="flex flex-col gap-2 rounded-field border border-coral bg-white p-3 text-sm" aria-labelledby="feedback-title">
+                        <h2 id="feedback-title" class="font-semibold">{{ __('admin.reading.feedback.title', ['chapter' => __('report.chapters.'.$feedback->chapter), 'answer' => __('report.feedback.answers.'.$feedback->answer)]) }}</h2>
+                        <p>„{{ $feedback->text }}” <span class="text-grey-700">· {{ $feedback->user?->name }} · {{ $feedback->created_at->format('Y.m.d.') }}</span></p>
+                        @if ($feedback->incorporated_at)
+                            <p>{{ __('admin.reading.feedback.done', ['date' => $feedback->incorporated_at->format('Y.m.d.')]) }}</p>
+                        @else
+                            <p class="text-grey-700">{{ __('admin.reading.feedback.help') }}</p>
+                            <x-ui.button size="sm" class="self-start" wire:click="incorporateFeedback">{{ __('admin.reading.feedback.mark') }}</x-ui.button>
+                        @endif
+                    </section>
+                @endif
                 <h2 id="leader-reads" class="text-lg font-semibold">{{ __('admin.reading.leader_reads') }}</h2>
                 @if ($selected)
                     <p class="text-lg font-semibold">{{ $selected->label() }} · {{ $selected->scoreLabel() ?: '–' }}</p>

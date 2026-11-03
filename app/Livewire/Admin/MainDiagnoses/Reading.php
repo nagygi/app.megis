@@ -23,6 +23,7 @@ use App\Services\Diagnoses\ProcessOccasionBreakdown;
 use App\Services\Diagnoses\ReadingService;
 use App\Services\Diagnoses\ThresholdPolicy;
 use App\Services\Inbox\InboxService;
+use App\Services\Report\ReportBuilder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -105,7 +106,11 @@ class Reading extends Component
         $this->gapRowId = ($diagnosis->main->biggest_gap_row_id ?? $diagnosis->main->calculation['biggest_gap']['row_id'] ?? null) === null
             ? null
             : (string) ($diagnosis->main->biggest_gap_row_id ?? $diagnosis->main->calculation['biggest_gap']['row_id']);
-        $this->selectedRowId ??= app(ReadingService::class)->rows($diagnosis->main)->first(fn (DiagnosisRow $row) => $row->approved_at === null)?->id;
+        $rows = app(ReadingService::class)->rows($diagnosis->main);
+        // "Beépítem" opens on the chapter of the feedback (22 · 22.2).
+        $feedbackKind = $this->feedbackKind();
+        $this->selectedRowId ??= ($feedbackKind === null ? null : $rows->firstWhere('kind', $feedbackKind)?->id)
+            ?? $rows->first(fn (DiagnosisRow $row) => $row->approved_at === null)?->id;
     }
 
     public function selectRow(int $rowId): void
@@ -424,6 +429,7 @@ class Reading extends Component
                 ->get(),
             'isOpen' => in_array($main->stage, [MainDiagnosisStage::Reading, MainDiagnosisStage::Published], true),
             'feedback' => $this->feedbackId === null ? null : ReportFeedback::query()->where('main_diagnosis_id', $main->id)->with('user')->find($this->feedbackId),
+            'feedbackKind' => $this->feedbackKind(),
         ])->layout('layouts::admin')->title($this->diagnosis->name);
     }
 
@@ -492,6 +498,16 @@ class Reading extends Component
     private function main(): MainDiagnosis
     {
         return $this->diagnosis->main;
+    }
+
+    /**
+     * The block of the chapter the feedback is about; none for the snapshot's single page.
+     */
+    private function feedbackKind(): ?DiagnosisRowKind
+    {
+        $chapter = $this->feedbackId === null ? null : ReportFeedback::query()->where('main_diagnosis_id', $this->main()->id)->whereKey($this->feedbackId)->value('chapter');
+
+        return $chapter === null ? null : (ReportBuilder::CHAPTERS[$chapter] ?? null);
     }
 
     private function admin(): User

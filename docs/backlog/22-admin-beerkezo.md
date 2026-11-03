@@ -13,7 +13,7 @@ Szuperadmin és Admin egyaránt használhatja (01).
 - Bal oldali menüpont: *Beérkező*, mellette a nyitott sorok száma. A szám azokat a sorokat számolja, amelyeket a lista alapból mutat (kapcsolattartó: én), ugyanígy a Diagnózisok oldal „Ma {n} dolog vár rád” mondata és az *Értékmérések › Beérkező* száma.
 - **Soronként:** típus, diagnózis (szervezet · csapat), a tárgy egy mondatban, mióta, legfeljebb két gomb.
 - **Lezárás:**
-  - a lezárt sor eltűnik a listából;
+  - a lezárt sor eltűnik a listából. Amíg az oka fennáll, a napi futás sem nyitja újra; ha az ok megszűnik, és később visszajön, új sor nyílik;
   - a „Lezártak” szűrővel visszanézhető, ki és mikor zárta le;
   - bármelyik admin lezárhatja.
 - Üres listánál ez áll: „Minden rendben. Mehetsz kávézni.”
@@ -35,9 +35,12 @@ Szuperadmin és Admin egyaránt használhatja (01).
 - **Értékmérések:** az Értéktükör sorai (az Értéktükör-felvétel feldolgozási hibája) nem a *Beérkező*ben vannak, hanem külön menücsoportban: *Értékmérések › Beérkező*. Ugyanazok a szűrők és gombok, saját számláló. A reggeli összefoglalóba nem kerülnek bele. A csoport első pontja az *Értéktükrök* lista (06 · 6.1).
 - **Besorolás:** a 12 · 12.6 „Besorolásra vár” sorai itt is megjelennek. Ha bármelyik helyen besorolják, mindkettőből eltűnik. Csak az „Egyikhez sem” anyagok jönnek ide; az alacsony konfidenciájú helyzet nem, mert a 12 nem bírálja felül, amit a felhasználó választott.
 - **Meghívó:** 5 nap megnyitás nélkül, vagy ha a meghívó lejárt (14 nap, 14 · 14.1). A sor akkor is megjelenik, ha a vezető a V10-en vagy az M6-on maga küldött emlékeztetőt.
+  - A 14. napon a még nyitott 5 napos sor „lejárt”-ra vált. Ha az 5 napos sort kézzel lezárták, a lejárt meghívó új sorként jön.
+  - **Emlékeztetem:** aki még nem regisztrált („Felvéve”, 02), friss regisztrációs linket kap, mert a belépő link neki nem működik. Ugyanígy a Futás lap (19) emlékeztetői.
+  - Inaktív tagra nem várunk: nem nyílik róla sor, a nyitott sora magától lezárul. Az „Új meghívó” neki nem küld semmit, és ezt jelzi.
 - **Kitöltés:** ha a vezető a kezdés napjáig nem nyomta meg az „Indul a diagnózis” gombot (17.5). A sor magától lezárul, amikor a vezető elindítja a diagnózist, vagy az admin zárja le.
 - **Beépítem:**
-  - megnyitja az érintett fejezetet az olvasatban (20), mellette a visszajelzés szövegével;
+  - megnyitja az érintett fejezetet az olvasatban (20): a fejezet első sora van kijelölve, a blokkján „Ide érkezett a visszajelzés.” áll, a visszajelzés szövege a jobb oldali oszlopban;
   - a javítás után a fejezet fejlécén „frissítve · {dátum}” jelenik meg (21.4);
   - a visszajelzés pontot nem ír át.
 - **Válaszolok:** a mégis válasza e-mailben megy a felhasználónak, név szerinti megszólítással, és a sor lezárul. A riportban nem jelenik meg.

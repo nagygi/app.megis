@@ -11,10 +11,12 @@ use App\Models\MainDiagnosis;
 use App\Models\MainDiagnosisParticipant;
 use App\Models\Material;
 use App\Models\MegisConversation;
+use App\Models\Membership;
 use App\Models\ReminderDispatch;
 use App\Models\User;
 use App\Services\Diagnoses\ThresholdPolicy;
 use App\Services\Inbox\InboxService;
+use App\Services\Organizations\MembershipService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -40,6 +42,7 @@ class DiagnosisRunService
         private StepProgress $progress,
         private StageMachine $stages,
         private ThresholdPolicy $threshold,
+        private MembershipService $memberships,
     ) {}
 
     public function canRemind(MainDiagnosis $main, User $user): bool
@@ -89,13 +92,12 @@ class DiagnosisRunService
         }
 
         $steps = $this->progress->forLeader($main, $leader);
-        $diagnosis = $main->diagnosis;
 
         $this->send($main, $leader, ReminderDispatch::LEADER, $admin, new DiagnosisNoticeMail(
             __('mail.diagnosis_reminder.leader_subject', ['subject' => $main->subjectName()]),
             __('mail.diagnosis_reminder.leader_body', ['count' => $steps->count() - $steps->doneCount(), 'subject' => $main->subjectName(), 'minutes' => $steps->remainingMinutes()]),
             __('mail.diagnosis_reminder.leader_action'),
-            route('client.diagnosis.show', [$diagnosis->organization, $diagnosis]),
+            $this->linkFor($main, $leader, $admin),
         ));
 
         return true;
@@ -110,7 +112,6 @@ class DiagnosisRunService
     {
         $sent = 0;
         $skipped = 0;
-        $diagnosis = $main->diagnosis;
 
         foreach ($this->peersToRemind($main) as $peer) {
             if (! $this->canRemind($main, $peer->user)) {
@@ -123,7 +124,7 @@ class DiagnosisRunService
                 __('mail.diagnosis_reminder.peer_subject', ['leader' => $main->leader->name]),
                 __('mail.diagnosis_reminder.peer_body', ['leader' => $main->leader->name, 'minutes' => $main->peerMinutes()]),
                 __('mail.diagnosis_reminder.peer_action'),
-                route('client.diagnosis.show', [$diagnosis->organization, $diagnosis]),
+                $this->linkFor($main, $peer->user, $admin),
             ));
             $sent++;
         }
@@ -144,13 +145,11 @@ class DiagnosisRunService
             return false;
         }
 
-        $diagnosis = $main->diagnosis;
-
         $this->send($main, $participant->user, ReminderDispatch::PEER, $admin, new DiagnosisNoticeMail(
             __('mail.diagnosis_reminder.peer_subject', ['leader' => $main->leader->name]),
             __('mail.diagnosis_reminder.peer_body', ['leader' => $main->leader->name, 'minutes' => $main->peerMinutes()]),
             __('mail.diagnosis_reminder.peer_action'),
-            route('client.diagnosis.show', [$diagnosis->organization, $diagnosis]),
+            $this->linkFor($main, $participant->user, $admin),
         ));
 
         return true;
@@ -208,13 +207,11 @@ class DiagnosisRunService
             return false;
         }
 
-        $diagnosis = $main->diagnosis;
-
         $this->send($main, $main->leader, ReminderDispatch::THRESHOLD, $admin, new DiagnosisNoticeMail(
             $subject,
             $body,
             __('mail.diagnosis_reminder.threshold_action'),
-            route('client.diagnosis.show', [$diagnosis->organization, $diagnosis]),
+            $this->linkFor($main, $main->leader, $admin),
         ));
 
         return true;
@@ -271,13 +268,11 @@ class DiagnosisRunService
             return;
         }
 
-        $diagnosis = $main->diagnosis;
-
         $this->send($main, $main->leader, ReminderDispatch::WINDOW, $admin, new DiagnosisNoticeMail(
             __('mail.diagnosis_reminder.window_subject', ['subject' => $main->subjectName()]),
             __('mail.diagnosis_reminder.window_body', ['subject' => $main->subjectName(), 'date' => $main->publishes_on->format('Y.m.d.')]),
             __('mail.diagnosis_reminder.window_action'),
-            route('client.diagnosis.show', [$diagnosis->organization, $diagnosis]),
+            $this->linkFor($main, $main->leader, $admin),
         ));
     }
 
@@ -310,6 +305,27 @@ class DiagnosisRunService
             'admin_id' => $data['admin_id'],
             'note' => filled($data['note']) ? trim($data['note']) : null,
         ]);
+    }
+
+    /**
+     * Where a reminder takes its reader: the diagnosis, or for someone not
+     * registered yet a fresh registration link, since the diagnosis asks for
+     * a login they cannot do yet (14 · 14.1, 22 · 22.2).
+     */
+    private function linkFor(MainDiagnosis $main, User $user, ?User $admin): string
+    {
+        $diagnosis = $main->diagnosis;
+
+        if (! $user->isActivated()) {
+            $membership = Membership::query()->whereBelongsTo($diagnosis->organization)->where('user_id', $user->id)->with('user', 'organization')->first();
+            $token = $membership === null ? null : $this->memberships->prepareInvitation($membership, $admin ?? $main->leader);
+
+            if ($token !== null) {
+                return route('client.invitation.show', $token);
+            }
+        }
+
+        return route('client.diagnosis.show', [$diagnosis->organization, $diagnosis]);
     }
 
     private function send(MainDiagnosis $main, User $recipient, string $kind, ?User $admin, DiagnosisNoticeMail $mail): void

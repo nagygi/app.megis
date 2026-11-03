@@ -2,6 +2,7 @@
 
 use App\Enums\InboxItemType;
 use App\Enums\MainDiagnosisStage;
+use App\Enums\MembershipStatus;
 use App\Enums\ParticipantRole;
 use App\Livewire\Admin\Inbox\Index;
 use App\Mail\DiagnosisNoticeMail;
@@ -9,10 +10,12 @@ use App\Mail\DiagnosisPeerInvitationMail;
 use App\Mail\InboxDigestMail;
 use App\Mail\MirrorBookingMail;
 use App\Models\InboxItem;
+use App\Models\Membership;
 use App\Models\MirrorSession;
 use App\Models\Process;
 use App\Models\ProcessOccasion;
 use App\Services\Inbox\InboxScanner;
+use App\Services\Inbox\InboxService;
 use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\MainDiagnoses\StageMachine;
 use App\Services\Mirror\MirrorService;
@@ -73,6 +76,10 @@ it('opens threshold and publication rows and closes them when published', functi
     $this->travel(4)->days();
     app(InboxScanner::class)->scan();
     expect(InboxItem::query()->where('type', InboxItemType::Publication)->exists())->toBeTrue();
+
+    // "→ Olvasat" (22 · 22.2).
+    actingAsAdmin($setup['admin']);
+    Livewire::test(Index::class)->assertSeeHtml(route('admin.main-diagnoses.reading', $main->diagnosis));
 
     app(StageMachine::class)->transition($main->refresh(), MainDiagnosisStage::Reading, $setup['admin']);
     app(StageMachine::class)->transition($main->refresh(), MainDiagnosisStage::Published, $setup['admin']);
@@ -144,4 +151,83 @@ it('reminds and re-invites from an invitation row', function () {
     Mail::assertQueued(DiagnosisNoticeMail::class, 1);
     Mail::assertQueued(DiagnosisPeerInvitationMail::class);
     expect($item->refresh()->closed_at)->not->toBeNull();
+});
+
+it('keeps a row closed by hand closed while its cause lasts, and opens it when the cause comes back (22 · 22.1)', function () {
+    [$setup, $main] = runningDiagnosis();
+    $main->update(['publishes_on' => today()->addDays(3)]);
+    app(InboxScanner::class)->scan();
+    $row = InboxItem::query()->where('type', InboxItemType::Threshold)->sole();
+
+    app(InboxService::class)->close($row, $setup['admin']);
+    app(InboxScanner::class)->scan();
+
+    expect(InboxItem::query()->open()->where('type', InboxItemType::Threshold)->exists())->toBeFalse();
+
+    // Out of danger, then in danger again: a new row.
+    $main->update(['publishes_on' => today()->addDays(10)]);
+    app(InboxScanner::class)->scan();
+    $main->update(['publishes_on' => today()->addDays(3)]);
+    app(InboxScanner::class)->scan();
+
+    expect(InboxItem::query()->open()->where('type', InboxItemType::Threshold)->count())->toBe(1)
+        ->and($row->refresh()->closed_by)->toBe($setup['admin']->id);
+});
+
+it('turns the five-day invitation row into the expired one, and the expiry comes after a close by hand too (22 · 22.2)', function () {
+    [$setup, $main] = runningDiagnosis();
+    [$first, $second] = [$main->participantFor($setup['peers'][0], ParticipantRole::Peer), $main->participantFor($setup['peers'][1], ParticipantRole::Peer)];
+    $this->travel(5)->days();
+    app(InboxScanner::class)->scan();
+    $firstRow = InboxItem::query()->where('subject_id', $first->id)->where('type', InboxItemType::Invitation)->sole();
+    app(InboxService::class)->close(InboxItem::query()->where('subject_id', $second->id)->where('type', InboxItemType::Invitation)->sole(), $setup['admin']);
+
+    $this->travel(9)->days();
+    app(InboxScanner::class)->scan();
+
+    expect($firstRow->refresh()->isOpen())->toBeTrue()
+        ->and($firstRow->summary)->toContain('meghívója lejárt')
+        ->and(InboxItem::query()->open()->where('subject_id', $first->id)->count())->toBe(1)
+        ->and(InboxItem::query()->open()->where('subject_id', $second->id)->sole()->summary)->toContain('meghívója lejárt');
+
+    app(MainDiagnosisService::class)->opened($main, $first);
+
+    expect($firstRow->refresh()->isOpen())->toBeFalse();
+});
+
+it('waits for no inactive member, and "Új meghívó" says it sent none (22 · 22.2)', function () {
+    [$setup, $main] = runningDiagnosis();
+    $peer = $setup['peers'][0];
+    $this->travel(5)->days();
+    app(InboxScanner::class)->scan();
+    $item = InboxItem::query()->where('type', InboxItemType::Invitation)->where('subject_id', $main->participantFor($peer, ParticipantRole::Peer)->id)->sole();
+    Membership::query()->where('organization_id', $setup['organization']->id)->where('user_id', $peer->id)->update(['status' => MembershipStatus::Inactive]);
+    actingAsAdmin($setup['admin']);
+    Mail::fake();
+
+    Livewire::test(Index::class)
+        ->call('reinvite', $item->id)
+        ->assertSee('a tagsága inaktív');
+
+    expect($item->refresh()->isOpen())->toBeTrue();
+    Mail::assertNotQueued(DiagnosisPeerInvitationMail::class);
+
+    app(InboxScanner::class)->scan();
+
+    expect($item->refresh()->close_reason)->toBe(InboxItem::CLOSED_AUTOMATICALLY);
+});
+
+it('reminds someone not registered yet with a registration link, not a login (22 · 22.2)', function () {
+    Mail::fake();
+    [$setup, $main] = runningDiagnosis();
+    $peer = $setup['peers'][0];
+    $peer->forceFill(['activated_at' => null])->save();
+    $this->travel(5)->days();
+    app(InboxScanner::class)->scan();
+    $item = InboxItem::query()->where('type', InboxItemType::Invitation)->where('subject_id', $main->participantFor($peer, ParticipantRole::Peer)->id)->sole();
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Index::class)->call('remind', $item->id);
+
+    Mail::assertQueued(DiagnosisNoticeMail::class, fn (DiagnosisNoticeMail $mail) => $mail->hasTo($peer->email) && str_contains($mail->url, '/meghivo/'));
 });

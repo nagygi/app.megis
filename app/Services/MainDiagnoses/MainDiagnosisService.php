@@ -20,6 +20,7 @@ use App\Models\Organization;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\Diagnoses\DiagnosisService;
+use App\Services\Inbox\InboxScanner;
 use App\Services\Inbox\InboxService;
 use App\Services\Organizations\MembershipService;
 use App\Services\Organizations\OrganizationValueSetService;
@@ -279,7 +280,7 @@ class MainDiagnosisService
     {
         if ($participant->opened_at === null) {
             $participant->update(['opened_at' => now()]);
-            app(InboxService::class)->closeAutomatically('invitation:'.$participant->id);
+            app(InboxService::class)->closeAutomatically(...InboxScanner::invitationKeys($participant->id));
         }
 
         if ($participant->role === ParticipantRole::Leader && $main->stage === MainDiagnosisStage::Invited) {
@@ -349,36 +350,39 @@ class MainDiagnosisService
      * The peer's e-mail: registration for a new account, the T1 link for an
      * existing one (25 · 25.1). Also the resend of 19 and 22.
      */
-    public function invitePeer(MainDiagnosisParticipant $peer, ?User $actor = null): void
+    public function invitePeer(MainDiagnosisParticipant $peer, ?User $actor = null): bool
     {
         $main = $peer->mainDiagnosis;
         $organization = $main->diagnosis->organization;
         $membership = Membership::query()->whereBelongsTo($organization)->where('user_id', $peer->user_id)->first();
 
         if ($membership === null || $membership->status === MembershipStatus::Inactive) {
-            return;
+            return false;
         }
 
         $token = $this->memberships->prepareInvitation($membership, $actor ?? $main->leader);
         $peer->update(['invited_at' => now()]);
 
         Mail::to($peer->user->email)->queue(new DiagnosisPeerInvitationMail($main, $peer->user, $token));
+
+        return true;
     }
 
     /**
-     * "Új meghívó" from the Beérkező (22 · 22.2): a fresh link to the leader or the peer.
+     * "Új meghívó" from the Beérkező (22 · 22.2): a fresh link to the leader or
+     * the peer. An inactive member gets none.
      */
-    public function resendInvitation(MainDiagnosisParticipant $participant, User $actor): void
+    public function resendInvitation(MainDiagnosisParticipant $participant, User $actor): bool
     {
         $main = $participant->mainDiagnosis;
 
         if ($participant->role === ParticipantRole::Leader) {
             $this->sendLeaderInvitation($main, $actor);
 
-            return;
+            return true;
         }
 
-        $this->invitePeer($participant, $actor);
+        return $this->invitePeer($participant, $actor);
     }
 
     /**
