@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.56 · {hash} · 2026-11-03
+## 1.56 · 708792b · 2026-11-03
 
 „Belépek a nevében” (14 · 14.6): a coral sáv a felhasználó címkéit és csapatait is mutatja.
 
