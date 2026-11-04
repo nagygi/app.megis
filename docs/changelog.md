@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.94 · HASH · 2026-11-04
+## 1.94 · 63ff316 · 2026-11-04
 
 Elfelejtett jelszó az ügyfeleknek (MEGIS-1; 14 · 14.3, 33 · 33.2).
 
