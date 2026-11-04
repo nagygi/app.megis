@@ -2,6 +2,14 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.96 · HASH · 2026-11-04
+
+Jegyek az oldalon: az `exot/onsite-comment` 1.4.1-ről 1.5.0-ra frissült (`composer.lock`; a `^1.0` feltétel maradt).
+
+- **Új:** a jegylista státusz- és prioritásszűrőjében egyszerre több érték is kijelölhető (lenyíló jelölőlista), a kis és a nagy nézetben is. A státusznál gyorsgombok: „Nyitottak” (alapértelmezés), „Lezártak”, „Mind”. A korábban mentett szűrő automatikusan átalakul.
+- Nincs migráció, új env-kulcs vagy config-változás.
+- **Rollback:** 1.95 (a csomag 1.4.1-re áll vissza).
+
 ## 1.95 · b84a6a2 · 2026-11-04
 
 Jegyek az oldalon: az `exot/onsite-comment` 1.4.0-ról 1.4.1-re frissült (`composer.lock`; a `^1.0` feltétel maradt).
