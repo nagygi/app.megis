@@ -2,6 +2,18 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.93 · HASH · 2026-11-04
+
+Jegyek az oldalon: az `exot/onsite-comment` 1.1.0-ról 1.4.0-ra frissült (`composer.lock`; a `^1.0` feltétel maradt).
+
+- **Összes jegy, nagy nézet:** a jegylista fejlécében új „Nagy nézet” gomb van. Bal oldalt a lista, jobb oldalt a kiválasztott jegy.
+  - A jegyek egymás után megnyithatók, és a lista végig a helyén marad. Más oldal jegyénél sincs navigálás.
+  - A jobb oldalon a jegy szerkeszthető, a státusza és a prioritása váltható, hozzászólás írható. A lista sora rögtön követi.
+  - 900 px alatt nincs nagy nézet. A widget megjegyzi a választott méretet (böngészőnként).
+- **Vissza gomb minden nézetben:** a jegy, az új jegy, a szerkesztés, a lista és a Résztvevők panel fejlécében egy balra mutató nyíl visz vissza a menübe. A kijelölősávon egy „Vissza a menübe” gomb van.
+- Nincs migráció, új env-kulcs vagy config-változás.
+- **Rollback:** 1.92 (a csomag 1.1.0-ra áll vissza).
+
 ## 1.92 · f8d5e9b · 2026-11-03
 
 Ügyfél-app lábléc (05 · 5.2, a kártyán érkezett kérés).
