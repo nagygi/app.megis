@@ -24,6 +24,14 @@ return [
         'validity' => 'A link 24 óráig él.',
     ],
 
+    'client_password_reset' => [
+        'subject' => 'Új jelszó beállítása a mégisben',
+        'body' => 'Új jelszót kértél a mégis fiókodhoz. A jelszavad addig nem változik, amíg az újat be nem állítod.',
+        'body_admin' => 'A mégis adminisztrátora jelszó-beállító linket küldött neked. A jelszavad addig nem változik, amíg az újat be nem állítod.',
+        'action' => 'Új jelszó beállítása',
+        'validity' => 'A link 60 percig él, és egyszer használható. Ha nem te kérted, hagyd figyelmen kívül.',
+    ],
+
     'password_changed' => [
         'subject' => 'Megváltozott a jelszavad',
         'body' => 'A jelszavad :time-kor megváltozott.',

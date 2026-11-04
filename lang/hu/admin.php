@@ -258,12 +258,17 @@ return [
         'deactivated' => 'Inaktiválva. A felhasználó nem tud belépni.',
         'activated' => 'Aktiválva.',
         'archived_flash' => 'Archiválva. A személyes adatai egy órán belül törlődnek.',
+        'send_password_reset' => 'Jelszó-beállító link küldése',
+        'confirm_send_password_reset' => 'Küldjünk jelszó-beállító linket? A link 60 percig él. A jelenlegi jelszava addig érvényes, amíg újat nem állít be.',
+        'password_reset_sent' => 'Jelszó-beállító linket küldtünk ide: :email.',
         // Why a row action is greyed out (33 · 33.2).
         'unavailable' => [
             'admin_account' => 'Admin fiók: az Admin felhasználók között kezelhető.',
             'admin_impersonation' => 'Admin fiók nevében nem lehet belépni.',
             'archived' => 'A felhasználó archivált.',
             'superadmin_only' => 'Archiválni csak szuperadmin tud.',
+            'not_registered' => 'Még nem regisztrált. Küldj neki meghívót.',
+            'inactive' => 'A felhasználó fiókja inaktív.',
         ],
         'status_values' => [
             'active' => 'Aktív',

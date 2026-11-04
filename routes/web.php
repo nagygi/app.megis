@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ValueImportSampleController;
 use App\Http\Controllers\Client\CalendarOAuthController;
 use App\Http\Controllers\Client\CustomerLoginController;
 use App\Http\Controllers\Client\CustomerLogoutController;
+use App\Http\Controllers\Client\ForgotPasswordController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ImpersonationController as ClientImpersonationController;
 use App\Http\Controllers\Client\InvitationController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\Client\LandingController;
 use App\Http\Controllers\Client\LegalAcceptanceController;
 use App\Http\Controllers\Client\LoginCodeController;
 use App\Http\Controllers\Client\LoginLinkController;
+use App\Http\Controllers\Client\PasswordResetController;
 use App\Http\Controllers\Client\ReportController;
 use App\Http\Controllers\Client\ReportPdfController;
 use App\Http\Controllers\Client\TakeawayController;
@@ -191,6 +193,11 @@ Route::middleware('guest:web')->name('client.')->group(function () {
     Route::get('belepes/link/{token}', [LoginLinkController::class, 'show'])->name('login.link');
     Route::post('belepes/link/{token}', [LoginLinkController::class, 'store'])->name('login.link.store');
     Route::post('belepes/link/{token}/uj', [LoginLinkController::class, 'resend'])->name('login.link.resend');
+    // "Elfelejtettem a jelszavam" (14 · 14.3).
+    Route::get('belepes/elfelejtett-jelszo', [ForgotPasswordController::class, 'create'])->name('password.request');
+    Route::post('belepes/elfelejtett-jelszo', [ForgotPasswordController::class, 'store'])->name('password.email');
+    Route::get('jelszo-visszaallitas/{token}', [PasswordResetController::class, 'show'])->name('password.reset');
+    Route::post('jelszo-visszaallitas/{token}', [PasswordResetController::class, 'store'])->name('password.update');
 });
 
 Route::name('client.')->group(function () {

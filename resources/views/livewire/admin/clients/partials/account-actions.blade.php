@@ -1,7 +1,7 @@
 {{--
     The account actions of a user (33 · 33.2, 33.8), inside an x-admin.row-actions.
     Every item is always listed: what the admin may not do is greyed out with the reason.
-    $client; $impersonationReason, $statusReason, $archiveReason: null when the action works;
+    $client; $impersonationReason, $passwordResetReason, $statusReason, $archiveReason: null when the action works;
     $withImpersonation: false where "Belépek a nevében" is a button of its own.
 --}}
 @if ($withImpersonation ?? true)
@@ -13,6 +13,17 @@
             <x-admin.row-action type="submit">{{ __('impersonation.start') }}</x-admin.row-action>
         </form>
     @endif
+@endif
+
+{{-- A 60-minute password link (33 · 33.2, 14 · 14.3) --}}
+@if ($passwordResetReason)
+    <x-admin.row-action :disabled-reason="$passwordResetReason">{{ __('admin.clients.send_password_reset') }}</x-admin.row-action>
+@else
+    <x-admin.row-action
+        wire:click="sendPasswordReset({{ $client->id }})"
+        wire:confirm="{{ __('admin.clients.confirm_send_password_reset') }}"
+        :data-confirm-label="__('admin.clients.send_password_reset')"
+    >{{ __('admin.clients.send_password_reset') }}</x-admin.row-action>
 @endif
 
 @if ($statusReason)

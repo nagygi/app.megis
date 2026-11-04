@@ -24,10 +24,11 @@ Szuperadmin és Admin egyaránt használhatja (01).
 - **Műveletek** a 02 · 2.5 szabályaival:
   - szerkesztés: egy ügyfél nevét bármelyik admin, az e-mail címet csak szuperadmin írhatja át, ahogy az adminoknál (01 · 1.5). Admin-fiók nevét itt is csak az írhatja át, aki a fiókot szerkesztheti: szuperadminét csak szuperadmin. E-mail-módosításkor a felhasználó a régi és az új címére is értesítést kap, és a „nem kézbesíthető” jelzés törlődik;
   - meghívó küldése vagy újraküldése;
+  - jelszó-beállító link küldése (MEGIS-1): bármelyik admin, megerősítő ablakkal, csak aktív, regisztrált ügyfélnek. A link 60 percig él, ugyanaz, mint az „Elfelejtettem a jelszavam” linkje (14 · 14.3). A jelenlegi jelszó addig érvényes, amíg a felhasználó újat nem állít be. A naplóba is bekerül;
   - inaktiválás vagy aktiválás: a fiók szintjén, bármelyik admin. Az inaktív fiók nem tud belépni, a munkamenetei azonnal véget érnek, a tagságai nem változnak. A naplóba is bekerül;
   - archiválás: csak szuperadmin. Ez a fióktörlés (31.7), csak a szuperadmin indítja: a fiók azonnal inaktív, a személyes adatok egy órán belül törlődnek, és ez nem vonható vissza. A felhasználó e-mailt kap, amely szerint az adminisztrátor törölte a fiókját. Archivált fiókot nem lehet aktiválni;
   - belépés a nevében (14 · 14.6).
-- Az inaktiválás, az aktiválás és az archiválás a fejléc *Műveletek* menüjében van, ugyanúgy, mint a listán (33.8).
+- A jelszó-beállító link, az inaktiválás, az aktiválás és az archiválás a fejléc *Műveletek* menüjében van, ugyanúgy, mint a listán (33.8).
 - Admin fióknál (admin, aki egy szervezetnek is tagja) ezek a műveletek nem érhetők el: az *Admin felhasználók* között kezelhető (01).
 
 ### 33.3 Szervezetek és diagnózisok
@@ -79,8 +80,8 @@ A napló üzleti adat, nem log: a technikai logok 365 napos szabálya (NFR) nem 
 - Kereső: név és e-mail; a teljes névre is, bármilyen sorrendben („Kovács Anna”, „Anna Kovács”). Szűrők: szervezet, állapot, „csak Értéktükör” (van megerősített Értéktükre, de nincs fő diagnózisa).
 - Állapot: Aktív, Meghívás alatt, Inaktív, Archivált. Archivált az, akinek a fióktörlése elindult: akár ő kérte (31.7), akár szuperadmin archiválta. Az archivált felhasználó a listán marad, a törlés után „Törölt felhasználó”-ként (33.7).
 - A sor az adatlapra nyílik. Új felhasználót innen nem lehet felvenni, az a szervezeten át megy (02).
-- Sorműveletek: belépés a nevében, inaktiválás vagy aktiválás, archiválás (33.2).
-  - Mindhárom menüpont mindig látszik. Ami az adott adminnak vagy felhasználónál nem érhető el, az szürke, és ráállva megmutatja az okát. Ilyen ok: csak szuperadmin archiválhat; admin fiók; archivált; inaktív; még nem regisztrált.
+- Sorműveletek: belépés a nevében, jelszó-beállító link küldése, inaktiválás vagy aktiválás, archiválás (33.2).
+  - Minden menüpont mindig látszik. Ami az adott adminnak vagy felhasználónál nem érhető el, az szürke, és ráállva megmutatja az okát. Ilyen ok: csak szuperadmin archiválhat; admin fiók; archivált; inaktív; még nem regisztrált.
   - A szerver is ellenőrzi a jogosultságot.
 
 ## Nincs benne

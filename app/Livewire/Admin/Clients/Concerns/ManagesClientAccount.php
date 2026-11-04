@@ -5,11 +5,12 @@ namespace App\Livewire\Admin\Clients\Concerns;
 use App\Models\User;
 use App\Services\Accounts\AccountDeletionService;
 use App\Services\Accounts\ClientAccountService;
+use App\Services\Auth\ClientPasswordResetService;
 use Illuminate\Support\Facades\Gate;
 
 /**
  * The account actions of the user list and the datasheet (33 · 33.2, 33.8):
- * inactivation, archiving and why an item is greyed out.
+ * inactivation, the password link, archiving and why an item is greyed out.
  */
 trait ManagesClientAccount
 {
@@ -29,6 +30,19 @@ trait ManagesClientAccount
 
         $accounts->activate($user, auth()->user());
         session()->flash('status', __('admin.clients.activated'));
+    }
+
+    /**
+     * A 60-minute password link (33 · 33.2, 14 · 14.3). The current password
+     * keeps working until the user sets a new one.
+     */
+    public function sendPasswordReset(int $userId, ClientPasswordResetService $resets): void
+    {
+        $user = $this->findClient($userId);
+        Gate::authorize('sendClientPasswordReset', $user);
+
+        $resets->sendByAdmin($user, auth()->user());
+        session()->flash('status', __('admin.clients.password_reset_sent', ['email' => $user->email]));
     }
 
     /**
@@ -71,6 +85,23 @@ trait ManagesClientAccount
         return $client->isAdmin()
             ? __('admin.clients.unavailable.admin_account')
             : __('admin.clients.unavailable.archived');
+    }
+
+    /**
+     * Why "Jelszó-beállító link küldése" is greyed out, or null when it works.
+     */
+    public function passwordResetUnavailableReason(User $client): ?string
+    {
+        if (Gate::allows('sendClientPasswordReset', $client)) {
+            return null;
+        }
+
+        return match (true) {
+            $client->isAdmin() => __('admin.clients.unavailable.admin_account'),
+            $client->isDeletionRequested() => __('admin.clients.unavailable.archived'),
+            ! $client->isActive() => __('admin.clients.unavailable.inactive'),
+            default => __('admin.clients.unavailable.not_registered'),
+        };
     }
 
     /**

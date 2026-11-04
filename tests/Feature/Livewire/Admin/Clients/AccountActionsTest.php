@@ -1,9 +1,11 @@
 <?php
 
 use App\Enums\AuditEventType;
+use App\Enums\TokenPurpose;
 use App\Livewire\Admin\Clients\Index;
 use App\Livewire\Admin\Clients\Show;
 use App\Mail\AccountDeletedMail;
+use App\Mail\ClientPasswordResetMail;
 use App\Models\AuditEvent;
 use App\Models\Membership;
 use App\Models\User;
@@ -144,3 +146,50 @@ it('acts on the datasheet\'s own account only', function () {
 
     expect($other->refresh()->isActive())->toBeTrue();
 });
+
+it('sends a password link from the datasheet and logs it; the old password stays (MEGIS-1, 33 · 33.2)', function () {
+    Mail::fake();
+    $admin = actingAsAdmin();
+    $customer = customerOf();
+    $password = $customer->password;
+
+    Livewire::test(Show::class, ['user' => $customer])
+        ->assertSee('Jelszó-beállító link küldése')
+        ->call('sendPasswordReset', $customer->id)
+        ->assertHasNoErrors();
+
+    Mail::assertQueued(ClientPasswordResetMail::class, fn (ClientPasswordResetMail $mail) => $mail->hasTo($customer->email) && $mail->byAdmin);
+    expect($customer->refresh()->password)->toBe($password)
+        ->and($customer->tokens()->sole())
+        ->purpose->toBe(TokenPurpose::ClientPasswordReset)
+        ->created_by->toBe($admin->id)
+        ->and(AuditEvent::query()->sole())
+        ->type->toBe(AuditEventType::PasswordResetLinkSent)
+        ->actor_id->toBe($admin->id);
+});
+
+it('sends a password link from the list too', function () {
+    Mail::fake();
+    actingAsAdmin();
+    $customer = customerOf();
+
+    Livewire::test(Index::class)->call('sendPasswordReset', $customer->id)->assertHasNoErrors();
+
+    Mail::assertQueued(ClientPasswordResetMail::class, 1);
+});
+
+it('greys out the password link where it cannot work, and the server refuses it', function (Closure $make, string $reason) {
+    Mail::fake();
+    actingAsAdmin(User::factory()->superadmin()->create());
+    $user = $make();
+
+    Livewire::test(Show::class, ['user' => $user])->assertSee($reason);
+    Livewire::test(Index::class)->call('sendPasswordReset', $user->id)->assertForbidden();
+
+    Mail::assertNothingQueued();
+})->with([
+    'admin account' => [fn () => tap(User::factory()->admin()->create(), fn (User $admin) => Membership::factory()->for($admin)->create()), 'Admin fiók: az Admin felhasználók között kezelhető.'],
+    'not registered' => [fn () => tap(customerOf(), fn (User $customer) => $customer->forceFill(['activated_at' => null])->save()), 'Még nem regisztrált. Küldj neki meghívót.'],
+    'inactive' => [fn () => tap(customerOf(), fn (User $customer) => $customer->forceFill(['deactivated_at' => now()])->save()), 'A felhasználó fiókja inaktív.'],
+    'archived' => [fn () => tap(customerOf(), fn (User $customer) => app(AccountDeletionService::class)->request($customer)), 'A felhasználó archivált.'],
+]);

@@ -24,6 +24,8 @@ enum AuditEventType: string
     case RecordingDeleted = 'recording_deleted';
     // An admin loaded the leader's calendar file or link at the leader's request (09 · 9.2).
     case CalendarConnectedByAdmin = 'calendar_connected_by_admin';
+    // An admin sent the customer a password link (33 · 33.2).
+    case PasswordResetLinkSent = 'password_reset_link_sent';
 
     public function label(): string
     {

@@ -30,6 +30,7 @@
                 @include('livewire.admin.clients.partials.account-actions', [
                     'client' => $user,
                     'withImpersonation' => false,
+                    'passwordResetReason' => $this->passwordResetUnavailableReason($user),
                     'statusReason' => $this->statusChangeUnavailableReason($user),
                     'archiveReason' => $this->archiveUnavailableReason($user),
                 ])

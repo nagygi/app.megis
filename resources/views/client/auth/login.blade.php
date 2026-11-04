@@ -12,8 +12,13 @@
 
         <x-form.input name="email" type="email" :label="__('auth_ui.email')" :value="old('email', $email)" autocomplete="email" required autofocus />
 
+        {{-- x-if keeps one root element. --}}
         <template x-if="withPassword">
-            <x-form.input name="password" type="password" :label="__('auth_ui.password')" autocomplete="current-password" />
+            <div class="flex flex-col gap-2">
+                <x-form.input name="password" type="password" :label="__('auth_ui.password')" autocomplete="current-password" />
+                {{-- "Elfelejtettem a jelszavam" (14 · 14.3) --}}
+                <a href="{{ route('client.password.request') }}" class="self-start text-sm font-semibold text-charcoal">{{ __('auth_ui.customer.forgot_password') }}</a>
+            </div>
         </template>
 
         {{-- The way in is chosen before the button that uses it. @js is not compiled in a component's attribute. --}}

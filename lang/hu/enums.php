@@ -54,6 +54,7 @@ return [
         'account_activated' => 'Fiók aktiválva',
         'recording_deleted' => 'Felvétel hangja törölve',
         'calendar_connected_by_admin' => 'Naptár betöltve a nevében (admin)',
+        'password_reset_link_sent' => 'Jelszó-beállító link elküldve',
     ],
 
     'capability_level' => [

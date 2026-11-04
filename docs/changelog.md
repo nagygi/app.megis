@@ -2,6 +2,21 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.94 · HASH · 2026-11-04
+
+Elfelejtett jelszó az ügyfeleknek (MEGIS-1; 14 · 14.3, 33 · 33.2).
+
+- **Eddig:** aki elfelejtette a jelszavát, csak kóddal léphetett be, és a Profilban állíthatott újat. Önkiszolgáló link nem volt, és az admin az ügyfél adatlapján sem tudott jelszó-beállító linket küldeni (az admin-reset csak admin fiókra működött).
+- **Most:**
+  - **„Elfelejtettem a jelszavam”** a B1-en, a jelszómező alatt. A lapon e-mail és Turnstile. A válasz mindig ugyanaz: „Ha ehhez a címhez tartozik fiók, elküldtük a jelszó-beállító linket. A link 60 percig él.”
+  - **A link 60 percig él**, egyszer használható, új kérés a régit érvényteleníti. Óránként legfeljebb 5 kérés e-mail és IP alapján.
+  - **A link lapja** (`/jelszo-visszaallitas/{token}`): a megnyitás nem használja el. Új jelszó kétszer, „Beállítom és belépek”. Utána a többi eszközön kiléptetünk, „Jelszó megváltozott” levél megy, a hibás jelszavak szünete megszűnik. Lejárt vagy használt linknél: „Ez a link már nem érvényes”, „Új linket kérek”.
+  - **Admin:** a *Felhasználók* listáján és az adatlap *Műveletek* menüjében új tétel: „Jelszó-beállító link küldése”, megerősítéssel. Ugyanazt a linket küldi, a levél szerint a mégis adminisztrátora küldte. A naplóba „Jelszó-beállító link elküldve” sor kerül. Admin fióknál, inaktív, még nem regisztrált és archivált felhasználónál szürke, az okkal.
+  - A régi jelszó a mentésig érvényes marad, a link kérése nem zár ki senkit.
+- **Admin fiók** ezt a linket nem kapja meg: az admin belépő szövege marad (01 · 1.2), az admin jelszavát továbbra is egy másik admin reseteli.
+- Nincs migráció, új env-kulcs vagy config-változás (új token-cél: `client_password_reset`).
+- **Rollback:** 1.93.
+
 ## 1.93 · 24a909b · 2026-11-04
 
 Jegyek az oldalon: az `exot/onsite-comment` 1.1.0-ról 1.4.0-ra frissült (`composer.lock`; a `^1.0` feltétel maradt).

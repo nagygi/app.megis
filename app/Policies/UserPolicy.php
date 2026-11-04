@@ -125,6 +125,19 @@ class UserPolicy
     }
 
     /**
+     * A password link to a registered, active customer (33 · 33.2, 14 · 14.3).
+     * An admin account's password is reset under Admin felhasználók (01 · 1.3).
+     */
+    public function sendClientPasswordReset(User $actor, User $target): bool
+    {
+        return $actor->isAdmin()
+            && ! $target->isAdmin()
+            && $target->isActive()
+            && $target->isActivated()
+            && ! $target->isDeletionRequested();
+    }
+
+    /**
      * Archiving is the account deletion of 31 · 31.7, started by a superadmin.
      */
     public function archive(User $actor, User $target): bool

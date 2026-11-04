@@ -44,6 +44,7 @@
                         @include('livewire.admin.clients.partials.account-actions', [
                             'client' => $client,
                             'impersonationReason' => $this->impersonationUnavailableReason($client),
+                            'passwordResetReason' => $this->passwordResetUnavailableReason($client),
                             'statusReason' => $this->statusChangeUnavailableReason($client),
                             'archiveReason' => $this->archiveUnavailableReason($client),
                         ])

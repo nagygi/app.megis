@@ -68,7 +68,15 @@ Az admin belépése külön működik: 01.
 - Beállítás és csere a Profilban (M6, 31):
   - Ha már van jelszava, a jelenlegi jelszót kéri.
   - Ha nincs jelszava, vagy elfelejtette, egy frissen kért kóddal erősíti meg. Jelszavas fióknál a jelenlegi jelszó alatt: „Elfelejtetted? Kódot kérek helyette”; a kód ezután a jelenlegi jelszó helyére lép.
-- Külön „Elfelejtett jelszó” folyamat nincs. Aki elfelejtette, kóddal lép be, és a Profilban új jelszót állít.
+- **Elfelejtett jelszó (MEGIS-1, 2026-11-04):**
+  - A B1-en a „Jelszóval lépek be” után a jelszómező alatt: „Elfelejtettem a jelszavam”. A lapon e-mail és Turnstile, gomb: „Küldöm a linket”.
+  - Mindig ugyanaz a válasz, vissza a B1-re: „Ha ehhez a címhez tartozik fiók, elküldtük a jelszó-beállító linket. A link 60 percig él.” Ismeretlen, inaktív, még nem regisztrált, archivált és admin fiók nem kap levelet. Jelszó nélküli fiók is kaphat: így állít be jelszót.
+  - A link **60 percig él**, egyszer használható, új kérés a korábbit érvényteleníti. Rate limit: óránként 5 kérés e-mail és IP alapján.
+  - A megnyitás nem használja el a linket (14.1). A lapon új jelszó kétszer és Turnstile, gomb: „Beállítom és belépek”. Mentéskor a többi session megszűnik, „Jelszó megváltozott” levél megy, a felhasználó belép (14.4), a hibás jelszavak számlálója és a szünet nullázódik.
+  - A régi jelszó a mentésig érvényes marad.
+  - Lejárt vagy használt link: „Ez a link már nem érvényes”, „Új linket kérek” gombbal.
+  - Ugyanezt a linket az admin is elküldheti a felhasználó adatlapjáról és a listáról (33 · 33.2).
+  - A kóddal belépés és a Profilban beállított új jelszó továbbra is működik.
 - Jelszócseréről e-mail értesítés megy.
 
 ### 14.4 Hová érkezik
@@ -122,6 +130,7 @@ További szabályok:
 ## E-mailek
 
 - **Belépő kód:** „A belépő kódod: {123456}. [Belépek] A kód és a link 15 percig él. Ha nem te kérted, hagyd figyelmen kívül.”
+- **Jelszó-beállító link:** „Új jelszót kértél a mégis fiókodhoz. A jelszavad addig nem változik, amíg az újat be nem állítod. [Új jelszó beállítása] A link 60 percig él, és egyszer használható. Ha nem te kérted, hagyd figyelmen kívül.” Ha az admin küldte: „A mégis adminisztrátora jelszó-beállító linket küldött neked. …”
 - **Jelszó megváltozott:** „A jelszavad {időpont}-kor megváltozott. Ha nem te voltál, írj nekünk: {támogatási e-mail}.”
 - A meghívó és a hozzáadás szövege a 02-es jegyben van.
 

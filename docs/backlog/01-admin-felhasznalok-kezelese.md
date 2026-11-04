@@ -43,7 +43,7 @@ Az admin ugyanolyan felhasználó, mint az ügyfelek, csak Admin vagy Szuperadmi
 
 - Mezők: e-mail, jelszó, Turnstile.
 - Hibás jelszó, inaktív és nem admin fiók esetén ugyanaz az üzenet jelenik meg: „Hibás e-mail cím vagy jelszó.”
-- Önkiszolgáló „Elfelejtett jelszó” nincs. A helyén ez a szöveg áll: „Kérd meg egy másik admint, hogy küldjön új beállító linket.”
+- Önkiszolgáló „Elfelejtett jelszó” nincs. A helyén ez a szöveg áll: „Kérd meg egy másik admint, hogy küldjön új beállító linket.” Az ügyfelek „Elfelejtettem a jelszavam” linkje (14 · 14.3) admin fióknak nem küld levelet.
 - Nincs „Emlékezz rám”.
 - Rate limit: 5 próbálkozás percenként, e-mail + IP alapján.
 - Fiókzárolás: 10 egymást követő sikertelen próbálkozás után a fiók zárolódik. Ezt a felület ki is írja: „A fiókod zárolva van. Kérd egy szuperadmin segítségét.” Feloldani csak konzolból lehet (`megis:admin:unlock`). Sikeres belépés után a számláló nullázódik.
@@ -110,7 +110,7 @@ Az admin ugyanolyan felhasználó, mint az ügyfelek, csak Admin vagy Szuperadmi
 ## Nincs benne
 
 - 2FA: [NM-01](../backlog_nem_MVP/NM-01-admin-ketfaktoros-azonositas.md).
-- Önkiszolgáló elfelejtett jelszó.
+- Önkiszolgáló elfelejtett jelszó az admin fióknak. Az ügyfeleké: 14 · 14.3.
 - Végleges törlés.
 - Audit napló UI.
 - Szervezeti címkék (szervezet vezetője, csapat vezető, munkatárs, partner): a 02-es jegyben vannak.

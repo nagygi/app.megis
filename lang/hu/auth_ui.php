@@ -54,6 +54,20 @@ return [
         'link_expired' => 'A belépő link 15 percig él, és csak egyszer használható.',
         'request_new' => 'Újat kérek',
 
+        // "Elfelejtettem a jelszavam" (14 · 14.3)
+        'forgot_password' => 'Elfelejtettem a jelszavam',
+        'forgot_title' => 'Elfelejtett jelszó',
+        'forgot_lead' => 'Add meg az e-mail címed. Küldünk egy linket, amellyel új jelszót állíthatsz be.',
+        'forgot_button' => 'Küldöm a linket',
+        'back_to_login' => 'Vissza a belépéshez',
+        'reset_link_sent' => 'Ha ehhez a címhez tartozik fiók, elküldtük a jelszó-beállító linket. A link 60 percig él.',
+        'reset_title' => 'Új jelszó beállítása',
+        'reset_lead' => 'Állítsd be az új jelszavad. Utána ezzel lépsz be, a többi eszközön kiléptetünk.',
+        'reset_button' => 'Beállítom és belépek',
+        'reset_invalid_title' => 'Ez a link már nem érvényes',
+        'reset_invalid' => 'A jelszó-beállító link 60 percig él, és csak egyszer használható.',
+        'reset_request_new' => 'Új linket kérek',
+
         'logout' => 'Kijelentkezem',
         'paused_title' => 'A hozzáférésed szünetel',
         'paused' => 'A hozzáférésed szünetel. Keresd a mégis kapcsolattartódat.',
