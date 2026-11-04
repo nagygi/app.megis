@@ -664,16 +664,16 @@
         },
         {
             "name": "exot/onsite-comment",
-            "version": "v1.4.0",
+            "version": "v1.4.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:EXOT-Labs-Kft/exot-onsite-comment.git",
-                "reference": "ec8479747d8cdb7e62ce0e1ab4157eb9b67e6ecb"
+                "reference": "7cddf9f3136946564f819461812bfa37cb11ced4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EXOT-Labs-Kft/exot-onsite-comment/zipball/ec8479747d8cdb7e62ce0e1ab4157eb9b67e6ecb",
-                "reference": "ec8479747d8cdb7e62ce0e1ab4157eb9b67e6ecb",
+                "url": "https://api.github.com/repos/EXOT-Labs-Kft/exot-onsite-comment/zipball/7cddf9f3136946564f819461812bfa37cb11ced4",
+                "reference": "7cddf9f3136946564f819461812bfa37cb11ced4",
                 "shasum": ""
             },
             "require": {
@@ -737,7 +737,7 @@
                 "qa",
                 "trello"
             ],
-            "time": "2026-11-04T09:57:42+00:00"
+            "time": "2026-11-04T16:58:43+00:00"
         },
         {
             "name": "firebase/php-jwt",

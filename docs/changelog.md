@@ -2,6 +2,14 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.95 · HASH · 2026-11-04
+
+Jegyek az oldalon: az `exot/onsite-comment` 1.4.0-ról 1.4.1-re frissült (`composer.lock`; a `^1.0` feltétel maradt).
+
+- **Javítás:** a jegylista „Mind” státuszszűrőjére eddig üres lett a lista („0 jegy”), a kis és a nagy nézetben is. Most a nyitott és a lezárt jegyek is megjelennek. A többi szűrő változatlan.
+- Nincs migráció, új env-kulcs vagy config-változás.
+- **Rollback:** 1.94 (a csomag 1.4.0-ra áll vissza).
+
 ## 1.94 · 63ff316 · 2026-11-04
 
 Elfelejtett jelszó az ügyfeleknek (MEGIS-1; 14 · 14.3, 33 · 33.2).
