@@ -2,6 +2,15 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.97 · – · 2026-11-05
+
+Jegyek az oldalon: az `exot/onsite-comment` 1.5.0-ról 1.7.0-ra frissült (`composer.lock`; a `^1.0` feltétel maradt).
+
+- **Új (1.7.0):** a widget menüjében a „Jelölők mutatása” alatt beállítható, mely státuszú jegyek jelölője látszik („Látható státuszok”: „Nyitottak” – az alapértelmezés –, „Lezártak”, „Mind”, vagy státuszonként). A választást a böngésző megjegyzi. A megnyitott jegy jelölője akkor is látszik, ha a státusza nincs kiválasztva.
+- **Új (1.6.0):** az új jegyről szóló e-mail tárgya `[EOS]` előtaggal kezdődik, a lábléc megnevezi a rendszert és a site-ot (a host `APP_NAME` és `APP_URL` értéke).
+- Nincs migráció, új env-kulcs vagy config-változás.
+- **Rollback:** 1.96 (a csomag 1.5.0-ra áll vissza).
+
 ## 1.96 · 3e82ad2 · 2026-11-04
 
 Jegyek az oldalon: az `exot/onsite-comment` 1.4.1-ről 1.5.0-ra frissült (`composer.lock`; a `^1.0` feltétel maradt).
