@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.98 · – · 2026-11-09
+## 1.98 · 458a1c5 · 2026-11-09
 
 Admin fiók az ügyféloldali belépőn (14 · 14.2).
 
