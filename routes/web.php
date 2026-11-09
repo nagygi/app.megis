@@ -23,6 +23,7 @@ use App\Http\Controllers\Client\LegalAcceptanceController;
 use App\Http\Controllers\Client\LoginCodeController;
 use App\Http\Controllers\Client\LoginLinkController;
 use App\Http\Controllers\Client\PasswordResetController;
+use App\Http\Controllers\Client\PausedController;
 use App\Http\Controllers\Client\ReportController;
 use App\Http\Controllers\Client\ReportPdfController;
 use App\Http\Controllers\Client\TakeawayController;
@@ -214,7 +215,7 @@ Route::name('client.')->group(function () {
 Route::middleware('customer')->name('client.')->group(function () {
     Route::post('kilepes', CustomerLogoutController::class)->name('logout');
     Route::post('kilepes-a-nevebol', [ClientImpersonationController::class, 'destroy'])->name('impersonation.end');
-    Route::view('szunetel', 'client.paused')->name('paused');
+    Route::get('szunetel', PausedController::class)->name('paused');
 
     Route::get('elfogadas', [LegalAcceptanceController::class, 'show'])->name('legal.show');
     Route::post('elfogadas', [LegalAcceptanceController::class, 'store'])->middleware('not-impersonating')->name('legal.store');

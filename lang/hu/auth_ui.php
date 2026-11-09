@@ -71,6 +71,7 @@ return [
         'logout' => 'Kijelentkezem',
         'paused_title' => 'A hozzáférésed szünetel',
         'paused' => 'A hozzáférésed szünetel. Keresd a mégis kapcsolattartódat.',
+        'admin_account' => 'Ez egy admin fiók. Az admin felületre itt, jelszóval lépsz be.',
     ],
 
     'registration' => [

@@ -2,6 +2,15 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.98 · – · 2026-11-09
+
+Admin fiók az ügyféloldali belépőn (14 · 14.2).
+
+- **Eddig:** az ügyféloldali belépő (`/belepes`) kóddal vagy jelszóval egy admin fiókot is beengedett. Ha az adminnak nem volt ügyfélszervezete (a superadminoknak jellemzően nincs), a belépés után „A hozzáférésed szünetel. Keresd a mégis kapcsolattartódat.” lap jött. Úgy tűnt, mintha a fiók le lenne tiltva.
+- **Most:** ilyenkor a rendszer kilépteti az admint az ügyféloldalról, és az admin belépőre (`/admin/belepes`) viszi ezzel az üzenettel: „Ez egy admin fiók. Az admin felületre itt, jelszóval lépsz be.” Az ügyfeleknél és az ügyfélszervezethez tartozó adminoknál nincs változás, és a „Belépek a nevében” sem változik.
+- Nincs migráció, új env-kulcs vagy config-változás.
+- **Rollback:** 1.97.
+
 ## 1.97 · 572b29b · 2026-11-05
 
 Jegyek az oldalon: az `exot/onsite-comment` 1.5.0-ról 1.7.0-ra frissült (`composer.lock`; a `^1.0` feltétel maradt).

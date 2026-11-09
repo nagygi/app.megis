@@ -61,6 +61,7 @@ Az admin belépése külön működik: 01.
 
 - Ha a felhasználó egyik szervezete inaktív, a többi szervezetét eléri.
 - Ha egy aktív szervezete sincs: „A hozzáférésed szünetel. Keresd a mégis kapcsolattartódat.”
+  - **Admin fiók (2026-11-09):** ha egy admin az ügyféloldalon lép be (pl. kóddal), és nincs elérhető ügyfélszervezete, nem a „szünetel” lapot kapja. Az ügyféloldalról kiléptetjük, és az admin belépőre visszük: „Ez egy admin fiók. Az admin felületre itt, jelszóval lépsz be.” Az admin, aki egy szervezet tagja is, ugyanúgy belép az ügyféloldalra, mint bárki.
 
 ### 14.3 Jelszó
 

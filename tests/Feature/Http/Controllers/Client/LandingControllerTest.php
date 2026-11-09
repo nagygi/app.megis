@@ -40,6 +40,16 @@ it('shows the paused page when no organization is active', function () {
     $this->get(route('client.paused'))->assertOk()->assertSee('A hozzáférésed szünetel. Keresd a mégis kapcsolattartódat.');
 });
 
+it('sends an admin account that logged in on the customer side to the admin login', function () {
+    actingAsCustomer(User::factory()->superadmin()->create());
+
+    $this->get(route('client.landing'))->assertRedirect(route('client.paused'));
+    $this->get(route('client.paused'))->assertRedirect(route('admin.login'));
+
+    $this->assertGuest('web');
+    $this->get(route('admin.login'))->assertOk()->assertSee('Ez egy admin fiók. Az admin felületre itt, jelszóval lépsz be.');
+});
+
 it('sends guests to the customer login', function () {
     $response = $this->get(route('client.landing'));
 
