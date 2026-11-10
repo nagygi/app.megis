@@ -100,6 +100,15 @@
                             @if (isset($stats['leader']) || isset($stats['peers']))
                                 <p class="text-sm">{{ __('admin.reading.experience_line', ['leader' => $decimal($stats['leader'] ?? null), 'team' => $decimal($selected->experience), 'situations' => $decimal($stats['situations'] ?? null)]) }}</p>
                             @endif
+                            @if ($clientSummary !== null && in_array($selected->kind, [\App\Enums\DiagnosisRowKind::Value, \App\Enums\DiagnosisRowKind::Process], true))
+                                @php($clientFigure = $selected->kind === \App\Enums\DiagnosisRowKind::Value ? ($clientSummary['values'][$selected->value_id] ?? null) : ($clientSummary['processes'][$selected->process_id] ?? null))
+                                @if ($clientFigure !== null)
+                                    <p class="text-sm">
+                                        {{ $clientFigure['mean'] === null ? __('admin.external_clients.reading_no_data') : __('admin.external_clients.reading_figure', ['score' => $decimal($clientFigure['mean']), 'answers' => $clientFigure['answers']]) }}
+                                        · <a href="{{ route('admin.main-diagnoses.external-clients', $diagnosis) }}">{{ __('admin.main_diagnoses.tabs.external_clients') }}</a>
+                                    </p>
+                                @endif
+                            @endif
                             @if ($selected->override_reason)
                                 <p class="mt-1 text-sm text-grey-700">{{ __('admin.diagnoses.override.reason') }}: {{ $selected->override_reason }}</p>
                             @endif

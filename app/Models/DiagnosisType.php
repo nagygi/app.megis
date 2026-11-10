@@ -26,6 +26,9 @@ class DiagnosisType extends Model
 
     public const MIRROR = 'mirror';
 
+    // A client's subdiagnosis in the Ügyfélmérés (35 · 35.7).
+    public const EXTERNAL_CLIENT = 'external_client';
+
     public static function byKey(string $key): self
     {
         return static::query()->where('key', $key)->firstOrFail();

@@ -6,6 +6,7 @@ use App\Enums\ConsentKind;
 use App\Enums\DiagnosisCreator;
 use App\Enums\DiagnosisLevel;
 use App\Enums\DiagnosisRowKind;
+use App\Enums\ExternalClientItemKind;
 use App\Enums\InboxItemType;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\MaterialStatus;
@@ -20,6 +21,8 @@ use App\Models\DiagnosisClaim;
 use App\Models\DiagnosisRow;
 use App\Models\DiagnosisType;
 use App\Models\EvidenceTrace;
+use App\Models\ExternalClient;
+use App\Models\ExternalClientAnswer;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\MaterialValueScore;
@@ -85,6 +88,7 @@ class DiagnosisCalculator
             $this->withdrawnRowIds = $dropped->whereNull('excluded_at')->pluck('diagnosis_row_id')->unique()->values()->all();
             $processDiagnoses = $this->processDiagnoses($main, $snapshot, $materials, $scores);
             $this->mainRows($main, $snapshot, $materials, $scores, $processDiagnoses);
+            $this->externalClientDiagnoses($main, $snapshot);
             $this->fallBackWithdrawnRows($main->diagnosis);
             $this->fallBackWithdrawnClaims($main, $dropped->pluck('id')->all());
             $this->summarize($main);
@@ -455,6 +459,132 @@ class DiagnosisCalculator
             'level' => DiagnosisLevel::Process,
             'process_id' => $process->id,
             'diagnosis_type_id' => DiagnosisType::byKey(DiagnosisType::PROCESS)->id,
+            'parent_id' => $parent->id,
+        ], DiagnosisCreator::Automatic, $parent->status);
+    }
+
+    /**
+     * Ügyfélmérés (35 · 35.7): one automatic subdiagnosis per client of the
+     * diagnosis, from its users' sent answers, apart from the team's rows. A
+     * client taken off the diagnosis takes its subdiagnosis with it.
+     *
+     * @param  array<string, mixed>  $snapshot
+     */
+    private function externalClientDiagnoses(MainDiagnosis $main, array $snapshot): void
+    {
+        $answers = ExternalClientAnswer::query()
+            ->where('main_diagnosis_id', $main->id)
+            ->whereNotNull('submitted_at')
+            ->whereHas('material', fn ($query) => $query->where('status', MaterialStatus::Processed))
+            ->with('material.occasion')
+            ->get();
+        $scores = MaterialValueScore::query()
+            ->whereIn('material_id', $answers->pluck('material_id'))
+            ->whereNull('speaker')
+            ->get()
+            ->groupBy('material_id');
+        $keep = [];
+
+        foreach ($main->externalClients()->with('items')->get() as $client) {
+            $keep[] = $this->externalClientDiagnosis($main, $client, $snapshot, $answers->where('external_client_id', $client->id), $scores)->id;
+        }
+
+        Diagnosis::query()
+            ->where('parent_id', $main->diagnosis_id)
+            ->where('diagnosis_type_id', DiagnosisType::byKey(DiagnosisType::EXTERNAL_CLIENT)->id)
+            ->whereNotIn('id', $keep)
+            ->get()
+            ->each(fn (Diagnosis $orphan) => $orphan->delete());
+    }
+
+    /**
+     * A client's rows: per value asked, the mean of its answers' scores for
+     * that value; per process asked, the mean of the value scores of the
+     * answers about it, as a process point (13 · 13.3).
+     *
+     * @param  array<string, mixed>  $snapshot
+     * @param  Collection<int, ExternalClientAnswer>  $answers
+     * @param  Collection<int, Collection<int, MaterialValueScore>>  $scores
+     */
+    private function externalClientDiagnosis(MainDiagnosis $main, ExternalClient $client, array $snapshot, Collection $answers, Collection $scores): Diagnosis
+    {
+        $diagnosis = $this->externalClientDiagnosisRecord($main, $client);
+        $values = collect($snapshot['values'] ?? [])->keyBy('key');
+        $materials = $answers->pluck('material')->values();
+        $position = 0;
+        $keep = [];
+
+        foreach ($client->items->where('kind', ExternalClientItemKind::Value) as $item) {
+            $value = $values->get($item->value_key);
+
+            if ($value === null) {
+                continue;
+            }
+
+            $valueId = (int) $value['value_id'];
+            $points = $materials->map(fn (Material $material) => $this->scoreOf($scores, $material, $valueId))->filter(fn ($score) => $score !== null)->values()->all();
+            $row = $this->writeRow($diagnosis, ['kind' => DiagnosisRowKind::Value, 'value_id' => $valueId], [
+                'value_version_id' => $value['source_version_id'] ?? null,
+                'position' => $position++,
+                'quotes' => $this->quotesFor($materials, $scores, $valueId),
+            ], ScoreMath::mean($points), ['n' => count($points), 'answers' => $materials->count()], null);
+            $keep[] = $row->id;
+
+            $this->tracesForValue($row, $materials, $scores, $valueId, $main);
+        }
+
+        foreach ($client->items->where('kind', ExternalClientItemKind::Process) as $item) {
+            $processMaterials = $answers->where('process_id', $item->process_id)->pluck('material')->values();
+            $points = $processMaterials->map(fn (Material $material) => ScoreMath::mean(
+                $scores->get($material->id, collect())
+                    ->where('state', ScoreResultState::Scored)
+                    ->pluck('score')
+                    ->map(fn ($score) => (float) $score)
+                    ->all(),
+            ))->filter(fn ($score) => $score !== null)->values()->all();
+            $row = $this->writeRow($diagnosis, ['kind' => DiagnosisRowKind::Process, 'process_id' => $item->process_id], [
+                'position' => $position++,
+            ], ScoreMath::mean($points), ['n' => count($points), 'answers' => $processMaterials->count()], null);
+            $keep[] = $row->id;
+
+            $this->syncTraces($row, $processMaterials->flatMap(fn (Material $material) => $scores->get($material->id, collect())
+                ->where('state', ScoreResultState::Scored)
+                ->flatMap(fn (MaterialValueScore $score) => collect($score->detection_ids)->map(fn (int $id) => ['detection' => $id, 'material' => $material]))), $main);
+        }
+
+        // Only what the client is asked: no brand base block, no row of an item taken out.
+        $diagnosis->rows()->whereNotIn('id', $keep)->delete();
+
+        return $diagnosis;
+    }
+
+    private function externalClientDiagnosisRecord(MainDiagnosis $main, ExternalClient $client): Diagnosis
+    {
+        $parent = $main->diagnosis;
+        $attributes = [
+            'name' => mb_substr(__('external_clients.diagnosis_name', ['client' => $client->name]), 0, 255),
+            'diagnosed_on' => ($main->running_at ?? $main->starts_on ?? today())->toDateString(),
+            'value_set_version_id' => $main->value_set_version_id,
+        ];
+
+        $diagnosis = Diagnosis::query()
+            ->where('parent_id', $parent->id)
+            ->where('external_client_id', $client->id)
+            ->where('creator_kind', DiagnosisCreator::Automatic)
+            ->first();
+
+        if ($diagnosis !== null) {
+            $diagnosis->update($attributes);
+
+            return $diagnosis;
+        }
+
+        return app(DiagnosisService::class)->create([
+            ...$attributes,
+            'organization_id' => $parent->organization_id,
+            'level' => DiagnosisLevel::Organization,
+            'external_client_id' => $client->id,
+            'diagnosis_type_id' => DiagnosisType::byKey(DiagnosisType::EXTERNAL_CLIENT)->id,
             'parent_id' => $parent->id,
         ], DiagnosisCreator::Automatic, $parent->status);
     }

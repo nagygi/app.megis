@@ -56,6 +56,10 @@ return [
         'text' => 'A válaszaimat a mégis névvel látja, és a(z) :organization diagnózisában név nélkül, összesítve használja fel.',
     ],
 
+    // A client's subdiagnosis (35 · 35.7, 35.8).
+    'diagnosis_name' => 'Ügyfélmérés · :client',
+    'subject' => 'Ügyfél · :name',
+
     // The speakers of the written exchange the measurement reads (35 · 35.7).
     'speaker_question' => 'Kérdés',
     'speaker_client' => 'Ügyfél',

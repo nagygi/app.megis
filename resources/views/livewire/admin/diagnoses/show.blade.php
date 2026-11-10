@@ -1,6 +1,6 @@
 @php
-    // A main diagnosis is calculated from its subdiagnoses (17 · 17.4, 18), not loaded.
-    $isAggregatable = $diagnosis->level->canAggregate() && $diagnosis->main === null;
+    // A main diagnosis is calculated from its subdiagnoses (17 · 17.4, 18), not loaded; a client's from its answers (35 · 35.7).
+    $isAggregatable = $diagnosis->level->canAggregate() && $diagnosis->main === null && $diagnosis->external_client_id === null;
     $aggregation = $diagnosis->aggregation;
     $decimalLabel = fn (?float $number) => $number === null ? '–' : number_format($number, 1, ',', '');
 @endphp

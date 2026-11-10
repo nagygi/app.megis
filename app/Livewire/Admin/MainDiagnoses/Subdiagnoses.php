@@ -27,7 +27,7 @@ class Subdiagnoses extends Component
     {
         return view('livewire.admin.main-diagnoses.subdiagnoses', [
             'subdiagnoses' => $this->diagnosis->subdiagnoses()
-                ->with(['type', 'user', 'team', 'process'])
+                ->with(['type', 'user', 'team', 'process', 'externalClient'])
                 ->orderBy('diagnosed_on')
                 ->orderBy('id')
                 ->get(),

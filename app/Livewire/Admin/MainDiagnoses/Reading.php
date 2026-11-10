@@ -22,6 +22,7 @@ use App\Services\Diagnoses\DiagnosisService;
 use App\Services\Diagnoses\ProcessOccasionBreakdown;
 use App\Services\Diagnoses\ReadingService;
 use App\Services\Diagnoses\ThresholdPolicy;
+use App\Services\ExternalClients\ExternalClientMeasurementService;
 use App\Services\Inbox\InboxService;
 use App\Services\Report\ReportBuilder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -419,6 +420,8 @@ class Reading extends Component
             'gapCandidates' => $rows->filter(fn (DiagnosisRow $row) => in_array($row->kind, [DiagnosisRowKind::Value, DiagnosisRowKind::TreeElement], true))->values(),
             'progress' => $reading->progress($main),
             'showsExperience' => $threshold->showsTeamExperience($main),
+            // "Ügyfél szemével" beside a value or process row (35 · 35.8).
+            'clientSummary' => $main->externalClients()->exists() ? app(ExternalClientMeasurementService::class)->summary($main) : null,
             'missingPeers' => $threshold->missingPeers($main),
             'materials' => $this->materials(),
             'events' => ReviewEvent::query()

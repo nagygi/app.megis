@@ -134,6 +134,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('diagnozisok/{diagnosis}/riport-pdf', UploadedReportPdfController::class)->name('diagnoses.report-pdf');
         Route::livewire('diagnozisok/{diagnosis}/beallitas', Admin\MainDiagnoses\Form::class)->name('main-diagnoses.edit');
         Route::livewire('diagnozisok/{diagnosis}/reszdiagnozisok', Admin\MainDiagnoses\Subdiagnoses::class)->name('main-diagnoses.subdiagnoses');
+        Route::livewire('diagnozisok/{diagnosis}/ugyfelmeres', Admin\MainDiagnoses\ExternalClients::class)->name('main-diagnoses.external-clients');
         Route::livewire('diagnozisok/{diagnosis}/futas', Admin\MainDiagnoses\Run::class)->name('main-diagnoses.run');
         Route::livewire('diagnozisok/{diagnosis}/olvasat', Admin\MainDiagnoses\Reading::class)->name('main-diagnoses.reading');
         Route::livewire('diagnozisok/{diagnosis}/publikalas', Admin\MainDiagnoses\Publish::class)->name('main-diagnoses.publish');

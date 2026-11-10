@@ -5,7 +5,6 @@ use App\Enums\ExternalClientItemKind;
 use App\Enums\LegalDocumentType;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\MaterialContext;
-use App\Enums\StepMark;
 use App\Enums\TokenPurpose;
 use App\Jobs\AnalyzeMaterial;
 use App\Livewire\Admin\MainDiagnoses\Form as MainDiagnosisForm;
@@ -16,9 +15,7 @@ use App\Models\ExternalClient;
 use App\Models\ExternalClientAnswer;
 use App\Models\LegalAcceptance;
 use App\Models\LegalDocumentVersion;
-use App\Models\MainDiagnosis;
 use App\Models\Material;
-use App\Models\Process;
 use App\Models\User;
 use App\Services\Accounts\AccountDeletionService;
 use App\Services\Auth\LandingResolver;
@@ -26,59 +23,10 @@ use App\Services\Auth\TokenService;
 use App\Services\Diagnoses\DiagnosisCalculator;
 use App\Services\ExternalClients\ExternalClientMeasurementService;
 use App\Services\ExternalClients\ExternalClientService;
-use App\Services\MainDiagnoses\ExperienceService;
-use App\Services\MainDiagnoses\MainDiagnosisService;
 use App\Services\MainDiagnoses\StageMachine;
-use App\Services\Organizations\OrganizationValueSetService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
-
-/**
- * A team diagnosis with one client (a user, a value and a process asked),
- * started by the leader: it runs, and the client's user got the link.
- *
- * @return array{0: MainDiagnosis, 1: ExternalClient, 2: User}
- */
-function diagnosisWithClient(bool $start = true): array
-{
-    $setup = diagnosisTeam(peers: 0);
-    $organization = $setup['organization'];
-    $organization->update(['external_clients_enabled' => true]);
-    $process = Process::factory()->accepted()->for($organization)->create(['name' => 'Ajánlatadás']);
-    $client = ExternalClient::factory()->for($organization)->create(['name' => 'Acme']);
-    $user = User::factory()->invited()->create(['email' => 'kati@acme.test']);
-    $client->users()->attach($user);
-    $client->items()->create(['kind' => ExternalClientItemKind::Value, 'value_key' => $organization->valueSet->items()->first()->key, 'question' => 'Mikor számíthattál ránk?', 'position' => 0]);
-    $client->items()->create(['kind' => ExternalClientItemKind::Process, 'process_id' => $process->id, 'question' => 'Milyen volt az ajánlatadás?', 'position' => 1]);
-
-    $main = startMainDiagnosis($setup);
-    app(ExternalClientMeasurementService::class)->syncClients($main, [$client->id]);
-
-    if ($start) {
-        confirmOwnValues($setup['leader']);
-        $version = app(OrganizationValueSetService::class)->forOrganization($organization)->latestVersion;
-        $rows = app(ExperienceService::class)->rows($version->snapshot);
-        app(ExperienceService::class)->submit($main, $setup['leader'], $version, collect($rows)->mapWithKeys(fn ($row) => [$row['key'] => '4'])->all());
-        $main->stepMarks()->create(['user_id' => $setup['leader']->id, 'step' => 'processes', 'mark' => StepMark::Skipped]);
-        $main->stepMarks()->create(['user_id' => $setup['leader']->id, 'step' => 'capabilities', 'mark' => StepMark::Skipped]);
-        app(MainDiagnosisService::class)->start($main->refresh(), $setup['leader']);
-    }
-
-    return [$main->refresh(), $client, $user];
-}
-
-/**
- * The client user, signed in on the customer side with consent given.
- */
-function answeringClient(MainDiagnosis $main, User $user): User
-{
-    $user->forceFill(['activated_at' => now()])->save();
-    actingAsCustomer($user);
-    app(ExternalClientMeasurementService::class)->giveConsent($main, $user);
-
-    return $user;
-}
 
 it('invites the users of the diagnosis\' clients as it starts running, once', function () {
     [$main, $client, $user] = diagnosisWithClient();

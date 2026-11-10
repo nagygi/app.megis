@@ -4,12 +4,15 @@ namespace App\Services\ExternalClients;
 
 use App\Enums\AuditEventType;
 use App\Enums\ConsentKind;
+use App\Enums\DiagnosisRowKind;
 use App\Enums\ExternalClientItemKind;
 use App\Enums\MainDiagnosisStage;
 use App\Enums\MaterialContext;
+use App\Enums\ScoreState;
 use App\Enums\TokenPurpose;
 use App\Mail\ExternalClientInvitationMail;
 use App\Models\Consent;
+use App\Models\DiagnosisRow;
 use App\Models\ExternalClient;
 use App\Models\ExternalClientAnswer;
 use App\Models\ExternalClientItem;
@@ -18,6 +21,7 @@ use App\Models\Organization;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use App\Services\Auth\TokenService;
+use App\Services\Diagnoses\ScoreMath;
 use App\Services\Materials\MaterialPipeline;
 use App\Services\Materials\MaterialStore;
 use Illuminate\Database\Eloquent\Builder;
@@ -295,6 +299,60 @@ class ExternalClientMeasurementService
         }
 
         return $sent;
+    }
+
+    /**
+     * "Ügyfél szemével" for the reading (35 · 35.8): per value and per process
+     * of the clients' subdiagnoses, the mean of the clients' rows (each client
+     * counts once) and the number of answers behind them.
+     *
+     * @return array{values: array<int, array{mean: ?float, clients: int, answers: int}>, processes: array<int, array{mean: ?float, clients: int, answers: int}>}
+     */
+    public function summary(MainDiagnosis $main): array
+    {
+        $rows = DiagnosisRow::query()
+            ->whereHas('diagnosis', fn (Builder $diagnoses) => $diagnoses
+                ->where('parent_id', $main->diagnosis_id)
+                ->whereNotNull('external_client_id'))
+            ->whereIn('kind', [DiagnosisRowKind::Value, DiagnosisRowKind::Process])
+            ->get();
+
+        $summarize = fn (Collection $group): array => [
+            'mean' => ScoreMath::round1(ScoreMath::mean($group->where('score_state', ScoreState::Scored)->pluck('score')->map(fn ($score) => (float) $score)->all())),
+            'clients' => $group->where('score_state', ScoreState::Scored)->count(),
+            'answers' => (int) $group->sum(fn (DiagnosisRow $row) => $row->aggregation_stats['n'] ?? 0),
+        ];
+
+        return [
+            'values' => $rows->where('kind', DiagnosisRowKind::Value)->groupBy('value_id')->map($summarize)->all(),
+            'processes' => $rows->where('kind', DiagnosisRowKind::Process)->groupBy('process_id')->map($summarize)->all(),
+        ];
+    }
+
+    /**
+     * Where each user of the diagnosis' clients stands: user id =>
+     * submitted · started · invited · not_invited (35 · 35.8).
+     *
+     * @return array<int, string>
+     */
+    public function userStates(MainDiagnosis $main): array
+    {
+        $submitted = $main->externalClientAnswers()->whereNotNull('submitted_at')->distinct()->pluck('user_id')->all();
+        $consented = Consent::query()->where('main_diagnosis_id', $main->id)->where('kind', ConsentKind::Answers)->pluck('user_id')->all();
+        $states = [];
+
+        foreach ($main->externalClients()->with('users')->get() as $client) {
+            foreach ($client->users as $user) {
+                $states[$user->id] = match (true) {
+                    in_array($user->id, $submitted, true) => 'submitted',
+                    in_array($user->id, $consented, true) => 'started',
+                    $client->pivot->invited_at !== null => 'invited',
+                    default => 'not_invited',
+                };
+            }
+        }
+
+        return $states;
     }
 
     /**

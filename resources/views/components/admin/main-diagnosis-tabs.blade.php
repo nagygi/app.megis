@@ -20,6 +20,8 @@
         $main && ($main->stage === \App\Enums\MainDiagnosisStage::Published || app(\App\Services\Diagnoses\ReadingService::class)->progress($main)['complete'])
             ? ['route' => 'admin.main-diagnoses.publish', 'label' => __('admin.main_diagnoses.tabs.publish')] : null,
         ['route' => 'admin.main-diagnoses.subdiagnoses', 'label' => __('admin.main_diagnoses.tabs.subdiagnoses')],
+        // Ügyfélmérés, when the diagnosis has clients (35 · 35.8).
+        $main && $main->externalClients()->exists() ? ['route' => 'admin.main-diagnoses.external-clients', 'label' => __('admin.main_diagnoses.tabs.external_clients')] : null,
         // Képességmérés (NM-12).
         ['route' => 'admin.diagnoses.capabilities', 'label' => __('admin.main_diagnoses.tabs.capabilities')],
     ]));

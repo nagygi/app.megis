@@ -48,7 +48,8 @@ class DiagnosisAggregator
      */
     public function preview(Diagnosis $diagnosis): array
     {
-        if (! $diagnosis->level->canAggregate()) {
+        // A client's subdiagnosis is calculated from its answers (35 · 35.7).
+        if (! $diagnosis->level->canAggregate() || $diagnosis->external_client_id !== null) {
             throw new DiagnosisException(__('admin.diagnoses.aggregation.not_available'));
         }
 

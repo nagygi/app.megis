@@ -18,6 +18,7 @@ use App\Models\MegisConversation;
 use App\Models\Process;
 use App\Models\User;
 use App\Services\Diagnoses\ThresholdPolicy;
+use App\Services\ExternalClients\ExternalClientMeasurementService;
 use App\Services\MainDiagnoses\DiagnosisRunService;
 use App\Services\MainDiagnoses\StepProgress;
 use Illuminate\Support\Facades\Gate;
@@ -256,6 +257,8 @@ class Run extends Component
                 'failed' => $materials->where('status', MaterialStatus::Failed)->count(),
                 'unclassified' => $materials->filter(fn (Material $material) => $material->isUnclassified())->count(),
             ],
+            // Ügyfélmérés: who answered of the clients' users (35 · 35.8).
+            'externalClientStates' => $main->externalClients()->exists() ? app(ExternalClientMeasurementService::class)->userStates($main) : null,
             'connections' => CalendarConnection::query()->whereBelongsTo($organization)->with('user')->latest('id')->get()->unique('user_id'),
             'conversations' => $main->conversations->sortBy('held_at')->values(),
             'thresholdAtRisk' => $run->thresholdAtRisk($main),

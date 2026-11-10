@@ -59,6 +59,12 @@ it('renders every admin page for a superadmin with a page heading', function (Cl
     'main diagnosis' => fn () => route('admin.diagnoses.show', MainDiagnosis::factory()->create()->diagnosis),
     'main diagnosis settings' => fn () => route('admin.main-diagnoses.edit', MainDiagnosis::factory()->create()->diagnosis),
     'subdiagnoses' => fn () => route('admin.main-diagnoses.subdiagnoses', MainDiagnosis::factory()->create()->diagnosis),
+    'main diagnosis clients' => function () {
+        $main = MainDiagnosis::factory()->create();
+        $main->externalClients()->attach(ExternalClient::factory()->for($main->diagnosis->organization)->create());
+
+        return route('admin.main-diagnoses.external-clients', $main->diagnosis);
+    },
     'invite member' => fn (array $models) => route('admin.organizations.members.create', $models['organization']),
     'edit member' => fn (array $models) => route('admin.organizations.members.edit', [$models['organization'], $models['membership']]),
     'new team' => fn (array $models) => route('admin.organizations.teams.create', $models['organization']),

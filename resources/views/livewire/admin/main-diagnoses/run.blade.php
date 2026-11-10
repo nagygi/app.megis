@@ -163,6 +163,15 @@
                 <x-ui.button tone="ghost" size="sm" class="-ml-1.5 self-start" :href="route('admin.inbox.index')">{{ __('admin.nav.inbox') }}</x-ui.button>
             </x-ui.card>
 
+            {{-- Ügyfélmérés (35 · 35.8) --}}
+            @if ($externalClientStates !== null)
+                <x-ui.card as="section" bordered class="flex flex-col gap-2" aria-labelledby="external-clients-title">
+                    <h2 id="external-clients-title" class="text-lg font-semibold">{{ __('admin.main_diagnoses.tabs.external_clients') }}</h2>
+                    <p class="text-sm">{{ __('admin.external_clients.run_count', ['answered' => collect($externalClientStates)->filter(fn ($state) => $state === 'submitted')->count(), 'total' => count($externalClientStates)]) }}</p>
+                    <x-ui.button tone="ghost" size="sm" class="-ml-1.5 self-start" :href="route('admin.main-diagnoses.external-clients', $diagnosis)">{{ __('admin.main_diagnoses.tabs.external_clients') }}</x-ui.button>
+                </x-ui.card>
+            @endif
+
             {{-- Naptár --}}
             <x-ui.card as="section" bordered class="flex flex-col gap-2" aria-labelledby="calendar-title">
                 <h2 id="calendar-title" class="text-lg font-semibold">{{ __('admin.processes.calendar') }}</h2>

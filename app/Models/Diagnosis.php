@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[Fillable([
     'name', 'description', 'organization_id', 'level', 'team_id', 'user_id',
     'diagnosis_type_id', 'diagnosed_on', 'diagnosed_until', 'creator_kind', 'status', 'aggregation', 'material_id', 'speaker',
-    'parent_id', 'value_set_version_id', 'excluded_at', 'process_id',
+    'parent_id', 'value_set_version_id', 'excluded_at', 'process_id', 'external_client_id',
     'score', 'score_state', 'automatic_score', 'automatic_score_state', 'score_override_reason', 'score_overridden_by', 'score_overridden_at',
     'report_pdf_path', 'report_pdf_name', 'report_pdf_uploaded_at',
 ])]
@@ -142,6 +142,16 @@ class Diagnosis extends Model
     public function process(): BelongsTo
     {
         return $this->belongsTo(Process::class);
+    }
+
+    /**
+     * The client of an Ügyfélmérés subdiagnosis (35 · 35.7).
+     *
+     * @return BelongsTo<ExternalClient, $this>
+     */
+    public function externalClient(): BelongsTo
+    {
+        return $this->belongsTo(ExternalClient::class);
     }
 
     /**
@@ -277,6 +287,11 @@ class Diagnosis extends Model
      */
     public function subjectLabel(): string
     {
+        // A client's subdiagnosis in the Ügyfélmérés (35 · 35.8).
+        if ($this->external_client_id !== null) {
+            return __('external_clients.subject', ['name' => (string) $this->externalClient?->name]);
+        }
+
         return match ($this->level) {
             DiagnosisLevel::Team => $this->level->label().' · '.$this->team?->name,
             DiagnosisLevel::User => $this->level->label().' · '.$this->user?->name,

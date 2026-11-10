@@ -46,6 +46,7 @@ class AdminBreadcrumbs
         'admin.main-diagnoses.reading',
         'admin.main-diagnoses.publish',
         'admin.main-diagnoses.subdiagnoses',
+        'admin.main-diagnoses.external-clients',
         'admin.diagnoses.capabilities',
     ];
 

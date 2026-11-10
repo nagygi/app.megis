@@ -38,6 +38,7 @@ Számok és állapotok, válaszok nélkül, ahogy a vezető is látja. A válasz
   - „A küszöbhöz még {n} kell.” (18.6).
 - **Folyamatok:** mért · bizonytalan · kizárt, link a szervezet *Folyamatok* fülére (11.6).
 - **Anyagok:** feltöltések és helyzetek száma; feldolgozás alatt, sikertelen és besorolatlan anyagok, link a Beérkezőre.
+- **Ügyfélmérés** (ha a diagnózisnak van ügyfele): „Ügyfelek: {x} / {y} válaszolt”, link a diagnózis *Ügyfélmérés* fülére (35 · 35.8).
 - **Naptár:** állapot, „a metaadat {dátum}-ig él” (09).
 - **Beszélgetések a mégissel:** 19.5.
 - Magánszemélynél a társak sora nem jelenik meg.

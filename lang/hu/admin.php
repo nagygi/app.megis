@@ -210,6 +210,23 @@ return [
         'empty' => 'Még nincs ügyfél.',
         'confirm_deactivate' => 'Biztosan inaktiválod az ügyfelet? Új diagnózishoz nem rendelhető, a korábbi válaszai megmaradnak.',
         'confirm_delete' => 'Biztosan törlöd az ügyfelet? A felhasználói fiókok megmaradnak, csak az ügyfélhez rendelésük szűnik meg.',
+        // The Ügyfélmérés tab of a main diagnosis (35 · 35.8).
+        'diagnosis_help' => 'Az ügyfelek válaszai a csapat számaiba nem számítanak bele: ügyfelenként saját részdiagnózisban állnak, és az Olvasaton „Ügyfél szemével” jelzésként látszanak. A vezető riportjában nem jelennek meg.',
+        'open_subdiagnosis' => 'Részdiagnózis',
+        'answers' => 'Válaszok',
+        'no_answers' => 'Még nincs beküldött válasz.',
+        'material' => 'Anyag',
+        'invitation_sent' => 'Új belépőlinket küldtünk ide: :email.',
+        'states' => [
+            'submitted' => 'beküldte',
+            'started' => 'elkezdte',
+            'invited' => 'meghívva',
+            'not_invited' => 'még nincs meghívva',
+        ],
+        // Futás and Olvasat (35 · 35.8).
+        'run_count' => 'Ügyfelek: :answered / :total válaszolt',
+        'reading_figure' => 'Ügyfél szemével: :score · :answers válasz',
+        'reading_no_data' => 'Ügyfél szemével: nincs adat',
     ],
 
     'teams' => [
@@ -1485,6 +1502,7 @@ return [
             'reading' => 'Olvasat',
             'publish' => 'Publikálás',
             'subdiagnoses' => 'Részdiagnózisok',
+            'external_clients' => 'Ügyfélmérés',
             'capabilities' => 'Képességek',
         ],
         'subdiagnoses_help' => 'A meghívótól az olvasat indításáig készült diagnózisok. Külön jóváhagyás nem kell: a fő diagnózissal együtt publikálódnak.',

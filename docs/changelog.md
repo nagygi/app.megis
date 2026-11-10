@@ -2,6 +2,23 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.102 · – · 2026-11-10
+
+Ügyfélmérés, harmadik rész (35 · 35.7–35.8): az ügyfelek eredménye az adminban.
+
+- **Ügyfelenként egy részdiagnózis** készül a fő diagnózis alá („Ügyfélmérés · {ügyfél}”, új rendszer-típus: *Ügyfélmérés*), a diagnózis minden újraszámolásakor:
+  - értéksoronként (a kijelölt értékekre) az ügyfél válaszainak pontátlaga az adott értékre;
+  - folyamatsoronként az arra a folyamatra adott válaszok értékpontjainak átlaga;
+  - a sorok nyomai a válaszok idézetei, „külső” szereppel.
+  - Ha egy ügyfél lekerül a diagnózisról, a részdiagnózisa törlődik. A csapat sorai, a riport és a képességmérés nem változnak.
+- **Új fül a fő diagnózison: Ügyfélmérés** (ha van ügyfele): ügyfelenként a felhasználók állapota (meghívva · elkezdte · beküldte), új belépőlink küldése futás közben, a beküldött válaszok a kérdéssel és az anyag linkjével, és a részdiagnózis.
+- **Futás:** „Ügyfelek: {x} / {y} válaszolt”.
+- **Részdiagnózisok:** az ügyfél részdiagnózisa „Ügyfél · {név}” címkével.
+- **Olvasat:** érték- és folyamatsornál „Ügyfél szemével: {átlag} · {n} válasz” (az ügyfelek átlaga, minden ügyfél egyszer számít).
+- Az ügyfél részdiagnózisára az adatlap nem kínál aggregált betöltést.
+- **Migráció:** `diagnoses.external_client_id`, és egy új rendszer-diagnózistípus: *Ügyfélmérés* (`external_client`). Ha már volt ilyen nevű típus, az lesz a rendszer-típus.
+- **Rollback:** 1.101, a migráció visszagörgetésével (`php artisan migrate:rollback --step=1`); ez az ügyfél-részdiagnózisokat is törli.
+
 ## 1.101 · 90fd514 · 2026-11-10
 
 Ügyfélmérés, második rész (35 · 35.4–35.6): diagnózishoz rendelés, meghívó, és az ügyfél kitöltése.

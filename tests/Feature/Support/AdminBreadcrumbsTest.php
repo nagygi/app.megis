@@ -150,6 +150,7 @@ it('puts every tab of a main diagnosis under its organization\'s diagnoses, ligh
     'Áttekintés' => 'admin.diagnoses.show',
     'Futás' => 'admin.main-diagnoses.run',
     'Részdiagnózisok' => 'admin.main-diagnoses.subdiagnoses',
+    'Ügyfélmérés' => 'admin.main-diagnoses.external-clients',
     'Képességek' => 'admin.diagnoses.capabilities',
 ]);
 
