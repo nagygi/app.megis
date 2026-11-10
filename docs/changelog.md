@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.99 · – · 2026-11-10
+## 1.99 · 84ec213 · 2026-11-10
 
 Jegyek az oldalon: a meghívott tesztelők és a megrendelő a személyes linkjükkel jelszó nélkül is elérik a stagingot.
 
