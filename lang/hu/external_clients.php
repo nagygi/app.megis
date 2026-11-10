@@ -5,9 +5,10 @@
  */
 
 return [
-    // The question a new item starts from; the admin rewrites it per client (35 · 35.3).
+    // The questions a new client starts from; the admin rewrites them per client (35 · 35.3).
     'default_questions' => [
-        'value' => 'Mesélj egy helyzetről, amikor a közös munkánkban megmutatkozott – vagy épp hiányzott – ez: „:value”. Mi történt, és milyen volt ezt megélni?',
+        // One for the values: the client is not led to them, they are measured from the answer.
+        'values' => 'Mesélj egy helyzetről a közös munkánkból, amely jól megmutatja, milyen velünk dolgozni. Mi történt, és milyen volt ezt megélni?',
         'process' => 'Gondolj a legutóbbi alkalomra, amikor részese voltál ennek nálunk: „:process”. Mi történt, mi ment jól, és min változtatnál?',
     ],
 
@@ -31,7 +32,6 @@ return [
         'consent_required' => 'A kezdéshez jelöld be a hozzájárulást.',
         'start' => 'Kezdem',
         'progress' => ':current / :total',
-        'value_label' => 'Érték',
         'process_label' => 'Folyamat',
         'answer' => 'Válaszod',
         'previous' => 'Vissza',

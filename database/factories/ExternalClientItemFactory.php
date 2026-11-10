@@ -24,7 +24,7 @@ class ExternalClientItemFactory extends Factory
             'kind' => ExternalClientItemKind::Value,
             'value_key' => (string) Str::uuid(),
             'process_id' => null,
-            'question' => fake()->sentence().'?',
+            'question' => null,
             'position' => 0,
         ];
     }
@@ -44,6 +44,7 @@ class ExternalClientItemFactory extends Factory
             'kind' => ExternalClientItemKind::Process,
             'value_key' => null,
             'process_id' => $process->id,
+            'question' => fake()->sentence().'?',
         ]);
     }
 }

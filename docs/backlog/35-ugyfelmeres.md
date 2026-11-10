@@ -34,10 +34,10 @@ Az „ügyfél” itt a szervezet ügyfele, nem a mégis ügyfél-felhasználój
 ### 35.3 Mit mérünk, milyen kérdéssel
 
 - **Értékek:** a szervezet aktuális értékei (08). Új ügyfélnél mindegyik ki van jelölve.
+  - Az értékekhez az ügyfél **egyetlen, általános kérdést** kap, és a válaszából mérjük az összes kijelölt értéket. Az értékek nevét nem látja, így a válaszát nem tereljük.
+  - A kérdést az admin ügyfelenként írja át. Kötelező, ha van kijelölt érték. Az alapszöveg: „Mesélj egy helyzetről a közös munkánkból, amely jól megmutatja, milyen velünk dolgozni. Mi történt, és milyen volt ezt megélni?”
 - **Folyamatok:** a szervezet mért (rutin, elfogadott, felső szintű) folyamatai (11). Alapból egyik sincs kijelölve. A lista alatt link az „Új folyamat” oldalra: az admin előre is felvehet folyamatot.
-- **Kérdés:** minden kijelölt elemhez tartozik egy saját kérdés, kötelező. Az alapszöveg:
-  - értéknél: „Mesélj egy helyzetről, amikor a közös munkánkban megmutatkozott – vagy épp hiányzott – ez: „{érték}”. Mi történt, és milyen volt ezt megélni?”
-  - folyamatnál: „Gondolj a legutóbbi alkalomra, amikor részese voltál ennek nálunk: „{folyamat}”. Mi történt, mi ment jól, és min változtatnál?”
+  - Minden kijelölt folyamathoz saját kérdés tartozik, kötelező. Az alapszöveg: „Gondolj a legutóbbi alkalomra, amikor részese voltál ennek nálunk: „{folyamat}”. Mi történt, mi ment jól, és min változtatnál?”
 - Az értéket a szervezeti értékkészlet elemének állandó kulcsa azonosítja, így az értékkészlet új verziója után is megmarad.
 
 ### 35.4 Diagnózishoz rendelés
@@ -58,7 +58,7 @@ Az „ügyfél” itt a szervezet ügyfele, nem a mégis ügyfél-felhasználój
 ### 35.6 Az ügyfél kitöltése
 
 - **Bevezető:** a szervezet neve, mire kell a válasz, és a hozzájárulás. Ez kötelező jelölőnégyzet, alapból nincs bejelölve.
-- **Kérdések:** elemenként egy képernyő a testreszabott kérdéssel.
+- **Kérdések:** egy képernyő az értékek kérdésével (ha van mért érték), utána folyamatonként egy, a testreszabott kérdésekkel.
   - A válasz elmondható, leírható vagy fájlból feltölthető: Leírom · Elmondom · Feltöltöm.
   - A piszkozat mentődik.
 - **Összegzés** és „Beküldöm”.

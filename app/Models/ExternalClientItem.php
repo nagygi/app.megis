@@ -10,9 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * One thing measured at a client, with the question its users are asked
- * (35 · 35.3). A value is held by the stable key of the organization's value
- * set item, so it survives a new version of the set.
+ * One thing measured at a client (35 · 35.3). A value is held by the stable
+ * key of the organization's value set item, so it survives a new version of
+ * the set; it has no question of its own, the client's value question asks
+ * for all values. A process has its own question.
  */
 #[Fillable(['external_client_id', 'kind', 'value_key', 'process_id', 'question', 'position'])]
 class ExternalClientItem extends Model

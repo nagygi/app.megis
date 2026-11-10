@@ -20,9 +20,9 @@ class ExternalClientService
     public function __construct(private ExternalClientMeasurementService $measurements) {}
 
     /**
-     * @param  array{name: string, description: ?string, active: bool}  $attributes
+     * @param  array{name: string, description: ?string, active: bool, value_question?: ?string}  $attributes
      * @param  list<array{email: string, first_name?: ?string, last_name?: ?string}>  $users
-     * @param  list<array{kind: ExternalClientItemKind, value_key?: ?string, process_id?: ?int, question: string}>  $items
+     * @param  list<array{kind: ExternalClientItemKind, value_key?: ?string, process_id?: ?int, question?: ?string}>  $items
      */
     public function save(Organization $organization, ?ExternalClient $client, array $attributes, array $users, array $items): ExternalClient
     {
@@ -32,6 +32,7 @@ class ExternalClientService
             $data = [
                 'name' => trim($attributes['name']),
                 'description' => filled($attributes['description']) ? $attributes['description'] : null,
+                'value_question' => filled($attributes['value_question'] ?? null) ? trim($attributes['value_question']) : null,
                 'deactivated_at' => $attributes['active'] ? null : ($client?->deactivated_at ?? now()),
             ];
 
@@ -109,7 +110,7 @@ class ExternalClientService
      * The items in the given order. One that stays keeps its row, so the
      * answers already given to it keep pointing at it.
      *
-     * @param  list<array{kind: ExternalClientItemKind, value_key?: ?string, process_id?: ?int, question: string}>  $items
+     * @param  list<array{kind: ExternalClientItemKind, value_key?: ?string, process_id?: ?int, question?: ?string}>  $items
      */
     private function syncItems(ExternalClient $client, array $items): void
     {
@@ -122,7 +123,8 @@ class ExternalClientService
                 'kind' => $item['kind'],
                 'value_key' => $item['kind'] === ExternalClientItemKind::Value ? $item['value_key'] : null,
                 'process_id' => $item['kind'] === ExternalClientItemKind::Process ? $item['process_id'] : null,
-                'question' => trim($item['question']),
+                // A value is asked with the client's value question (35 · 35.3).
+                'question' => $item['kind'] === ExternalClientItemKind::Process ? trim((string) $item['question']) : null,
                 'position' => $position,
             ];
 

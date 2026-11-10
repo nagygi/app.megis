@@ -45,10 +45,10 @@
                 <div class="flex flex-col gap-2">
                     <h3 class="text-sm font-semibold">{{ __('admin.external_clients.answers') }}</h3>
                     @forelse ($answers->get($client->id, collect()) as $answer)
-                        @php($subject = $answer->kind === \App\Enums\ExternalClientItemKind::Value ? ($valueNames[$answer->value_key] ?? '') : $answer->process?->name)
+                        @php($subject = $answer->kind === \App\Enums\ExternalClientItemKind::Value ? ($valueNames[$answer->value_key] ?? null) : $answer->process?->name)
                         <article class="flex flex-col gap-1.5 rounded-card border border-grey-250 p-4" wire:key="external-answer-{{ $answer->id }}">
                             <p class="text-sm text-grey-700">
-                                {{ $answer->kind->label() }} · <span class="font-semibold text-charcoal">{{ $subject }}</span> · {{ $answer->user->name }} · {{ $answer->submitted_at->format('Y.m.d. H:i') }}
+                                {{ $answer->kind->label() }}{{ filled($subject) ? ' · '.$subject : '' }} · {{ $answer->user->name }} · {{ $answer->submitted_at->format('Y.m.d. H:i') }}
                             </p>
                             <p class="font-semibold">{{ $answer->question }}</p>
                             <p class="whitespace-pre-line">{{ $answer->answer }}</p>

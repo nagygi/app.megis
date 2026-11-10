@@ -2,6 +2,7 @@
 
 namespace App\Livewire\ExternalClient;
 
+use App\Enums\ExternalClientItemKind;
 use App\Enums\MainDiagnosisStage;
 use App\Livewire\Concerns\WithDictation;
 use App\Models\Diagnosis;
@@ -21,9 +22,10 @@ use Livewire\WithFileUploads;
 
 /**
  * The Ügyfélmérés of a client user (35 · 35.6): the consent, then one
- * question per screen, told, typed or uploaded (Leírom · Elmondom ·
- * Feltöltöm), an overview and "Beküldöm". While the diagnosis runs the
- * answers can be changed and sent again; after it, the page says it closed.
+ * question per screen (the one for the values, then one per process), told,
+ * typed or uploaded (Leírom · Elmondom · Feltöltöm), an overview and
+ * "Beküldöm". While the diagnosis runs the answers can be changed and sent
+ * again; after it, the page says it closed.
  */
 class Measurement extends Component
 {
@@ -47,9 +49,9 @@ class Measurement extends Component
     public bool $consent = false;
 
     /**
-     * The answers by item id.
+     * The answers by question key: "values", or a process item's id.
      *
-     * @var array<int, string>
+     * @var array<string, string>
      */
     public array $answers = [];
 
@@ -63,8 +65,8 @@ class Measurement extends Component
 
         $saved = $measurements->answersFor($main, $this->user());
 
-        foreach ($this->items() as $item) {
-            $this->answers[$item->id] = (string) $saved->get($item->id)?->answer;
+        foreach ($this->questions() as $question) {
+            $this->answers[$question['key']] = (string) $saved->get($question['key'])?->answer;
         }
 
         if ($measurements->hasConsent($main, $this->user())) {
@@ -94,7 +96,7 @@ class Measurement extends Component
         }
 
         $this->validateOnly('answers.'.$key, $this->answerRules());
-        $this->saveDraft((int) $key);
+        $this->saveDraft($key);
     }
 
     public function next(): void
@@ -102,7 +104,7 @@ class Measurement extends Component
         $this->authorizeAnswering();
         $this->saveCurrent();
 
-        if ($this->position >= $this->items()->count() - 1) {
+        if ($this->position >= $this->questions()->count() - 1) {
             $this->screen = 'summary';
 
             return;
@@ -124,7 +126,7 @@ class Measurement extends Component
     public function edit(int $index): void
     {
         $this->authorizeAnswering();
-        $this->position = max(0, min($index, $this->items()->count() - 1));
+        $this->position = max(0, min($index, $this->questions()->count() - 1));
         $this->screen = 'question';
     }
 
@@ -143,8 +145,8 @@ class Measurement extends Component
         $this->authorizeAnswering();
         $this->validate($this->answerRules());
 
-        foreach ($this->items() as $item) {
-            $this->saveDraft($item->id);
+        foreach ($this->questions() as $question) {
+            $this->saveDraft($question['key']);
         }
 
         if (collect($this->answers)->filter(fn ($answer) => trim((string) $answer) !== '')->isEmpty()) {
@@ -158,14 +160,13 @@ class Measurement extends Component
     public function render(): View
     {
         $main = $this->main();
-        $items = $this->items();
+        $questions = $this->questions();
         $organization = $main->diagnosis->organization;
 
         return view('livewire.external-client.measurement', [
             'organization' => $organization,
-            'items' => $items,
-            'current' => $items->get($this->position),
-            'valueNames' => app(ExternalClientMeasurementService::class)->valueNames($main),
+            'questions' => $questions,
+            'current' => $questions->get($this->position),
             'open' => $this->acceptsInput(),
             'deadline' => $main->readingStartsOn()->copy()->subDay()->format('Y.m.d.'),
             'maxCharacters' => self::MAX_CHARACTERS,
@@ -178,7 +179,9 @@ class Measurement extends Component
 
     protected function canDictate(string $field): bool
     {
-        return $this->canAnswer() && $this->items()->contains('id', (int) str_replace('answers.', '', $field)) && str_starts_with($field, 'answers.');
+        return str_starts_with($field, 'answers.')
+            && $this->canAnswer()
+            && $this->questions()->contains('key', mb_substr($field, mb_strlen('answers.')));
     }
 
     protected function dictationOrganization(): ?Organization
@@ -193,7 +196,7 @@ class Measurement extends Component
 
     protected function dictated(string $field): void
     {
-        $this->saveDraft((int) str_replace('answers.', '', $field));
+        $this->saveDraft(mb_substr($field, mb_strlen('answers.')));
     }
 
     private function main(): ?MainDiagnosis
@@ -214,13 +217,13 @@ class Measurement extends Component
     }
 
     /**
-     * @return Collection<int, ExternalClientItem>
+     * @return Collection<int, array{key: string, kind: ExternalClientItemKind, question: string, process: ?string, item: ?ExternalClientItem}>
      */
-    private function items(): Collection
+    private function questions(): Collection
     {
         $client = $this->client();
 
-        return $client === null ? collect() : app(ExternalClientMeasurementService::class)->itemsFor($this->main(), $client);
+        return $client === null ? collect() : app(ExternalClientMeasurementService::class)->questionsFor($this->main(), $client);
     }
 
     /**
@@ -249,23 +252,23 @@ class Measurement extends Component
 
     private function saveCurrent(): void
     {
-        $item = $this->items()->get($this->position);
+        $question = $this->questions()->get($this->position);
 
-        if ($item !== null) {
-            $this->validateOnly('answers.'.$item->id, $this->answerRules());
-            $this->saveDraft($item->id);
+        if ($question !== null) {
+            $this->validateOnly('answers.'.$question['key'], $this->answerRules());
+            $this->saveDraft($question['key']);
         }
     }
 
-    private function saveDraft(int $itemId): void
+    private function saveDraft(string $key): void
     {
-        $item = $this->items()->firstWhere('id', $itemId);
+        $question = $this->questions()->firstWhere('key', $key);
 
-        if ($item === null) {
+        if ($question === null) {
             return;
         }
 
-        app(ExternalClientMeasurementService::class)->saveDraft($this->main(), $this->client(), $this->user(), $item, trim((string) ($this->answers[$itemId] ?? '')));
+        app(ExternalClientMeasurementService::class)->saveDraft($this->main(), $this->client(), $this->user(), $question, trim((string) ($this->answers[$key] ?? '')));
     }
 
     /**

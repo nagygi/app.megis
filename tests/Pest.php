@@ -553,10 +553,10 @@ function diagnosisWithClient(bool $start = true): array
     $organization = $setup['organization'];
     $organization->update(['external_clients_enabled' => true]);
     $process = Process::factory()->accepted()->for($organization)->create(['name' => 'Ajánlatadás']);
-    $client = ExternalClient::factory()->for($organization)->create(['name' => 'Acme']);
+    $client = ExternalClient::factory()->for($organization)->create(['name' => 'Acme', 'value_question' => 'Mikor számíthattál ránk?']);
     $user = User::factory()->invited()->create(['email' => 'kati@acme.test']);
     $client->users()->attach($user);
-    $client->items()->create(['kind' => ExternalClientItemKind::Value, 'value_key' => $organization->valueSet->items()->first()->key, 'question' => 'Mikor számíthattál ránk?', 'position' => 0]);
+    $client->items()->create(['kind' => ExternalClientItemKind::Value, 'value_key' => $organization->valueSet->items()->first()->key, 'position' => 0]);
     $client->items()->create(['kind' => ExternalClientItemKind::Process, 'process_id' => $process->id, 'question' => 'Milyen volt az ajánlatadás?', 'position' => 1]);
 
     $main = startMainDiagnosis($setup);

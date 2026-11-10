@@ -63,25 +63,27 @@
 
         <fieldset class="flex flex-col gap-4">
             <legend class="mb-1 text-lg font-semibold">{{ __('admin.external_clients.measured_values') }}</legend>
-            <p class="text-sm text-grey-700">{{ __('admin.external_clients.questions_help') }}</p>
 
-            @forelse ($valueNames as $key => $valueName)
-                <div wire:key="external-client-value-{{ $key }}" class="flex flex-col gap-3 rounded-card border border-grey-250 p-4">
-                    <x-form.checkbox :name="'values.'.$key.'.selected'" :id="'external-client-value-'.$key" wire:model.live="values.{{ $key }}.selected" :label="$valueName" />
-                    @if ($values[$key]['selected'] ?? false)
-                        <x-form.textarea :name="'values.'.$key.'.question'" :id="'external-client-value-question-'.$key" wire:model="values.{{ $key }}.question" :label="__('admin.external_clients.question')" rows="3" />
-                    @endif
-                </div>
-            @empty
+            @if ($valueNames === [])
                 <p class="text-sm text-grey-700">
                     {{ __('admin.external_clients.no_values') }}
                     <a href="{{ route('admin.organizations.values', $organization) }}" class="font-semibold underline">{{ __('admin.organizations.tabs.values') }}</a>
                 </p>
-            @endforelse
+            @else
+                <x-form.textarea name="valueQuestion" wire:model="valueQuestion" :label="__('admin.external_clients.value_question')" :help="__('admin.external_clients.value_question_help')" rows="3" />
+
+                <div class="flex flex-col gap-3 rounded-card border border-grey-250 p-4">
+                    <p class="text-sm font-medium">{{ __('admin.external_clients.values_measured') }}</p>
+                    @foreach ($valueNames as $key => $valueName)
+                        <x-form.checkbox :name="'values.'.$key" :id="'external-client-value-'.$key" wire:key="external-client-value-{{ $key }}" wire:model="values.{{ $key }}" :label="$valueName" />
+                    @endforeach
+                </div>
+            @endif
         </fieldset>
 
         <fieldset class="flex flex-col gap-4">
             <legend class="mb-1 text-lg font-semibold">{{ __('admin.external_clients.measured_processes') }}</legend>
+            <p class="text-sm text-grey-700">{{ __('admin.external_clients.process_questions_help') }}</p>
 
             @forelse ($processList as $processId => $process)
                 <div wire:key="external-client-process-{{ $processId }}" class="flex flex-col gap-3 rounded-card border border-grey-250 p-4">

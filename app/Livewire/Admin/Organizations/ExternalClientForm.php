@@ -32,6 +32,11 @@ class ExternalClientForm extends Component
     public bool $active = true;
 
     /**
+     * The one question for the values; they are measured from its answer (35 · 35.3).
+     */
+    public string $valueQuestion = '';
+
+    /**
      * The client's users; a new one has no id until saved.
      *
      * @var list<array{id: ?int, email: string, first_name: string, last_name: string}>
@@ -45,9 +50,9 @@ class ExternalClientForm extends Component
     public string $newEmail = '';
 
     /**
-     * The organization's values: value set item key => selected and its question.
+     * The organization's values: value set item key => selected.
      *
-     * @var array<string, array{selected: bool, question: string}>
+     * @var array<string, bool>
      */
     public array $values = [];
 
@@ -72,6 +77,7 @@ class ExternalClientForm extends Component
             $this->name = $externalClient->name;
             $this->description = (string) $externalClient->description;
             $this->active = $externalClient->isActive();
+            $this->valueQuestion = $externalClient->valueQuestion();
             $this->users = $externalClient->users()->orderBy('last_name')->orderBy('first_name')->get()
                 ->map(fn (User $user) => [
                     'id' => $user->id,
@@ -84,13 +90,13 @@ class ExternalClientForm extends Component
         }
 
         // A new client measures every value of the organization, with the default question.
-        foreach ($clients->measurableValues($organization) as $key => $name) {
-            $item = $items->first(fn ($item) => $item->kind === ExternalClientItemKind::Value && $item->value_key === $key);
+        if ($this->externalClient === null) {
+            $this->valueQuestion = __('external_clients.default_questions.values');
+        }
 
-            $this->values[$key] = [
-                'selected' => $item !== null || $this->externalClient === null,
-                'question' => $item?->question ?? __('external_clients.default_questions.value', ['value' => $name]),
-            ];
+        foreach (array_keys($clients->measurableValues($organization)) as $key) {
+            $this->values[$key] = $this->externalClient === null
+                || $items->contains(fn ($item) => $item->kind === ExternalClientItemKind::Value && $item->value_key === $key);
         }
 
         foreach ($clients->measurableProcesses($organization) as $process) {
@@ -157,7 +163,7 @@ class ExternalClientForm extends Component
                     ->ignore($this->externalClient?->id),
             ],
             'description' => ['nullable', 'string', 'max:5000'],
-            'values.*.question' => ['nullable', 'string', 'max:2000'],
+            'valueQuestion' => ['nullable', 'string', 'max:2000'],
             'processes.*.question' => ['nullable', 'string', 'max:2000'],
         ], ['name.unique' => __('admin.external_clients.name_taken')]);
 
@@ -166,7 +172,7 @@ class ExternalClientForm extends Component
         $client = $clients->save(
             $this->organization,
             $this->externalClient,
-            ['name' => $this->name, 'description' => $this->description, 'active' => $this->active],
+            ['name' => $this->name, 'description' => $this->description, 'active' => $this->active, 'value_question' => $this->valueQuestion],
             $this->users,
             $items,
         );
@@ -188,9 +194,10 @@ class ExternalClientForm extends Component
     }
 
     /**
-     * The checked values and processes; a checked one needs its question.
+     * The checked values and processes. The values need the value question,
+     * a checked process its own.
      *
-     * @return list<array{kind: ExternalClientItemKind, value_key?: string, process_id?: int, question: string}>
+     * @return list<array{kind: ExternalClientItemKind, value_key?: string, process_id?: int, question?: string}>
      *
      * @throws ValidationException
      */
@@ -201,16 +208,14 @@ class ExternalClientForm extends Component
         $valueKeys = array_keys($clients->measurableValues($this->organization));
         $processIds = $clients->measurableProcesses($this->organization)->modelKeys();
 
-        foreach ($this->values as $key => $value) {
-            if (! ($value['selected'] ?? false) || ! in_array((string) $key, $valueKeys, true)) {
-                continue;
+        foreach ($this->values as $key => $selected) {
+            if ($selected && in_array((string) $key, $valueKeys, true)) {
+                $items[] = ['kind' => ExternalClientItemKind::Value, 'value_key' => (string) $key];
             }
+        }
 
-            if (blank($value['question'] ?? null)) {
-                $missing['values.'.$key.'.question'] = __('admin.external_clients.question_required');
-            } else {
-                $items[] = ['kind' => ExternalClientItemKind::Value, 'value_key' => (string) $key, 'question' => $value['question']];
-            }
+        if ($items !== [] && blank($this->valueQuestion)) {
+            $missing['valueQuestion'] = __('admin.external_clients.value_question_required');
         }
 
         foreach ($this->processes as $processId => $process) {

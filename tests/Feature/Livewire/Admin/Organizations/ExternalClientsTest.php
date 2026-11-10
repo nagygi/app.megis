@@ -35,7 +35,7 @@ it('shows the Ügyfelek tab once Ügyfélmérés is switched on', function () {
     $this->get(route('admin.organizations.external-clients', $organization))->assertOk();
 });
 
-it('creates a client with users who are not members, and its values and processes with their own questions', function () {
+it('creates a client with users who are not members, one question for its values, and its processes with their own questions', function () {
     actingAsAdmin();
     $organization = Organization::factory()->withExternalClients()->withHeadcountLimit(1)->create();
     Membership::factory()->for($organization)->create();
@@ -44,7 +44,8 @@ it('creates a client with users who are not members, and its values and processe
     $existing = User::factory()->create(['email' => 'kati@ugyfel.test']);
 
     $component = Livewire::test(ExternalClientForm::class, ['organization' => $organization])
-        ->assertSet("values.{$first->key}.selected", true)
+        ->assertSet("values.{$first->key}", true)
+        ->assertSet('valueQuestion', __('external_clients.default_questions.values'))
         ->assertSet("processes.{$process->id}.selected", false)
         ->set('name', 'Acme Kft.')
         ->set('newLastName', 'Új')
@@ -53,9 +54,9 @@ it('creates a client with users who are not members, and its values and processe
         ->call('addUser')
         ->set('newEmail', 'kati@ugyfel.test')
         ->call('addUser')
-        ->set("values.{$second->key}.selected", false)
-        ->set("values.{$third->key}.selected", false)
-        ->set("values.{$first->key}.question", 'Mikor éreztél ránk számítani?')
+        ->set("values.{$second->key}", false)
+        ->set("values.{$third->key}", false)
+        ->set('valueQuestion', 'Mikor éreztél ránk számítani?')
         ->set("processes.{$process->id}.selected", true)
         ->call('save')
         ->assertHasNoErrors();
@@ -65,6 +66,7 @@ it('creates a client with users who are not members, and its values and processe
 
     $newUser = User::query()->where('email', 'uj@ugyfel.test')->sole();
     expect($client->name)->toBe('Acme Kft.')
+        ->and($client->value_question)->toBe('Mikor éreztél ránk számítani?')
         ->and($client->users()->pluck('users.id')->sort()->values()->all())->toBe(collect([$newUser->id, $existing->id])->sort()->values()->all())
         ->and($newUser->name)->toBe('Új Ügyfél')
         ->and($newUser->memberships()->exists())->toBeFalse()
@@ -73,7 +75,7 @@ it('creates a client with users who are not members, and its values and processe
 
     $items = $client->items()->get();
     expect($items->map(fn ($item) => [$item->kind, $item->value_key, $item->process_id, $item->question])->all())->toBe([
-        [ExternalClientItemKind::Value, $first->key, null, 'Mikor éreztél ránk számítani?'],
+        [ExternalClientItemKind::Value, $first->key, null, null],
         [ExternalClientItemKind::Process, null, $process->id, __('external_clients.default_questions.process', ['process' => 'Ajánlatadás'])],
     ]);
 });
@@ -82,32 +84,34 @@ it('keeps an item that stays, and drops one taken out', function () {
     actingAsAdmin();
     $organization = Organization::factory()->withExternalClients()->create();
     [$first, $second] = organizationValues($organization)->items()->get()->all();
-    $client = ExternalClient::factory()->for($organization)->create();
-    $kept = $client->items()->create(['kind' => ExternalClientItemKind::Value, 'value_key' => $first->key, 'question' => 'Régi kérdés?']);
-    $client->items()->create(['kind' => ExternalClientItemKind::Value, 'value_key' => $second->key, 'question' => 'Másik?']);
+    $client = ExternalClient::factory()->for($organization)->create(['value_question' => 'Régi kérdés?']);
+    $kept = $client->items()->create(['kind' => ExternalClientItemKind::Value, 'value_key' => $first->key]);
+    $client->items()->create(['kind' => ExternalClientItemKind::Value, 'value_key' => $second->key]);
 
     Livewire::test(ExternalClientForm::class, ['organization' => $organization, 'externalClient' => $client])
-        ->assertSet("values.{$first->key}.question", 'Régi kérdés?')
-        ->set("values.{$second->key}.selected", false)
-        ->set("values.{$first->key}.question", 'Új kérdés?')
+        ->assertSet('valueQuestion', 'Régi kérdés?')
+        ->set("values.{$second->key}", false)
+        ->set('valueQuestion', 'Új kérdés?')
         ->call('save')
         ->assertHasNoErrors();
 
-    expect($client->items()->sole())
-        ->id->toBe($kept->id)
-        ->question->toBe('Új kérdés?');
+    expect($client->items()->sole()->id)->toBe($kept->id)
+        ->and($client->refresh()->value_question)->toBe('Új kérdés?');
 });
 
-it('asks for the question of a checked item', function () {
+it('asks for the values\' question while a value is measured, and for a checked process\' own', function () {
     actingAsAdmin();
     $organization = Organization::factory()->withExternalClients()->create();
-    $first = organizationValues($organization)->items()->first();
+    organizationValues($organization);
+    $process = Process::factory()->accepted()->for($organization)->create();
 
     Livewire::test(ExternalClientForm::class, ['organization' => $organization])
         ->set('name', 'Acme Kft.')
-        ->set("values.{$first->key}.question", '')
+        ->set('valueQuestion', '')
+        ->set("processes.{$process->id}.selected", true)
+        ->set("processes.{$process->id}.question", '')
         ->call('save')
-        ->assertHasErrors(["values.{$first->key}.question"]);
+        ->assertHasErrors(['valueQuestion', "processes.{$process->id}.question"]);
 
     expect($organization->externalClients()->exists())->toBeFalse();
 });

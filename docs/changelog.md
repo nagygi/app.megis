@@ -2,6 +2,21 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.103 · – · 2026-11-10
+
+Ügyfélmérés (35 · 35.3, 35.6): az értékekhez egy általános kérdés, értékenkénti kérdés helyett.
+
+- **Eddig:** az ügyfél minden kijelölt értékre külön kérdést kapott, a kérdésben az érték nevével.
+- **Most:**
+  - Az admin ügyfél-szerkesztő oldalán (Ügyfelek fül) az Értékek szakasz tetején egy kérdés áll: „Kérdés az értékekhez”. Az ügyfél erre az egy kérdésre válaszol, és a válaszából mérjük az összes kijelölt értéket. Az értékek nevét nem látja.
+  - Alapszövege: „Mesélj egy helyzetről a közös munkánkból, amely jól megmutatja, milyen velünk dolgozni. Mi történt, és milyen volt ezt megélni?” Kötelező, ha van kijelölt érték.
+  - Az értékek alatt csak jelölőnégyzetek maradtak.
+  - A folyamatoknál nincs változás: mindegyiknek saját kérdése van.
+- **A kérdőív:** egy képernyő az értékek kérdésével, utána folyamatonként egy.
+- **A számítás nem változik:** az ügyfél értéksorai eddig is az ügyfél összes válaszából számoltak.
+- **Migráció:** `external_clients.value_question`, az `external_client_items.question` nullázható lett, és a meglévő érték-elemek kérdése törlődik. A meglévő ügyfelek az alapszöveget kapják, amíg az admin át nem írja.
+- **Rollback:** 1.102, a migráció visszagörgetésével (`php artisan migrate:rollback --step=1`); az érték-elemek kérdése üres marad.
+
 ## 1.102 · 8297a2b · 2026-11-10
 
 Ügyfélmérés, harmadik rész (35 · 35.7–35.8): az ügyfelek eredménye az adminban.

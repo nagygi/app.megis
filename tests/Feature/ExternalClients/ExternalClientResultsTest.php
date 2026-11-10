@@ -28,10 +28,11 @@ use Livewire\Livewire;
 
 /**
  * A sent, processed answer with its scores per value: value position => score.
+ * Without a process item it answers the client's question for the values.
  *
  * @param  array<int, ?float>  $scores
  */
-function sentClientAnswer(MainDiagnosis $main, ExternalClient $client, User $user, ExternalClientItem $item, string $text, array $scores): ExternalClientAnswer
+function sentClientAnswer(MainDiagnosis $main, ExternalClient $client, User $user, ?ExternalClientItem $processItem, string $text, array $scores): ExternalClientAnswer
 {
     $material = Material::factory()->create([
         'context' => MaterialContext::ExternalClient,
@@ -54,11 +55,10 @@ function sentClientAnswer(MainDiagnosis $main, ExternalClient $client, User $use
         'main_diagnosis_id' => $main->id,
         'external_client_id' => $client->id,
         'user_id' => $user->id,
-        'external_client_item_id' => $item->id,
-        'kind' => $item->kind,
-        'value_key' => $item->value_key,
-        'process_id' => $item->process_id,
-        'question' => $item->question,
+        'external_client_item_id' => $processItem?->id,
+        'kind' => $processItem === null ? ExternalClientItemKind::Value : ExternalClientItemKind::Process,
+        'process_id' => $processItem?->process_id,
+        'question' => $processItem?->question ?? $client->valueQuestion(),
         'answer' => $text,
         'material_id' => $material->id,
         'submitted_at' => now(),
@@ -74,9 +74,9 @@ function sentClientAnswer(MainDiagnosis $main, ExternalClient $client, User $use
 function answeredClientDiagnosis(): array
 {
     [$main, $client, $user] = diagnosisWithClient();
-    [$valueItem, $processItem] = $client->items()->get()->all();
+    $processItem = $client->items()->firstWhere('kind', ExternalClientItemKind::Process);
 
-    sentClientAnswer($main, $client, $user, $valueItem, 'Mindig számíthattunk rájuk.', [0 => 5.0]);
+    sentClientAnswer($main, $client, $user, null, 'Mindig számíthattunk rájuk.', [0 => 5.0]);
     sentClientAnswer($main, $client, $user, $processItem, 'Gyors volt az ajánlat.', [0 => 3.0, 1 => 4.0]);
     app(DiagnosisCalculator::class)->recalculate($main->refresh());
 

@@ -120,7 +120,7 @@ it('asks for the consent first, then saves the answers as drafts', function () {
     [$main, $client, $user] = diagnosisWithClient();
     $user->forceFill(['activated_at' => now()])->save();
     actingAsCustomer($user);
-    [$valueItem, $processItem] = $client->items()->get()->all();
+    $processItem = $client->items()->firstWhere('kind', ExternalClientItemKind::Process);
 
     $this->get(route('external.measurement', $main->diagnosis))->assertOk()->assertSee($main->diagnosis->organization->name)->assertSee(__('external_clients.measurement.start'));
 
@@ -132,12 +132,14 @@ it('asks for the consent first, then saves the answers as drafts', function () {
         ->call('start')
         ->assertSet('screen', 'question')
         ->assertSee('Mikor számíthattál ránk?')
-        ->set("answers.{$valueItem->id}", 'Amikor határidő előtt szóltak.')
+        // The values are measured from the answer; the client does not see them.
+        ->assertDontSee($main->valueSetVersion->snapshot['values'][0]['name'])
+        ->set('answers.values', 'Amikor határidő előtt szóltak.')
         ->call('next')
         ->assertSee('Milyen volt az ajánlatadás?');
 
     expect(Consent::query()->where('user_id', $user->id)->where('main_diagnosis_id', $main->id)->sole()->kind)->toBe(ConsentKind::Answers)
-        ->and(ExternalClientAnswer::query()->where('external_client_item_id', $valueItem->id)->sole())
+        ->and(ExternalClientAnswer::query()->whereNull('external_client_item_id')->sole())
         ->answer->toBe('Amikor határidő előtt szóltak.')
         ->submitted_at->toBeNull()
         ->question->toBe('Mikor számíthattál ránk?');
@@ -147,15 +149,15 @@ it('sends every answer as a material of its own, outside the team\'s materials',
     Queue::fake();
     [$main, $client, $user] = diagnosisWithClient();
     answeringClient($main, $user);
-    [$valueItem, $processItem] = $client->items()->get()->all();
+    $processItem = $client->items()->firstWhere('kind', ExternalClientItemKind::Process);
 
     Livewire::test(Measurement::class, ['diagnosis' => $main->diagnosis])
-        ->set("answers.{$valueItem->id}", 'Mindig számíthattunk rájuk.')
+        ->set('answers.values', 'Mindig számíthattunk rájuk.')
         ->call('submit')
         ->assertHasNoErrors()
         ->assertSet('screen', 'sent');
 
-    $answer = ExternalClientAnswer::query()->where('external_client_item_id', $valueItem->id)->sole();
+    $answer = ExternalClientAnswer::query()->whereNull('external_client_item_id')->sole();
     expect($answer->submitted_at)->not->toBeNull()
         ->and($answer->material)
         ->context->toBe(MaterialContext::ExternalClient)
@@ -174,22 +176,22 @@ it('replaces the material of a changed answer and takes back an emptied one', fu
     Queue::fake();
     [$main, $client, $user] = diagnosisWithClient();
     answeringClient($main, $user);
-    [$valueItem, $processItem] = $client->items()->get()->all();
+    $processItem = $client->items()->firstWhere('kind', ExternalClientItemKind::Process);
 
     $component = Livewire::test(Measurement::class, ['diagnosis' => $main->diagnosis])
-        ->set("answers.{$valueItem->id}", 'Első válasz.')
+        ->set('answers.values', 'Első válasz.')
         ->set("answers.{$processItem->id}", 'Gyors volt.')
         ->call('submit');
-    $first = ExternalClientAnswer::query()->where('external_client_item_id', $valueItem->id)->sole()->material_id;
+    $first = ExternalClientAnswer::query()->whereNull('external_client_item_id')->sole()->material_id;
     $processMaterial = ExternalClientAnswer::query()->where('external_client_item_id', $processItem->id)->sole()->material_id;
 
     $component->call('summary')
-        ->set("answers.{$valueItem->id}", 'Átírt válasz.')
+        ->set('answers.values', 'Átírt válasz.')
         ->set("answers.{$processItem->id}", '')
         ->call('submit')
         ->assertHasNoErrors();
 
-    $answer = ExternalClientAnswer::query()->where('external_client_item_id', $valueItem->id)->sole();
+    $answer = ExternalClientAnswer::query()->whereNull('external_client_item_id')->sole();
     expect($answer->material_id)->not->toBe($first)
         ->and($answer->material->text)->toContain('Átírt válasz.')
         ->and(Material::query()->whereKey([$first, $processMaterial])->exists())->toBeFalse()
@@ -209,11 +211,10 @@ it('closes the measurement once the reading starts', function () {
     [$main, $client, $user] = diagnosisWithClient();
     answeringClient($main, $user);
     app(StageMachine::class)->transition($main, MainDiagnosisStage::Reading);
-    $item = $client->items()->first();
 
     Livewire::test(Measurement::class, ['diagnosis' => $main->diagnosis])
         ->assertSee(__('external_clients.measurement.closed'))
-        ->set("answers.{$item->id}", 'Késő.')
+        ->set('answers.values', 'Késő.')
         ->call('submit')
         ->assertForbidden();
 
@@ -224,8 +225,7 @@ it('takes a client user\'s answers and client links when the account is deleted'
     Queue::fake();
     [$main, $client, $user] = diagnosisWithClient();
     answeringClient($main, $user);
-    $item = $client->items()->first();
-    Livewire::test(Measurement::class, ['diagnosis' => $main->diagnosis])->set("answers.{$item->id}", 'Válasz.')->call('submit');
+    Livewire::test(Measurement::class, ['diagnosis' => $main->diagnosis])->set('answers.values', 'Válasz.')->call('submit');
 
     app(AccountDeletionService::class)->purge($user);
 

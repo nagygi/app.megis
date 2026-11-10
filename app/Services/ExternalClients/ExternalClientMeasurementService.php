@@ -36,6 +36,11 @@ use Illuminate\Support\Facades\Mail;
  */
 class ExternalClientMeasurementService
 {
+    /**
+     * The key of the one question for the values among the client's questions.
+     */
+    public const VALUES_KEY = 'values';
+
     public function __construct(
         private TokenService $tokens,
         private MaterialStore $materials,
@@ -188,6 +193,41 @@ class ExternalClientMeasurementService
     }
 
     /**
+     * What the client's users are asked, in order (35 · 35.3, 35.6): one
+     * question for the values, when any value is measured, then one per
+     * process. The values are measured from the one answer.
+     *
+     * @return Collection<int, array{key: string, kind: ExternalClientItemKind, question: string, process: ?string, item: ?ExternalClientItem}>
+     */
+    public function questionsFor(MainDiagnosis $main, ExternalClient $client): Collection
+    {
+        $items = $this->itemsFor($main, $client);
+        $questions = collect();
+
+        if ($items->contains(fn (ExternalClientItem $item) => $item->kind === ExternalClientItemKind::Value)) {
+            $questions->push([
+                'key' => self::VALUES_KEY,
+                'kind' => ExternalClientItemKind::Value,
+                'question' => $client->valueQuestion(),
+                'process' => null,
+                'item' => null,
+            ]);
+        }
+
+        foreach ($items->filter(fn (ExternalClientItem $item) => $item->kind === ExternalClientItemKind::Process) as $item) {
+            $questions->push([
+                'key' => (string) $item->id,
+                'kind' => ExternalClientItemKind::Process,
+                'question' => (string) $item->question,
+                'process' => $item->process->name,
+                'item' => $item,
+            ]);
+        }
+
+        return $questions->values();
+    }
+
+    /**
      * The values of the diagnosis' frozen set: key => name.
      *
      * @return array<string, string>
@@ -231,28 +271,39 @@ class ExternalClientMeasurementService
     }
 
     /**
-     * The user's answers in the diagnosis by item id.
+     * The user's answers in the diagnosis by question key (questionsFor).
      *
-     * @return Collection<int, ExternalClientAnswer>
+     * @return Collection<string, ExternalClientAnswer>
      */
     public function answersFor(MainDiagnosis $main, User $user): Collection
     {
-        return $main->externalClientAnswers()->where('user_id', $user->id)->get()->keyBy('external_client_item_id');
+        return $main->externalClientAnswers()
+            ->where('user_id', $user->id)
+            ->get()
+            ->keyBy(fn (ExternalClientAnswer $answer) => $answer->external_client_item_id === null ? self::VALUES_KEY : (string) $answer->external_client_item_id);
     }
 
     /**
      * A draft: the text as it stands, with the question it answers.
+     *
+     * @param  array{key: string, kind: ExternalClientItemKind, question: string, process: ?string, item: ?ExternalClientItem}  $question
      */
-    public function saveDraft(MainDiagnosis $main, ExternalClient $client, User $user, ExternalClientItem $item, string $text): ExternalClientAnswer
+    public function saveDraft(MainDiagnosis $main, ExternalClient $client, User $user, array $question, string $text): ExternalClientAnswer
     {
+        $item = $question['item'];
+
         return ExternalClientAnswer::query()->updateOrCreate(
-            ['main_diagnosis_id' => $main->id, 'user_id' => $user->id, 'external_client_item_id' => $item->id],
             [
+                'main_diagnosis_id' => $main->id,
+                'user_id' => $user->id,
                 'external_client_id' => $client->id,
-                'kind' => $item->kind,
-                'value_key' => $item->value_key,
-                'process_id' => $item->process_id,
-                'question' => $item->question,
+                'kind' => $question['kind'],
+                'external_client_item_id' => $item?->id,
+            ],
+            [
+                'value_key' => $item?->value_key,
+                'process_id' => $item?->process_id,
+                'question' => $question['question'],
                 'answer' => $text,
             ],
         );

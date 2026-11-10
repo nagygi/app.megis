@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * the organization's values and processes; they are not members of it and do
  * not count in the headcount.
  */
-#[Fillable(['organization_id', 'name', 'description', 'deactivated_at'])]
+#[Fillable(['organization_id', 'name', 'description', 'value_question', 'deactivated_at'])]
 class ExternalClient extends Model
 {
     /** @use HasFactory<ExternalClientFactory> */
@@ -85,5 +85,14 @@ class ExternalClient extends Model
     public function isActive(): bool
     {
         return $this->deactivated_at === null;
+    }
+
+    /**
+     * The one question the client answers for the values; its values are
+     * measured from that answer (35 · 35.3).
+     */
+    public function valueQuestion(): string
+    {
+        return filled($this->value_question) ? $this->value_question : __('external_clients.default_questions.values');
     }
 }
