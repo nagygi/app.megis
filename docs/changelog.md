@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.101 · – · 2026-11-10
+## 1.101 · 90fd514 · 2026-11-10
 
 Ügyfélmérés, második rész (35 · 35.4–35.6): diagnózishoz rendelés, meghívó, és az ügyfél kitöltése.
 
