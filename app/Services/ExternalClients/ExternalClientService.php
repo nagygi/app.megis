@@ -46,7 +46,10 @@ class ExternalClientService
             }
 
             $attached = $client->users()->sync($this->userIds($users))['attached'];
-            $this->syncItems($client, $items);
+            // Any value or chosen ones, never both (35 · 35.3).
+            $this->syncItems($client, $client->measuresAnyValue()
+                ? array_values(array_filter($items, fn (array $item) => $item['kind'] !== ExternalClientItemKind::Value))
+                : $items);
 
             return $client;
         });

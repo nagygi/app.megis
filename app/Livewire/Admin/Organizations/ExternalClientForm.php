@@ -38,7 +38,7 @@ class ExternalClientForm extends Component
     public string $valueQuestion = '';
 
     /**
-     * Besides the chosen values, any value found in the answer is measured (35 · 35.3).
+     * Any value found in the answer is measured instead of chosen ones (35 · 35.3).
      */
     public bool $anyValue = false;
 
@@ -118,6 +118,16 @@ class ExternalClientForm extends Component
                 'selected' => $item !== null,
                 'question' => $item?->question ?? __('external_clients.default_questions.process', ['process' => $process->name]),
             ];
+        }
+    }
+
+    /**
+     * Back to chosen values: with none chosen yet, every value is checked, as for a new client.
+     */
+    public function updatedAnyValue(bool $value): void
+    {
+        if (! $value && ! in_array(true, $this->values, true)) {
+            $this->values = array_fill_keys(array_keys($this->values), true);
         }
     }
 
@@ -241,7 +251,8 @@ class ExternalClientForm extends Component
         $valueKeys = array_keys($clients->measurableValues($this->organization));
         $processIds = $clients->measurableProcesses($this->organization)->modelKeys();
 
-        foreach ($this->values as $key => $selected) {
+        // Any value or chosen ones, never both (35 · 35.3).
+        foreach ($this->anyValue ? [] : $this->values as $key => $selected) {
             if ($selected && in_array((string) $key, $valueKeys, true)) {
                 $items[] = ['kind' => ExternalClientItemKind::Value, 'value_key' => (string) $key];
             }

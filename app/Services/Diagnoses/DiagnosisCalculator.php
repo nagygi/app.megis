@@ -499,10 +499,10 @@ class DiagnosisCalculator
     }
 
     /**
-     * A client's rows: per value asked, the mean of its answers' scores for
-     * that value, and when the client is measured on any value, the same for
-     * every other value found in its answers; per process asked, the mean of
-     * the value scores of the answers about it, as a process point (13 · 13.3).
+     * A client's rows: per value chosen, the mean of its answers' scores for
+     * that value, or when the client is measured on any value, the same for
+     * every value found in its answers; per process asked, the mean of the
+     * value scores of the answers about it, as a process point (13 · 13.3).
      *
      * @param  array<string, mixed>  $snapshot
      * @param  Collection<int, ExternalClientAnswer>  $answers
@@ -537,7 +537,7 @@ class DiagnosisCalculator
             $chosenIds[] = $valueId;
         }
 
-        // Any other value found in the answers, by name (35 · 35.3).
+        // Measured on any value: every value found in the answers, by name (35 · 35.3).
         $foundIds = $client->measuresAnyValue()
             ? $materials->flatMap(fn (Material $material) => $scores->get($material->id, collect())->where('state', ScoreResultState::Scored)->pluck('value_id'))->unique()->diff($chosenIds)->values()->all()
             : [];

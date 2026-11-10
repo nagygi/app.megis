@@ -33,10 +33,13 @@ Az „ügyfél” itt a szervezet ügyfele, nem a mégis ügyfél-felhasználój
 
 ### 35.3 Mit mérünk, milyen kérdéssel
 
-- **Értékek:** a szervezet aktuális értékei (08). Új ügyfélnél mindegyik ki van jelölve.
-  - Az értékekhez az ügyfél **egyetlen, általános kérdést** kap, és a válaszából mérjük az összes kijelölt értéket. Az értékek nevét nem látja, így a válaszát nem tereljük.
-  - A kérdést az admin ügyfelenként írja át. Kötelező, ha van kijelölt érték, vagy be van kapcsolva a „Bármilyen értéket mérünk”. Az alapszöveg: „Mesélj egy helyzetről a közös munkánkból, amely jól megmutatja, milyen velünk dolgozni. Mi történt, és milyen volt ezt megélni?”
-  - **„Bármilyen értéket mérünk”** kapcsoló, alapból kikapcsolva. Bekapcsolva a kijelöltek mellett minden más értéket is mérünk, amit a válaszokban találunk (az Értéktár bármelyik értékét). Ami egyikre sem illik, AI által detektált értékként kerül az Értéktárba, ahogy az Értéktükörnél (06 · 6.4). Kijelölt érték nélkül is bekapcsolható.
+- **Értékek:**
+  - Az értékekhez az ügyfél **egyetlen, általános kérdést** kap, és a válaszából mérjük az értékeket. Az értékek nevét nem látja, így a válaszát nem tereljük.
+  - A kérdést az admin ügyfelenként írja át. Kötelező, ha mérünk értéket. Az alapszöveg: „Mesélj egy helyzetről a közös munkánkból, amely jól megmutatja, milyen velünk dolgozni. Mi történt, és milyen volt ezt megélni?”
+  - Kétféleképpen mérhetünk, a kettő kizárja egymást:
+    - **kijelölt értékek:** a szervezet aktuális értékei (08) közül; új ügyfélnél mindegyik ki van jelölve;
+    - **„Bármilyen értéket mérünk”** kapcsoló (a lista fölött, alapból kikapcsolva): bekapcsolva a lista eltűnik, és minden értéket mérünk, amit a válaszokban találunk, a szervezet értékeit is (az Értéktár bármelyik értékét). Ami egyikre sem illik, AI által detektált értékként kerül az Értéktárba, ahogy az Értéktükörnél (06 · 6.4).
+  - Ha kikapcsolva egy érték sincs kijelölve, mind kijelölve jelenik meg.
 - **Folyamatok:** a szervezet mért (rutin, elfogadott, felső szintű) folyamatai (11), és az **ügyfél folyamatai** elfogadás nélkül is. Alapból egyik sincs kijelölve.
   - A lista alatt „Új ügyfélfolyamat” mező: a folyamat azonnal a szervezet folyamatai közé kerül „Ügyfél folyamat” jelöléssel, és itt kijelölve, az alapkérdéssel marad. Az oldalt nem kell elhagyni.
   - Az „Ügyfél folyamat” jelölés a szervezet *Folyamatok* fülén címkeként látszik, a szerkesztésnél ki-be kapcsolható, és az admin „Új folyamat” oldalán is megadható (11 · 11.6).
@@ -75,7 +78,7 @@ Az „ügyfél” itt a szervezet ügyfele, nem a mégis ügyfél-felhasználój
 - **A csapat számai nem változnak:** az ügyfelek anyaga nem számít bele a fő diagnózis Mérés és Megélés értékeibe, sem a képességmérésbe.
 - **Ügyfelenként egy részdiagnózis** készül a fő diagnózis alá (17.4), automatikusan.
   - Értéksoronként: az ügyfél anyagainak pontátlaga a kijelölt értékre. Adat nélkül „nincs adat”.
-  - Ha az ügyfélnél „Bármilyen értéket mérünk”: utánuk, név szerint, minden más érték is sort kap, amit a válaszokban találtunk.
+  - Ha az ügyfélnél „Bármilyen értéket mérünk”: minden érték sort kap, amit a válaszokban találtunk, név szerint.
   - Folyamatsoronként: az arra a folyamatra adott válaszok értékpontjainak átlaga (13).
   - Ha egy ügyfél lekerül a diagnózisról, a részdiagnózisa törlődik.
 

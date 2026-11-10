@@ -174,28 +174,46 @@ it('deactivates, activates and deletes a client, its users keeping their account
     $this->assertModelExists($user);
 });
 
-it('measures any value when asked, and then wants the value question even without a chosen value', function () {
+it('measures any value instead of chosen ones: the list hides, no value is saved, and the value question is still needed', function () {
     actingAsAdmin();
     $organization = Organization::factory()->withExternalClients()->create();
-    $values = organizationValues($organization)->items()->get();
+    $first = organizationValues($organization)->items()->first();
 
     $component = Livewire::test(ExternalClientForm::class, ['organization' => $organization])
+        ->assertSee($first->name)
         ->set('name', 'Acme Kft.')
         ->set('valueQuestion', '')
-        ->set('anyValue', true);
-
-    foreach ($values as $value) {
-        $component->set("values.{$value->key}", false);
-    }
-
-    $component->call('save')->assertHasErrors('valueQuestion');
+        ->set('anyValue', true)
+        ->assertDontSee($first->name)
+        ->call('save')
+        ->assertHasErrors('valueQuestion');
 
     $component->set('valueQuestion', 'Milyen velünk dolgozni?')->call('save')->assertHasNoErrors();
 
-    expect($organization->externalClients()->sole())
+    $client = $organization->externalClients()->sole();
+    expect($client)
         ->measuresAnyValue()->toBeTrue()
         ->value_question->toBe('Milyen velünk dolgozni?')
-        ->and($organization->externalClients()->sole()->items()->exists())->toBeFalse();
+        ->and($client->items()->exists())->toBeFalse();
+});
+
+it('checks every value again when switched back to chosen values with none chosen', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->withExternalClients()->create();
+    $first = organizationValues($organization)->items()->first();
+    $client = ExternalClient::factory()->for($organization)->create(['measures_any_value' => true]);
+
+    Livewire::test(ExternalClientForm::class, ['organization' => $organization, 'externalClient' => $client])
+        ->assertSet('anyValue', true)
+        ->assertSet("values.{$first->key}", false)
+        ->set('anyValue', false)
+        ->assertSet("values.{$first->key}", true)
+        ->assertSee($first->name)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($client->refresh()->measuresAnyValue())->toBeFalse()
+        ->and($client->items()->where('kind', ExternalClientItemKind::Value)->count())->toBe(3);
 });
 
 it('adds a client process in place: it joins the organization\'s processes marked, and stays checked here', function () {

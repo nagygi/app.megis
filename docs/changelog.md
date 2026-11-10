@@ -2,6 +2,19 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.106 · – · 2026-11-10
+
+Ügyfélmérés (35 · 35.3): a „Bármilyen értéket mérünk” és a kijelölt értékek kizárják egymást.
+
+- **Eddig:** a kapcsoló a kijelölt értékek mellé adta a többi talált értéket, és mindkettő egyszerre be lehetett kapcsolva.
+- **Most:**
+  - A kapcsoló az értéklista fölé került. Bekapcsolva a lista eltűnik, és minden értéket mérünk, amit a válaszokban találunk, a szervezet értékeit is. Kikapcsolva a lista megjelenik, és csak a kijelölt értékeket mérjük.
+  - Ha visszakapcsolod a kijelölésre, és egy érték sincs kijelölve, mind kijelölve jelenik meg.
+  - A szerver sem ment kijelölt értéket bekapcsolt kapcsoló mellett.
+  - **Ügyfelek lista:** „bármilyen érték · {m} folyamat”.
+- **Migráció:** a már mindkettővel mentett ügyfelektől elveszi a kijelölt értékeket; a kapcsoló marad.
+- **Rollback:** 1.105. A migráció lefelé nem állítja vissza a törölt kijelöléseket.
+
 ## 1.105 · 378d3d1 · 2026-11-10
 
 Ügyfélmérés (35 · 35.3): ügyfél folyamat, és új folyamat felvétele az ügyfél oldaláról.

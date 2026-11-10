@@ -186,19 +186,23 @@ it('labels the client\'s subdiagnosis and offers no loading for it', function ()
     $this->get(route('admin.diagnoses.show', $subdiagnosis))->assertOk()->assertDontSee(__('admin.diagnoses.aggregation.load'));
 });
 
-it('measures every other value found in the answers when the client is measured on any value', function () {
+it('gives every value found in the answers a row when the client is measured on any value', function () {
     [$main, $client] = answeredClientDiagnosis();
-    $secondValueId = $main->valueSetVersion->snapshot['values'][1]['value_id'];
+    $values = $main->valueSetVersion->snapshot['values'];
 
     // Only the chosen first value has a row; the second, found in the process answer, has none.
-    expect(externalClientDiagnosisOf($main)->valueRows()->pluck('value_id')->all())->not->toContain($secondValueId);
+    expect(externalClientDiagnosisOf($main)->valueRows()->pluck('value_id')->all())->toBe([$values[0]['value_id']]);
 
+    // Any value instead of chosen ones (35 · 35.3).
+    $client->items()->where('kind', ExternalClientItemKind::Value)->delete();
     $client->update(['measures_any_value' => true]);
     app(DiagnosisCalculator::class)->recalculate($main->refresh());
 
-    $row = externalClientDiagnosisOf($main)->valueRows()->where('value_id', $secondValueId)->sole();
-    expect((float) $row->score)->toBe(4.0)
-        ->and($row->aggregation_stats['found'])->toBeTrue();
+    $rows = externalClientDiagnosisOf($main)->valueRows()->get()->keyBy('value_id');
+    expect($rows->keys()->sort()->values()->all())->toBe(collect([$values[0]['value_id'], $values[1]['value_id']])->sort()->values()->all())
+        ->and((float) $rows[$values[0]['value_id']]->score)->toBe(4.0)
+        ->and((float) $rows[$values[1]['value_id']]->score)->toBe(4.0)
+        ->and($rows[$values[1]['value_id']]->aggregation_stats['found'])->toBeTrue();
 });
 
 it('adds what matched no value of the Értéktár as an AI-detected value, only for a client measured on any value', function (bool $anyValue) {

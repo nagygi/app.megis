@@ -66,19 +66,22 @@
 
             <x-form.textarea name="valueQuestion" wire:model="valueQuestion" :label="__('admin.external_clients.value_question')" :help="__('admin.external_clients.value_question_help')" rows="3" />
 
-            <div class="flex flex-col gap-3 rounded-card border border-grey-250 p-4">
-                <p class="text-sm font-medium">{{ __('admin.external_clients.values_measured') }}</p>
-                @forelse ($valueNames as $key => $valueName)
-                    <x-form.checkbox :name="'values.'.$key" :id="'external-client-value-'.$key" wire:key="external-client-value-{{ $key }}" wire:model="values.{{ $key }}" :label="$valueName" />
-                @empty
-                    <p class="text-sm text-grey-700">
-                        {{ __('admin.external_clients.no_values') }}
-                        <a href="{{ route('admin.organizations.values', $organization) }}" class="font-semibold underline">{{ __('admin.organizations.tabs.values') }}</a>
-                    </p>
-                @endforelse
-            </div>
+            {{-- Any value or chosen ones, never both: the list shows only without the switch (35 · 35.3). --}}
+            <x-form.toggle name="anyValue" wire:model.live="anyValue" :label="__('admin.external_clients.any_value')" :help="__('admin.external_clients.any_value_help')" />
 
-            <x-form.toggle name="anyValue" wire:model="anyValue" :label="__('admin.external_clients.any_value')" :help="__('admin.external_clients.any_value_help')" />
+            @unless ($anyValue)
+                <div class="flex flex-col gap-3 rounded-card border border-grey-250 p-4">
+                    <p class="text-sm font-medium">{{ __('admin.external_clients.values_measured') }}</p>
+                    @forelse ($valueNames as $key => $valueName)
+                        <x-form.checkbox :name="'values.'.$key" :id="'external-client-value-'.$key" wire:key="external-client-value-{{ $key }}" wire:model="values.{{ $key }}" :label="$valueName" />
+                    @empty
+                        <p class="text-sm text-grey-700">
+                            {{ __('admin.external_clients.no_values') }}
+                            <a href="{{ route('admin.organizations.values', $organization) }}" class="font-semibold underline">{{ __('admin.organizations.tabs.values') }}</a>
+                        </p>
+                    @endforelse
+                </div>
+            @endunless
         </fieldset>
 
         <fieldset class="flex flex-col gap-4">
