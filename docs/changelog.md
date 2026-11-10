@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.106 · – · 2026-11-10
+## 1.106 · 5b7dd96 · 2026-11-10
 
 Ügyfélmérés (35 · 35.3): a „Bármilyen értéket mérünk” és a kijelölt értékek kizárják egymást.
 
