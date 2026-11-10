@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.100 · – · 2026-11-10
+## 1.100 · 10e7d44 · 2026-11-10
 
 Ügyfélmérés, első rész (35 · 35.1–35.3): a szervezet ügyfelei, a felhasználóik, és hogy mit mérünk náluk.
 
