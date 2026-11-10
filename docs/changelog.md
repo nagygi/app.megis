@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.100 · – · 2026-11-10
+
+Ügyfélmérés, első rész (35 · 35.1–35.3): a szervezet ügyfelei, a felhasználóik, és hogy mit mérünk náluk.
+
+- **Új kapcsoló:** a szervezet *Adatok* fülén „Ügyfélmérés”, alapból kikapcsolva. Bekapcsolva megjelenik az **Ügyfelek** fül a *Folyamatok* és a *Diagnózisok* között. Kikapcsolva a fül nem látszik, a címe 404-et ad.
+- **Ügyfelek fül:** a szervezet ügyfelei (név, megjegyzés, aktív), keresővel és rendezéssel. Sorműveletek: szerkesztés, inaktiválás és aktiválás, törlés. Törléskor a felhasználói fiókok megmaradnak.
+- **Ügyfél oldala:**
+  - **Felhasználók:** név és e-mail. Ha már van fiók ezzel a címmel, azt használjuk. Admin fiók nem lehet ügyfél-felhasználó. Nem lesznek a szervezet tagjai, ezért a létszámba sem számítanak.
+  - **Mit mérünk:** a szervezet értékei (alapból mind kijelölve) és mért folyamatai (alapból egyik sem), mindegyikhez saját, átírható kérdéssel. A folyamatok alatt link az „Új folyamat” oldalra.
+- **Admin Felhasználók adatlap:** a szervezetek alatt az ügyfélkapcsolatok is látszanak.
+- Meghívó, kitöltés és eredmény még nincs; a következő verziók hozzák (35.4–35.8).
+- **Migráció:** `organizations.external_clients_enabled`, új táblák: `external_clients`, `external_client_user`, `external_client_items`. Csak hozzáad.
+- **Rollback:** 1.99, a migráció visszagörgetésével (`php artisan migrate:rollback --step=1`).
+
 ## 1.99 · 84ec213 · 2026-11-10
 
 Jegyek az oldalon: a meghívott tesztelők és a megrendelő a személyes linkjükkel jelszó nélkül is elérik a stagingot.

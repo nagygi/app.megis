@@ -1,5 +1,5 @@
 {{--
-    Tabs of an organization page (02 · 2.3, 08 · 8.5, 11 · 11.6, 17 · 17.8), in
+    Tabs of an organization page (02 · 2.3, 08 · 8.5, 11 · 11.6, 17 · 17.8, 35 · 35.1), in
     the green header of every page of the organization. active: the route of
     the tab the page belongs to (AdminLocation), lit on the pages under it too
     (a process' occasions, a diagnosis).
@@ -19,6 +19,11 @@
     $tabs[] = ['route' => 'admin.organizations.values', 'label' => __('admin.organizations.tabs.values')];
     $tabs[] = ['route' => 'admin.organizations.brand', 'label' => __('admin.organizations.tabs.brand')];
     $tabs[] = ['route' => 'admin.organizations.processes', 'label' => __('admin.organizations.tabs.processes')];
+
+    if ($organization->usesExternalClients()) {
+        $tabs[] = ['route' => 'admin.organizations.external-clients', 'label' => __('admin.organizations.tabs.external-clients')];
+    }
+
     $tabs[] = ['route' => 'admin.organizations.diagnoses', 'label' => __('admin.organizations.tabs.diagnoses')];
 
     $tabs = array_map(fn (array $tab) => ['href' => route($tab['route'], $organization), 'label' => $tab['label'], 'active' => $tab['route'] === $active], $tabs);

@@ -68,6 +68,13 @@
             />
         @endif
 
+        <x-form.toggle
+            name="external_clients_enabled"
+            wire:model="external_clients_enabled"
+            :label="__('admin.organizations.external_clients_enabled')"
+            :help="__('admin.organizations.external_clients_enabled_help')"
+        />
+
         <div class="flex flex-wrap gap-3">
             <x-ui.button type="submit">{{ __('admin.common.save') }}</x-ui.button>
             <x-ui.button tone="outline" :href="route('admin.organizations.index')">{{ __('admin.common.cancel') }}</x-ui.button>

@@ -40,6 +40,11 @@ class Form extends Component
 
     public ?int $headcount_limit = null;
 
+    /**
+     * The optional Ügyfélmérés with its Ügyfelek tab (35 · 35.1).
+     */
+    public bool $external_clients_enabled = false;
+
     public function mount(?Organization $organization = null): void
     {
         if ($organization?->exists) {
@@ -53,6 +58,7 @@ class Form extends Component
             $this->contact_admin_id = $organization->contact_admin_id;
             $this->product_id = $organization->product_id;
             $this->headcount_limit = $organization->headcount_limit;
+            $this->external_clients_enabled = $organization->usesExternalClients();
 
             return;
         }
@@ -98,6 +104,7 @@ class Form extends Component
             'description' => ['nullable', 'string', 'max:5000'],
             'contact_admin_id' => ['nullable', Rule::exists('users', 'id')->whereNotNull('role')->whereNull('deactivated_at')],
             'product_id' => ['required', Rule::exists('products', 'id')],
+            'external_clients_enabled' => ['boolean'],
             'headcount_limit' => [
                 'nullable',
                 'integer',
@@ -119,6 +126,7 @@ class Form extends Component
             'contact_admin_id' => $validated['contact_admin_id'],
             'product_id' => $validated['product_id'],
             'headcount_limit' => $isIndividual ? null : $validated['headcount_limit'],
+            'external_clients_enabled' => $validated['external_clients_enabled'],
         ];
 
         if ($this->organization === null) {
@@ -131,10 +139,17 @@ class Form extends Component
             return;
         }
 
+        $tabsChanged = $this->organization->usesExternalClients() !== $attributes['external_clients_enabled'];
+
         $this->organization->update($attributes);
         $this->slugLocked = true;
 
         session()->flash('status', __('admin.common.saved'));
+
+        // The tabs are in the layout, which a Livewire update does not draw again.
+        if ($tabsChanged) {
+            $this->redirectRoute('admin.organizations.edit', $this->organization, navigate: false);
+        }
     }
 
     public function render(): View

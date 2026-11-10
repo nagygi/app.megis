@@ -352,6 +352,11 @@ return [
         'quotes' => 'Az idézeteim név nélkül',
     ],
 
+    'external_client_item_kind' => [
+        'value' => 'érték',
+        'process' => 'folyamat',
+    ],
+
     'process_kind' => [
         'routine' => 'rutin',
         'one_off' => 'egyszeri',

@@ -170,6 +170,8 @@ class Show extends Component
                 ->get(),
             'memberships' => $memberships,
             'teamsByOrganization' => $teamsByOrganization,
+            // The organizations' clients the user answers for (35 · 35.2).
+            'externalClients' => $this->user->externalClients()->with('organization')->orderBy('name')->get(),
             'acceptances' => LegalAcceptance::query()
                 ->whereBelongsTo($this->user)
                 ->with('version')

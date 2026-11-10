@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Diagnosis;
+use App\Models\ExternalClient;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\Organization;
@@ -115,6 +116,24 @@ it('puts a team\'s form under the organization\'s Csapatok tab, lighting it', fu
         'Csapatok' => route('admin.organizations.teams', $organization),
     ])->and($location->tab)->toBe('admin.organizations.teams');
 })->with(['new team' => false, 'editing' => true]);
+
+it('puts a client\'s form under the organization\'s Ügyfelek tab, lighting it', function (bool $editing) {
+    $client = ExternalClient::factory()->create();
+    $organization = $client->organization;
+    $parameters = ['organization' => $organization];
+
+    if ($editing) {
+        $parameters['externalClient'] = $client;
+    }
+
+    $location = locate($editing ? 'admin.organizations.external-clients.edit' : 'admin.organizations.external-clients.create', $parameters);
+
+    expect(crumbs($location))->toBe([
+        'Szervezetek' => route('admin.organizations.index'),
+        $organization->name => route('admin.organizations.edit', $organization),
+        'Ügyfelek' => route('admin.organizations.external-clients', $organization),
+    ])->and($location->tab)->toBe('admin.organizations.external-clients');
+})->with(['new client' => false, 'editing' => true]);
 
 it('puts every tab of a main diagnosis under its organization\'s diagnoses, lighting Szervezetek and the Diagnózisok tab', function (string $routeName) {
     $main = MainDiagnosis::factory()->create();

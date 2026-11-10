@@ -91,6 +91,17 @@
                     </div>
                 </li>
             @endforeach
+            @foreach ($externalClients as $externalClient)
+                <li class="flex flex-wrap items-start justify-between gap-4 py-3" wire:key="client-external-{{ $externalClient->id }}">
+                    <div>
+                        <a href="{{ route('admin.organizations.external-clients.edit', [$externalClient->organization, $externalClient]) }}" class="font-semibold text-charcoal">{{ $externalClient->name }}</a>
+                        <p class="mt-1 text-sm text-grey-700">{{ __('admin.clients.external_client_of', ['organization' => $externalClient->organization->name]) }}</p>
+                    </div>
+                    @unless ($externalClient->isActive())
+                        <x-admin.user-status status="inactive">{{ __('admin.organizations.inactive') }}</x-admin.user-status>
+                    @endunless
+                </li>
+            @endforeach
         </ul>
     </x-ui.card>
 

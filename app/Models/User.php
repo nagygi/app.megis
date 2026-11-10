@@ -135,6 +135,16 @@ class User extends Authenticatable
     }
 
     /**
+     * The organizations' clients the user answers for (35 · 35.2).
+     *
+     * @return BelongsToMany<ExternalClient, $this>
+     */
+    public function externalClients(): BelongsToMany
+    {
+        return $this->belongsToMany(ExternalClient::class)->withTimestamps();
+    }
+
+    /**
      * @return HasMany<UserToken, $this>
      */
     public function tokens(): HasMany

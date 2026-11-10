@@ -5,6 +5,7 @@ use App\Models\Capability;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisRow;
 use App\Models\DiagnosisType;
+use App\Models\ExternalClient;
 use App\Models\LegalDocumentVersion;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
@@ -51,6 +52,9 @@ it('renders every admin page for a superadmin with a page heading', function (Cl
     'process occasions' => fn (array $models) => route('admin.organizations.process-occasions', [$models['organization'], Process::factory()->for($models['organization'])->create()]),
     'new process' => fn (array $models) => route('admin.organizations.processes.create', $models['organization']),
     'organization diagnoses' => fn (array $models) => route('admin.organizations.diagnoses', $models['organization']),
+    'external clients' => fn () => route('admin.organizations.external-clients', Organization::factory()->withExternalClients()->create()),
+    'new external client' => fn () => route('admin.organizations.external-clients.create', Organization::factory()->withExternalClients()->create()),
+    'edit external client' => fn () => route('admin.organizations.external-clients.edit', [($client = ExternalClient::factory()->create())->organization, $client]),
     'start diagnosis' => fn (array $models) => route('admin.main-diagnoses.create', ['szervezet' => $models['organization']->id]),
     'main diagnosis' => fn () => route('admin.diagnoses.show', MainDiagnosis::factory()->create()->diagnosis),
     'main diagnosis settings' => fn () => route('admin.main-diagnoses.edit', MainDiagnosis::factory()->create()->diagnosis),

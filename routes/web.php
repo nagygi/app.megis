@@ -94,6 +94,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('szervezetek/{organization}/folyamatok/uj', Admin\Organizations\ProcessForm::class)->name('organizations.processes.create');
         Route::livewire('szervezetek/{organization}/folyamatok/{process}', Admin\Organizations\ProcessOccasions::class)->whereNumber('process')->name('organizations.process-occasions');
         Route::livewire('szervezetek/{organization}/diagnozisok', Admin\Organizations\Diagnoses::class)->name('organizations.diagnoses');
+        // Ügyfelek: the organization's clients, when Ügyfélmérés is switched on (35).
+        Route::livewire('szervezetek/{organization}/ugyfelek', Admin\Organizations\ExternalClients::class)->name('organizations.external-clients');
+        Route::livewire('szervezetek/{organization}/ugyfelek/uj', Admin\Organizations\ExternalClientForm::class)->name('organizations.external-clients.create');
+        Route::livewire('szervezetek/{organization}/ugyfelek/{externalClient}/szerkesztes', Admin\Organizations\ExternalClientForm::class)
+            ->name('organizations.external-clients.edit')
+            ->scopeBindings();
         Route::livewire('szervezetek/{organization}/felhasznalok/meghivas', Admin\Organizations\MemberForm::class)->name('organizations.members.create');
         Route::livewire('szervezetek/{organization}/felhasznalok/{membership}/szerkesztes', Admin\Organizations\MemberForm::class)
             ->name('organizations.members.edit')

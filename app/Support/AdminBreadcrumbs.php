@@ -32,6 +32,7 @@ class AdminBreadcrumbs
         'admin.organizations.values',
         'admin.organizations.brand',
         'admin.organizations.processes',
+        'admin.organizations.external-clients',
         'admin.organizations.diagnoses',
     ];
 
@@ -130,7 +131,7 @@ class AdminBreadcrumbs
 
     /**
      * The tabs of an organization sit under it; the pages under a tab (a
-     * process' occasions, a member's form, a team's form) under the tab.
+     * process' occasions, a member's form, a team's or a client's form) under the tab.
      */
     private function organizationPage(string $routeName, Organization $organization, ?Process $process): AdminLocation
     {
@@ -141,6 +142,7 @@ class AdminBreadcrumbs
         $tab = match (true) {
             $process !== null, str_starts_with($routeName, 'admin.organizations.processes.') => 'admin.organizations.processes',
             str_starts_with($routeName, 'admin.organizations.teams.') => 'admin.organizations.teams',
+            str_starts_with($routeName, 'admin.organizations.external-clients.') => 'admin.organizations.external-clients',
             default => 'admin.organizations.members',
         };
 

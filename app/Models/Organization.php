@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['type', 'name', 'slug', 'description', 'contact_admin_id', 'product_id', 'headcount_limit', 'process_recommendation'])]
+#[Fillable(['type', 'name', 'slug', 'description', 'contact_admin_id', 'product_id', 'headcount_limit', 'process_recommendation', 'external_clients_enabled'])]
 class Organization extends Model
 {
     /** @use HasFactory<OrganizationFactory> */
@@ -32,6 +32,7 @@ class Organization extends Model
         return [
             'type' => OrganizationType::class,
             'headcount_limit' => 'integer',
+            'external_clients_enabled' => 'boolean',
             'deactivated_at' => 'datetime',
             'last_activity_at' => 'datetime',
         ];
@@ -78,6 +79,16 @@ class Organization extends Model
     }
 
     /**
+     * The clients the organization serves (35).
+     *
+     * @return HasMany<ExternalClient, $this>
+     */
+    public function externalClients(): HasMany
+    {
+        return $this->hasMany(ExternalClient::class);
+    }
+
+    /**
      * @return HasMany<Membership, $this>
      */
     public function memberships(): HasMany
@@ -104,6 +115,14 @@ class Organization extends Model
     public function isActive(): bool
     {
         return $this->deactivated_at === null;
+    }
+
+    /**
+     * The optional Ügyfélmérés is switched on (35 · 35.1).
+     */
+    public function usesExternalClients(): bool
+    {
+        return (bool) $this->external_clients_enabled;
     }
 
     /**

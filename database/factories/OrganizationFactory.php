@@ -47,4 +47,12 @@ class OrganizationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => ['deactivated_at' => now()]);
     }
+
+    /**
+     * Ügyfélmérés switched on (35 · 35.1).
+     */
+    public function withExternalClients(): static
+    {
+        return $this->state(fn (array $attributes) => ['external_clients_enabled' => true]);
+    }
 }
