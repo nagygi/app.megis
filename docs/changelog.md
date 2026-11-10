@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.105 · – · 2026-11-10
+## 1.105 · 378d3d1 · 2026-11-10
 
 Ügyfélmérés (35 · 35.3): ügyfél folyamat, és új folyamat felvétele az ügyfél oldaláról.
 
