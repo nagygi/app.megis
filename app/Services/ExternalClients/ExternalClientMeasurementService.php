@@ -194,8 +194,8 @@ class ExternalClientMeasurementService
 
     /**
      * What the client's users are asked, in order (35 · 35.3, 35.6): one
-     * question for the values, when any value is measured, then one per
-     * process. The values are measured from the one answer.
+     * question for the values, when a value is chosen or any value is
+     * measured, then one per process. The values are measured from the one answer.
      *
      * @return Collection<int, array{key: string, kind: ExternalClientItemKind, question: string, process: ?string, item: ?ExternalClientItem}>
      */
@@ -204,7 +204,7 @@ class ExternalClientMeasurementService
         $items = $this->itemsFor($main, $client);
         $questions = collect();
 
-        if ($items->contains(fn (ExternalClientItem $item) => $item->kind === ExternalClientItemKind::Value)) {
+        if ($client->measuresAnyValue() || $items->contains(fn (ExternalClientItem $item) => $item->kind === ExternalClientItemKind::Value)) {
             $questions->push([
                 'key' => self::VALUES_KEY,
                 'kind' => ExternalClientItemKind::Value,

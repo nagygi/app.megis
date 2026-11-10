@@ -171,3 +171,27 @@ it('deactivates, activates and deletes a client, its users keeping their account
     $this->assertModelMissing($client);
     $this->assertModelExists($user);
 });
+
+it('measures any value when asked, and then wants the value question even without a chosen value', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->withExternalClients()->create();
+    $values = organizationValues($organization)->items()->get();
+
+    $component = Livewire::test(ExternalClientForm::class, ['organization' => $organization])
+        ->set('name', 'Acme Kft.')
+        ->set('valueQuestion', '')
+        ->set('anyValue', true);
+
+    foreach ($values as $value) {
+        $component->set("values.{$value->key}", false);
+    }
+
+    $component->call('save')->assertHasErrors('valueQuestion');
+
+    $component->set('valueQuestion', 'Milyen velünk dolgozni?')->call('save')->assertHasNoErrors();
+
+    expect($organization->externalClients()->sole())
+        ->measuresAnyValue()->toBeTrue()
+        ->value_question->toBe('Milyen velünk dolgozni?')
+        ->and($organization->externalClients()->sole()->items()->exists())->toBeFalse();
+});

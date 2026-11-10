@@ -8,6 +8,7 @@ use App\Enums\MaterialContext;
 use App\Enums\MaterialStatus;
 use App\Enums\ScoreResultState;
 use App\Enums\ScoreState;
+use App\Enums\ValueOrigin;
 use App\Livewire\Admin\MainDiagnoses\ExternalClients;
 use App\Livewire\Admin\MainDiagnoses\Reading;
 use App\Mail\ExternalClientInvitationMail;
@@ -19,9 +20,11 @@ use App\Models\ExternalClientItem;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\User;
+use App\Models\Value;
 use App\Services\Diagnoses\DiagnosisCalculator;
 use App\Services\ExternalClients\ExternalClientMeasurementService;
 use App\Services\MainDiagnoses\StageMachine;
+use App\Services\Materials\MaterialPipeline;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
@@ -182,3 +185,30 @@ it('labels the client\'s subdiagnosis and offers no loading for it', function ()
     $this->get(route('admin.main-diagnoses.subdiagnoses', $main->diagnosis))->assertOk()->assertSee('Ügyfél · Acme');
     $this->get(route('admin.diagnoses.show', $subdiagnosis))->assertOk()->assertDontSee(__('admin.diagnoses.aggregation.load'));
 });
+
+it('measures every other value found in the answers when the client is measured on any value', function () {
+    [$main, $client] = answeredClientDiagnosis();
+    $secondValueId = $main->valueSetVersion->snapshot['values'][1]['value_id'];
+
+    // Only the chosen first value has a row; the second, found in the process answer, has none.
+    expect(externalClientDiagnosisOf($main)->valueRows()->pluck('value_id')->all())->not->toContain($secondValueId);
+
+    $client->update(['measures_any_value' => true]);
+    app(DiagnosisCalculator::class)->recalculate($main->refresh());
+
+    $row = externalClientDiagnosisOf($main)->valueRows()->where('value_id', $secondValueId)->sole();
+    expect((float) $row->score)->toBe(4.0)
+        ->and($row->aggregation_stats['found'])->toBeTrue();
+});
+
+it('adds what matched no value of the Értéktár as an AI-detected value, only for a client measured on any value', function (bool $anyValue) {
+    Queue::fake();
+    [$main, $client, $user] = diagnosisWithClient();
+    $client->update(['measures_any_value' => $anyValue]);
+    $answer = sentClientAnswer($main, $client, $user, null, 'Mindig kíváncsiak voltak ránk.', []);
+    $answer->material->detections()->create(['quote' => 'Mindig kíváncsiak voltak ránk.', 'free_name' => 'Kíváncsiság', 'strength' => 3]);
+
+    app(MaterialPipeline::class)->analyzed($answer->material);
+
+    expect(Value::query()->where('name', 'Kíváncsiság')->where('origin', ValueOrigin::Ai)->exists())->toBe($anyValue);
+})->with(['any value' => true, 'chosen values only' => false]);

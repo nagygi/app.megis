@@ -30,6 +30,7 @@ use App\Models\OccasionExperience;
 use App\Models\Process;
 use App\Models\ProcessOccasion;
 use App\Models\RawDetection;
+use App\Models\Value;
 use App\Services\Capabilities\CapabilityAssessmentService;
 use App\Services\Inbox\InboxService;
 use Illuminate\Support\Collection;
@@ -499,8 +500,9 @@ class DiagnosisCalculator
 
     /**
      * A client's rows: per value asked, the mean of its answers' scores for
-     * that value; per process asked, the mean of the value scores of the
-     * answers about it, as a process point (13 · 13.3).
+     * that value, and when the client is measured on any value, the same for
+     * every other value found in its answers; per process asked, the mean of
+     * the value scores of the answers about it, as a process point (13 · 13.3).
      *
      * @param  array<string, mixed>  $snapshot
      * @param  Collection<int, ExternalClientAnswer>  $answers
@@ -513,6 +515,7 @@ class DiagnosisCalculator
         $materials = $answers->pluck('material')->values();
         $position = 0;
         $keep = [];
+        $chosenIds = [];
 
         foreach ($client->items->where('kind', ExternalClientItemKind::Value) as $item) {
             $value = $values->get($item->value_key);
@@ -531,6 +534,24 @@ class DiagnosisCalculator
             $keep[] = $row->id;
 
             $this->tracesForValue($row, $materials, $scores, $valueId, $main);
+            $chosenIds[] = $valueId;
+        }
+
+        // Any other value found in the answers, by name (35 · 35.3).
+        $foundIds = $client->measuresAnyValue()
+            ? $materials->flatMap(fn (Material $material) => $scores->get($material->id, collect())->where('state', ScoreResultState::Scored)->pluck('value_id'))->unique()->diff($chosenIds)->values()->all()
+            : [];
+
+        foreach (Value::query()->whereIn('id', $foundIds)->with('latestVersion')->get()->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE) as $value) {
+            $points = $materials->map(fn (Material $material) => $this->scoreOf($scores, $material, $value->id))->filter(fn ($score) => $score !== null)->values()->all();
+            $row = $this->writeRow($diagnosis, ['kind' => DiagnosisRowKind::Value, 'value_id' => $value->id], [
+                'value_version_id' => $value->latestVersion?->id,
+                'position' => $position++,
+                'quotes' => $this->quotesFor($materials, $scores, $value->id),
+            ], ScoreMath::mean($points), ['n' => count($points), 'answers' => $materials->count(), 'found' => true], null);
+            $keep[] = $row->id;
+
+            $this->tracesForValue($row, $materials, $scores, $value->id, $main);
         }
 
         foreach ($client->items->where('kind', ExternalClientItemKind::Process) as $item) {

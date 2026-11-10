@@ -33,7 +33,7 @@
                     @endif
                 </td>
                 <td class="px-3 py-2">{{ $client->users_count }}</td>
-                <td class="px-3 py-2">{{ __('admin.external_clients.measured_counts', ['values' => $client->values_count, 'processes' => $client->processes_count]) }}</td>
+                <td class="px-3 py-2">{{ __($client->measuresAnyValue() ? 'admin.external_clients.measured_counts_any' : 'admin.external_clients.measured_counts', ['values' => $client->values_count, 'processes' => $client->processes_count]) }}</td>
                 <td class="px-3 py-2">
                     <x-admin.user-status :status="$client->isActive() ? 'active' : 'inactive'">{{ $client->isActive() ? __('admin.organizations.active') : __('admin.organizations.inactive') }}</x-admin.user-status>
                 </td>

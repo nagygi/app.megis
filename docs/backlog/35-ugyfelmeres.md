@@ -35,7 +35,8 @@ Az „ügyfél” itt a szervezet ügyfele, nem a mégis ügyfél-felhasználój
 
 - **Értékek:** a szervezet aktuális értékei (08). Új ügyfélnél mindegyik ki van jelölve.
   - Az értékekhez az ügyfél **egyetlen, általános kérdést** kap, és a válaszából mérjük az összes kijelölt értéket. Az értékek nevét nem látja, így a válaszát nem tereljük.
-  - A kérdést az admin ügyfelenként írja át. Kötelező, ha van kijelölt érték. Az alapszöveg: „Mesélj egy helyzetről a közös munkánkból, amely jól megmutatja, milyen velünk dolgozni. Mi történt, és milyen volt ezt megélni?”
+  - A kérdést az admin ügyfelenként írja át. Kötelező, ha van kijelölt érték, vagy be van kapcsolva a „Bármilyen értéket mérünk”. Az alapszöveg: „Mesélj egy helyzetről a közös munkánkból, amely jól megmutatja, milyen velünk dolgozni. Mi történt, és milyen volt ezt megélni?”
+  - **„Bármilyen értéket mérünk”** kapcsoló, alapból kikapcsolva. Bekapcsolva a kijelöltek mellett minden más értéket is mérünk, amit a válaszokban találunk (az Értéktár bármelyik értékét). Ami egyikre sem illik, AI által detektált értékként kerül az Értéktárba, ahogy az Értéktükörnél (06 · 6.4). Kijelölt érték nélkül is bekapcsolható.
 - **Folyamatok:** a szervezet mért (rutin, elfogadott, felső szintű) folyamatai (11). Alapból egyik sincs kijelölve. A lista alatt link az „Új folyamat” oldalra: az admin előre is felvehet folyamatot.
   - Minden kijelölt folyamathoz saját kérdés tartozik, kötelező. Az alapszöveg: „Gondolj a legutóbbi alkalomra, amikor részese voltál ennek nálunk: „{folyamat}”. Mi történt, mi ment jól, és min változtatnál?”
 - Az értéket a szervezeti értékkészlet elemének állandó kulcsa azonosítja, így az értékkészlet új verziója után is megmarad.
@@ -72,6 +73,7 @@ Az „ügyfél” itt a szervezet ügyfele, nem a mégis ügyfél-felhasználój
 - **A csapat számai nem változnak:** az ügyfelek anyaga nem számít bele a fő diagnózis Mérés és Megélés értékeibe, sem a képességmérésbe.
 - **Ügyfelenként egy részdiagnózis** készül a fő diagnózis alá (17.4), automatikusan.
   - Értéksoronként: az ügyfél anyagainak pontátlaga a kijelölt értékre. Adat nélkül „nincs adat”.
+  - Ha az ügyfélnél „Bármilyen értéket mérünk”: utánuk, név szerint, minden más érték is sort kap, amit a válaszokban találtunk.
   - Folyamatsoronként: az arra a folyamatra adott válaszok értékpontjainak átlaga (13).
   - Ha egy ügyfél lekerül a diagnózisról, a részdiagnózisa törlődik.
 

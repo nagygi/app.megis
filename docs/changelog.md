@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.104 · – · 2026-11-10
+
+Ügyfélmérés (35 · 35.3, 35.7): „Bármilyen értéket mérünk” ügyfelenként.
+
+- **Új kapcsoló** az ügyfél szerkesztő oldalán, az Értékek szakasz alján, alapból kikapcsolva.
+- **Bekapcsolva:**
+  - a kijelölt értékek mellett minden más értéket is mérünk, amit a válaszokban találunk (az Értéktár bármelyik értékét). Az ügyfél részdiagnózisában ezek a kijelöltek után, név szerint kapnak sort;
+  - ami az Értéktár egyik értékére sem illik, AI által detektált értékként kerül az Értéktárba, ahogy az Értéktükörnél (06 · 6.4);
+  - kijelölt érték nélkül is működik: ilyenkor is megjelenik az értékek kérdése.
+- **Ügyfelek lista:** „{n} érték és bármilyen más · {m} folyamat”.
+- **Kikapcsolva** minden marad a régiben: csak a kijelölt értékek kapnak sort.
+- **Migráció:** `external_clients.measures_any_value`. Csak hozzáad.
+- **Rollback:** 1.103, a migráció visszagörgetésével (`php artisan migrate:rollback --step=1`).
+
 ## 1.103 · 41fde87 · 2026-11-10
 
 Ügyfélmérés (35 · 35.3, 35.6): az értékekhez egy általános kérdés, értékenkénti kérdés helyett.

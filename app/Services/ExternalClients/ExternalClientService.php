@@ -20,7 +20,7 @@ class ExternalClientService
     public function __construct(private ExternalClientMeasurementService $measurements) {}
 
     /**
-     * @param  array{name: string, description: ?string, active: bool, value_question?: ?string}  $attributes
+     * @param  array{name: string, description: ?string, active: bool, value_question?: ?string, measures_any_value?: bool}  $attributes
      * @param  list<array{email: string, first_name?: ?string, last_name?: ?string}>  $users
      * @param  list<array{kind: ExternalClientItemKind, value_key?: ?string, process_id?: ?int, question?: ?string}>  $items
      */
@@ -33,6 +33,7 @@ class ExternalClientService
                 'name' => trim($attributes['name']),
                 'description' => filled($attributes['description']) ? $attributes['description'] : null,
                 'value_question' => filled($attributes['value_question'] ?? null) ? trim($attributes['value_question']) : null,
+                'measures_any_value' => (bool) ($attributes['measures_any_value'] ?? false),
                 'deactivated_at' => $attributes['active'] ? null : ($client?->deactivated_at ?? now()),
             ];
 

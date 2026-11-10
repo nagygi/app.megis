@@ -91,7 +91,8 @@ class MaterialPipeline
             MaterialContext::Mirror => $this->finishSignedInMirror($material),
             MaterialContext::AdminUpload => $this->buildUploadDiagnoses($material),
             MaterialContext::Occasion => $this->registerUnmatched($material),
-            MaterialContext::Dictation, MaterialContext::CapabilityStory, MaterialContext::ExternalClient => null,
+            MaterialContext::ExternalClient => $this->registerUnmatchedOfClient($material),
+            MaterialContext::Dictation, MaterialContext::CapabilityStory => null,
         };
 
         // ET4 · the mégis Coach's suggestions, in a job of their own (NM-06).
@@ -129,6 +130,19 @@ class MaterialPipeline
     {
         foreach ($this->diagnoses->unmatchedDetections($material, null) as $detection) {
             app(DetectedValueRegistry::class)->register($detection, $material->organization);
+        }
+    }
+
+    /**
+     * A client measured on any value: what matched no value of the Értéktár
+     * becomes "AI által detektált", as in a mirror (06 · 6.4, 35 · 35.3).
+     */
+    private function registerUnmatchedOfClient(Material $material): void
+    {
+        $client = ExternalClientAnswer::query()->where('material_id', $material->id)->first()?->externalClient;
+
+        if ($client?->measuresAnyValue()) {
+            $this->registerUnmatched($material);
         }
     }
 

@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * the organization's values and processes; they are not members of it and do
  * not count in the headcount.
  */
-#[Fillable(['organization_id', 'name', 'description', 'value_question', 'deactivated_at'])]
+#[Fillable(['organization_id', 'name', 'description', 'value_question', 'measures_any_value', 'deactivated_at'])]
 class ExternalClient extends Model
 {
     /** @use HasFactory<ExternalClientFactory> */
@@ -31,6 +31,7 @@ class ExternalClient extends Model
     {
         return [
             'deactivated_at' => 'datetime',
+            'measures_any_value' => 'boolean',
         ];
     }
 
@@ -91,6 +92,14 @@ class ExternalClient extends Model
      * The one question the client answers for the values; its values are
      * measured from that answer (35 · 35.3).
      */
+    /**
+     * Besides the chosen values, any value found in the answers is measured (35 · 35.3).
+     */
+    public function measuresAnyValue(): bool
+    {
+        return (bool) $this->measures_any_value;
+    }
+
     public function valueQuestion(): string
     {
         return filled($this->value_question) ? $this->value_question : __('external_clients.default_questions.values');

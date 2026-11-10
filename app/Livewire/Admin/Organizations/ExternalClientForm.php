@@ -37,6 +37,11 @@ class ExternalClientForm extends Component
     public string $valueQuestion = '';
 
     /**
+     * Besides the chosen values, any value found in the answer is measured (35 · 35.3).
+     */
+    public bool $anyValue = false;
+
+    /**
      * The client's users; a new one has no id until saved.
      *
      * @var list<array{id: ?int, email: string, first_name: string, last_name: string}>
@@ -78,6 +83,7 @@ class ExternalClientForm extends Component
             $this->description = (string) $externalClient->description;
             $this->active = $externalClient->isActive();
             $this->valueQuestion = $externalClient->valueQuestion();
+            $this->anyValue = $externalClient->measuresAnyValue();
             $this->users = $externalClient->users()->orderBy('last_name')->orderBy('first_name')->get()
                 ->map(fn (User $user) => [
                     'id' => $user->id,
@@ -172,7 +178,7 @@ class ExternalClientForm extends Component
         $client = $clients->save(
             $this->organization,
             $this->externalClient,
-            ['name' => $this->name, 'description' => $this->description, 'active' => $this->active, 'value_question' => $this->valueQuestion],
+            ['name' => $this->name, 'description' => $this->description, 'active' => $this->active, 'value_question' => $this->valueQuestion, 'measures_any_value' => $this->anyValue],
             $this->users,
             $items,
         );
@@ -214,7 +220,7 @@ class ExternalClientForm extends Component
             }
         }
 
-        if ($items !== [] && blank($this->valueQuestion)) {
+        if (($items !== [] || $this->anyValue) && blank($this->valueQuestion)) {
             $missing['valueQuestion'] = __('admin.external_clients.value_question_required');
         }
 

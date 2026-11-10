@@ -64,21 +64,21 @@
         <fieldset class="flex flex-col gap-4">
             <legend class="mb-1 text-lg font-semibold">{{ __('admin.external_clients.measured_values') }}</legend>
 
-            @if ($valueNames === [])
-                <p class="text-sm text-grey-700">
-                    {{ __('admin.external_clients.no_values') }}
-                    <a href="{{ route('admin.organizations.values', $organization) }}" class="font-semibold underline">{{ __('admin.organizations.tabs.values') }}</a>
-                </p>
-            @else
-                <x-form.textarea name="valueQuestion" wire:model="valueQuestion" :label="__('admin.external_clients.value_question')" :help="__('admin.external_clients.value_question_help')" rows="3" />
+            <x-form.textarea name="valueQuestion" wire:model="valueQuestion" :label="__('admin.external_clients.value_question')" :help="__('admin.external_clients.value_question_help')" rows="3" />
 
-                <div class="flex flex-col gap-3 rounded-card border border-grey-250 p-4">
-                    <p class="text-sm font-medium">{{ __('admin.external_clients.values_measured') }}</p>
-                    @foreach ($valueNames as $key => $valueName)
-                        <x-form.checkbox :name="'values.'.$key" :id="'external-client-value-'.$key" wire:key="external-client-value-{{ $key }}" wire:model="values.{{ $key }}" :label="$valueName" />
-                    @endforeach
-                </div>
-            @endif
+            <div class="flex flex-col gap-3 rounded-card border border-grey-250 p-4">
+                <p class="text-sm font-medium">{{ __('admin.external_clients.values_measured') }}</p>
+                @forelse ($valueNames as $key => $valueName)
+                    <x-form.checkbox :name="'values.'.$key" :id="'external-client-value-'.$key" wire:key="external-client-value-{{ $key }}" wire:model="values.{{ $key }}" :label="$valueName" />
+                @empty
+                    <p class="text-sm text-grey-700">
+                        {{ __('admin.external_clients.no_values') }}
+                        <a href="{{ route('admin.organizations.values', $organization) }}" class="font-semibold underline">{{ __('admin.organizations.tabs.values') }}</a>
+                    </p>
+                @endforelse
+            </div>
+
+            <x-form.toggle name="anyValue" wire:model="anyValue" :label="__('admin.external_clients.any_value')" :help="__('admin.external_clients.any_value_help')" />
         </fieldset>
 
         <fieldset class="flex flex-col gap-4">

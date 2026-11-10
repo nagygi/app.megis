@@ -233,3 +233,17 @@ it('takes a client user\'s answers and client links when the account is deleted'
         ->and(Material::query()->where('user_id', $user->id)->exists())->toBeFalse()
         ->and($client->users()->exists())->toBeFalse();
 });
+
+it('asks the value question when the client is measured on any value, even without a chosen value', function () {
+    [$main, $client] = diagnosisWithClient();
+    $client->items()->where('kind', ExternalClientItemKind::Value)->delete();
+    $measurements = app(ExternalClientMeasurementService::class);
+
+    expect($measurements->questionsFor($main, $client->refresh())->pluck('key')->all())->not->toContain(ExternalClientMeasurementService::VALUES_KEY);
+
+    $client->update(['measures_any_value' => true]);
+
+    expect($measurements->questionsFor($main, $client->refresh())->first())
+        ->key->toBe(ExternalClientMeasurementService::VALUES_KEY)
+        ->question->toBe('Mikor számíthattál ránk?');
+});
