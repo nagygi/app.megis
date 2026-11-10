@@ -1,9 +1,11 @@
 <?php
 
 use App\Enums\ExternalClientItemKind;
+use App\Enums\ProcessKind;
 use App\Livewire\Admin\Organizations\ExternalClientForm;
 use App\Livewire\Admin\Organizations\ExternalClients;
 use App\Livewire\Admin\Organizations\Form;
+use App\Livewire\Admin\Organizations\ProcessForm;
 use App\Models\ExternalClient;
 use App\Models\Membership;
 use App\Models\Organization;
@@ -194,4 +196,57 @@ it('measures any value when asked, and then wants the value question even withou
         ->measuresAnyValue()->toBeTrue()
         ->value_question->toBe('Milyen velünk dolgozni?')
         ->and($organization->externalClients()->sole()->items()->exists())->toBeFalse();
+});
+
+it('adds a client process in place: it joins the organization\'s processes marked, and stays checked here', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->withExternalClients()->create();
+
+    $component = Livewire::test(ExternalClientForm::class, ['organization' => $organization])
+        ->set('name', 'Acme Kft.')
+        ->set('newProcessName', 'Reklamációkezelés')
+        ->call('addProcess')
+        ->assertHasNoErrors()
+        ->assertSet('newProcessName', '');
+
+    $process = $organization->processes()->sole();
+    expect($process)
+        ->name->toBe('Reklamációkezelés')
+        ->isClientFacing()->toBeTrue()
+        ->isAccepted()->toBeFalse();
+
+    $component->assertSet("processes.{$process->id}.selected", true)
+        ->assertSee(__('admin.processes.client_facing'))
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($organization->externalClients()->sole()->items()->sole())
+        ->process_id->toBe($process->id)
+        ->question->toBe(__('external_clients.default_questions.process', ['process' => 'Reklamációkezelés']));
+});
+
+it('offers the measured processes and the client processes, not an unaccepted or excluded other one', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->withExternalClients()->create();
+    $measured = Process::factory()->accepted()->for($organization)->create();
+    $clientFacing = Process::factory()->for($organization)->create(['client_facing' => true]);
+    Process::factory()->for($organization)->create();
+    Process::factory()->for($organization)->create(['client_facing' => true, 'kind' => ProcessKind::Excluded]);
+
+    expect(array_keys(Livewire::test(ExternalClientForm::class, ['organization' => $organization])->get('processes')))
+        ->toEqualCanonicalizing([$measured->id, $clientFacing->id]);
+});
+
+it('marks a process added on the Folyamatok tab as a client process, and shows the mark in the list', function () {
+    actingAsAdmin();
+    $organization = Organization::factory()->create();
+
+    Livewire::test(ProcessForm::class, ['organization' => $organization])
+        ->set('name', 'Ajánlatadás')
+        ->set('clientFacing', true)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($organization->processes()->sole()->isClientFacing())->toBeTrue();
+    $this->get(route('admin.organizations.processes', $organization))->assertOk()->assertSee(__('admin.processes.client_facing'));
 });

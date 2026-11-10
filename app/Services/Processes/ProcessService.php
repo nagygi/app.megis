@@ -41,7 +41,7 @@ class ProcessService
     /**
      * "Folyamat vagy alfolyamat hozzáadása": "nincs a naptárban · 0 alkalom" (11 · 11.2).
      */
-    public function addManual(Organization $organization, string $name, ?ProcessRhythm $rhythm, ?Process $parent = null, ?string $description = null): Process
+    public function addManual(Organization $organization, string $name, ?ProcessRhythm $rhythm, ?Process $parent = null, ?string $description = null, bool $clientFacing = false): Process
     {
         if ($parent !== null) {
             $this->ensureCanHaveChildren($parent, $organization);
@@ -54,6 +54,7 @@ class ProcessService
             'description' => filled($description) ? trim($description) : null,
             'rhythm' => $rhythm,
             'kind' => ProcessKind::Routine,
+            'client_facing' => $clientFacing,
             'source' => ProcessSource::Manual,
             'confidence' => ProcessConfidence::Manual,
         ]);

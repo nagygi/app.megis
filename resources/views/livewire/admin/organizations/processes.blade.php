@@ -157,6 +157,7 @@
                                     </x-form.select>
                                     <div class="flex flex-col justify-end gap-2">
                                         <x-form.checkbox name="edit.accepted" wire:model="edit.accepted" :label="__('processes.list.accepted')" />
+                                        <x-form.checkbox name="edit.client_facing" wire:model="edit.client_facing" :label="__('admin.processes.client_facing')" />
                                         <div class="flex gap-2">
                                             <x-ui.button type="submit" size="sm">{{ __('admin.common.save') }}</x-ui.button>
                                             <x-ui.button tone="outline" size="sm" wire:click="$set('editingId', null)">{{ __('admin.common.cancel') }}</x-ui.button>
@@ -180,6 +181,9 @@
                                 @endif
                                 @if ($process->breakpoint_candidate)
                                     <x-ui.badge tone="coral">{{ __('processes.list.breakpoint') }}</x-ui.badge>
+                                @endif
+                                @if ($process->isClientFacing())
+                                    <x-ui.badge tone="yellow">{{ __('admin.processes.client_facing') }}</x-ui.badge>
                                 @endif
                             </td>
                             <td class="px-3 py-2">{{ $process->parent?->name ?? '–' }}</td>

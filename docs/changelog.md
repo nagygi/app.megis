@@ -2,6 +2,19 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.105 · – · 2026-11-10
+
+Ügyfélmérés (35 · 35.3): ügyfél folyamat, és új folyamat felvétele az ügyfél oldaláról.
+
+- **Eddig:** az ügyfél oldalán az „Új folyamat” gomb a szervezet *Új folyamat* oldalára vitt. Az ott felvett folyamat a szervezet folyamatai közé került, de elfogadás nélkül, ezért az ügyfél oldalán nem jelent meg, és a félig kitöltött ügyfél-űrlap is elveszett.
+- **Most:**
+  - Az ügyfél oldalán a Folyamatok alatt „Új ügyfélfolyamat” mező és „Hozzáadom” gomb van. A folyamat azonnal a szervezet folyamatai közé kerül, „Ügyfél folyamat” jelöléssel, és az ügyfélnél kijelölve, az alapkérdéssel marad. Az oldalt nem kell elhagyni.
+  - Az ügyfél oldala a mért folyamatok mellett az ügyfél folyamatokat is felkínálja, elfogadás nélkül is (a „nem mérjük” típusúakat nem).
+  - **Ügyfél folyamat jelölés:** a szervezet *Folyamatok* fülén sárga „Ügyfél folyamat” címke jelzi; a sor szerkesztésénél ki-be kapcsolható, és az admin *Új folyamat* oldalán is megadható. Az ügyfél oldalán is ott a címke.
+  - A csapat diagnózisán nincs változás: egy ügyfél folyamat csak akkor mért a csapatnak, ha elfogadták, mint eddig bármelyik folyamatot.
+- **Migráció:** `processes.client_facing`. Csak hozzáad.
+- **Rollback:** 1.104, a migráció visszagörgetésével (`php artisan migrate:rollback --step=1`).
+
 ## 1.104 · 0efddbd · 2026-11-10
 
 Ügyfélmérés (35 · 35.3, 35.7): „Bármilyen értéket mérünk” ügyfelenként.

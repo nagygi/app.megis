@@ -3,10 +3,12 @@
 namespace App\Services\ExternalClients;
 
 use App\Enums\ExternalClientItemKind;
+use App\Enums\ProcessKind;
 use App\Models\ExternalClient;
 use App\Models\Organization;
 use App\Models\Process;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -66,14 +68,21 @@ class ExternalClientService
     }
 
     /**
-     * The processes a client can be asked about: the accepted top-level ones
-     * that are measured, by name (11 · 11.2).
+     * The processes a client can be asked about, by name: the measured ones
+     * (11 · 11.2), and the top-level client processes even before they are
+     * accepted (35 · 35.3); none that is "nem mérjük".
      *
      * @return Collection<int, Process>
      */
     public function measurableProcesses(Organization $organization): Collection
     {
-        return Process::query()->whereBelongsTo($organization)->measured()->orderBy('name')->get();
+        return Process::query()
+            ->whereBelongsTo($organization)
+            ->where(fn (Builder $processes) => $processes
+                ->measured()
+                ->orWhere(fn (Builder $clientFacing) => $clientFacing->whereNull('parent_id')->where('client_facing', true)->where('kind', '!=', ProcessKind::Excluded)))
+            ->orderBy('name')
+            ->get();
     }
 
     /**

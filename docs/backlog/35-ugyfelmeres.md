@@ -37,7 +37,9 @@ Az „ügyfél” itt a szervezet ügyfele, nem a mégis ügyfél-felhasználój
   - Az értékekhez az ügyfél **egyetlen, általános kérdést** kap, és a válaszából mérjük az összes kijelölt értéket. Az értékek nevét nem látja, így a válaszát nem tereljük.
   - A kérdést az admin ügyfelenként írja át. Kötelező, ha van kijelölt érték, vagy be van kapcsolva a „Bármilyen értéket mérünk”. Az alapszöveg: „Mesélj egy helyzetről a közös munkánkból, amely jól megmutatja, milyen velünk dolgozni. Mi történt, és milyen volt ezt megélni?”
   - **„Bármilyen értéket mérünk”** kapcsoló, alapból kikapcsolva. Bekapcsolva a kijelöltek mellett minden más értéket is mérünk, amit a válaszokban találunk (az Értéktár bármelyik értékét). Ami egyikre sem illik, AI által detektált értékként kerül az Értéktárba, ahogy az Értéktükörnél (06 · 6.4). Kijelölt érték nélkül is bekapcsolható.
-- **Folyamatok:** a szervezet mért (rutin, elfogadott, felső szintű) folyamatai (11). Alapból egyik sincs kijelölve. A lista alatt link az „Új folyamat” oldalra: az admin előre is felvehet folyamatot.
+- **Folyamatok:** a szervezet mért (rutin, elfogadott, felső szintű) folyamatai (11), és az **ügyfél folyamatai** elfogadás nélkül is. Alapból egyik sincs kijelölve.
+  - A lista alatt „Új ügyfélfolyamat” mező: a folyamat azonnal a szervezet folyamatai közé kerül „Ügyfél folyamat” jelöléssel, és itt kijelölve, az alapkérdéssel marad. Az oldalt nem kell elhagyni.
+  - Az „Ügyfél folyamat” jelölés a szervezet *Folyamatok* fülén címkeként látszik, a szerkesztésnél ki-be kapcsolható, és az admin „Új folyamat” oldalán is megadható (11 · 11.6).
   - Minden kijelölt folyamathoz saját kérdés tartozik, kötelező. Az alapszöveg: „Gondolj a legutóbbi alkalomra, amikor részese voltál ennek nálunk: „{folyamat}”. Mi történt, mi ment jól, és min változtatnál?”
 - Az értéket a szervezeti értékkészlet elemének állandó kulcsa azonosítja, így az értékkészlet új verziója után is megmarad.
 

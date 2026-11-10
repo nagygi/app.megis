@@ -17,6 +17,7 @@
             @endforeach
         </x-form.select>
         <x-form.textarea name="description" wire:model="description" :label="__('processes.sheet.description')" rows="3" maxlength="2000" />
+        <x-form.checkbox name="clientFacing" wire:model="clientFacing" :label="__('admin.processes.client_facing')" :help="__('admin.processes.client_facing_help')" />
 
         <div class="flex flex-wrap gap-2">
             <x-ui.button type="submit" icon="plus">{{ __('processes.list.add') }}</x-ui.button>

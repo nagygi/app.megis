@@ -28,6 +28,11 @@ class ProcessForm extends Component
 
     public string $description = '';
 
+    /**
+     * Ügyfél folyamat (35 · 35.3).
+     */
+    public bool $clientFacing = false;
+
     public function mount(Organization $organization): void
     {
         Gate::authorize('update', $organization);
@@ -55,6 +60,7 @@ class ProcessForm extends Component
             filled($this->rhythm) ? ProcessRhythm::from($this->rhythm) : null,
             $this->parentId ? $this->parents()->find($this->parentId) : null,
             $this->description,
+            $this->clientFacing,
         );
 
         session()->flash('status', __('admin.processes.added', ['name' => trim($this->name)]));

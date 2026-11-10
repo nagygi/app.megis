@@ -87,7 +87,12 @@
 
             @forelse ($processList as $processId => $process)
                 <div wire:key="external-client-process-{{ $processId }}" class="flex flex-col gap-3 rounded-card border border-grey-250 p-4">
-                    <x-form.checkbox :name="'processes.'.$processId.'.selected'" :id="'external-client-process-'.$processId" wire:model.live="processes.{{ $processId }}.selected" :label="$process->name" />
+                    <div class="flex flex-wrap items-center gap-2">
+                        <x-form.checkbox :name="'processes.'.$processId.'.selected'" :id="'external-client-process-'.$processId" wire:model.live="processes.{{ $processId }}.selected" :label="$process->name" />
+                        @if ($process->isClientFacing())
+                            <x-ui.badge tone="yellow">{{ __('admin.processes.client_facing') }}</x-ui.badge>
+                        @endif
+                    </div>
                     @if ($processes[$processId]['selected'] ?? false)
                         <x-form.textarea :name="'processes.'.$processId.'.question'" :id="'external-client-process-question-'.$processId" wire:model="processes.{{ $processId }}.question" :label="__('admin.external_clients.question')" rows="3" />
                     @endif
@@ -96,8 +101,13 @@
                 <p class="text-sm text-grey-700">{{ __('admin.external_clients.no_processes') }}</p>
             @endforelse
 
-            <div>
-                <x-ui.button tone="outline" icon="plus" :href="route('admin.organizations.processes.create', $organization)">{{ __('admin.external_clients.new_process') }}</x-ui.button>
+            <div class="flex flex-col gap-3 rounded-card border border-grey-250 p-4">
+                <x-form.inline>
+                    <x-form.input name="newProcessName" wire:model="newProcessName" wire:keydown.enter.prevent="addProcess" :label="__('admin.external_clients.new_process')" :help="__('admin.external_clients.new_process_help')" />
+                    <x-slot:actions>
+                        <x-ui.button tone="outline" icon="plus" wire:click="addProcess">{{ __('admin.external_clients.add_process_button') }}</x-ui.button>
+                    </x-slot:actions>
+                </x-form.inline>
             </div>
         </fieldset>
 

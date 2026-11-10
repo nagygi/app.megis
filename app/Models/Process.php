@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'organization_id', 'parent_id', 'name', 'description', 'rhythm', 'rhythm_label', 'duration_minutes', 'headcount',
     'occurrence_label', 'kind', 'source', 'confidence', 'unclear', 'accepted_at', 'responsible_user_id',
-    'breakpoint_candidate', 'calendar_series_key', 'merge_candidate_id',
+    'breakpoint_candidate', 'calendar_series_key', 'merge_candidate_id', 'client_facing',
 ])]
 class Process extends Model
 {
@@ -44,6 +44,7 @@ class Process extends Model
             'confidence' => ProcessConfidence::class,
             'unclear' => 'boolean',
             'breakpoint_candidate' => 'boolean',
+            'client_facing' => 'boolean',
             'accepted_at' => 'datetime',
             'duration_minutes' => 'integer',
             'headcount' => 'integer',
@@ -137,6 +138,14 @@ class Process extends Model
     protected function measured(Builder $query): void
     {
         $query->whereNull('parent_id')->where('kind', ProcessKind::Routine)->whereNotNull('accepted_at');
+    }
+
+    /**
+     * Ügyfél folyamat: the organization's clients take part in it (35 · 35.3).
+     */
+    public function isClientFacing(): bool
+    {
+        return (bool) $this->client_facing;
     }
 
     public function isAccepted(): bool

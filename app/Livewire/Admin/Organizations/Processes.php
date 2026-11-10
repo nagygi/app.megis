@@ -65,9 +65,9 @@ class Processes extends Component
     public ?int $editingId = null;
 
     /**
-     * @var array{name: string, description: string, kind: string, accepted: bool, responsible_user_id: ?int, parent_id: ?int}
+     * @var array{name: string, description: string, kind: string, accepted: bool, client_facing: bool, responsible_user_id: ?int, parent_id: ?int}
      */
-    public array $edit = ['name' => '', 'description' => '', 'kind' => 'routine', 'accepted' => false, 'responsible_user_id' => null, 'parent_id' => null];
+    public array $edit = ['name' => '', 'description' => '', 'kind' => 'routine', 'accepted' => false, 'client_facing' => false, 'responsible_user_id' => null, 'parent_id' => null];
 
     /**
      * "Besorolásra vár": material uuid => process id and date (12 · 12.6).
@@ -131,6 +131,7 @@ class Processes extends Component
             'description' => (string) $process->description,
             'kind' => $process->kind->value,
             'accepted' => $process->isAccepted(),
+            'client_facing' => $process->isClientFacing(),
             'responsible_user_id' => $process->responsible_user_id,
             'parent_id' => $process->parent_id,
         ];
@@ -164,6 +165,8 @@ class Processes extends Component
             if ($process->children()->doesntExist()) {
                 $process->update(['parent_id' => $this->edit['parent_id'] ?: null]);
             }
+
+            $process->update(['client_facing' => (bool) $this->edit['client_facing']]);
 
             $processes->setAccepted($process->refresh(), (bool) $this->edit['accepted'], $this->runningDiagnosis());
         } catch (DiagnosisException $exception) {

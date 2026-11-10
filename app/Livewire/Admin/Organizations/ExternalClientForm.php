@@ -7,6 +7,7 @@ use App\Models\ExternalClient;
 use App\Models\Organization;
 use App\Models\User;
 use App\Services\ExternalClients\ExternalClientService;
+use App\Services\Processes\ProcessService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -53,6 +54,11 @@ class ExternalClientForm extends Component
     public string $newFirstName = '';
 
     public string $newEmail = '';
+
+    /**
+     * A new client process added in place (35 · 35.3).
+     */
+    public string $newProcessName = '';
 
     /**
      * The organization's values: value set item key => selected.
@@ -146,6 +152,27 @@ class ExternalClientForm extends Component
         ];
 
         $this->reset('newEmail', 'newFirstName', 'newLastName');
+    }
+
+    /**
+     * "Új ügyfélfolyamat": the process joins the organization's processes at
+     * once, marked as a client process, and is checked here with the default question.
+     */
+    public function addProcess(ProcessService $processes): void
+    {
+        Gate::authorize('update', $this->organization);
+
+        $this->validate(['newProcessName' => ['required', 'string', 'min:2', 'max:255']], attributes: [
+            'newProcessName' => __('processes.list.fields.name'),
+        ]);
+
+        $process = $processes->addManual($this->organization, $this->newProcessName, null, clientFacing: true);
+
+        $this->processes[$process->id] = [
+            'selected' => true,
+            'question' => __('external_clients.default_questions.process', ['process' => $process->name]),
+        ];
+        $this->reset('newProcessName');
     }
 
     public function removeUser(int $index): void
