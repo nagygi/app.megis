@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.102 · – · 2026-11-10
+## 1.102 · 8297a2b · 2026-11-10
 
 Ügyfélmérés, harmadik rész (35 · 35.7–35.8): az ügyfelek eredménye az adminban.
 
