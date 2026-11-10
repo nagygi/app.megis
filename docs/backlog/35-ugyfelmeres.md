@@ -78,10 +78,10 @@ Az „ügyfél” itt a szervezet ügyfele, nem a mégis ügyfél-felhasználój
 ### 35.8 Az admin nézetei
 
 - **Ügyfélmérés fül** a fő diagnózison, ha a diagnózisnak van ügyfele:
-  - ügyfelenként a felhasználók állapota (meghívva, belépett, beküldte) és a meghívó újraküldése;
+  - ügyfelenként a felhasználók állapota (meghívva · elkezdte · beküldte), és futás közben új link küldése;
   - a válaszok: kérdés, válasz, link az anyagra;
   - link a részdiagnózisra.
-- **Futás** (19): „Ügyfelek: {x}/{y} válaszolt”.
-- **Részdiagnózisok** (19.3): az ügyfél részdiagnózisa „Ügyfél: {név}” címkével.
-- **Olvasat** (20): érték- és folyamatsoronként „Ügyfél szemével: {átlag} · {n} válasz”.
+- **Futás** (19): „Ügyfelek: {x} / {y} válaszolt”.
+- **Részdiagnózisok** (19.3): az ügyfél részdiagnózisa „Ügyfél · {név}” címkével. Az adatlapja nem kínál aggregált betöltést.
+- **Olvasat** (20): a kiválasztott érték- vagy folyamatsornál „Ügyfél szemével: {átlag} · {n} válasz”. Az átlagban minden ügyfél egyszer számít.
 - **A vezető riportja egyelőre nem változik.** Az „Ügyfél szemével” blokk a riportban későbbi jegy.
