@@ -24,7 +24,7 @@ Minden adat az EU-n belül van: az adatbázis, a fájlok, a mentések és a logo
 - **Local:** a fejlesztő gépe. A leírás az `install.md`-ben van.
 - **Staging:**
   - Itt nézi át a mégis a kiadást.
-  - Jelszóval vagy IP-szűréssel védett, és noindex.
+  - Jelszóval vagy IP-szűréssel védett, és noindex. A „Jegyek az oldalon” meghívottjai (tesztelők, megrendelő) a személyes linkjükkel jelszó nélkül is bejutnak, amíg a jegy-munkamenetük érvényes.
   - A levelek valódi címekre mennek, hogy a mégis a meghívókat és az értesítéseket is kipróbálhassa. A `MEGIS_MAIL_ALLOWLIST` megadásával szűkíthető a címzettek köre; ilyenkor az admin felület sávban jelzi, kik kapnak levelet.
   - Saját AI-kulcsai vannak, alacsony kerettel.
 - **Production:** csak itt indexelhetők a nyilvános oldalak.

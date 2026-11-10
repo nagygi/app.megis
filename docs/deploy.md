@@ -7,7 +7,7 @@ Kiegészíti a `docs/uzemeltetes.md`-t. Itt a konkrét lépések és konfigurác
 | Környezet | Indexelés | Levelek | Védelem |
 |---|---|---|---|
 | local | noindex | Mailpit vagy log | – |
-| staging | noindex | valódi címekre; a `MEGIS_MAIL_ALLOWLIST` megadásával csak az ott felsoroltakra | `MEGIS_STAGING_USER`/`MEGIS_STAGING_PASSWORD` és/vagy `MEGIS_STAGING_ALLOWED_IPS` |
+| staging | noindex | valódi címekre; a `MEGIS_MAIL_ALLOWLIST` megadásával csak az ott felsoroltakra | `MEGIS_STAGING_USER`/`MEGIS_STAGING_PASSWORD` és/vagy `MEGIS_STAGING_ALLOWED_IPS`; a „Jegyek az oldalon” érvényes munkamenete is átenged |
 | production | csak a címlap | valódi címekre | – |
 
 A noindex-et az `X-Robots-Tag` fejléc, a `robots.txt` és a lapok meta-tagje adja. Csak a production indexelhető, ott is csak a címlap: a `robots.txt` a `/`-t és a `/build/` alatti CSS-t, JS-t engedi, minden mást tilt. A sitemap is csak a címlapot sorolja fel.
@@ -111,7 +111,7 @@ php artisan onsite-comment:doctor
 php artisan onsite-comment:invite "Teszt Elek" elek@example.com --role=tester   # a link csak egyszer jelenik meg
 ```
 
-Az adminok az admin menü alján, a verziószám alatti „Jegyek bekapcsolása az oldalon” linkkel kapcsolják be a widgetet, meghívó nélkül. Trellóhoz: `php artisan onsite-comment:trello:setup --board=<board link>`, majd `php artisan onsite-comment:trello:sync --push`.
+A meghívottnak nem kell a staging jelszava: a személyes link megerősítése után a jegy-munkamenete (`osc_session` süti, 30 nap) a staging-védelmen is átengedi. Egyes böngészők a basic auth ablakot fel sem dobják, csak a „Staging” szöveget mutatják. Az adminok az admin menü alján, a verziószám alatti „Jegyek bekapcsolása az oldalon” linkkel kapcsolják be a widgetet, meghívó nélkül. Trellóhoz: `php artisan onsite-comment:trello:setup --board=<board link>`, majd `php artisan onsite-comment:trello:sync --push`.
 
 ### Utána
 

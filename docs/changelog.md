@@ -2,6 +2,16 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.99 · – · 2026-11-10
+
+Jegyek az oldalon: a meghívott tesztelők és a megrendelő a személyes linkjükkel jelszó nélkül is elérik a stagingot.
+
+- **Eddig:** a meghívó link megerősítése után a csomag a főoldalra irányított, és ott a staging basic auth védelme („Staging”, 401) megállította azt, akinek az IP-je nem volt a `MEGIS_STAGING_ALLOWED_IPS` listán. Egyes böngészők a jelszóablakot fel sem dobták, csak a „Staging” szót mutatták, így a widget és az egész oldal elérhetetlen lett.
+- **Most:** az érvényes jegy-munkamenet (`osc_session` süti, 30 napos csúszó lejárat) a staging-védelmen is átenged, IP-listától és jelszótól függetlenül. Visszavont résztvevő vagy lejárt munkamenet nem enged át. Ha a csomag ki van kapcsolva (`ONSITE_COMMENT_ENABLED=false`), a süti nem számít. Mindenki más továbbra is jelszót kap, vagy az IP-je alapján jut be.
+- Aki már megerősítette a linkjét, annak a deploy után elég újratöltenie az oldalt.
+- Nincs migráció, új env-kulcs vagy config-változás.
+- **Rollback:** 1.98.
+
 ## 1.98 · 458a1c5 · 2026-11-09
 
 Admin fiók az ügyféloldali belépőn (14 · 14.2).

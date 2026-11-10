@@ -1,5 +1,8 @@
 <?php
 
+use Exot\OnsiteComment\Auth\ParticipantSessions;
+use Exot\OnsiteComment\Models\ParticipantSession;
+
 beforeEach(function () {
     $this->app['env'] = 'staging';
     config([
@@ -45,6 +48,23 @@ it('forbids other addresses when only an IP allowlist is configured', function (
     $response = $this->withServerVariables(['REMOTE_ADDR' => '192.168.1.5'])->get('/');
 
     $response->assertForbidden();
+});
+
+it('lets an on-page ticket participant through without credentials', function () {
+    $this->mock(ParticipantSessions::class)->shouldReceive('resolve')->andReturn(new ParticipantSession);
+
+    $response = $this->get('/');
+
+    $response->assertOk();
+});
+
+it('ignores a ticket session while the on-page tickets are switched off', function () {
+    config(['onsite-comment.enabled' => false]);
+    $this->mock(ParticipantSessions::class)->shouldReceive('resolve')->andReturn(new ParticipantSession);
+
+    $response = $this->get('/');
+
+    $response->assertUnauthorized();
 });
 
 it('keeps the health check reachable for the monitor', function () {
