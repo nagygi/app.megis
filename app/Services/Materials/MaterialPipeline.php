@@ -12,6 +12,7 @@ use App\Jobs\DetectCapabilities;
 use App\Jobs\RecalculateMainDiagnosis;
 use App\Jobs\TranscribeMaterial;
 use App\Models\DiagnosisType;
+use App\Models\ExternalClientAnswer;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\MirrorSession;
@@ -90,7 +91,7 @@ class MaterialPipeline
             MaterialContext::Mirror => $this->finishSignedInMirror($material),
             MaterialContext::AdminUpload => $this->buildUploadDiagnoses($material),
             MaterialContext::Occasion => $this->registerUnmatched($material),
-            MaterialContext::Dictation, MaterialContext::CapabilityStory => null,
+            MaterialContext::Dictation, MaterialContext::CapabilityStory, MaterialContext::ExternalClient => null,
         };
 
         // ET4 · the mégis Coach's suggestions, in a job of their own (NM-06).
@@ -166,8 +167,15 @@ class MaterialPipeline
         }
     }
 
+    /**
+     * A client's answer belongs to its diagnosis through the answer (35 · 35.7).
+     */
     private function mainOf(Material $material): ?MainDiagnosis
     {
+        if ($material->context === MaterialContext::ExternalClient) {
+            return ExternalClientAnswer::query()->where('material_id', $material->id)->first()?->mainDiagnosis;
+        }
+
         return $material->parent_diagnosis_id === null
             ? null
             : MainDiagnosis::query()->where('diagnosis_id', $material->parent_diagnosis_id)->first();

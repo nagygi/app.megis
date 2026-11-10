@@ -20,7 +20,8 @@ class CapabilityMeasurementPolicy
             return false;
         }
 
-        if (in_array($material->context, [MaterialContext::PublicMirror, MaterialContext::Dictation], true)) {
+        // A client's answer is not read for capabilities yet (35 · 35.7).
+        if (in_array($material->context, [MaterialContext::PublicMirror, MaterialContext::Dictation, MaterialContext::ExternalClient], true)) {
             return false;
         }
 

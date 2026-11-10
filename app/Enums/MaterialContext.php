@@ -17,6 +17,9 @@ enum MaterialContext: string
     case Occasion = 'occasion';
     // A situation told to a value on the Képességek step: only capabilities are measured (NM-12).
     case CapabilityStory = 'capability_story';
+    // A client user's answer to one question (35 · 35.7). It belongs to its diagnosis
+    // through the answer, not as a material of the diagnosis: the team's numbers stay as they are.
+    case ExternalClient = 'external_client';
 
     public function label(): string
     {

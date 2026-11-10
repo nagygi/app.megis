@@ -67,7 +67,8 @@ Az „ügyfél” itt a szervezet ügyfele, nem a mégis ügyfél-felhasználój
 
 ### 35.7 Feldolgozás
 
-- Minden beküldött válaszból egy anyag készül, a kérdéssel és a válasszal együtt. Az anyag a diagnózishoz tartozik, és ugyanúgy értékelődik, mint a csapat anyagai (18 · 18.4).
+- Minden beküldött válaszból egy anyag készül, a kérdéssel és a válasszal együtt, és ugyanúgy értékelődik, mint a csapat anyagai (18 · 18.4). Az AI tudja, hogy egy ügyfél válaszát olvassa.
+- Az anyag a válaszon keresztül tartozik a diagnózishoz, nem a diagnózis anyagaként. Így a csapat nézetei (Futás, riport, vezetői kezdőlap) nem számolnak vele.
 - **A csapat számai nem változnak:** az ügyfelek anyaga nem számít bele a fő diagnózis Mérés és Megélés értékeibe, sem a képességmérésbe.
 - **Ügyfelenként egy részdiagnózis** készül a fő diagnózis alá (17.4), automatikusan.
   - Értéksoronként: az ügyfél anyagainak pontátlaga a kijelölt értékre. Adat nélkül „nincs adat”.

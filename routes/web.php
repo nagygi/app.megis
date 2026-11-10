@@ -28,10 +28,12 @@ use App\Http\Controllers\Client\ReportController;
 use App\Http\Controllers\Client\ReportPdfController;
 use App\Http\Controllers\Client\TakeawayController;
 use App\Http\Controllers\Client\WisdomController;
+use App\Http\Controllers\ExternalClient\InvitationController as ExternalClientInvitationController;
 use App\Http\Controllers\LegalDocumentController;
 use App\Http\Controllers\MirrorConfirmationController;
 use App\Livewire\Admin;
 use App\Livewire\Client;
+use App\Livewire\ExternalClient;
 use App\Livewire\Mirror;
 use App\Services\Report\ReportService;
 use Illuminate\Support\Facades\Route;
@@ -210,6 +212,22 @@ Route::middleware('guest:web')->name('client.')->group(function () {
 Route::name('client.')->group(function () {
     Route::get('meghivo/{token}', [InvitationController::class, 'show'])->name('invitation.show');
     Route::post('meghivo/{token}', [InvitationController::class, 'store'])->middleware('throttle:public-form')->name('invitation.store');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Ügyfélmérés (35): a client user's personal link and answers. A client user
+| is no member of the organization, so the page is not under /{slug}/….
+|--------------------------------------------------------------------------
+*/
+
+Route::name('external.')->group(function () {
+    Route::get('ugyfelmeres/meghivo/{token}', [ExternalClientInvitationController::class, 'show'])->name('invitation.show');
+    Route::post('ugyfelmeres/meghivo/{token}', [ExternalClientInvitationController::class, 'store'])->middleware('throttle:public-form')->name('invitation.store');
+
+    Route::middleware(['customer', 'legal'])->group(function () {
+        Route::livewire('ugyfelmeres/{diagnosis}', ExternalClient\Measurement::class)->whereNumber('diagnosis')->name('measurement');
+    });
 });
 
 /*

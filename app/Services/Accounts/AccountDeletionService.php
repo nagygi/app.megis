@@ -13,6 +13,7 @@ use App\Models\AuditEvent;
 use App\Models\Diagnosis;
 use App\Models\DiagnosisClaim;
 use App\Models\EvidenceTrace;
+use App\Models\ExternalClientAnswer;
 use App\Models\MainDiagnosis;
 use App\Models\Material;
 use App\Models\MirrorSession;
@@ -83,6 +84,9 @@ class AccountDeletionService
             }
 
             OccasionExperience::query()->where('user_id', $user->id)->delete();
+            // A client user's answers and their link to the clients (35).
+            ExternalClientAnswer::query()->where('user_id', $user->id)->delete();
+            $user->externalClients()->detach();
             // Their own diagnoses: Megélés, Értéktükör and user level ones (04, 17 · 17.4).
             Diagnosis::query()->where('level', DiagnosisLevel::User)->where('user_id', $user->id)->get()->each->delete();
             MirrorSession::query()->where('user_id', $user->id)->delete();
@@ -146,6 +150,7 @@ class AccountDeletionService
         $diagnosisIds = $materials->pluck('parent_diagnosis_id')->filter()
             ->merge(EvidenceTrace::query()->where('user_id', $user->id)->join('diagnosis_rows', 'diagnosis_rows.id', '=', 'evidence_traces.diagnosis_row_id')->pluck('diagnosis_rows.diagnosis_id'))
             ->merge(Diagnosis::query()->where('user_id', $user->id)->whereNotNull('parent_id')->pluck('parent_id'))
+            ->merge(ExternalClientAnswer::query()->where('user_id', $user->id)->with('mainDiagnosis')->get()->pluck('mainDiagnosis.diagnosis_id'))
             ->unique();
 
         return MainDiagnosis::query()

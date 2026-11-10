@@ -6,6 +6,7 @@ use App\Ai\AiContext;
 use App\Ai\Tasks\DetectValuesTask;
 use App\Ai\Tasks\MatchValuesTask;
 use App\Ai\Tasks\ScoreValuesTask;
+use App\Enums\MaterialContext;
 use App\Enums\ScoreResultState;
 use App\Exceptions\EmptyValueCatalogException;
 use App\Models\Material;
@@ -53,6 +54,11 @@ class ValueMeasurementEngine
      */
     public function situation(Material $material): string
     {
+        // A client tells how the organization looks from outside (35 · 35.7).
+        if ($material->context === MaterialContext::ExternalClient) {
+            return __('materials.engine_situation_external_client');
+        }
+
         $process = $material->occasion?->process;
 
         if ($process === null) {

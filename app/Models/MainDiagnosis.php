@@ -159,6 +159,24 @@ class MainDiagnosis extends Model
         return $this->hasMany(Consent::class);
     }
 
+    /**
+     * The organization's clients asked in this diagnosis (35 · 35.4).
+     *
+     * @return BelongsToMany<ExternalClient, $this>
+     */
+    public function externalClients(): BelongsToMany
+    {
+        return $this->belongsToMany(ExternalClient::class)->withPivot('invited_at')->withTimestamps();
+    }
+
+    /**
+     * @return HasMany<ExternalClientAnswer, $this>
+     */
+    public function externalClientAnswers(): HasMany
+    {
+        return $this->hasMany(ExternalClientAnswer::class);
+    }
+
     #[Scope]
     protected function inStages(Builder $query, MainDiagnosisStage ...$stages): void
     {

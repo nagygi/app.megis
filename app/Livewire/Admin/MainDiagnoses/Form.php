@@ -9,11 +9,13 @@ use App\Enums\ParticipantRole;
 use App\Exceptions\DiagnosisException;
 use App\Exceptions\HeadcountLimitReachedException;
 use App\Models\Diagnosis;
+use App\Models\ExternalClient;
 use App\Models\MainDiagnosis;
 use App\Models\Membership;
 use App\Models\Organization;
 use App\Models\Team;
 use App\Models\User;
+use App\Services\ExternalClients\ExternalClientMeasurementService;
 use App\Services\MainDiagnoses\MainDiagnosisService;
 use Carbon\CarbonImmutable;
 use Closure;
@@ -66,6 +68,13 @@ class Form extends Component
      */
     public array $peers = [];
 
+    /**
+     * The organization's clients asked in the diagnosis (35 · 35.4).
+     *
+     * @var list<int|string>
+     */
+    public array $externalClientIds = [];
+
     public string $starts_on = '';
 
     public string $publishes_on = '';
@@ -101,6 +110,7 @@ class Form extends Component
             $this->publishes_on = $main->publishes_on->toDateString();
             $this->show_peer_quotes = $main->show_peer_quotes;
             $this->name = $diagnosis->name;
+            $this->externalClientIds = $main->externalClients()->pluck('external_clients.id')->all();
             $this->peers = $main->participants()
                 ->where('role', ParticipantRole::Peer)
                 ->pluck('excluded_at', 'user_id')
@@ -315,6 +325,7 @@ class Form extends Component
             'replacementNotOrganizationLeader' => $this->replacementLeaderId !== null && ! $organizationLeaderIds->contains($this->replacementLeaderId),
             'leaderAwaitsInvitation' => $this->leaderAwaitsInvitation(),
             'peerCandidates' => $hasPeers && $team !== null ? $mainDiagnoses->teamPeerCandidates($team, $leader?->id) : collect(),
+            'externalClients' => $this->externalClientOptions($organization),
             'blockers' => $this->blockers($organization, $subject, $leader, $hasFlow, $mainDiagnoses),
             'readingStartsOn' => filled($this->publishes_on)
                 ? rescue(fn () => today()->parse($this->publishes_on)->subDays((int) config('diagnosis.reading_offset_days'))->format('Y.m.d.'), null, false)
@@ -346,6 +357,8 @@ class Form extends Component
 
                 return null;
             }
+
+            $this->syncExternalClients($this->main);
 
             return $this->main;
         }
@@ -390,7 +403,7 @@ class Form extends Component
         $this->updateContact();
 
         try {
-            return $mainDiagnoses->create([
+            $main = $mainDiagnoses->create([
                 'organization_id' => $organization->id,
                 'subject' => $this->subject,
                 'team_id' => $this->newTeam ? null : $this->team_id,
@@ -408,6 +421,9 @@ class Form extends Component
                 // The offered name is built again from what is saved, so a field the last render missed still counts.
                 'name' => $this->nameEdited ? $this->name : null,
             ], auth('admin')->user());
+            $this->syncExternalClients($main);
+
+            return $main;
         } catch (HeadcountLimitReachedException) {
             $this->addError('leader_email', __('admin.main_diagnoses.headcount_full'));
         } catch (DiagnosisException $exception) {
@@ -595,10 +611,33 @@ class Form extends Component
         $organization = $this->organization();
 
         $this->reset(['team_id', 'leader_id', 'peers', 'newTeam', 'new_team_name', 'newLeader']);
+        // Every active client is asked by default (35 · 35.4).
+        $this->externalClientIds = app(ExternalClientMeasurementService::class)->selectableClients($organization)->pluck('id')->all();
         $this->contact_admin_id = $organization?->contact_admin_id;
         $this->subject = $organization?->isIndividual() ? MainDiagnosisSubject::Individual->value : MainDiagnosisSubject::Team->value;
         $this->publishes_on = $this->defaultPublishesOn();
         $this->leader_id = $this->defaultLeaderId();
+    }
+
+    /**
+     * The active clients, and those already in the diagnosis even if deactivated since.
+     *
+     * @return Collection<int, ExternalClient>
+     */
+    private function externalClientOptions(?Organization $organization): Collection
+    {
+        $attached = $this->main?->externalClients()->get() ?? collect();
+
+        return app(ExternalClientMeasurementService::class)->selectableClients($organization)
+            ->concat($attached)
+            ->unique('id')
+            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+    }
+
+    private function syncExternalClients(MainDiagnosis $main): void
+    {
+        app(ExternalClientMeasurementService::class)->syncClients($main->refresh(), array_map('intval', $this->externalClientIds), auth('admin')->user());
     }
 
     private function defaultPublishesOn(): string

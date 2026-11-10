@@ -203,6 +203,23 @@
                     </fieldset>
                 @endif
 
+                {{-- Ügyfélmérés: the organization's clients asked in the diagnosis (35 · 35.4) --}}
+                @if ($externalClients->isNotEmpty())
+                    <fieldset class="flex flex-col gap-3" @disabled(! $canEditSettings)>
+                        <legend class="mb-2 text-lg font-semibold">{{ __('admin.main_diagnoses.external_clients') }}</legend>
+                        <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.external_clients_help') }}</p>
+                        @foreach ($externalClients as $externalClient)
+                            <x-form.checkbox
+                                name="externalClientIds"
+                                :id="'main-external-client-'.$externalClient->id"
+                                wire:model="externalClientIds"
+                                :value="$externalClient->id"
+                                :label="$externalClient->isActive() ? $externalClient->name : $externalClient->name.' · '.__('admin.organizations.inactive')"
+                            />
+                        @endforeach
+                    </fieldset>
+                @endif
+
                 {{-- Időablak --}}
                 <fieldset class="flex flex-col gap-3" @disabled(! $canEditSettings)>
                     <legend class="mb-2 text-lg font-semibold">{{ __('admin.main_diagnoses.window') }}</legend>

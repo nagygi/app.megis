@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
  */
 class ExternalClientService
 {
+    public function __construct(private ExternalClientMeasurementService $measurements) {}
+
     /**
      * @param  array{name: string, description: ?string, active: bool}  $attributes
      * @param  list<array{email: string, first_name?: ?string, last_name?: ?string}>  $users
@@ -24,7 +26,9 @@ class ExternalClientService
      */
     public function save(Organization $organization, ?ExternalClient $client, array $attributes, array $users, array $items): ExternalClient
     {
-        return DB::transaction(function () use ($organization, $client, $attributes, $users, $items): ExternalClient {
+        $attached = [];
+
+        $client = DB::transaction(function () use ($organization, $client, $attributes, $users, $items, &$attached): ExternalClient {
             $data = [
                 'name' => trim($attributes['name']),
                 'description' => filled($attributes['description']) ? $attributes['description'] : null,
@@ -37,11 +41,16 @@ class ExternalClientService
                 $client->update($data);
             }
 
-            $client->users()->sync($this->userIds($users));
+            $attached = $client->users()->sync($this->userIds($users))['attached'];
             $this->syncItems($client, $items);
 
             return $client;
         });
+
+        // A user added while the client's diagnoses run is invited at once (35 · 35.5).
+        $this->measurements->usersAdded($client, array_map('intval', $attached), auth()->user());
+
+        return $client;
     }
 
     /**

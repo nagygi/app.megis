@@ -45,6 +45,7 @@ Egy lap, a prototípus A1-e szerint:
   - Ha a diagnózis vezetője nem ilyen, a 2. és a 3. lépést csak olvassa (17.3).
   - Ha ilyenkor a szervezet értékszettje még üres, a „Meghívó küldése” szürke: „A szervezet értékeit előbb a szervezet vezetője vagy az admin adja meg (08 · 8.5).”
 - **Termék:** csak olvasható, mellette link a szervezet szerkesztésére. Snapshot · Külső termékű szervezetnek nem indítható diagnózis, az A1 ezt írja ki: „Ehhez a termékhez még nincs diagnózis-folyamat.”
+- **Ügyfélmérés** (csak ha a szervezetnél be van kapcsolva, és van aktív ügyfele): mely ügyfelek felhasználói kapnak meghívót, amikor a diagnózis elindul. Alapból minden aktív ügyfél ki van jelölve (35 · 35.4).
 - **Időablak:** kezdés napja (a vezető kitöltési határideje) és publikálás napja. Az alap hossz: Belső snapshot 14 nap, Teljes 42 nap. Az olvasat a publikálás előtti 4. napon kezdődik (konfigurálható), ezt a vezető csak tájékoztatásul látja (V10). A kezdés napja üres is lehet: ilyenkor a vezető „egyeztetés alatt” feliratot lát (V1).
 - **Hozzáférés:** „A társak idézetei a vezetőnek, szereppel és dátummal, név nélkül” kapcsoló, alapból bekapcsolva. Kikapcsolva a társak idézetei a riport egyik lapján sem jelennek meg; bekapcsolva csak annak a társnak az idézetei, aki ehhez hozzájárult (25 · 25.2, 31 · 31.6).
 - **Élő előnézet** jobbra: amit a vezető az első belépéskor lát (V1), a 17.3 szerint szűkülő lépésekkel.

@@ -300,6 +300,7 @@ return [
         'dictation' => 'Elmondott mező',
         'occasion' => 'Alkalom anyaga',
         'capability_story' => 'Képesség-helyzet',
+        'external_client' => 'Ügyfélválasz',
     ],
 
     'material_source' => [

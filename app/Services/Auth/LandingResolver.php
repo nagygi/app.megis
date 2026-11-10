@@ -8,6 +8,7 @@ use App\Models\MainDiagnosis;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\User;
+use App\Services\ExternalClients\ExternalClientMeasurementService;
 
 /**
  * Where a customer arrives after logging in (14 · 14.4). The system picks the
@@ -24,8 +25,11 @@ class LandingResolver
     {
         $organization = $this->organizationFor($user);
 
+        // A client user is no member: their open Ügyfélmérés, else nothing to open (35 · 35.5).
         if ($organization === null) {
-            return route('client.paused');
+            $measurement = app(ExternalClientMeasurementService::class)->openMeasurementsFor($user)->first();
+
+            return $measurement === null ? route('client.paused') : route('external.measurement', $measurement->diagnosis);
         }
 
         if ($main = $this->diagnosisFor($user, $organization)) {

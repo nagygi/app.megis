@@ -15,5 +15,7 @@ return [
     'engine_situation' => "# A szöveg helyzete\n\nA szöveg egy szervezeti folyamat egyik alkalmáról szól: „:process”:rhythm:parent. Ez a helyzet megértéséhez kell. Az értékeket továbbra is csak abból olvasd ki, ami a szövegben van.",
     'engine_situation_rhythm' => ', ritmusa: :rhythm',
     'engine_situation_parent' => ', a(z) „:parent” folyamat része',
+    // A client's answer (35 · 35.7).
+    'engine_situation_external_client' => "# A szöveg helyzete\n\nA szöveg a szervezet egyik ügyfelének válasza a szervezet kérdésére: azt mondja el, hogyan éli meg kívülről a szervezet működését. A kérdés is a szöveg része; az értékeket csak az ügyfél válaszából olvasd ki.",
 
 ];

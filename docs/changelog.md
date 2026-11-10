@@ -2,6 +2,24 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.101 · – · 2026-11-10
+
+Ügyfélmérés, második rész (35 · 35.4–35.6): diagnózishoz rendelés, meghívó, és az ügyfél kitöltése.
+
+- **A1:** új „Ügyfélmérés” szakasz, ha a szervezetnél be van kapcsolva, és van aktív ügyfele. Itt jelölöd ki, mely ügyfelek vesznek részt. Új diagnózisnál alapból minden aktív ügyfél ki van jelölve.
+- **Meghívó:**
+  - Amikor a diagnózis „Fut” szakaszba lép, a kijelölt ügyfelek felhasználói e-mailt kapnak személyes linkkel (14 napig él, jelszó nem kell).
+  - Futás közben azonnal megy a meghívó, ha ügyfél kerül a diagnózishoz, vagy egy ügyfélhez új felhasználó.
+- **A link** (`/ugyfelmeres/meghivo/{token}`): megnyitáskor csak egy gomb látszik, első alkalommal a jogi dokumentumok elfogadásával. A gombra a fiók aktiválódik, a felhasználó belép, és a kérdőív nyílik. Lejárt vagy használt link után belépőkóddal jön vissza.
+- **Belépés után:** akinek nincs szervezete, de van nyitott ügyfélmérése, a „szünetel” lap helyett a kérdőívre jut.
+- **Kérdőív** (`/ugyfelmeres/{diagnózis}`):
+  - Hozzájárulás, utána kérdésenként egy képernyő a testreszabott kérdéssel: Leírom · Elmondom · Feltöltöm. A piszkozat mentődik.
+  - Áttekintés, „Beküldöm”. Minden válaszból egy anyag készül a kérdéssel együtt, és az értékmérés feldolgozza. A beküldött válasz a „Fut” szakasz végéig módosítható; az olvasat indulása után a lap lezárul.
+- **A csapat számai nem változnak:** az ügyfél anyaga nem a diagnózis anyagaként, hanem a válaszon keresztül tartozik a diagnózishoz. Így sem a Mérés és a Megélés, sem a riport, a Futás vagy a képességmérés nem számol vele. Az ügyfél-eredmény a következő verzióban jön (35.7–35.8).
+- **Fióktörlés:** az ügyfélválaszok és az ügyfélkapcsolatok is törlődnek.
+- **Migráció:** új táblák: `external_client_main_diagnosis`, `external_client_answers`. Csak hozzáad.
+- **Rollback:** 1.100, a migráció visszagörgetésével (`php artisan migrate:rollback --step=1`).
+
 ## 1.100 · 10e7d44 · 2026-11-10
 
 Ügyfélmérés, első rész (35 · 35.1–35.3): a szervezet ügyfelei, a felhasználóik, és hogy mit mérünk náluk.

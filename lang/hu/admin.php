@@ -1426,6 +1426,8 @@ return [
         'leader_changed' => 'A vezetőt lecseréltük.',
         'leader_not_invited' => ':name még nem kapott meghívót.',
         'invite_new_leader' => 'Elküldöm a meghívót az új vezetőnek',
+        'external_clients' => 'Ügyfélmérés',
+        'external_clients_help' => 'Ezeknek az ügyfeleknek a felhasználói kapnak meghívót, amikor a diagnózis elindul, és az olvasatig válaszolhatnak.',
         'peers' => 'Társak',
         'peers_help' => 'A csapat felhasználói a vezetőn kívül, címkétől függetlenül. Akit nem akarsz társnak, vedd ki. Aki az olvasat indításáig a csapatba kerül, automatikusan társ lesz.',
         'peers_empty' => 'A csapatban még nincs más felhasználó. Társat úgy adhatsz hozzá, hogy a csapathoz rendeled.',

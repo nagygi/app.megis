@@ -58,6 +58,24 @@ class ExternalClient extends Model
         return $this->hasMany(ExternalClientItem::class)->orderBy('position')->orderBy('id');
     }
 
+    /**
+     * The diagnoses the client is asked in (35 · 35.4).
+     *
+     * @return BelongsToMany<MainDiagnosis, $this>
+     */
+    public function mainDiagnoses(): BelongsToMany
+    {
+        return $this->belongsToMany(MainDiagnosis::class)->withPivot('invited_at')->withTimestamps();
+    }
+
+    /**
+     * @return HasMany<ExternalClientAnswer, $this>
+     */
+    public function answers(): HasMany
+    {
+        return $this->hasMany(ExternalClientAnswer::class);
+    }
+
     #[Scope]
     protected function active(Builder $query): void
     {

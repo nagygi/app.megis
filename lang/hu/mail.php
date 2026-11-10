@@ -107,6 +107,14 @@ return [
         'action' => 'Kezdjük',
     ],
 
+    // A client user's personal link to the Ügyfélmérés (35 · 35.5).
+    'external_client' => [
+        'subject' => 'Hogyan látod a(z) :organization működését?',
+        'body' => 'A(z) :organization kíváncsi, hogyan éled meg a közös munkát. Néhány kérdés vár rád: elmondhatod, leírhatod, vagy fájlt is feltölthetsz. A válaszaidat :date napig küldheted el.',
+        'action' => 'Válaszolok',
+        'validity' => 'A link 14 napig érvényes, jelszó nem kell hozzá. Később a belépőoldalon az e-mail címeddel kérhetsz belépőkódot.',
+    ],
+
     'diagnosis_peer' => [
         'subject' => 'Hogyan látod te a(z) :subject működését?',
         'body' => ':leader kíváncsi, hogyan látod te a(z) :subject működését. Kb. :minutes perc.',
