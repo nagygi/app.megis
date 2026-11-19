@@ -91,7 +91,7 @@
                     @endif
                 </div>
                 <div>
-                    <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.window') }}</p>
+                    <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.window_short') }}</p>
                     {{-- A date range, written like the run's time window (admin.run.window_label). --}}
                     <p class="font-semibold">{{ $main->starts_on?->format('Y.m.d.') ?? __('diagnosis.date_open') }} – {{ $main->publishes_on->format('Y.m.d.') }}</p>
                     <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.reading_short', ['date' => $main->readingStartsOn()->format('Y.m.d.')]) }}</p>

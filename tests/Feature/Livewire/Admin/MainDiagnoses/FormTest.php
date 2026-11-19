@@ -345,3 +345,17 @@ it('keeps guests and customers out of A1', function () {
     actingAsCustomer($setup['leader']);
     $this->get(route('admin.main-diagnoses.create'))->assertForbidden();
 });
+
+it('says only that it saved after the invitation, not that the invitation is still to send', function () {
+    $setup = diagnosisTeam();
+    $draft = startMainDiagnosis($setup, invite: false);
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Form::class, ['diagnosis' => $draft->diagnosis])->call('saveDraft');
+    expect(session('status'))->toBe(__('admin.main_diagnoses.saved_draft'));
+
+    $invited = startMainDiagnosis($setup);
+
+    Livewire::test(Form::class, ['diagnosis' => $invited->diagnosis])->call('saveDraft');
+    expect(session('status'))->toBe('Elmentettük.');
+});

@@ -196,7 +196,8 @@ class Form extends Component
             return;
         }
 
-        session()->flash('status', __('admin.main_diagnoses.saved_draft'));
+        // Only a draft still waits for its invitation; after it the settings are just saved.
+        session()->flash('status', __($main->stage === MainDiagnosisStage::Draft ? 'admin.main_diagnoses.saved_draft' : 'admin.main_diagnoses.saved'));
         $this->redirectRoute('admin.diagnoses.show', $main->diagnosis, navigate: false);
     }
 
@@ -330,6 +331,7 @@ class Form extends Component
             'readingStartsOn' => filled($this->publishes_on)
                 ? rescue(fn () => today()->parse($this->publishes_on)->subDays((int) config('diagnosis.reading_offset_days'))->format('Y.m.d.'), null, false)
                 : null,
+            'schedule' => $this->schedule($hasPeers),
             'nameEdited' => $this->nameEdited,
             'canEditSettings' => $this->main === null || ! in_array($this->main->stage, [MainDiagnosisStage::Reading, MainDiagnosisStage::Published, MainDiagnosisStage::Closed], true),
             'isDraft' => $this->main === null || $this->main->stage === MainDiagnosisStage::Draft,
@@ -431,6 +433,40 @@ class Form extends Component
         }
 
         return null;
+    }
+
+    /**
+     * How the time splits up to publishing, under the dates: the leader until
+     * the deadline, then the peers (or the materials) until the reading, then
+     * the reading. From the invitation, or from today before it. Null while a
+     * date is missing or does not parse.
+     *
+     * @return list<array{key: string, days: int, until: string}>|null
+     */
+    private function schedule(bool $hasPeers): ?array
+    {
+        $publishes = filled($this->publishes_on) ? rescue(fn () => CarbonImmutable::parse($this->publishes_on)->startOfDay(), null, false) : null;
+
+        if ($publishes === null) {
+            return null;
+        }
+
+        $from = CarbonImmutable::parse($this->main?->invited_at ?? today())->startOfDay();
+        $reading = $publishes->subDays((int) config('diagnosis.reading_offset_days'));
+        $starts = filled($this->starts_on) ? rescue(fn () => CarbonImmutable::parse($this->starts_on)->startOfDay(), null, false) : null;
+        $days = fn (CarbonImmutable $start, CarbonImmutable $end) => max(0, (int) $start->diffInDays($end, false));
+        $segments = [];
+
+        if ($starts !== null && $starts->gt($from) && $starts->lt($reading)) {
+            $segments[] = ['key' => 'leader', 'days' => $days($from, $starts), 'until' => $starts->format('Y.m.d')];
+            $segments[] = ['key' => $hasPeers ? 'peers' : 'materials', 'days' => $days($starts, $reading), 'until' => $reading->format('Y.m.d')];
+        } else {
+            $segments[] = ['key' => 'filling', 'days' => $days($from, $reading), 'until' => $reading->format('Y.m.d')];
+        }
+
+        $segments[] = ['key' => 'reading', 'days' => $days($reading, $publishes), 'until' => $publishes->format('Y.m.d')];
+
+        return $segments;
     }
 
     /**
