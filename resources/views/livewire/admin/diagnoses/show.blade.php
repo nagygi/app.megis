@@ -73,12 +73,8 @@
         </div>
 
         @if ($main)
-            {{-- The main diagnosis: stage, leader, time window (17) --}}
-            <x-ui.card as="section" bordered padding="lg" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="{{ __('admin.main_diagnoses.summary') }}">
-                <div>
-                    <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.stage') }}</p>
-                    <p class="font-semibold">{{ $main->stage->label() }}</p>
-                </div>
+            {{-- The main diagnosis: product, leader, time window (17); the stage and what comes next are in the band. --}}
+            <x-ui.card as="section" bordered padding="lg" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="{{ __('admin.main_diagnoses.summary') }}">
                 <div>
                     <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.product') }}</p>
                     <p class="font-semibold">{{ $main->product_name }} · {{ $main->subject->label() }}</p>
@@ -95,21 +91,6 @@
                     {{-- A date range, written like the run's time window (admin.run.window_label). --}}
                     <p class="font-semibold">{{ $main->starts_on?->format('Y.m.d.') ?? __('diagnosis.date_open') }} – {{ $main->publishes_on->format('Y.m.d.') }}</p>
                     <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.reading_short', ['date' => $main->readingStartsOn()->format('Y.m.d.')]) }}</p>
-                </div>
-                {{-- What moves the stage on, and that the status follows it (17 · 17.5). --}}
-                <div class="flex flex-col gap-1 border-t border-grey-200 pt-4 text-sm text-grey-700 sm:col-span-2 lg:col-span-4">
-                    <p>{{ __('admin.main_diagnoses.stage_next.'.$main->stage->value, [
-                        'name' => $main->leader->name,
-                        'date' => match ($main->stage) {
-                            \App\Enums\MainDiagnosisStage::Invited => $main->invited_at?->format('Y.m.d.') ?? '',
-                            \App\Enums\MainDiagnosisStage::Running => $main->readingStartsOn()->format('Y.m.d.'),
-                            \App\Enums\MainDiagnosisStage::Published => $main->published_at?->format('Y.m.d.') ?? '',
-                            default => '',
-                        },
-                    ]) }}</p>
-                    @unless ($main->stage === \App\Enums\MainDiagnosisStage::Closed)
-                        <p>{{ __('admin.main_diagnoses.status_follows_stage') }}</p>
-                    @endunless
                 </div>
             </x-ui.card>
         @elseif ($diagnosis->parent)
@@ -440,6 +421,10 @@
         {{-- Status log (04 · 4.3) --}}
         <section class="flex flex-col gap-2" aria-labelledby="history-title">
             <h2 id="history-title" class="text-lg font-semibold">{{ __('admin.diagnoses.history') }}</h2>
+            @if ($main && $main->stage !== \App\Enums\MainDiagnosisStage::Closed)
+                {{-- A main diagnosis moves in stages; its status follows them (17 · 17.5). --}}
+                <p class="text-sm text-grey-700">{{ __('admin.main_diagnoses.status_follows_stage') }}</p>
+            @endif
             <ul class="flex flex-col gap-1 text-sm text-grey-700">
                 @foreach ($diagnosis->transitions->sortByDesc('id') as $transition)
                     <li>

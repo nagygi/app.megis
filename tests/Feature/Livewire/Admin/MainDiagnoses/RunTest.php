@@ -20,7 +20,7 @@ it('shows the run of the diagnosis in numbers to the contact (19 · 19.3)', func
     actingAsAdmin($setup['admin']);
 
     Livewire::test(Run::class, ['diagnosis' => $main->diagnosis])
-        ->assertSee('Időablak')
+        ->assertSee('Ütemezés')
         ->assertSee('A vezető')
         // The leader and the peers open their datasheets (33 · 33.1).
         ->assertSeeHtml('href="'.route('admin.clients.show', $setup['leader']).'"')

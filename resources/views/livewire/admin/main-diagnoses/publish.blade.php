@@ -36,7 +36,7 @@
 
             @if ($isReading)
                 {{-- Publishing is the page's main action: dark and large. --}}
-                <div class="pt-2">
+                <div class="flex flex-wrap items-center gap-3 pt-2">
                     @if ($canPublish)
                         <x-ui.button
                             size="lg"
@@ -45,7 +45,8 @@
                             :data-confirm-label="__('admin.publish.publish')"
                         >{{ __('admin.publish.publish') }}</x-ui.button>
                     @else
-                        <x-ui.button size="lg" disabled aria-disabled="true">{{ __('admin.publish.publish') }}</x-ui.button>
+                        <x-ui.button size="lg" disabled aria-disabled="true" aria-describedby="publish-disabled-help">{{ __('admin.publish.publish') }}</x-ui.button>
+                        <span id="publish-disabled-help" class="text-sm text-grey-700">{{ __('admin.publish.disabled_help') }}</span>
                     @endif
                 </div>
             @elseif (! $isPublished)

@@ -65,21 +65,63 @@
             <x-ui.notice>{{ __('admin.run.threshold.snoozed', ['date' => $main->threshold_snoozed_until->format('Y.m.d.')]) }}</x-ui.notice>
         @endif
 
-        {{-- Időablak (19 · 19.3) --}}
+        {{-- Starting the reading is the page's main action (dark lg, like Publikálom on the next tab): on top, with what is ready for it. --}}
+        @if ($main->stage === \App\Enums\MainDiagnosisStage::Running)
+            @php
+                $readingOn = $main->readingStartsOn();
+                $peersReady = $thresholdMet || $main->threshold_overridden_at !== null;
+                $readiness = array_values(array_filter([
+                    ['state' => 'done', 'text' => __('admin.run.ready.leader', ['date' => $main->running_at?->format('Y.m.d.') ?? '–'])],
+                    $main->hasPeers() ? [
+                        'state' => $peersReady ? 'done' : 'now',
+                        'text' => __($main->threshold_overridden_at && ! $thresholdMet ? 'admin.run.ready.peers_overridden' : 'admin.run.ready.peers', ['answered' => $peerCounts['answered'], 'total' => $peerStates->count(), 'threshold' => \App\Services\Diagnoses\ThresholdPolicy::PEERS]),
+                    ] : null,
+                    $processingCount > 0
+                        ? ['state' => 'now', 'text' => __('admin.run.ready.processing', ['count' => $processingCount])]
+                        : ['state' => 'done', 'text' => __('admin.run.ready.processed')],
+                    $readingOn->lte(today())
+                        ? ['state' => 'done', 'text' => __('admin.run.ready.date_reached', ['date' => $readingOn->format('Y.m.d.')])]
+                        : ['state' => 'later', 'text' => __('admin.run.ready.date', ['date' => $readingOn->format('Y.m.d.'), 'days' => (int) today()->diffInDays($readingOn)])],
+                ]));
+            @endphp
+            <x-ui.card as="section" id="start-reading" class="flex scroll-mt-4 flex-col gap-4" aria-labelledby="start-reading-title">
+                <x-ui.section-header id="start-reading-title" :title="__('admin.run.start_reading_title')" :description="__('admin.run.start_reading_intro')" />
+                <ul class="flex flex-col gap-2">
+                    @foreach ($readiness as $item)
+                        <li class="flex items-center gap-3 text-sm">
+                            <x-diagnosis.state-mark :state="$item['state']" />
+                            <span>{{ $item['text'] }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+                <div>
+                    @if ($processingCount > 0)
+                        <x-ui.button size="lg" wire:click="startReading" wire:confirm="{{ __('admin.run.confirm_reading', ['count' => $processingCount]) }}">{{ __('admin.run.start_reading') }}</x-ui.button>
+                    @elseif ($thresholdOverridable)
+                        <x-ui.button size="lg" wire:click="startReading" wire:confirm="{{ __('admin.run.confirm_reading_below_threshold', ['count' => $missingPeers]) }}">{{ __('admin.run.start_reading') }}</x-ui.button>
+                    @else
+                        <x-ui.button size="lg" wire:click="startReading" wire:confirm="{{ __('admin.run.confirm_reading_plain') }}">{{ __('admin.run.start_reading') }}</x-ui.button>
+                    @endif
+                </div>
+            </x-ui.card>
+        @endif
+
+        {{-- Ütemezés (19 · 19.3) --}}
         <x-ui.card as="section" bordered class="flex flex-col gap-3" aria-labelledby="window-title">
             <h2 id="window-title" class="text-lg font-semibold">{{ __('admin.run.window') }}</h2>
             <div class="relative h-3 rounded-pill bg-grey-200" role="img" aria-label="{{ __('admin.run.window_label', ['from' => $start->format('Y.m.d.'), 'to' => $main->publishes_on->format('Y.m.d.'), 'today' => today()->format('Y.m.d.')]) }}">
                 <div class="absolute inset-y-0 left-0 rounded-pill bg-green-muted" style="width: {{ $position(today()) }}%"></div>
                 <div class="absolute inset-y-[-4px] w-0.5 bg-coral-dark" style="left: {{ $position($main->readingStartsOn()) }}%" title="{{ __('admin.main_diagnoses.reading_short', ['date' => $main->readingStartsOn()->format('Y.m.d.')]) }}"></div>
             </div>
-            <p class="flex flex-wrap justify-between gap-2 text-sm text-grey-700">
-                <span>{{ $start->format('Y.m.d.') }}</span>
-                <span>{{ __('admin.main_diagnoses.reading_short', ['date' => $main->readingStartsOn()->format('Y.m.d.')]) }}</span>
-                <span>{{ $main->publishes_on->format('Y.m.d.') }}</span>
-            </p>
+            <div class="grid grid-cols-3 gap-2 text-sm">
+                <p class="flex flex-col"><span class="text-grey-700">{{ $main->starts_on ? __('admin.main_diagnoses.starts_on') : __('admin.run.window_invited') }}</span><span class="font-medium">{{ $start->format('Y.m.d.') }}</span></p>
+                <p class="flex flex-col text-center"><span class="text-grey-700">{{ __('admin.run.window_reading') }}</span><span class="font-medium">{{ $main->readingStartsOn()->format('Y.m.d.') }}</span></p>
+                <p class="flex flex-col text-right"><span class="text-grey-700">{{ __('admin.run.window_publish') }}</span><span class="font-medium">{{ $main->publishes_on->format('Y.m.d.') }}</span></p>
+            </div>
+            <p class="text-sm text-grey-700">{{ __('admin.run.window_today', ['date' => today()->format('Y.m.d.')]) }}</p>
             @if ($isOpen)
                 <x-form.inline as="form" wire:submit="changePublishDate" class="max-w-xl">
-                    <x-form.input name="publishesOn" type="date" wire:model="publishesOn" :label="__('admin.main_diagnoses.publishes_on')" :help="__('admin.run.window_help')" />
+                    <x-form.input name="publishesOn" type="date" wire:model="publishesOn" :label="__('admin.main_diagnoses.publishes_on')" :help="__('admin.run.window_help')" :info="__('admin.main_diagnoses.publishes_on_info')" />
                     <x-slot:actions>
                         <x-ui.button type="submit" size="sm">{{ __('admin.common.save') }}</x-ui.button>
                     </x-slot:actions>
@@ -89,14 +131,14 @@
 
         <div class="grid gap-6 lg:grid-cols-2">
             {{-- A vezető --}}
-            <x-ui.card as="section" bordered class="flex flex-col gap-3" aria-labelledby="leader-title">
+            <x-ui.card as="section" bordered id="leader" class="flex scroll-mt-4 flex-col gap-3" aria-labelledby="leader-title">
                 <h2 id="leader-title" class="text-lg font-semibold">{{ __('admin.run.leader') }} · <x-admin.user-link :user="$main->leader" /></h2>
                 @php($current = $leaderSteps->firstMissing())
-                <ol class="flex flex-col gap-1 text-sm">
+                <ol class="flex flex-col gap-1.5 text-sm">
                     @foreach ($leaderSteps->steps as $state)
-                        <li class="flex justify-between gap-3">
-                            <span>{{ $state->step->label() }}</span>
-                            <span @class(['font-semibold' => $current?->step === $state->step])>{{ $state->done ? __('admin.run.steps.done') : ($current?->step === $state->step ? __('admin.run.steps.now') : __('admin.run.steps.left')) }}</span>
+                        <li class="flex items-center gap-3">
+                            <x-diagnosis.state-mark :state="$state->done ? 'done' : ($current?->step === $state->step ? 'now' : 'later')" />
+                            <span @class(['font-semibold' => $current?->step === $state->step])>{{ $state->step->label() }}</span>
                         </li>
                     @endforeach
                 </ol>
@@ -249,18 +291,6 @@
             </form>
         </x-ui.card>
 
-        {{-- Starting the reading is the page's main action (dark lg, like Publikálom on the next tab). --}}
-        @if ($main->stage === \App\Enums\MainDiagnosisStage::Running)
-            <div class="flex flex-wrap items-center gap-3">
-                @if ($processingCount > 0)
-                    <x-ui.button size="lg" wire:click="startReading" wire:confirm="{{ __('admin.run.confirm_reading', ['count' => $processingCount]) }}">{{ __('admin.run.start_reading') }}</x-ui.button>
-                @elseif ($thresholdOverridable)
-                    <x-ui.button size="lg" wire:click="startReading" wire:confirm="{{ __('admin.run.confirm_reading_below_threshold', ['count' => $missingPeers]) }}">{{ __('admin.run.start_reading') }}</x-ui.button>
-                @else
-                    <x-ui.button size="lg" wire:click="startReading" wire:confirm="{{ __('admin.run.confirm_reading_plain') }}">{{ __('admin.run.start_reading') }}</x-ui.button>
-                @endif
-                <span class="text-sm text-grey-700">{{ __('admin.run.start_reading_help') }}</span>
-            </div>
-        @endif
+
     </div>
 </div>
