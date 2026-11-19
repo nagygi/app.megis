@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.107 · HASH · 2026-11-19
+## 1.107 · d2d2b7b · 2026-11-19
 
 Fő diagnózis az adminban: minden fülön látszik, hol tart, ki jön, mire kell kattintani, és mi akad el.
 
