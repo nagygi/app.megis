@@ -380,7 +380,7 @@ it('needs the "Mit nézünk" sentence of every process row, within 160 character
     $component->call('saveText', DiagnosisText::processKey(rowOf($main, DiagnosisRowKind::Value)->id))->assertNotFound();
 });
 
-it('opens the Publikálás tab only when everything is approved (20 · 20.5)', function () {
+it('is ready to publish only when everything is approved (20 · 20.5)', function () {
     [$setup, $main] = diagnosisInReading();
     $reading = app(ReadingService::class);
     $admin = $setup['admin'];

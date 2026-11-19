@@ -1,6 +1,9 @@
 <?php
 
+use App\Enums\MainDiagnosisStage;
 use App\Models\MainDiagnosis;
+use App\Services\MainDiagnoses\StageMachine;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Testing\TestResponse;
 
 /**
@@ -30,3 +33,24 @@ it('lights the tab of the page in the band of a main diagnosis, and only that on
     'Részdiagnózisok' => 'admin.main-diagnoses.subdiagnoses',
     'Képességek' => 'admin.diagnoses.capabilities',
 ]);
+
+it('keeps the coming tabs in their place, locked, and opens Publikálás with the reading (19 · 19.1, 20 · 20.5)', function () {
+    Queue::fake();
+    [$setup, $main] = runningDiagnosis();
+    actingAsAdmin($setup['admin']);
+    $readingUrl = route('admin.main-diagnoses.reading', $main->diagnosis);
+    $publishUrl = route('admin.main-diagnoses.publish', $main->diagnosis);
+
+    $this->get(route('admin.diagnoses.show', $main->diagnosis))
+        ->assertSee('Az olvasat indításával nyílik meg: a Futás fülön indítod.')
+        ->assertSee('Az olvasat szakaszban nyílik meg.')
+        ->assertDontSee('href="'.$readingUrl.'"', false)
+        ->assertDontSee('href="'.$publishUrl.'"', false);
+
+    app(StageMachine::class)->transition($main, MainDiagnosisStage::Reading, $setup['admin']);
+
+    // Not everything is approved yet: Publikálás opens anyway and tells what is missing.
+    $this->get(route('admin.diagnoses.show', $main->diagnosis))
+        ->assertSee('href="'.$publishUrl.'"', false)
+        ->assertDontSee('Az olvasat szakaszban nyílik meg.');
+});
