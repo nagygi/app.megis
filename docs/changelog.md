@@ -2,6 +2,54 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.107 · HASH · 2026-11-19
+
+Fő diagnózis az adminban: minden fülön látszik, hol tart, ki jön, mire kell kattintani, és mi akad el.
+
+- **Eddig:**
+  - A szakaszt csak egy badge mutatta.
+  - Hogy mi jön, és hol kell kattintani, egy mondat írta az Áttekintés fülön.
+  - A Publikálás fül csak akkor jelent meg, ha minden jóvá volt hagyva. Az Olvasat fül csak az olvasat indításakor jelent meg.
+  - A dátumoknál nem derült ki, mire jók, hol látszanak, és hogy magától semmi nem indul.
+  - A Beállítás egyetlen hosszú űrlap volt, a Mentem a legalján.
+- **Most:**
+  - **Lépéssor a fejlécben, minden fülön:** Vázlat → Meghívva → Kitöltés → Fut → Olvasat → Publikálva.
+    - Minden szakasznál ott a dátum: kész, „óta”, terv vagy határidő.
+    - A még hátralévő szakaszoknál látszik, ki lép: az admin vagy a vezető.
+    - Az info buborék megmondja, mi történik a szakaszban, és mi viszi tovább.
+    - A lezárt diagnózis lépéssora ott ér véget, ahol lezárták.
+  - **„Most mi jön?” kártya a lépéssor alatt:**
+    - kinek a lépése („Te jössz”, „A vezetőre várunk”, „A társakra várunk”), egy mondat arról, mi történik, és haladás (például „2 / 6 lépés kész”, „0 / 2 társ”, „14 / 19 jóváhagyva”);
+    - az elakadások linkkel:
+      - a meghívó blokkolói;
+      - 5 napja meg nem nyitott vagy lejárt meghívó;
+      - lejárt vezetői határidő;
+      - veszélyben lévő küszöb;
+      - feldolgozás alatti, sikertelen vagy besorolatlan anyag;
+      - elmúlt publikálási nap;
+      - a publikálás hiányzó tételei;
+    - gomb a fülre és a helyre, ahol a teendő van: Elküldöm a meghívót, Emlékeztetőt küldök, Olvasat indítása, Jóváhagyás folytatása, Publikálás.
+    - Aki a Futás fület nem látja, annak a kártya megírja, hogy a kapcsolattartó intézi.
+  - **Fülek a folyamat sorrendjében:** Áttekintés · Beállítás · Futás · Olvasat · Publikálás, elválasztva tőlük a Részdiagnózisok, az Ügyfélmérés és a Képességek.
+    - A még nem nyitható fül zárolva a helyén marad, és buborékban megmondja, mikor nyílik.
+    - A Publikálás az olvasat szakasztól mindig nyitva van, a hiányzó tételek listájával.
+  - **Beállítás:**
+    - Külön kártyák egy-egy kérdéssel: Ügyfél és kapcsolattartó · Kit diagnosztizálunk? · Kik adnak visszajelzést? · Ütemezés: mikorra mi készüljön el? · Mit lát a vezető a riportban?
+    - Új dátumnevek info buborékkal: „A vezető határideje”, „Tervezett publikálás”, „Olvasat (tervezett)” (számolt).
+    - Alattuk az idő megoszlása a publikálásig: vezető, társak, olvasat.
+    - A Mentem és az Elküldöm a meghívót sávja tablettől felfelé a képernyő alján marad.
+    - A lezárás külön kártya.
+    - Az olvasat után felül jelzi, hogy a beállítás csak olvasható.
+  - **Futás:**
+    - Az „Olvasat indítása” a lap tetejére került, egy listával arról, mi kész és mi hiányzik (vezető, társak és küszöb, anyagok, tervezett nap).
+    - „Időablak” helyett „Ütemezés” feliratozott sávval.
+    - A vezető lépései jelölőkkel.
+  - **Áttekintés:** a szakasz és a „mi viszi tovább” mondat helyett a fejléc mutatja ezt.
+  - **Publikálás:** a tiltott gomb mellett, hogy mikor lesz aktív.
+  - **Javítás:** meghívás után a Beállítás mentése „Elmentettük.” üzenetet ír, nem azt, hogy a vezető még nem kapott meghívót.
+- **Migráció:** nincs.
+- **Rollback:** 1.106.
+
 ## 1.106 · 5b7dd96 · 2026-11-10
 
 Ügyfélmérés (35 · 35.3): a „Bármilyen értéket mérünk” és a kijelölt értékek kizárják egymást.
