@@ -13,6 +13,7 @@ return [
     'new_tab' => 'új lapon nyílik',
     'cancel' => 'Mégse',
     'confirm' => 'Igen',
+    'info' => 'Mit jelent?',
 
     // A longer text written, told or uploaded (x-form.long-text); the Értéktükör and Egy helyzet pills too.
     'long_text' => [

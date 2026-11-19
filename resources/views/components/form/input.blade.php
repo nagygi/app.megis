@@ -6,6 +6,7 @@
     'name',
     'label',
     'help' => null,
+    'info' => null,
     'type' => 'text',
     'required' => false,
     'id' => null,
@@ -18,7 +19,7 @@
 @endphp
 
 <div class="flex flex-col gap-1.5">
-    <x-form.label :for="$id" :required="$required">{{ $label }}</x-form.label>
+    <x-form.label :for="$id" :required="$required" :info="$info">{{ $label }}</x-form.label>
 
     <input
         id="{{ $id }}"

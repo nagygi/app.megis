@@ -122,6 +122,16 @@
     mask-image: url('../../images/megis/icons/drag.svg');
 }
 
+.megis-icon-info {
+    -webkit-mask-image: url('../../images/megis/icons/info.svg');
+    mask-image: url('../../images/megis/icons/info.svg');
+}
+
+.megis-icon-lock {
+    -webkit-mask-image: url('../../images/megis/icons/lock.svg');
+    mask-image: url('../../images/megis/icons/lock.svg');
+}
+
 .megis-icon-mic {
     -webkit-mask-image: url('../../images/megis/icons/mic.svg');
     mask-image: url('../../images/megis/icons/mic.svg');
