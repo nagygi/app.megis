@@ -45,7 +45,8 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
 
 ### 25.4 A megélésed (T4)
 
-- Ugyanaz a csúszka, mint a vezetőnél (08 · 8.3): a szervezet értékei és a márkád alapjának négy eleme.
+- Ugyanaz a csúszka, mint a vezetőnél (08 · 8.3): a szervezet értékei és a márkád alapjának négy eleme, ugyanazzal a beköszönéssel, kérdéssel és elemenkénti segítő kérdéssel.
+- **Ki látja** (MEGIS-2): a kérdés alatt, csak a társnak: „A vezetőd nem látja az egyéni válaszaidat, csak az összesített képet, legalább 3 kitöltőnél.” Ugyanaz az ígéret, mint a hozzájárulásban (25.2); „anonim”-ot nem írunk, mert a mégis névvel látja.
 - Soronként 1–6 vagy „nem tudom”. Minden sorra kell válasz, a fejléc számol: „9 / 9 megválaszolva”.
 - Az értékek sorában mindig látszik a definíció a szervezet szavaival (08), a diagnózisban rögzített verzióból: „Mit jelent: Nyíltság? · 1 és 6”, alatta az 1 és a 6 jelentése. Nem csukható be: nélküle a kérdés nem értelmezhető. A vezető V5-je ugyanígy.
 - Beküldéskor Megélés típusú felhasználói részdiagnózis jön létre (04, 17.4).

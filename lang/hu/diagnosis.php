@@ -309,6 +309,15 @@ return [
 
     'experience' => [
         'question' => 'Hogyan látjátok ma a márkát?',
+        // What is asked and who sees it, above the rows (MEGIS-2, MEGIS-3).
+        'values_lead' => 'Arra vagyunk kíváncsiak, hogyan látod a(z) :organization alábbi értékeinek megvalósulását a mindennapi működésetekben. Értékeld őket 1-től 6-ig: az 1 a nagyon nem, a 6 a nagyon igen. Ha valamit nem tudsz megítélni, válaszd a „Nem tudom” lehetőséget.',
+        'values_lead_individual' => 'Arra vagyunk kíváncsiak, hogyan látod az alábbi értékeid megvalósulását a mindennapi működésedben. Értékeld őket 1-től 6-ig: az 1 a nagyon nem, a 6 a nagyon igen. Ha valamit nem tudsz megítélni, válaszd a „Nem tudom” lehetőséget.',
+        // The same promise as the consent (consent.answers): never "anonim", the mégis sees the names.
+        'peer_visibility' => 'A vezetőd nem látja az egyéni válaszaidat, csak az összesített képet, legalább :count kitöltőnél.',
+        'brand_lead' => 'Most arra vagyunk kíváncsiak, hogyan látod a szervezeted alappilléreinek megvalósulását a mindennapokban.',
+        'brand_lead_individual' => 'Most arra vagyunk kíváncsiak, hogyan látod a márkád alappilléreinek megvalósulását a mindennapokban.',
+        'given_by' => 'Ezeket a meghatározásokat :name adta meg.',
+        'given_by_leader' => 'Ezeket a meghatározásokat a szervezetetek vezetője adta meg.',
         'count' => ':answered / :total megválaszolva',
         'values' => 'A szervezet értékei',
         'brand' => 'A márkád alapja',

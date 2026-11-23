@@ -55,10 +55,12 @@ Négy doboz, ugyanazzal a mintával: jel és cím, alatta szürkén a kérdés, 
 
 ### 8.3 Nézzük egyben – megélés (V5)
 
+- **A lap tetején** (MEGIS-2): „Szia, {keresztnév}!”, alatta a kérdés: „Arra vagyunk kíváncsiak, hogyan látod a(z) {szervezet} alábbi értékeinek megvalósulását a mindennapi működésetekben.” Az 1–6 skála és a „Nem tudom” jelentése egy mondatban. Magánszemélynél egyes számban („az alábbi értékeid”).
 - **Egy lapon:**
   - a szervezet értékei, a saját mondatukkal;
-  - a márkád alapjának négy eleme;
+  - a márkád alapjának négy eleme, saját bevezetővel („Most arra vagyunk kíváncsiak, hogyan látod a szervezeted alappilléreinek megvalósulását a mindennapokban.”). Elemenként a V4 kérdése (Mik a szervezet értékei? · Miért csináljátok? · Mit kap tőletek, aki veletek dolgozik? · Mi marad utánatok?), alatta a szervezet válasza (MEGIS-3);
   - soronként egy csúszka: 1–6 vagy „nem tudom”.
+- **Ki adta meg** (MEGIS-3): a márkád alapja alatt „Ezeket a meghatározásokat {név} adta meg.” A név a diagnózisban rögzített verzió készítője, ha az a szervezet tagja és nem maga a kitöltő. A társ név nélkül is megkapja: „…a szervezetetek vezetője adta meg.”
 - **Minden sorra válasz kell,** a fejléc számol: „9 / 9 megválaszolva”.
 - **Beküldéskor felhasználói diagnózis jön létre** (04):
   - Diagnózis típusa: **Megélés**.

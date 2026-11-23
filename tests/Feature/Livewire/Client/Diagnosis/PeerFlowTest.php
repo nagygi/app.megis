@@ -143,6 +143,34 @@ it('lets a peer fill in the own values and the experience, answering the recorde
         ->assertSee('1. hét a 7-ből · publikálás: '.$main->publishes_on->format('m.d.'));
 });
 
+it('tells the peer what is asked, who sees the answers and who gave the brand base (MEGIS-2, MEGIS-3)', function () {
+    [$setup, $main] = runningDiagnosis();
+    $peer = $setup['peers'][0];
+    $main->participantFor($peer, ParticipantRole::Peer)->update(['started_at' => now()]);
+    Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => ConsentKind::Answers, 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
+    actingAsCustomer($peer);
+    // A version without a known author: the peer is still told it came from the leader.
+    $main->valueSetVersion->forceFill(['created_by' => null])->save();
+
+    Livewire::test(Experience::class, peerParams($setup, $main))
+        ->assertSee('Szia, '.$peer->first_name.'!')
+        ->assertSee('hogyan látod a(z) '.$setup['organization']->name.' alábbi értékeinek megvalósulását')
+        ->assertSee('A vezetőd nem látja az egyéni válaszaidat, csak az összesített képet, legalább 3 kitöltőnél.')
+        ->assertSeeInOrder([
+            'Értékek (gyökér)', 'Mik a szervezet értékei?',
+            'Purpose (törzs)', 'Miért csináljátok?',
+            'Értékajánlat (korona)', 'Mit kap tőletek, aki veletek dolgozik?',
+            'Impact (árnyék)', 'Mi marad utánatok?',
+        ])
+        ->assertSee('Ezeket a meghatározásokat a szervezetetek vezetője adta meg.');
+
+    // Named when the recorded version has an author from the organization.
+    $main->valueSetVersion->forceFill(['created_by' => $setup['leader']->id])->save();
+
+    Livewire::test(Experience::class, peerParams($setup, $main->fresh()))
+        ->assertSee('Ezeket a meghatározásokat '.$setup['leader']->name.' adta meg.');
+});
+
 it('keeps the leader-only steps from peers and peers out before "Kezdem"', function () {
     [$setup, $main] = runningDiagnosis();
     actingAsCustomer($setup['peers'][0]);

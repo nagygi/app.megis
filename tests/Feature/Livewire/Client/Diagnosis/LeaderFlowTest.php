@@ -454,6 +454,11 @@ it('sends the experience as a Megélés subdiagnosis with the value set version'
     $component = Livewire::test(Experience::class, leaderParams($setup, $main))
         ->assertSee('0 / 7 megválaszolva')
         ->assertSee(['Alig 1', 'Nagyon 1'])
+        // What is asked, for the leader too; who sees the answers only concerns the peers (MEGIS-2).
+        ->assertSee('Szia, '.$setup['leader']->first_name.'!')
+        ->assertSee('hogyan látod a(z) '.$setup['organization']->name.' alábbi értékeinek megvalósulását')
+        ->assertSee(['Miért csináljátok?', 'Mi marad utánatok?'])
+        ->assertDontSee('A vezetőd nem látja')
         ->assertDontSeeHtml('aria-expanded');
 
     $keys = collect($setup['organization']->valueSet->items)->map(fn ($item) => 'value:'.$item->key)

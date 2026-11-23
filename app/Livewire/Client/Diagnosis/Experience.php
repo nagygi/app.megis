@@ -3,11 +3,14 @@
 namespace App\Livewire\Client\Diagnosis;
 
 use App\Enums\DiagnosisStep;
+use App\Enums\MainDiagnosisSubject;
+use App\Enums\TreeElement;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
 use App\Livewire\Concerns\NotesImpersonatedChanges;
 use App\Models\Diagnosis;
 use App\Models\Organization;
 use App\Models\Version;
+use App\Services\Diagnoses\ThresholdPolicy;
 use App\Services\MainDiagnoses\ExperienceService;
 use App\Services\Organizations\OrganizationValueSetService;
 use Illuminate\Validation\ValidationException;
@@ -84,14 +87,48 @@ class Experience extends Component
     public function render(): View
     {
         $rows = $this->rows();
+        $individual = $this->main()->subject === MainDiagnosisSubject::Individual;
+        // The brand base's questions as V4 asks them, in the singular for a private person (MEGIS-3).
+        $brandTexts = $individual ? 'diagnosis.brand_individual' : 'diagnosis.brand';
+        $treeRows = array_map(
+            fn (array $row) => [...$row, 'question' => __($brandTexts.'.questions.'.(TreeElement::from($row['element'])->valueSetField() ?? 'root'))],
+            array_values(array_filter($rows, fn (array $row) => $row['kind'] === 'tree_element')),
+        );
 
         return view('livewire.client.diagnosis.experience', [
             'valueRows' => array_values(array_filter($rows, fn (array $row) => $row['kind'] === 'value')),
-            'treeRows' => array_values(array_filter($rows, fn (array $row) => $row['kind'] === 'tree_element')),
+            'treeRows' => $treeRows,
             'answeredCount' => count(array_intersect_key($this->answers, array_flip(array_column($rows, 'key')))),
             'total' => count($rows),
             'editable' => $this->acceptsInput(),
+            'firstName' => $this->user()->first_name ?? $this->user()->name,
+            'individual' => $individual,
+            'givenBy' => $this->givenBy(),
+            'peerThreshold' => ThresholdPolicy::PEERS,
         ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Experience, __('diagnosis.experience.question')))->title(DiagnosisStep::Experience->label());
+    }
+
+    /**
+     * Who gave the values and the brand base the page asks about (MEGIS-3):
+     * the author of the recorded version, named when it is someone else from
+     * the organization. A peer is told at least that the leader gave them;
+     * nothing is said when the user gave them or a mégis admin did.
+     */
+    private function givenBy(): ?string
+    {
+        $version = $this->main()->valueSetVersion;
+        $set = $version === null ? app(OrganizationValueSetService::class)->forOrganization($this->organization) : null;
+        $author = $version !== null ? $version->creator : ($set->latestVersion?->creator ?? $set->updater);
+
+        if ($author?->is($this->user())) {
+            return null;
+        }
+
+        if ($author !== null && ! $author->isAdmin()) {
+            return __('diagnosis.experience.given_by', ['name' => $author->name]);
+        }
+
+        return $this->isLeader() ? null : __('diagnosis.experience.given_by_leader');
     }
 
     /**

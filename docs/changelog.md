@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.108 · – · 2026-11-23
+
+A megélésed (V5, T4; MEGIS-2, MEGIS-3): a lap megmondja, mit kérdezünk, ki látja a választ, és honnan jönnek a meghatározások.
+
+- **Eddig:**
+  - A lapon a fejléc kérdése („Hogyan látjátok ma a márkát?”) után rögtön a sorok jöttek. A meghívott társ nem tudta, mit értékel és ki látja.
+  - A márkád alapja sorain csak az elem neve és a szervezet válasza állt, a V4 kérdése nem.
+- **Most:**
+  - **Felül:** „Szia, {keresztnév}!”, és a kérdés: hogyan látod a(z) {szervezet} alábbi értékeinek megvalósulását a mindennapi működésetekben, 1-től 6-ig, vagy „Nem tudom”. Magánszemélynél egyes számban.
+  - **Csak a társnak:** „A vezetőd nem látja az egyéni válaszaidat, csak az összesített képet, legalább 3 kitöltőnél.” Ugyanaz, mint a hozzájárulásban.
+  - **A márkád alapja:** saját bevezető mondat, és elemenként a V4 kérdése (Mik a szervezet értékei? · Miért csináljátok? · Mit kap tőletek, aki veletek dolgozik? · Mi marad utánatok?), alatta a szervezet válasza.
+  - **Ki adta meg:** „Ezeket a meghatározásokat {név} adta meg.” A név a rögzített verzió készítője, ha a szervezet tagja és nem maga a kitöltő. A társ név nélkül is megkapja („…a szervezetetek vezetője adta meg.”).
+- Jegyszövegek: 08 · 8.3, 25 · 25.4.
+
 ## 1.107 · d2d2b7b · 2026-11-19
 
 Fő diagnózis az adminban: minden fülön látszik, hol tart, ki jön, mire kell kattintani, és mi akad el.
