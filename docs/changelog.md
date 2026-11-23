@@ -38,7 +38,7 @@ Fő diagnózis az adminban: minden fülön látszik, hol tart, ki jön, mire kel
     - Új dátumnevek info buborékkal: „A vezető határideje”, „Tervezett publikálás”, „Olvasat (tervezett)” (számolt).
     - Alattuk az idő megoszlása a publikálásig: vezető, társak, olvasat.
     - A Mentem és az Elküldöm a meghívót sávja tablettől felfelé a képernyő alján marad.
-    - A lezárás külön kártya.
+    - A lezárás külön kártya a gombsáv fölött: a Mentem sáv a legalsó kártya.
     - Az olvasat után felül jelzi, hogy a beállítás csak olvasható.
   - **Futás:**
     - Az „Olvasat indítása” a lap tetejére került, egy listával arról, mi kész és mi hiányzik (vezető, társak és küszöb, anyagok, tervezett nap).
