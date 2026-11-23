@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.110 · – · 2026-11-23
+## 1.110 · b778dd8 · 2026-11-23
 
 Várakozás (MEGIS-5): a „…” három pontja egymás után felvillan, így látszik, hogy a munka megy, és a lap nem fagyott le.
 
