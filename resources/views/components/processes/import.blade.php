@@ -31,7 +31,7 @@
                 :pending="$pending"
                 :tools="$canDictate"
             />
-            <div wire:loading wire:target="parseImport" class="text-sm" role="status">{{ __('processes.import.parsing') }}</div>
+            <div wire:loading wire:target="parseImport" class="text-sm" role="status"><x-ui.working-text :text="__('processes.import.parsing')" /></div>
             <x-ui.button type="submit" tone="outline" class="self-start" data-focus-errors>{{ __('processes.import.parse') }}</x-ui.button>
         </form>
     @else

@@ -2,6 +2,18 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.110 · – · 2026-11-23
+
+Várakozás (MEGIS-5): a „…” három pontja egymás után felvillan, így látszik, hogy a munka megy, és a lap nem fagyott le.
+
+- **Eddig:** az Értéktükör feldolgozása alatt csak az évgyűrű lüktetett, az „Olvassuk, amit mondtál…” felirat állt. A többi várakozó felirat is mozdulatlan volt.
+- **Most:**
+  - Új komponens: `x-ui.working-text`. A szöveg saját „…”-ja helyén három pont, amelyek sorban felvillannak. A képernyőolvasó a szöveget változatlanul kapja.
+  - Mozgás nélkül (a rendszer „csökkentett mozgás” beállítása) a három pont áll.
+  - Mindenhol, ahol várunk: Értéktükör feldolgozása és mégis Coach, folyamatok kiolvasása a beszélgetésből, naptár beolvasása (ügyfél és admin), diktálás feltöltése és átírása, hosszú szöveg beolvasása, táblázat feldolgozása, és az admin és az ügyfél feltöltései.
+- Jegyszöveg: 06.
+- Telepítés: `npm run build`.
+
 ## 1.109 · 537533c · 2026-11-23
 
 Kezdőlapok (T5, V10; MEGIS-4, MEGIS-6): a dátumok megmondják, mik.

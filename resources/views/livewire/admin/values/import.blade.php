@@ -33,7 +33,7 @@
                     :disabled="! $canImport"
                     required
                 />
-                <p wire:loading wire:target="file" class="text-sm text-grey-700">{{ __('admin.values.import.uploading') }}</p>
+                <p wire:loading wire:target="file" class="text-sm text-grey-700"><x-ui.working-text :text="__('admin.values.import.uploading')" /></p>
             </div>
 
             @if ($preview === null)

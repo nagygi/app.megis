@@ -18,7 +18,7 @@
         {{-- The poll sits here, so it also starts after "Újra próbálom" --}}
         <x-ui.card wire:key="processing" wire:poll.3s padding="lg" class="flex flex-col items-center gap-4 text-center" role="status">
             <x-megis.symbol name="growth-rings" class="size-16 animate-pulse text-charcoal" />
-            <p class="text-xl font-semibold">{{ __('mirror.processing') }}</p>
+            <p class="text-xl font-semibold"><x-ui.working-text :text="__('mirror.processing')" /></p>
             <p class="text-grey-700">{{ __('mirror.processing_hint') }}</p>
             @if ($isPublic && $session->awaitsConfirmation())
                 <p class="text-sm text-grey-700">{{ __('mirror.processing_mail', ['email' => $session->email]) }}</p>
@@ -90,7 +90,7 @@
         @elseif ($insightPending)
             <section wire:key="coach-pending" wire:poll.3s class="flex items-center gap-3 rounded-card bg-grey-100 p-5" role="status">
                 <x-megis.symbol name="spiral" class="size-8 shrink-0 animate-pulse text-coral" />
-                <p>{{ __('mirror.coach_pending') }}</p>
+                <p><x-ui.working-text :text="__('mirror.coach_pending')" /></p>
             </section>
         @elseif ($libraryValue && $libraryValue->meanings !== [])
             {{-- The Coach did not answer: the Értéktár's words stand in --}}

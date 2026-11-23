@@ -23,7 +23,7 @@
                     :label="__('admin.capabilities.import.file')"
                     required
                 />
-                <p wire:loading wire:target="file" class="text-sm text-grey-700">{{ __('admin.capabilities.import.uploading') }}</p>
+                <p wire:loading wire:target="file" class="text-sm text-grey-700"><x-ui.working-text :text="__('admin.capabilities.import.uploading')" /></p>
             </div>
 
             @if ($preview === null)

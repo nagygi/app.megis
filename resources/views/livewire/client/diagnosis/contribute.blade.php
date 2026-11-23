@@ -25,7 +25,7 @@
                 <p class="text-sm text-grey-700">{{ __('processes.occasions.upload_kinds') }}</p>
             </div>
             <x-form.file name="file" id="occasion-file" wire:model="file" :label="__('processes.occasions.file')" :help="__('processes.occasions.upload_rules', $rules)" />
-            <div wire:loading wire:target="file" class="text-sm" role="status">{{ __('processes.occasions.uploading') }}</div>
+            <div wire:loading wire:target="file" class="text-sm" role="status"><x-ui.working-text :text="__('processes.occasions.uploading')" /></div>
             <x-ui.button type="submit" size="sm" icon="upload" class="self-start" wire:loading.attr="disabled" wire:target="file">{{ __('processes.occasions.upload_button') }}</x-ui.button>
         </x-ui.card>
 

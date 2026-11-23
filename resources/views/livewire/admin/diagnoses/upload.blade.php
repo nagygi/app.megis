@@ -26,7 +26,7 @@
 
         <div class="flex flex-col gap-1.5">
             <x-form.file name="file" id="upload-file" wire:model="file" :label="__('admin.upload.file')" :help="__('admin.upload.rules', $rules)" required />
-            <div wire:loading wire:target="file" class="text-sm" role="status">{{ __('admin.upload.uploading') }}</div>
+            <div wire:loading wire:target="file" class="text-sm" role="status"><x-ui.working-text :text="__('admin.upload.uploading')" /></div>
         </div>
 
         <p class="text-sm text-grey-700">{{ __('admin.upload.speakers_next') }}</p>

@@ -30,9 +30,9 @@
     </template>
 
     <span x-show="recording" x-text="timeLabel" class="tabular-nums" aria-live="off"></span>
-    <span x-show="uploading" x-cloak role="status">{{ __('diagnosis.dictation.uploading') }}</span>
+    <span x-show="uploading" x-cloak role="status"><x-ui.working-text :text="__('diagnosis.dictation.uploading')" /></span>
     @if ($pending)
-        <span role="status">{{ __('diagnosis.dictation.transcribing') }}</span>
+        <span role="status"><x-ui.working-text :text="__('diagnosis.dictation.transcribing')" /></span>
     @endif
     <span x-show="error" x-text="error" x-cloak class="text-coral-ink" role="alert"></span>
     <span x-show="notice" x-text="notice" x-cloak class="basis-full text-grey-700" role="status"></span>

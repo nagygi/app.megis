@@ -59,13 +59,13 @@
                     @if ($calendarSource === 'file')
                         <form wire:submit="connectCalendarFile" class="flex flex-col gap-3">
                             <x-form.file name="icsFile" id="admin-ics-file" accept=".ics,text/calendar" wire:model="icsFile" :label="__('calendar.ics_file')" :help="__('calendar.ics_file_help', ['size' => $maxMegabytes])" />
-                            <div wire:loading wire:target="connectCalendarFile,icsFile" class="text-sm" role="status">{{ __('calendar.reading') }}</div>
+                            <div wire:loading wire:target="connectCalendarFile,icsFile" class="text-sm" role="status"><x-ui.working-text :text="__('calendar.reading')" /></div>
                             <x-ui.button type="submit" class="self-start" wire:loading.attr="disabled" wire:target="icsFile">{{ __('admin.processes.load_file') }}</x-ui.button>
                         </form>
                     @else
                         <form wire:submit="connectCalendarUrl" class="flex flex-col gap-3">
                             <x-form.input name="icsUrl" type="url" wire:model="icsUrl" :label="__('calendar.ics_url')" :help="__('calendar.ics_url_help')" inputmode="url" />
-                            <div wire:loading wire:target="connectCalendarUrl" class="text-sm" role="status">{{ __('calendar.reading') }}</div>
+                            <div wire:loading wire:target="connectCalendarUrl" class="text-sm" role="status"><x-ui.working-text :text="__('calendar.reading')" /></div>
                             <x-ui.button type="submit" class="self-start">{{ __('admin.processes.load_url') }}</x-ui.button>
                         </form>
                     @endif

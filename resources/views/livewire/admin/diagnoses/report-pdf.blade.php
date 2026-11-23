@@ -31,7 +31,7 @@
     <form wire:submit="save" class="flex flex-col gap-3">
         <div class="flex flex-col gap-1.5">
             <x-form.file name="file" id="report-pdf-file" wire:model="file" accept="application/pdf" :label="__('admin.report_pdf.file')" :help="__('admin.report_pdf.file_help')" required />
-            <div wire:loading wire:target="file" class="text-sm text-grey-700" role="status">{{ __('admin.upload.uploading') }}</div>
+            <div wire:loading wire:target="file" class="text-sm text-grey-700" role="status"><x-ui.working-text :text="__('admin.upload.uploading')" /></div>
         </div>
         <x-ui.button type="submit" size="sm" icon="upload" class="self-start" wire:loading.attr="disabled" wire:target="file,save">
             {{ $diagnosis->hasReportPdf() ? __('admin.report_pdf.replace') : __('admin.report_pdf.upload') }}

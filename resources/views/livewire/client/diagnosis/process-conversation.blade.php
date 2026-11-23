@@ -32,7 +32,7 @@
             <span class="font-normal text-grey-700">· {{ __('processes.conversation.count', ['processes' => $processCount, 'unclear' => $unclearCount]) }}</span>
         </h3>
         @if ($extracting)
-            <p class="text-sm text-grey-700" role="status">{{ __('processes.conversation.extracting') }}</p>
+            <p class="text-sm text-grey-700" role="status"><x-ui.working-text :text="__('processes.conversation.extracting')" /></p>
         @endif
         <ul class="flex flex-wrap gap-2">
             @foreach ($chips as $chip)

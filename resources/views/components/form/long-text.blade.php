@@ -94,7 +94,7 @@
                 <p id="{{ $id }}-file-help" class="text-sm text-grey-600">
                     {{ __('ui.long_text.upload_hint', ['formats' => implode(', ', config('megis.materials.text_extensions')), 'size' => intdiv((int) config('megis.materials.text_max_kilobytes'), 1024)]) }}
                 </p>
-                <p x-show="reading" x-cloak class="text-sm" role="status">{{ __('ui.long_text.reading') }}</p>
+                <p x-show="reading" x-cloak class="text-sm" role="status"><x-ui.working-text :text="__('ui.long_text.reading')" /></p>
                 <p x-show="error" x-text="error" x-cloak class="text-sm text-coral-ink" role="alert"></p>
             </div>
         @endif

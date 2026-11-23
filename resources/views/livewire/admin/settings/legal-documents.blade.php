@@ -35,7 +35,7 @@
                 <form wire:submit="storeVersion" class="mt-6 flex flex-col gap-5 border-t border-grey-200 pt-6 *:max-w-3xl">
                     <div class="flex flex-col gap-1.5">
                         <x-form.file name="file" id="legal-file" wire:model="file" accept="application/pdf" :label="__('admin.legal.file')" :help="__('admin.legal.file_help')" required />
-                        <div wire:loading wire:target="file" class="text-sm text-grey-700" role="status">{{ __('admin.upload.uploading') }}</div>
+                        <div wire:loading wire:target="file" class="text-sm text-grey-700" role="status"><x-ui.working-text :text="__('admin.upload.uploading')" /></div>
                     </div>
 
                     <x-form.input name="effectiveFrom" type="date" wire:model="effectiveFrom" :label="__('admin.legal.effective_from')" :help="__('admin.legal.effective_help')" required />

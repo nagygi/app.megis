@@ -68,14 +68,14 @@
             <x-ui.card as="form" wire:submit="connectUrl" class="flex flex-col gap-3">
                 <h3 class="font-semibold">{{ __('calendar.providers.ics_url') }}</h3>
                 <x-form.input name="icsUrl" type="url" wire:model="icsUrl" :label="__('calendar.ics_url')" :help="__('calendar.ics_url_help')" inputmode="url" />
-                <div wire:loading wire:target="connectUrl" class="text-sm" role="status">{{ __('calendar.reading') }}</div>
+                <div wire:loading wire:target="connectUrl" class="text-sm" role="status"><x-ui.working-text :text="__('calendar.reading')" /></div>
                 <x-ui.button type="submit" size="sm" class="self-start">{{ __('calendar.connect_url') }}</x-ui.button>
             </x-ui.card>
 
             <x-ui.card as="form" wire:submit="connectFile" class="flex flex-col gap-3">
                 <h3 class="font-semibold">{{ __('calendar.providers.ics_file') }}</h3>
                 <x-form.file name="icsFile" id="ics-file" accept=".ics,text/calendar" wire:model="icsFile" :label="__('calendar.ics_file')" :help="__('calendar.ics_file_help', ['size' => $maxMegabytes])" />
-                <div wire:loading wire:target="connectFile,icsFile" class="text-sm" role="status">{{ __('calendar.reading') }}</div>
+                <div wire:loading wire:target="connectFile,icsFile" class="text-sm" role="status"><x-ui.working-text :text="__('calendar.reading')" /></div>
                 <x-ui.button type="submit" size="sm" class="self-start" wire:loading.attr="disabled" wire:target="icsFile">{{ __('calendar.upload') }}</x-ui.button>
             </x-ui.card>
 

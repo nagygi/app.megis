@@ -45,7 +45,7 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
   - A beküldéssel azonnal megy a megerősítő levél. Ha a cím már egy aktív fiókhoz tartozik, nem megy levél: a felhasználó az ET5-ön lép be.
 - Beküldés Turnstile-lal, IP-alapú rate limittel (óránként 5).
 - E-mail címenként naponta 10 ingyenes tükör készülhet (2026.10.27.); éjfélkor nullázódik. A 11.-nél az e-mail mező alatt: „Erre az e-mail címre ma már elkészült a napi 10 ingyenes tükör. Holnap újra belenézhetsz.” Felvételnél ezt is a feltöltés előtt ellenőrizzük. A belépett ügyfél saját menüs tükrét nem korlátozza.
-- A feldolgozás alatt várakozó állapot látszik. Ha a feldolgozás nem sikerül, ez jelenik meg: „Nem tudtuk feldolgozni. Próbáld újra.”
+- A feldolgozás alatt várakozó állapot látszik: lüktető évgyűrű és „Olvassuk, amit mondtál…”, a három pont egymás után felvillan (MEGIS-5; mozgás nélkül álló pontok). Ugyanez a pont-animáció minden várakozó feliraton (feltöltés, átírás, beolvasás, mégis Coach). Ha a feldolgozás nem sikerül, ez jelenik meg: „Nem tudtuk feldolgozni. Próbáld újra.”
 
 **ET3 · az értékeid**
 

@@ -60,7 +60,7 @@
             <p class="text-sm text-grey-700">{{ __('admin.occasions.add_help', ['diagnosis' => $main->diagnosis->name]) }}</p>
             <div class="flex flex-col gap-1.5">
                 <x-form.file name="file" id="admin-occasion-file" wire:model="file" :label="__('processes.occasions.file')" :help="__('admin.upload.rules', $rules)" />
-                <div wire:loading wire:target="file" class="text-sm text-grey-700" role="status">{{ __('admin.upload.uploading') }}</div>
+                <div wire:loading wire:target="file" class="text-sm text-grey-700" role="status"><x-ui.working-text :text="__('admin.upload.uploading')" /></div>
             </div>
             <x-form.input name="date" type="date" wire:model="date" :label="__('processes.occasions.when')" :max="today()->toDateString()" required />
             <x-form.checkbox name="consent" wire:model="consent" :label="__('processes.occasions.consent')" :help="__('processes.occasions.consent_help')" />
