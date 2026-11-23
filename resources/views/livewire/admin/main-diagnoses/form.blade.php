@@ -2,8 +2,8 @@
     A1 · starting a main diagnosis (17 · 17.2) and its Beállítás tab. What the
     leader sees, the admin checks with "Belépek a nevében". One form in
     cards, one question each (who for, whom, who answers, when, what the
-    leader sees), its buttons in a bar that stays at the bottom of the screen;
-    closing is a card of its own under the form.
+    leader sees), closing in a card of its own, and the buttons in the last
+    card, a bar that stays at the bottom of the screen.
 --}}
 @php($subjectEnum = \App\Enums\MainDiagnosisSubject::tryFrom($subject))
 
@@ -288,8 +288,25 @@
                         </fieldset>
                     </x-ui.card>
                 @endif
+            @endif
 
-                {{-- The buttons stay at the bottom of the screen while the form scrolls (from a tablet up: on a phone the bar would take a quarter of it). --}}
+            {{-- Lezárás: a card of its own above the buttons, so the saving bar stays the last one. Its button does not submit the form. --}}
+            @if ($main && $main->stage !== \App\Enums\MainDiagnosisStage::Closed)
+                <x-ui.card as="section" padding="lg" aria-labelledby="section-close" class="flex flex-col items-start gap-4">
+                    <x-ui.section-header id="section-close" :title="__('admin.main_diagnoses.section_close')" :description="__('admin.main_diagnoses.close_help')" />
+                    <x-ui.button
+                        tone="danger"
+                        size="sm"
+                        wire:click="close"
+                        wire:confirm="{{ __('admin.main_diagnoses.close_confirm') }}"
+                        data-confirm-tone="danger"
+                        :data-confirm-label="__('admin.main_diagnoses.close')"
+                    >{{ __('admin.main_diagnoses.close') }}</x-ui.button>
+                </x-ui.card>
+            @endif
+
+            @if ($organization && $hasFlow)
+                {{-- The buttons, the last card: they stay at the bottom of the screen while the form scrolls (from a tablet up: on a phone the bar would take a quarter of it). --}}
                 @if ($isDraft || $canEditSettings)
                     <x-ui.card padding="sm" class="flex flex-col gap-3 md:sticky md:bottom-4 md:z-20">
                         @if ($blockers !== [] && $isDraft)
@@ -326,20 +343,5 @@
                 @endif
             @endif
         </form>
-
-        {{-- Lezárás: a card of its own, away from the saving. --}}
-        @if ($main && $main->stage !== \App\Enums\MainDiagnosisStage::Closed)
-            <x-ui.card as="section" padding="lg" aria-labelledby="section-close" class="flex flex-col items-start gap-4">
-                <x-ui.section-header id="section-close" :title="__('admin.main_diagnoses.section_close')" :description="__('admin.main_diagnoses.close_help')" />
-                <x-ui.button
-                    tone="danger"
-                    size="sm"
-                    wire:click="close"
-                    wire:confirm="{{ __('admin.main_diagnoses.close_confirm') }}"
-                    data-confirm-tone="danger"
-                    :data-confirm-label="__('admin.main_diagnoses.close')"
-                >{{ __('admin.main_diagnoses.close') }}</x-ui.button>
-            </x-ui.card>
-        @endif
     </div>
 </div>
