@@ -79,14 +79,15 @@
                             @keydown.down.prevent="open = true; $nextTick(() => move(1))"
                             class="field w-full pl-10"
                         >
-                        <div
+                        <x-ui.card
+                            padding="none"
                             id="team-member-candidates"
                             x-ref="candidates"
                             x-show="open"
                             x-cloak
-                            @keydown.down.prevent="move(1)"
-                            @keydown.up.prevent="move(-1)"
-                            class="absolute inset-x-0 top-full z-30 mt-1.5 flex max-h-72 flex-col gap-0.5 overflow-y-auto rounded-card border border-grey-250 bg-white p-2 text-charcoal"
+                            x-on:keydown.down.prevent="move(1)"
+                            x-on:keydown.up.prevent="move(-1)"
+                            class="absolute inset-x-0 top-full z-30 mt-1.5 flex max-h-72 flex-col gap-0.5 overflow-y-auto p-2 text-charcoal"
                         >
                             @forelse ($candidates as $candidate)
                                 <button
@@ -107,7 +108,7 @@
                             @empty
                                 <p class="px-3 py-2 text-sm text-grey-700">{{ $hasCandidates ? __('admin.common.empty') : __('admin.teams.no_candidates') }}</p>
                             @endforelse
-                        </div>
+                        </x-ui.card>
                     </div>
                     <p id="team-member-search-help" class="text-sm text-grey-600">{{ __('admin.teams.members_help') }}</p>
                 </div>
