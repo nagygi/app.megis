@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.108 · – · 2026-11-23
+## 1.108 · d5ef6f1 · 2026-11-23
 
 A megélésed (V5, T4; MEGIS-2, MEGIS-3): a lap megmondja, mit kérdezünk, ki látja a választ, és honnan jönnek a meghatározások.
 
