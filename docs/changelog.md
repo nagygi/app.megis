@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.109 · – · 2026-11-23
+## 1.109 · 537533c · 2026-11-23
 
 Kezdőlapok (T5, V10; MEGIS-4, MEGIS-6): a dátumok megmondják, mik.
 
