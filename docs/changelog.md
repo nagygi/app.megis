@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.111 · – · 2026-11-23
+## 1.111 · 4f4316d · 2026-11-23
 
 Fő diagnózis, admin (MEGIS-7): a publikálás napja előrehozható.
 
