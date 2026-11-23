@@ -158,6 +158,20 @@ it('moves the publishing day and tells the leader (19 · 19.4)', function () {
     Mail::assertQueued(DiagnosisNoticeMail::class, fn (DiagnosisNoticeMail $mail) => $mail->hasTo($setup['leader']->email) && str_contains($mail->body, today()->addWeeks(8)->format('Y.m.d.')));
 });
 
+it('brings the publishing day before the leader\'s deadline once the diagnosis runs, down to today (MEGIS-7)', function () {
+    Mail::fake();
+    [$setup, $main] = runningDiagnosis();
+    actingAsAdmin($setup['admin']);
+
+    Livewire::test(Run::class, ['diagnosis' => $main->diagnosis])
+        ->set('publishesOn', today()->toDateString())
+        ->call('changePublishDate')
+        ->assertHasNoErrors();
+
+    expect($main->refresh()->publishes_on->isToday())->toBeTrue()
+        ->and($main->starts_on->isFuture())->toBeTrue();
+});
+
 it('starts the reading from the Futás tab (19 · 19.4)', function () {
     [$setup, $main] = runningDiagnosis();
     actingAsAdmin($setup['admin']);

@@ -2,6 +2,19 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.111 · – · 2026-11-23
+
+Fő diagnózis, admin (MEGIS-7): a publikálás napja előrehozható.
+
+- **Eddig:**
+  - A publikálás napja nem lehetett a vezető határideje előtt, akkor sem, ha a vezető már rég elindította a diagnózist. Egy 11.10-én induló, 11.16-os határidejű diagnózist 11.16-nál korábbra nem lehetett tenni.
+  - A Beállításon a határidő napja sem volt jó (csak az utána következő), a Futáson a mai nap nem volt jó.
+- **Most:**
+  - Mindkét fülön ugyanaz a szabály: a publikálás napja ma vagy később.
+  - Amíg a vezető el nem indítja a diagnózist (vázlat, meghívva, kitöltés), a határidejénél sem korábbi; a határidő napja már jó.
+  - Indulás után a vezető határideje nem köti a publikálás napját.
+- Jegyszövegek: 17 · 17.2, 19 · 19.4.
+
 ## 1.110 · b778dd8 · 2026-11-23
 
 Várakozás (MEGIS-5): a „…” három pontja egymás után felvillan, így látszik, hogy a munka megy, és a lap nem fagyott le.

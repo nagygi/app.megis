@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'version' => '1.110',
+    'version' => '1.111',
 
     // Set by the deploy script, shown on Rendszer → Health (docs/uzemeltetes.md · 3).
     'deployed_at' => env('MEGIS_DEPLOYED_AT'),

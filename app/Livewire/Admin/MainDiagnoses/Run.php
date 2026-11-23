@@ -134,15 +134,19 @@ class Run extends Component
     }
 
     /**
-     * The publishing day changes; the leader gets an e-mail (19 · 19.4).
+     * The publishing day changes; the leader gets an e-mail (19 · 19.4). It
+     * is today or later; until the leader starts the diagnosis not before
+     * their deadline, after that the deadline binds nothing (MEGIS-7), as on
+     * Beállítás.
      */
     public function changePublishDate(DiagnosisRunService $run): void
     {
         $this->authorizeRun();
         $main = $this->main();
+        $deadlineBinds = $main->starts_on !== null && $main->stage->isBeforeRunning();
 
         $this->validate([
-            'publishesOn' => ['required', 'date', 'after:today', ...($main->starts_on ? ['after_or_equal:'.$main->starts_on->toDateString()] : [])],
+            'publishesOn' => ['required', 'date', 'after_or_equal:today', ...($deadlineBinds ? ['after_or_equal:'.$main->starts_on->toDateString()] : [])],
         ], attributes: ['publishesOn' => __('admin.main_diagnoses.publishes_on')]);
 
         $this->attempt(function () use ($run, $main): void {

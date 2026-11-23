@@ -238,6 +238,36 @@ it('changes the time window and the peers after the invitation, but not the team
         ->and($main->peers()->pluck('user_id')->all())->toBe([$setup['peers'][1]->id]);
 });
 
+it('keeps the publishing day from the leader\'s deadline on until the diagnosis runs, then from today (MEGIS-7)', function () {
+    $setup = diagnosisTeam(peers: 2);
+    $main = startMainDiagnosis($setup);
+    actingAsAdmin($setup['admin']);
+    $deadline = $main->starts_on->toDateString();
+
+    // Invited: the day before the deadline is refused, the deadline itself is fine.
+    Livewire::test(Form::class, ['diagnosis' => $main->diagnosis])
+        ->set('publishes_on', $main->starts_on->copy()->subDay()->toDateString())
+        ->call('saveDraft')
+        ->assertHasErrors(['publishes_on' => 'after_or_equal'])
+        ->set('publishes_on', $deadline)
+        ->call('saveDraft')
+        ->assertHasNoErrors();
+
+    expect($main->refresh()->publishes_on->toDateString())->toBe($deadline);
+
+    // Running: the leader started, the deadline next week binds nothing.
+    [$running, $runningMain] = runningDiagnosis();
+    actingAsAdmin($running['admin']);
+
+    Livewire::test(Form::class, ['diagnosis' => $runningMain->diagnosis])
+        ->set('publishes_on', today()->toDateString())
+        ->call('saveDraft')
+        ->assertHasNoErrors();
+
+    expect($runningMain->refresh()->publishes_on->isToday())->toBeTrue()
+        ->and($runningMain->starts_on->isFuture())->toBeTrue();
+});
+
 it('picks the organization leader as the leader of a team (17 · 17.2)', function () {
     $setup = diagnosisTeam();
     actingAsAdmin($setup['admin']);

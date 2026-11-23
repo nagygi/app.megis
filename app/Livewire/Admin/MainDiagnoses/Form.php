@@ -470,14 +470,20 @@ class Form extends Component
     }
 
     /**
+     * The publishing day is today or later. Until the leader starts the
+     * diagnosis it is not before their deadline (the deadline itself is
+     * fine); once it runs the deadline binds nothing (MEGIS-7, as on Futás).
+     *
      * @return array<string, mixed>
      */
     private function windowRules(): array
     {
+        $deadlineBinds = filled($this->starts_on) && ($this->main?->stage->isBeforeRunning() ?? true);
+
         return [
             'name' => ['nullable', 'string', 'max:255'],
             'starts_on' => ['nullable', 'date'],
-            'publishes_on' => ['required', 'date', 'after_or_equal:today', ...(filled($this->starts_on) ? ['after:starts_on'] : [])],
+            'publishes_on' => ['required', 'date', 'after_or_equal:today', ...($deadlineBinds ? ['after_or_equal:starts_on'] : [])],
         ];
     }
 

@@ -52,7 +52,7 @@ Számok és állapotok, válaszok nélkül, ahogy a vezető is látja. A válasz
   - A döntés a publikálásig visszavonható.
   - Küszöb alatt a „Csapat-szám nélkül megy” a sáv nélkül is elérhető, futás és olvasat alatt bármikor, mert a publikálás ellenőrzőlistája kéri (21).
 - **Emlékeztető:** egy gombbal a vezetőnek (ha nem fejezte be a kitöltést), vagy egyszerre minden társnak, aki még nem töltötte ki. Egy címzett legfeljebb 48 óránként kaphat.
-- **Időablak módosítása:** a publikálás napja átírható; a vezető e-mailt kap.
+- **Időablak módosítása:** a publikálás napja átírható, ugyanazzal a szabállyal, mint a Beállításon (17 · 17.2): ma vagy később, és indulás előtt nem a vezető határideje előtt. Futó diagnózisnál a publikálás a határidő elé is kerülhet (MEGIS-7). A vezető e-mailt kap.
 - **Olvasat indítása:** a szakasz „Olvasat” lesz (17.5). Mindig megerősítést kér; ha van még feldolgozás alatti anyag, vagy a küszöb hiányzik, a kérdés ezt is kimondja.
 
 ### 19.5 Beszélgetések a mégissel
