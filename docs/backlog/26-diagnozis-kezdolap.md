@@ -15,7 +15,7 @@ Belső snapshotnál napos sávval (V10·b, V12·b). A belépés ide irányít (1
 ### 26.1 Fut (V10, V10·b)
 
 - **Fejléc** (charcoal): „A ti diagnózisotok”, kísérősor: „{Termék} · fut · {kezdés} → {publikálás}”.
-- **A gyűrű helyén** a publikálás dátuma és „Belső működés · {n} mérőpont”.
+- **A gyűrű helyén** a publikálás dátuma, fölötte „A diagnózis publikálásának napja” (MEGIS-6), alatta „Belső működés · {n} mérőpont”.
 - **Hol tartunk:** sáv a hetekkel (snapshotnál napokkal), alatta a lépések. Állapotuk: kész, most vagy később.
   - **Onboarding:** „értékek · folyamatok · a márkád alapja · {dátum}”. Koppintásra a lépéslista nyílik. A lépések az olvasat indításáig javíthatók (23.2).
   - **Társak** (csak Teljes, csak csapat): „{k} / {n} kitöltötte” és „Emlékeztető” gomb. 3 kitöltő alatt: „Még {n} társ hangja kell, hogy lássátok a rést.”
@@ -25,7 +25,7 @@ Belső snapshotnál napos sávval (V10·b, V12·b). A belépés ide irányít (1
   - **Amit hozzátesztek:** „{n} felvétel · {k} dokumentum · {j} elmondott helyzet”, az egész csapat száma, név nélkül. Koppintásra csak a saját helyzetei nyílnak meg (12 · 12.5).
   - **A mégis olvasata:** „{olvasat kezdete} → {publikálás előtti nap}” (17.2).
   - **A riport:** „{publikálás}”.
-- **Mélyítés** (szürke, nem kattintható): „Belső működés · értékek · folyamatok · területek · a márkád alapja · {publikálás}”.
+- **Mélyítés** (szürke, nem kattintható): „Belső működés · értékek · folyamatok · területek · a márkád alapja”, jobbra „publikálás: {dátum}”.
 - **A coral plusz** (15 · 15.5) a feltöltésre visz (12).
 - A vezető számokat lát, nem válaszokat.
 

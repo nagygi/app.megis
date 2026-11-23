@@ -87,6 +87,8 @@ return [
         'title' => 'A ti diagnózisotok',
         'subtitle' => ':product · :stage · :from → :to',
         'conversations_title' => 'Beszélgetések a mégissel',
+        // Above the big date in place of the ring (MEGIS-6).
+        'publishes_label' => 'A diagnózis publikálásának napja',
         'ring' => 'Belső működés · :count mérőpont',
         'where' => 'Hol tartunk',
         'week_of' => ':current / :count hét',

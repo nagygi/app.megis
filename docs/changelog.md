@@ -2,6 +2,16 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.109 · – · 2026-11-23
+
+Kezdőlapok (T5, V10; MEGIS-4, MEGIS-6): a dátumok megmondják, mik.
+
+- **Eddig:** a társ kezdőlapján az Útravaló mellett, a vezetőén a gyűrű helyén és a Mélyítés sorában egy puszta dátum állt („12.28.”), és nem derült ki, hogy ez a publikálás napja.
+- **Most:**
+  - **Társ (T5):** az Útravaló mellett „publikálás: 12.28.”, ahogy a fejléc kísérősorában.
+  - **Vezető (V10):** a nagy dátum fölött „A diagnózis publikálásának napja”; a Mélyítés sorában „publikálás: 11.16.”.
+- Jegyszövegek: 25 · 25.5, 26 · 26.1.
+
 ## 1.108 · d5ef6f1 · 2026-11-23
 
 A megélésed (V5, T4; MEGIS-2, MEGIS-3): a lap megmondja, mit kérdezünk, ki látja a választ, és honnan jönnek a meghatározások.

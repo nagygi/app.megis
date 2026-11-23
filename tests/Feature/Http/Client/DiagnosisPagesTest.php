@@ -112,7 +112,9 @@ it('shows the leader\'s home while it runs, with the coral plus, and without it 
         ->assertSee(' → '.$main->publishes_on->format('m.d.'))
         ->assertSee('1. hét a 7-ből')
         ->assertSee('Beszélgetések a mégissel')
-        ->assertSee('Mélyítés')
+        // The big date and the Mélyítés badge say what the date is (MEGIS-6).
+        ->assertSeeInOrder(['A diagnózis publikálásának napja', $main->publishes_on->format('m.d.')])
+        ->assertSeeInOrder(['Mélyítés', 'publikálás: '.$main->publishes_on->format('m.d.')])
         ->assertSeeHtml('href="'.route('client.diagnosis.contribute', $parameters).'"');
 
     app(StageMachine::class)->transition($main, MainDiagnosisStage::Reading, $setup['admin']);

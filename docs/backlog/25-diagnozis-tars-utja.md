@@ -59,7 +59,7 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
   - Saját értékek: a nevek, a 24-re visz;
   - A megélésed: „az elején · {dátum}”, a T4-re visz;
   - Helyzetek: „{n} elmondva · {k} dokumentum · mindegyikhez a megélésed”, a T5·b-re visz (12 · 12.5).
-- **Útravaló:** szürkén, a publikálás dátumával. Publikálás után él (29).
+- **Útravaló:** szürkén, jobbra „publikálás: {dátum}” (MEGIS-4). Publikálás után él (29).
 - **Értéktár:** a csapat értékei, definícióval, pont nélkül.
 - **A coral plusz** (15 · 15.5) a feltöltésre visz (12). A „Hova tartozik” listán csak azok a folyamatok vannak, amelyekben a társ résztvevő (12).
 - Az olvasat indításától a coral plusz eltűnik. Publikálás után a saját értékek és a megélés csak olvashatók (21.3).

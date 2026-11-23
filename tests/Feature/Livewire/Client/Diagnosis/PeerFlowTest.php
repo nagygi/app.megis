@@ -135,6 +135,8 @@ it('lets a peer fill in the own values and the experience, answering the recorde
         // As in the prototype T5: the situations among what was brought in, the Coach kept for later.
         ->assertSee('0 elmondva · 0 dokumentum')
         ->assertSee('az elején · '.$experience->diagnosed_on->format('m.d.').' · három érték')
+        // The Útravaló's day says what it is (MEGIS-4).
+        ->assertSeeInOrder(['Útravaló · a te értékeid', 'publikálás: '.$main->publishes_on->format('m.d.')])
         ->assertSee('Coach');
 
     $this->get(route('client.diagnosis.show', peerParams($setup, $main)))

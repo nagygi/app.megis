@@ -49,13 +49,13 @@
         @if ($takeawayReady)
             <x-ui.link-row tone="green" :href="route('client.diagnosis.takeaway', [$main->diagnosis->organization, $main->diagnosis])" :title="__('takeaway.home_row')" :meta="__('takeaway.home_row_help')" />
         @else
-            {{-- Not there yet: the day it comes instead of the chevron. --}}
+            {{-- Not there yet: the day it comes instead of the chevron, named (MEGIS-4). --}}
             <div class="flex items-center justify-between gap-3 rounded-card border border-dashed border-grey-350 px-5 py-4 text-grey-700">
                 <span>
                     <span class="block font-semibold">{{ __('diagnosis.end.takeaway') }}</span>
                     <span class="block text-sm">{{ __('diagnosis.end.takeaway_help') }}</span>
                 </span>
-                <span class="text-sm tabular-nums">{{ $main->publishes_on->format('m.d.') }}</span>
+                <span class="shrink-0 text-sm tabular-nums">{{ __('diagnosis.peer_home.publishes', ['date' => $main->publishes_on->format('m.d.')]) }}</span>
             </div>
         @endif
 

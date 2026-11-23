@@ -10,8 +10,9 @@
         <x-ui.notice>{{ __('diagnosis.home.correcting') }}</x-ui.notice>
     @endif
 
-    {{-- In place of the ring: the publishing day and the measuring points --}}
+    {{-- In place of the ring: the publishing day, named (MEGIS-6), and the measuring points --}}
     <x-ui.card as="section" padding="lg" class="flex flex-col items-center gap-1 text-center" aria-label="{{ __('diagnosis.home.report') }}">
+        <p class="text-sm text-grey-700">{{ __('diagnosis.home.publishes_label') }}</p>
         <p class="text-3xl font-extrabold tabular-nums">{{ $main->publishes_on->format('m.d.') }}</p>
         <p class="text-grey-700">{{ __('diagnosis.home.ring', ['count' => $home['measuringPoints']]) }}</p>
     </x-ui.card>
@@ -144,7 +145,7 @@
                 <span class="block font-semibold text-charcoal">{{ __('diagnosis.home.deepening') }}</span>
                 <span class="block text-sm">{{ $main->isSnapshot() ? __('diagnosis.home.deepening_help_snapshot') : __('diagnosis.home.deepening_help') }}</span>
             </span>
-            <x-ui.badge tone="muted" class="tabular-nums">{{ $main->publishes_on->format('m.d.') }}</x-ui.badge>
+            <x-ui.badge tone="muted" class="shrink-0 tabular-nums">{{ __('diagnosis.peer_home.publishes', ['date' => $main->publishes_on->format('m.d.')]) }}</x-ui.badge>
         </div>
         <div class="flex items-center justify-between gap-3 rounded-card border border-dashed border-grey-350 px-5 py-4 text-grey-700" aria-disabled="true">
             <span>
