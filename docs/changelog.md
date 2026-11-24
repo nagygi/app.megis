@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.118 · – · 2026-11-24
+## 1.118 · 2a0c257 · 2026-11-24
 
 Meghívott ügyféloldal, az első demó észrevételei (4. rész): egy tükör, az admin ugyanazt látja, példa riport, anekdoták helye.
 
