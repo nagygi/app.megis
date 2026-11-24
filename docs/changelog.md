@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.115 · – · 2026-11-24
+## 1.115 · a7cca72 · 2026-11-24
 
 Meghívott ügyféloldal, az első demó észrevételei (1. rész): Folyamatok, Értéktükör-szövegek, kíváncsiság-kérdések.
 
