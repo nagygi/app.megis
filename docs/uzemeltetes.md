@@ -59,6 +59,13 @@ Minden adat az EU-n belül van: az adatbázis, a fájlok, a mentések és a logo
   - mail;
   - queue.
 - A logok központi log-tárba kerülnek, csatornánként külön, **365 napos** megőrzéssel. A szerveren naponta rotálódnak, rövid megőrzéssel.
+- **Tevékenységnapló:** melyik felhasználó mikor mit csinált.
+  - Két fájl: `activity-admin` (az adminok) és `activity-customer` (az ügyfelek). Naponta új fájl, **60 napos** megőrzéssel (`LOG_ACTIVITY_DAYS`).
+  - Bekerül: a bejelentkezett felhasználó minden megnyitott oldala, elküldött űrlapja és Livewire-akciója, a belépés és a kilépés.
+  - Egy sor: időpont, a művelet (például `GET client.home` vagy `Livewire client.profile::save`), a felhasználó azonosítója és e-mail-címe, az útvonal, a válasz státusza, az IP és a kérés `log_id`-ja.
+  - Nem kerül bele: a be nem jelentkezett látogatók kérései, a Livewire saját hívásai és az időzített frissítések, a lekérdezési paraméterek, a linkekben lévő tokenek.
+  - Ha egy admin a felhasználó nevében dolgozik, a művelet mindkét fájlba bekerül: az admin a végző, az ügyfél az `on_behalf_of` mezőkben áll.
+  - A szerveren marad, nem megy a 365 napos központi log-tárba.
 - A logot a fejlesztő nézi. Az adminban nincs logböngésző.
 - Logba nem kerülhet: jelszó, belépő kód, token, API-kulcs, átirat vagy felvétel tartalma.
 

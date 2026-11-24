@@ -7,6 +7,7 @@ use App\Models\Impersonation;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use App\Support\CurrentOrganization;
+use App\Support\LivewireUpdate;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Log;
 
@@ -19,11 +20,6 @@ use Illuminate\Support\Facades\Log;
 class ImpersonationService
 {
     public const SESSION_KEY = 'impersonation_id';
-
-    /**
-     * Livewire actions that change nothing, called on a timer (14 · 14.6).
-     */
-    private const NOT_CHANGES = ['pollDictations'];
 
     private ?Impersonation $current = null;
 
@@ -128,28 +124,12 @@ class ImpersonationService
      */
     public function logLivewireRequest(array $components): void
     {
-        $actions = collect($components)
-            ->filter(fn ($component) => is_array($component))
-            ->flatMap(function (array $component): array {
-                $name = json_decode($component['snapshot'] ?? '{}', true)['memo']['name'] ?? 'livewire';
+        $actions = array_filter(
+            LivewireUpdate::actions($components),
+            fn (string $action): bool => ! str_starts_with($action, 'admin.'),
+        );
 
-                if (str_starts_with($name, 'admin.')) {
-                    return [];
-                }
-
-                return collect($component['calls'] ?? [])
-                    ->pluck('method')
-                    ->filter(fn ($method) => is_string($method)
-                        && ! str_starts_with($method, '$')
-                        && ! str_starts_with($method, '_')
-                        && ! in_array($method, self::NOT_CHANGES, true))
-                    ->map(fn (string $method): string => $name.'::'.$method)
-                    ->all();
-            })
-            ->values()
-            ->all();
-
-        $this->logActions($actions);
+        $this->logActions(array_values($actions));
     }
 
     /**

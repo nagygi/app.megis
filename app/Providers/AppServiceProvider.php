@@ -31,6 +31,7 @@ use App\Models\ReportFeedback;
 use App\Models\User;
 use App\Models\Value;
 use App\Services\Alerting\ErrorAlerter;
+use App\Services\Audit\ActivityLogger;
 use App\Services\Auth\ImpersonationService;
 use App\Services\Transcription\AiTranscriber;
 use App\Services\Transcription\FakeTranscriber;
@@ -63,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->scoped(CurrentOrganization::class);
         $this->app->scoped(ImpersonationService::class);
+        $this->app->scoped(ActivityLogger::class);
 
         // The fake transcriber is for local work only, never in production.
         $this->app->bind(Transcriber::class, fn ($app) => config('megis.transcriber') === 'fake' && ! $app->isProduction()

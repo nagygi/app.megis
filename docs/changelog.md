@@ -2,6 +2,19 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.112 · – · 2026-11-24
+
+Tevékenységnapló: fájlban látszik, melyik felhasználó mikor mit csinált.
+
+- **Eddig:** csak a belépések (auth napló) és az admin felhasználó nevében végzett munkája (ügyfél-adatlap) naplózódott. Az nem látszott, hogy ki melyik oldalt nyitotta meg, és mit csinált rajta.
+- **Most:**
+  - Két új napló: `storage/logs/activity-admin-{dátum}.log` az adminoknak, `activity-customer-{dátum}.log` az ügyfeleknek. Naponta új fájl, 60 napos megőrzéssel (`LOG_ACTIVITY_DAYS`).
+  - Bekerül a bejelentkezett felhasználó minden megnyitott oldala, elküldött űrlapja és Livewire-akciója, a belépés és a kilépés is. Ide tartoznak az azonnal mentődő mezők is (például a Profil neve).
+  - Egy sor: időpont, a művelet (`GET client.home`, `POST admin.logout`, `Livewire client.profile::save`), a felhasználó azonosítója és e-mail-címe, az útvonal, a státusz, az IP és a `log_id`.
+  - Ha egy admin a felhasználó nevében dolgozik, a művelet mindkét fájlba bekerül, az ügyfél az `on_behalf_of` mezőkben áll.
+  - Nem kerül bele: a látogatók kérései, a Livewire saját hívásai és az időzített frissítések, a lekérdezési paraméterek. A linkek tokenje helyén `[redacted]` áll.
+- Dokumentáció: `docs/uzemeltetes.md` · 4, `docs/deploy.md`. A tevékenységnapló a szerveren marad, nem megy a 365 napos központi log-tárba.
+
 ## 1.111 · 4f4316d · 2026-11-23
 
 Fő diagnózis, admin (MEGIS-7): a publikálás napja előrehozható.

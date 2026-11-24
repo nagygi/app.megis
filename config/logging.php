@@ -108,6 +108,30 @@ return [
             'replace_placeholders' => true,
         ],
 
+        /*
+         * User activity (docs/uzemeltetes.md · 4): which user did what and
+         * when, admins and customers apart (App\Services\Audit\ActivityLogger).
+         * One file a day, kept for 60 days. Always at info level, whatever
+         * LOG_LEVEL is.
+         */
+        'activity-admin' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/activity-admin.log'),
+            'level' => 'info',
+            'days' => env('LOG_ACTIVITY_DAYS', 60),
+            'tap' => [RedactSensitiveData::class],
+            'replace_placeholders' => true,
+        ],
+
+        'activity-customer' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/activity-customer.log'),
+            'level' => 'info',
+            'days' => env('LOG_ACTIVITY_DAYS', 60),
+            'tap' => [RedactSensitiveData::class],
+            'replace_placeholders' => true,
+        ],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),

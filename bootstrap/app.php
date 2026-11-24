@@ -9,6 +9,7 @@ use App\Http\Middleware\AuthenticateCustomer;
 use App\Http\Middleware\EnsureLegalAcceptance;
 use App\Http\Middleware\EnsureSuperadmin;
 use App\Http\Middleware\ForbidWhileImpersonating;
+use App\Http\Middleware\LogUserActivity;
 use App\Http\Middleware\ProtectStaging;
 use App\Http\Middleware\ResolveOrganization;
 use App\Http\Middleware\SecurityHeaders;
@@ -38,7 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(AssignLogId::class);
         $middleware->append(AddRobotsHeader::class);
         $middleware->append(SecurityHeaders::class);
-        $middleware->web(prepend: [ProtectStaging::class]);
+        $middleware->web(prepend: [ProtectStaging::class], append: [LogUserActivity::class]);
 
         $middleware->alias([
             'admin' => AuthenticateAdmin::class,

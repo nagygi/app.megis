@@ -4,6 +4,7 @@ namespace App\Livewire\ExternalClient;
 
 use App\Enums\ExternalClientItemKind;
 use App\Enums\MainDiagnosisStage;
+use App\Livewire\Concerns\NotesImpersonatedChanges;
 use App\Livewire\Concerns\WithDictation;
 use App\Models\Diagnosis;
 use App\Models\ExternalClient;
@@ -29,7 +30,7 @@ use Livewire\WithFileUploads;
  */
 class Measurement extends Component
 {
-    use WithDictation, WithFileUploads;
+    use NotesImpersonatedChanges, WithDictation, WithFileUploads;
 
     /**
      * The longest answer; a longer dictation or file is condensed to it.
@@ -97,6 +98,7 @@ class Measurement extends Component
 
         $this->validateOnly('answers.'.$key, $this->answerRules());
         $this->saveDraft($key);
+        $this->noteChange('answers');
     }
 
     public function next(): void
