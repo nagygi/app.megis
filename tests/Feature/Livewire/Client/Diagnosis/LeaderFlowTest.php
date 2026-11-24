@@ -29,6 +29,7 @@ use App\Models\User;
 use App\Models\Value;
 use App\Services\Auth\LandingResolver;
 use App\Services\MainDiagnoses\ExperienceService;
+use App\Services\MainDiagnoses\StageMachine;
 use App\Services\MainDiagnoses\StepProgress;
 use App\Services\Values\ValueService;
 use Illuminate\Support\Facades\Mail;
@@ -584,4 +585,21 @@ it('asks a private person about the brand base in the singular', function () {
         ->assertSee('Mit mond rólad a fa?')
         ->assertSee('Miért csinálod?')
         ->assertDontSee('Mit mond rólatok a fa?');
+});
+
+it('closes the leader\'s home without publishing: no report, the steps no longer open (29 · 29.2)', function () {
+    [$setup, $main] = runningDiagnosis();
+    actingAsCustomer($setup['leader']);
+    $parameters = leaderParams($setup, $main);
+    app(StageMachine::class)->transition($main, MainDiagnosisStage::Closed);
+
+    $this->get(route('client.diagnosis.show', $parameters))
+        ->assertOk()
+        ->assertSee('A ti diagnózisotok')
+        ->assertSee('A diagnózis lezárult.')
+        ->assertDontSee('Mi vár rád')
+        ->assertDontSee('Elindult a mégis olvasata.')
+        ->assertDontSee('href="'.route('client.diagnosis.sajat-ertekek', $parameters).'"', false);
+
+    $this->get(route('client.diagnosis.sajat-ertekek', $parameters))->assertNotFound();
 });

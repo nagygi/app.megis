@@ -153,9 +153,11 @@ class Overview extends Component
             'livewire.client.diagnosis.overview-running' => ['title' => __('diagnosis.home.title'), 'label' => __('client.header.diagnosis'), 'symbol' => 'growth-rings', 'subtitle' => $this->runningSubtitle(), 'note' => $this->windowNote($main), 'color' => 'charcoal', 'plus' => $plus],
             'livewire.client.diagnosis.invitation' => ['title' => __('diagnosis.invitation.title'), 'color' => 'coral'],
             'livewire.client.diagnosis.overview-peer' => $steps->current() === null
-                ? ['title' => __('diagnosis.peer_home.title'), 'label' => __('client.header.home'), 'symbol' => 'growth-rings', 'subtitle' => $this->peerHomeSubtitle(), 'note' => $this->windowNote($main).' · '.__('diagnosis.peer_home.publishes', ['date' => $main->publishes_on->format('m.d.')]), 'color' => 'charcoal', 'plus' => $plus]
+                ? ['title' => __('diagnosis.peer_home.title'), 'label' => __('client.header.home'), 'symbol' => 'growth-rings', 'subtitle' => $this->peerHomeSubtitle(), 'note' => $this->peerHomeNote($main), 'color' => 'charcoal', 'plus' => $plus]
                 : ['title' => __('diagnosis.what_awaits'), 'color' => 'cream', ...$this->peerWelcomeHeader($steps)],
-            default => ['title' => __('diagnosis.what_awaits'), 'color' => 'cream', ...$this->leaderWelcomeHeader($steps)],
+            default => $main->stage === MainDiagnosisStage::Closed
+                ? ['title' => __('diagnosis.home.title'), 'label' => __('client.header.diagnosis'), 'subtitle' => $this->runningSubtitle(), 'color' => 'charcoal']
+                : ['title' => __('diagnosis.what_awaits'), 'color' => 'cream', ...$this->leaderWelcomeHeader($steps)],
         };
 
         return view($view, [
@@ -340,6 +342,21 @@ class Overview extends Component
             'product' => $main->product_name,
             'stage' => mb_strtolower($main->stage->label()),
         ]);
+    }
+
+    /**
+     * "1. hét a 7-ből · publikálás: 03.16." (T5); a diagnosis closed without
+     * publishing names no day that never comes.
+     */
+    private function peerHomeNote(MainDiagnosis $main): string
+    {
+        $window = $this->windowNote($main);
+
+        if ($main->stage === MainDiagnosisStage::Closed && $main->published_at === null) {
+            return $window;
+        }
+
+        return $window.' · '.__('diagnosis.peer_home.publishes', ['date' => $main->publishes_on->format('m.d.')]);
     }
 
     /**

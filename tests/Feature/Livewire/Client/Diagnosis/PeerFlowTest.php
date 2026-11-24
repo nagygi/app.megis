@@ -145,6 +145,49 @@ it('lets a peer fill in the own values and the experience, answering the recorde
         ->assertSee('1. hét a 7-ből · publikálás: '.$main->publishes_on->format('m.d.'));
 });
 
+it('keeps the peer\'s home after closing without publishing, its rows no longer opening the gone steps (29 · 29.2)', function () {
+    [$setup, $main] = runningDiagnosis();
+    $peer = $setup['peers'][0];
+    $main->participantFor($peer, ParticipantRole::Peer)->update(['started_at' => now()]);
+    Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => ConsentKind::Answers, 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);
+    actingAsCustomer($peer);
+    $parameters = peerParams($setup, $main);
+    $stepLinks = [
+        route('client.diagnosis.sajat-ertekek', $parameters),
+        route('client.diagnosis.megeles', $parameters),
+        route('client.diagnosis.situations', $parameters),
+    ];
+
+    // Every step done, so the running home (T5) is the one that links them.
+    Livewire::test(OwnValues::class, $parameters)->call('show', 'add')->set('draft.name', 'Türelem')->set('draft.meaning', 'Kivárom.')->call('addDraft')->call('next');
+    $answers = Livewire::test(Experience::class, $parameters);
+    foreach (app(ExperienceService::class)->rows($main->valueSetVersion->snapshot) as $row) {
+        $answers->set('answers.'.$row['key'], '5');
+    }
+    $answers->call('submit');
+    $running = $this->get(route('client.diagnosis.show', $parameters))->assertOk();
+    foreach ($stepLinks as $link) {
+        $running->assertSee('href="'.$link.'"', false);
+    }
+
+    app(StageMachine::class)->transition($main->refresh(), MainDiagnosisStage::Reading);
+    app(StageMachine::class)->transition($main->refresh(), MainDiagnosisStage::Closed);
+
+    $closed = $this->get(route('client.diagnosis.show', $parameters))
+        ->assertOk()
+        ->assertSee('Amit eddig behoztál')
+        ->assertSee('Türelem')
+        ->assertSee($setup['team']->name.' · Teljes · lezárva')
+        // No report, so no Útravaló: neither its row nor the day it would have come.
+        ->assertDontSee('Útravaló · a te értékeid')
+        ->assertDontSee('publikálás:');
+
+    foreach ($stepLinks as $link) {
+        $closed->assertDontSee('href="'.$link.'"', false);
+        $this->get($link)->assertNotFound();
+    }
+});
+
 it('tells the peer what is asked, who sees the answers and who gave the brand base (MEGIS-2, MEGIS-3)', function () {
     [$setup, $main] = runningDiagnosis();
     $peer = $setup['peers'][0];

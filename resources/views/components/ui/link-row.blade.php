@@ -7,24 +7,33 @@
     - symbol: a brand symbol before the text;
     - trailing: a slot right of the text, before the chevron (e.g. points);
     - tone: white (default), pale (the recommended choice), yellow and green
-      (the strong rows of a published report: Márkád alapja, Belső működés).
+      (the strong rows of a published report: Márkád alapja, Belső működés);
+    - plain: the same card without the chevron, a place that no longer opens
+      (what the peer brought into a closed diagnosis, T5).
 --}}
-@props(['href' => null, 'title' => null, 'meta' => null, 'symbol' => null, 'tone' => 'white'])
+@props(['href' => null, 'title' => null, 'meta' => null, 'symbol' => null, 'tone' => 'white', 'plain' => false])
 
 @php
+    $tag = $plain ? 'div' : ($href ? 'a' : 'button');
     $classes = [
-        'press flex w-full items-center justify-between gap-3 rounded-card px-5 py-4 text-left no-underline',
-        'border border-grey-250 bg-white text-charcoal hover:bg-paper' => $tone === 'white',
-        'bg-yellow-pale text-charcoal hover:bg-yellow-light' => $tone === 'pale',
-        'bg-yellow text-charcoal hover:bg-yellow-light' => $tone === 'yellow',
-        'on-dark bg-green text-cream hover:bg-green-muted' => $tone === 'green',
+        'flex w-full items-center justify-between gap-3 rounded-card px-5 py-4 text-left no-underline',
+        'press' => ! $plain,
+        'border border-grey-250 bg-white text-charcoal' => $tone === 'white',
+        'bg-yellow-pale text-charcoal' => $tone === 'pale',
+        'bg-yellow text-charcoal' => $tone === 'yellow',
+        'on-dark bg-green text-cream' => $tone === 'green',
+        'hover:bg-paper' => ! $plain && $tone === 'white',
+        'hover:bg-yellow-light' => ! $plain && in_array($tone, ['pale', 'yellow'], true),
+        'hover:bg-green-muted' => ! $plain && $tone === 'green',
     ];
 @endphp
 
-@if ($href)
+@if ($tag === 'a')
     <a href="{{ $href }}" {{ $attributes->class($classes) }}>
-@else
+@elseif ($tag === 'button')
     <button type="button" {{ $attributes->class($classes) }}>
+@else
+    <div {{ $attributes->class($classes) }}>
 @endif
     <span class="flex min-w-0 items-center gap-3">
         @if ($symbol)
@@ -41,10 +50,14 @@
         @isset($trailing)
             <span class="text-sm tabular-nums">{{ $trailing }}</span>
         @endisset
-        <x-megis.icon name="chevron-right" />
+        @unless ($plain)
+            <x-megis.icon name="chevron-right" />
+        @endunless
     </span>
-@if ($href)
+@if ($tag === 'a')
     </a>
-@else
+@elseif ($tag === 'button')
     </button>
+@else
+    </div>
 @endif

@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.113 · – · 2026-11-24
+
+Lezárt diagnózis: a kezdőlap nem visz a megszűnt lépésekre.
+
+- **Eddig:**
+  - A társ kezdőlapján (T5) az „Amit eddig behoztál” sorai (Saját értékek, A megélésed, Helyzetek) a lezárás után is linkek maradtak, és a „Nincs ilyen oldal” lapra vittek.
+  - Ha a diagnózis publikálás nélkül zárult le, a T5 továbbra is ígérte az Útravalót („publikálás: 11.16.”), a fejlécben is.
+  - A vezető ilyenkor a „Mi vár rád” lapot kapta „Elindult a mégis olvasata.” szöveggel, és a lépései szintén a „Nincs ilyen oldal” lapra vittek.
+- **Most:**
+  - A T5 sorai lezárás után sima kártyák, nyíl nélkül: a nevek és a számok látszanak, de nem nyílnak meg.
+  - Publikálás nélküli lezárásnál nincs Útravaló-sor és „publikálás: {dátum}”.
+  - A vezető fejléce „A ti diagnózisotok · {Termék} · lezárva”, alatta „A diagnózis lezárult.”, a lépései nem nyílnak meg.
+- Jegyszövegek: 25 · 25.5, 26 · 26.3·b.
+
 ## 1.112 · d40c94f · 2026-11-24
 
 Tevékenységnapló: fájlban látszik, melyik felhasználó mikor mit csinált.

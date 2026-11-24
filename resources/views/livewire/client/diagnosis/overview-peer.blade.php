@@ -29,15 +29,19 @@
             @endforeach
         </ol>
 
+        {{-- A closed diagnosis keeps only its home: the steps behind these rows are gone (29 · 29.2). --}}
+        @php($closed = $main->stage === \App\Enums\MainDiagnosisStage::Closed)
         <section class="flex flex-col gap-3" aria-labelledby="brought-in">
             <h2 id="brought-in" class="text-lg font-semibold">{{ __('diagnosis.peer_home.brought_in') }}</h2>
-            <x-ui.link-row :href="$stepUrl(\App\Enums\DiagnosisStep::OwnValues)" :title="__('enums.diagnosis_step.own_values')" :meta="$ownValues->implode(' · ')" />
+            <x-ui.link-row :plain="$closed" :href="$stepUrl(\App\Enums\DiagnosisStep::OwnValues)" :title="__('enums.diagnosis_step.own_values')" :meta="$ownValues->implode(' · ')" />
             <x-ui.link-row
+                :plain="$closed"
                 :href="$stepUrl(\App\Enums\DiagnosisStep::Experience)"
                 :title="__('enums.diagnosis_step.experience')"
                 :meta="$experience ? __('diagnosis.peer_home.experience_at', ['date' => $experience->diagnosed_on->format('m.d.'), 'count' => \App\Services\Report\HungarianNumber::word($valueCount)]) : null"
             />
             <x-ui.link-row
+                :plain="$closed"
                 :href="route('client.diagnosis.situations', [$main->diagnosis->organization, $main->diagnosis])"
                 :title="__('diagnosis.peer_home.situations')"
                 :meta="__('diagnosis.peer_home.situations_count', $situations).($situations['total'] > 0 ? ' · '.($situations['missing'] > 0 ? __('diagnosis.peer_home.situations_missing', ['count' => $situations['missing']]) : __('diagnosis.peer_home.situations_all_lived')) : '')"
@@ -48,8 +52,8 @@
 
         @if ($takeawayReady)
             <x-ui.link-row tone="green" :href="route('client.diagnosis.takeaway', [$main->diagnosis->organization, $main->diagnosis])" :title="__('takeaway.home_row')" :meta="__('takeaway.home_row_help')" />
-        @else
-            {{-- Not there yet: the day it comes instead of the chevron, named (MEGIS-4). --}}
+        @elseif (! $closed)
+            {{-- Not there yet: the day it comes instead of the chevron, named (MEGIS-4). Closed without one, it never comes. --}}
             <div class="flex items-center justify-between gap-3 rounded-card border border-dashed border-grey-350 px-5 py-4 text-grey-700">
                 <span>
                     <span class="block font-semibold">{{ __('diagnosis.end.takeaway') }}</span>

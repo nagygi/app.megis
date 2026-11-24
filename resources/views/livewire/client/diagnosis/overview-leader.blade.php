@@ -6,9 +6,15 @@
 <div class="flex max-w-2xl flex-col gap-6">
     <x-ui.flash />
 
+    {{-- Closed before publishing: no report, and the steps are gone (29 · 29.2). --}}
+    @php($closed = $main->stage === \App\Enums\MainDiagnosisStage::Closed)
+
     @unless ($main->stage->isBeforeRunning())
         <div class="flex flex-col gap-1">
-            @if ($main->acceptsInput())
+            @if ($closed)
+                <h2 class="text-xl font-semibold">{{ __('diagnosis.closed_lead') }}</h2>
+                <p class="text-grey-700">{{ __('diagnosis.closed_help') }}</p>
+            @elseif ($main->acceptsInput())
                 <h2 class="text-xl font-semibold">{{ __('diagnosis.running_lead', ['date' => $main->publishes_on->format('m.d.')]) }}</h2>
                 <p class="text-grey-700">{{ __('diagnosis.running_help', ['date' => $main->readingStartsOn()->format('m.d.')]) }}</p>
             @else
@@ -18,7 +24,7 @@
         </div>
     @endunless
 
-    <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" />
+    <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" :open="! $closed" />
 
     @if (($current && $main->acceptsInput()) || $main->stage->isBeforeRunning())
         <div class="flex flex-wrap items-center gap-3">

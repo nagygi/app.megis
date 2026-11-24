@@ -50,6 +50,12 @@ Belső snapshotnál napos sávval (V10·b, V12·b). A belépés ide irányít (1
 - **Riportok:** a vezető publikált fő diagnózisai, soronként: „{Termék} · {dátum} · Megnyitom · PDF” (28).
 - **Értékmérés-teaser:** „Értékmérés · a diagnózis után kapcsolható be. Az értékalapú működés nyomás alatt és hosszabb távon jobban tart.”
 
+### 26.3·b Lezárva publikálás nélkül
+
+- **Fejléc:** „A ti diagnózisotok”, kísérősor: „{Termék} · lezárva · {kezdés} → {publikálás}”.
+- „A diagnózis lezárult.” Alatta: „Publikálás nélkül zárult le, ezért riport sem készült. A lépései már nem nyílnak meg.”
+- A lépések listája megmarad, de egyik lépés sem nyílik meg (29 · 29.2).
+
 ### 26.4 Több diagnózis, több szerep
 
 Egy ember lehet az egyik diagnózisban vezető, egy másikban társ (25.7), és lehetnek régebbi diagnózisai is.

@@ -21,6 +21,8 @@ return [
     'running_help' => 'A kész lépéseket az olvasat indításáig (:date) javíthatod. A szervezet értékei és a márkád alapja az induláskor rögzültek.',
     'reading_lead' => 'Elindult a mégis olvasata.',
     'reading_help' => 'A lépések már csak olvashatók.',
+    'closed_lead' => 'A diagnózis lezárult.',
+    'closed_help' => 'Publikálás nélkül zárult le, ezért riport sem készült. A lépései már nem nyílnak meg.',
     'continue' => 'Folytatom',
     'start' => 'Kezdjük',
     'next' => 'Tovább',

@@ -63,6 +63,7 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
 - **Értéktár:** a csapat értékei, definícióval, pont nélkül.
 - **A coral plusz** (15 · 15.5) a feltöltésre visz (12). A „Hova tartozik” listán csak azok a folyamatok vannak, amelyekben a társ résztvevő (12).
 - Az olvasat indításától a coral plusz eltűnik. Publikálás után a saját értékek és a megélés csak olvashatók (21.3).
+- **Lezárás után** (29 · 29.2) a T5 megmarad, de az „Amit eddig behoztál” sorai nem nyílnak meg, mert a lépések megszűnnek: a nevek és a számok látszanak, nyíl nélkül. Ha a diagnózis publikálás nélkül zárult le, Útravaló nem készül: sem a sora, sem a „publikálás: {dátum}” nem látszik.
 
 ### 25.6 Hozzájárulás visszavonása
 
