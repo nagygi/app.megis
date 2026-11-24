@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.113 · – · 2026-11-24
+## 1.113 · e05d6a1 · 2026-11-24
 
 Lezárt diagnózis: a kezdőlap nem visz a megszűnt lépésekre.
 
