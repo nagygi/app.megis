@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.116 · – · 2026-11-24
+## 1.116 · c81efd8 · 2026-11-24
 
 Meghívott ügyféloldal, az első demó észrevételei (2. rész): a felvevő és a meghívott útja.
 
