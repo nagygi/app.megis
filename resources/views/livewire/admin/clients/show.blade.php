@@ -150,7 +150,7 @@
     @endif
 
     @if ($mirrors->isNotEmpty())
-        {{-- Értéktükrök with the ticked curiosity questions (06 · 6.1, ET5) --}}
+        {{-- Értéktükrök with the values the user sees (ET3) and the ticked curiosity questions (06 · 6.1, ET5) --}}
         <x-ui.card as="section" bordered>
             <h2 class="mb-4 text-lg font-semibold">{{ __('admin.clients.section_mirrors') }}</h2>
             @foreach ($mirrors as $mirror)
@@ -163,6 +163,10 @@
                         @if ($mirror->booking_requested_at)
                             <x-ui.badge tone="yellow" class="ml-1">{{ __('admin.clients.mirror_booking', ['date' => $mirror->booking_requested_at->format('Y.m.d. H:i')]) }}</x-ui.badge>
                         @endif
+                    </p>
+                    <p class="text-sm">
+                        {{ __('admin.clients.mirror_values') }}:
+                        {{ $mirrorValues($mirror) ?: __('admin.common.none') }}
                     </p>
                     <p class="text-sm text-grey-700">
                         {{ __('admin.clients.mirror_curiosity') }}:

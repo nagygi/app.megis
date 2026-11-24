@@ -71,7 +71,9 @@ class AutomaticDiagnosisBuilder
 
     /**
      * Rebuilds the value rows from the scores, leaving out what the user marked
-     * "nem az enyém"; used again when they change their mind on ET3.
+     * "nem az enyém"; used again when they change their mind on ET3. A row the
+     * admin added by hand ("+ Érték", no quotes) or changed stays; a changed
+     * row of a value the user took out goes.
      */
     public function syncRows(Diagnosis $diagnosis): void
     {
@@ -88,15 +90,28 @@ class AutomaticDiagnosisBuilder
             ->get();
 
         DB::transaction(function () use ($diagnosis, $scores, $detections): void {
-            $diagnosis->valueRows()->delete();
+            $adminRows = $diagnosis->valueRows()
+                ->where(fn ($query) => $query->whereNull('quotes')->orWhere('manually_modified', true))
+                ->get()
+                ->keyBy('value_id');
+            $diagnosis->valueRows()->whereNotIn('id', $adminRows->pluck('id'))->delete();
 
             foreach ($scores->values() as $position => $score) {
                 /** @var MaterialValueScore $score */
                 $kept = collect($score->detection_ids)
                     ->map(fn (int $id) => $detections->get($id))
                     ->filter(fn (?RawDetection $detection) => $detection !== null && ! $detection->isExcluded());
+                $adminRow = $adminRows->get($score->value_id);
 
                 if ($kept->isEmpty()) {
+                    if ($adminRow !== null && $adminRow->quotes !== null) {
+                        $adminRow->delete();
+                    }
+
+                    continue;
+                }
+
+                if ($adminRow !== null) {
                     continue;
                 }
 

@@ -360,6 +360,8 @@ class Show extends Component
             'editingRow' => $this->editingRowId === null ? null : $rows->firstWhere('id', $this->editingRowId),
             // "Egyéb detektált értékek": what matched nothing, without a score (06 · 6.5).
             'otherDetected' => $this->otherDetected($breakdown),
+            // Matched, so the user sees them in the mirror, but without a score (06 · 6.5).
+            'unscored' => $this->unscored($valueRows),
         ])->layout('layouts::admin')->title($this->diagnosis->name);
     }
 
@@ -385,6 +387,40 @@ class Show extends Component
             ->with(['unmatchedValue', 'material.occasion.process'])
             ->get()
             ->groupBy('unmatched_value_id');
+    }
+
+    /**
+     * The values a kept quote of the material matched, without a row: the
+     * scoring found the quotes too few ("nincs adat"). The user sees them on
+     * ET3 all the same, so the admin sees them here (06 · 6.5).
+     *
+     * @param  Collection<int, DiagnosisRow>  $valueRows
+     * @return Collection<int, array{value: Value, quotes: list<string>}>
+     */
+    private function unscored(Collection $valueRows): Collection
+    {
+        $material = $this->diagnosis->material;
+
+        if ($material === null || $this->diagnosis->isCalculated()) {
+            return collect();
+        }
+
+        $threshold = (float) config('megis.engine.match_threshold');
+        $rowValueIds = $valueRows->pluck('value_id')->filter()->all();
+
+        return $material->detections()
+            ->when($this->diagnosis->speaker !== null, fn ($query) => $query->where('speaker', $this->diagnosis->speaker))
+            ->kept()
+            ->with(['matches' => fn ($query) => $query->where('confidence', '>=', $threshold)->with('value')])
+            ->get()
+            ->flatMap(fn (RawDetection $detection) => $detection->matches->map(fn ($match) => ['value' => $match->value, 'quote' => $detection->quote]))
+            ->filter(fn (array $match) => $match['value'] !== null && ! in_array($match['value']->id, $rowValueIds, true))
+            ->groupBy(fn (array $match) => $match['value']->id)
+            ->map(fn (Collection $matches) => [
+                'value' => $matches->first()['value'],
+                'quotes' => $matches->pluck('quote')->unique()->values()->all(),
+            ])
+            ->values();
     }
 
     /**

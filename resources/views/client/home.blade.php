@@ -46,7 +46,9 @@
         </section>
 
         @if (($firstStep['state'] ?? null) === 'done')
-            <x-client.mirror-waiting />
+            <x-client.mirror-waiting>
+                <a href="{{ route('client.sample-report', $organization) }}" class="mt-1 self-start font-semibold">{{ __('sample_report.link') }}</a>
+            </x-client.mirror-waiting>
         @endif
 
         @unless ($later)

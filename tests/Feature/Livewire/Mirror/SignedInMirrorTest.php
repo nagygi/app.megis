@@ -1,9 +1,11 @@
 <?php
 
+use App\Enums\DiagnosisStatus;
 use App\Enums\MaterialContext;
 use App\Livewire\Mirror\Record;
 use App\Livewire\Mirror\Result;
 use App\Mail\MirrorInterestMail;
+use App\Models\Diagnosis;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Services\Ai\AiGateway;
@@ -14,6 +16,11 @@ use Laravel\Ai\Responses\Data\Meta;
 use Laravel\Ai\Responses\Data\TextUsage;
 use Laravel\Ai\Responses\StructuredTextResponse;
 use Livewire\Livewire;
+
+function mirrorAnswerFor(array $data): StructuredTextResponse
+{
+    return new StructuredTextResponse($data, json_encode($data), new TextUsage(10, 5), new Meta('anthropic', 'claude-test'));
+}
 
 function signedInMirror(Organization $organization): MirrorSession
 {
@@ -170,7 +177,7 @@ it('deepens the values from the own menu too (ET4)', function () {
 });
 
 it('lists the earlier mirrors on the Értéktükör page, to open them again', function () {
-    $organization = Organization::factory()->create();
+    $organization = Organization::factory()->individual()->create();
     actingAsCustomer(customerOf($organization));
     $session = signedInMirror($organization);
 
@@ -183,6 +190,62 @@ it('lists the earlier mirrors on the Értéktükör page, to open them again', f
     actingAsCustomer(customerOf($organization));
 
     $this->get(route('client.mirror.record', $organization))->assertOk()->assertDontSee('Korábbi tükreid');
+});
+
+it('opens an invited member’s one mirror from the menu, and replaces it with a new one', function () {
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+    $first = signedInMirror($organization);
+    $firstDiagnosis = $first->diagnosis;
+
+    $this->get(route('client.mirror.record', $organization))
+        ->assertRedirect(route('client.mirror.result', [$organization, $first]));
+
+    Livewire::test(Result::class, ['session' => $first, 'organization' => $organization])
+        ->assertSee('Újrakezdem')
+        ->call('startOver')
+        ->assertRedirect(route('client.mirror.record', [$organization, 'uj' => 1]));
+
+    $this->get(route('client.mirror.record', [$organization, 'uj' => 1]))
+        ->assertOk()
+        ->assertSee('Amikor beküldöd, a mostani tükröd és az értékei törlődnek')
+        ->assertDontSee('Korábbi tükreid');
+
+    AiGateway::fake([
+        mirrorAnswerFor(['detections' => [['speaker' => 'Beszélő 1', 'quote' => 'megint szóltam', 'free_name' => 'Egyenesség', 'reasoning' => 'Szól.', 'strength' => 5]]]),
+        mirrorAnswerFor(['results' => [['detection' => 'D1', 'matches' => []]]]),
+        mirrorAnswerFor(['scores' => []]),
+    ]);
+    Livewire::withQueryParams(['uj' => 1])->test(Record::class, ['organization' => $organization])
+        ->call('setMode', 'text')
+        ->set('text', str_repeat('A héten megint szóltam a csúszásról, időben. ', 3))
+        ->call('submitText')
+        ->assertHasNoErrors();
+
+    expect(MirrorSession::query()->whereKey($first->id)->exists())->toBeFalse()
+        ->and(Diagnosis::query()->whereKey($firstDiagnosis->id)->exists())->toBeFalse()
+        ->and(MirrorSession::query()->where('organization_id', $organization->id)->count())->toBe(1);
+});
+
+it('keeps the diagnosis the mégis already published when a new mirror replaces the old one', function () {
+    $organization = Organization::factory()->create();
+    $user = actingAsCustomer(customerOf($organization));
+    $first = signedInMirror($organization);
+    $first->diagnosis->update(['status' => DiagnosisStatus::Published]);
+    $second = MirrorSession::factory()->ownMenu($user, $organization)->create();
+
+    app(MirrorService::class)->replaceStandalone($user, $organization, $second);
+
+    expect(MirrorSession::query()->whereKey($first->id)->exists())->toBeFalse()
+        ->and(Diagnosis::query()->whereKey($first->diagnosis_id)->exists())->toBeTrue();
+});
+
+it('lets a private person record a new mirror from the menu, as before', function () {
+    $organization = Organization::factory()->individual()->create();
+    actingAsCustomer(customerOf($organization));
+    signedInMirror($organization);
+
+    $this->get(route('client.mirror.record', $organization))->assertOk()->assertSee('Korábbi tükreid');
 });
 
 it('does not show someone else’s mirror', function () {

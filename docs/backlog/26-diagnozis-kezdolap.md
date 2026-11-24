@@ -74,6 +74,7 @@ Ha a felhasználó egy nem magánszemély típusú szervezet tagja, és még nem
 - **A tükre feldolgozás alatt van, vagy még nincs kész vele:** „Folytatom a tükrömet” (→ a tükör eredménye).
 - **Kész a tükre:** a sor zöld pipát kap, a gomb „Megnézem a tükrömet”. Fölötte charcoal kártya: „Most nincs több dolgod · A mégis átnézi a tükrödet, és megvárjuk, hogy a csapattársaid is elkészítsék a sajátjukat. Ha indul a diagnózis, e-mailben kapsz meghívót.” (06 · 6.2).
 - A menüben az *Értéktükör* sor ugyaneddig coral aláhúzást és coral „!” jelet kap (15 · 15.3).
+- **Példa riport:** a „Most nincs több dolgod” kártyán (itt és az ET5-ön) link: „Így fog kinézni a riport · minta” → statikus mintalap kitalált adatokkal („Minta Kft.”): a riport gyűrűje, létrája, érték- és folyamatsorai, egy Útravaló-mondat. Felül végig coral „Minta” sáv: „Ez egy példa riport kitalált adatokkal. A te riportod a mégis csapat elemzése és jóváhagyása után jelenik meg.” A szövegeket a mégis nézi át (`lang/hu/sample_report.php`).
 - Csak a diagnózison kívüli tükör számít, a legutóbbi. Magánszemélynél nincs ilyen sor: ő a tükörrel érkezett.
 
 ## Nincs benne

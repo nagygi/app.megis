@@ -2,6 +2,7 @@
 
 namespace App\Services\Mirror;
 
+use App\Enums\DiagnosisStatus;
 use App\Enums\InboxItemType;
 use App\Enums\MaterialStatus;
 use App\Enums\MembershipStatus;
@@ -124,6 +125,36 @@ class MirrorService
             ->whereHas('material', fn ($query) => $query->whereNull('parent_diagnosis_id'))
             ->latest('id')
             ->first();
+    }
+
+    /**
+     * "Újrakezdem" (06 · 6.2): an invited member keeps one mirror outside a
+     * diagnosis, the new one replaces the earlier ones when it is sent. With
+     * each goes its automatic diagnosis while it waits for approval; one the
+     * mégis already published stays, only the mirror goes.
+     */
+    public function replaceStandalone(User $user, Organization $organization, MirrorSession $keep): void
+    {
+        MirrorSession::query()
+            ->where('user_id', $user->id)
+            ->where('organization_id', $organization->id)
+            ->whereKeyNot($keep->id)
+            ->whereNotNull('claimed_at')
+            ->whereHas('material', fn ($query) => $query->whereNull('parent_diagnosis_id'))
+            ->with('diagnosis')
+            ->get()
+            ->each(function (MirrorSession $session): void {
+                DB::transaction(function () use ($session): void {
+                    $diagnosis = $session->diagnosis;
+
+                    if ($diagnosis !== null && $diagnosis->status !== DiagnosisStatus::Published && ! $diagnosis->subdiagnoses()->exists()) {
+                        $session->update(['diagnosis_id' => null]);
+                        $diagnosis->delete();
+                    }
+
+                    $this->delete($session->refresh());
+                });
+            });
     }
 
     /**

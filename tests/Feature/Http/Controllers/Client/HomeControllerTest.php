@@ -57,9 +57,23 @@ it('tells an invited member with a mirror that there is nothing more to do for n
         ->assertSee('Most nincs több dolgod')
         ->assertSee('Megnézem a tükrömet')
         ->assertSee(route('client.mirror.result', [$organization, $session]))
+        ->assertSee(route('client.sample-report', $organization))
         ->assertDontSee('Itt tartasz')
         ->assertDontSee('Kezdjük az Értéktükröt!')
         ->assertDontSee('itt a következő lépésed');
+});
+
+it('shows a sample report, marked as a sample', function () {
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+
+    $this->get(route('client.sample-report', $organization))
+        ->assertOk()
+        ->assertSee('Példa riport')
+        ->assertSee('Ez egy példa riport kitalált adatokkal. A te riportod a mégis csapat elemzése és jóváhagyása után jelenik meg.')
+        ->assertSee('Minta Kft.')
+        ->assertSee('Egyenesség')
+        ->assertSee('Vezetői kör');
 });
 
 it('does not put the Értéktükör before a private person’s steps', function () {

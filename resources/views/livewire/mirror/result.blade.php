@@ -23,6 +23,18 @@
             @if ($isPublic && $session->awaitsConfirmation())
                 <p class="text-sm text-grey-700">{{ __('mirror.processing_mail', ['email' => $session->email]) }}</p>
             @endif
+            @if ($stories !== [])
+                {{-- Short stories from the life of the mégis while the mirror is read; they turn by themselves and outlive the poll (06 · ET2) --}}
+                <figure
+                    wire:ignore
+                    x-data="{ index: 0, stories: {{ \Illuminate\Support\Js::from($stories) }} }"
+                    x-init="if (stories.length > 1) setInterval(() => index = (index + 1) % stories.length, 12000)"
+                    class="mt-2 flex w-full flex-col gap-2 rounded-card bg-yellow-pale p-5 text-left"
+                >
+                    <figcaption class="text-xs font-semibold tracking-wide text-grey-700 uppercase">{{ __('mirror.stories_title') }}</figcaption>
+                    <p x-text="stories[index]">{{ $stories[0] }}</p>
+                </figure>
+            @endif
         </x-ui.card>
     @elseif ($status === \App\Enums\MirrorStatus::Failed)
         <x-ui.card wire:key="failed" padding="lg" class="flex flex-col items-start gap-4" role="alert">
@@ -248,7 +260,9 @@
         @endif
 
         @if ($waitsForTeam)
-            <x-client.mirror-waiting />
+            <x-client.mirror-waiting>
+                <a href="{{ route('client.sample-report', $organization) }}" class="mt-1 self-start font-semibold">{{ __('sample_report.link') }}</a>
+            </x-client.mirror-waiting>
         @endif
 
         @if (! $isPublic)
@@ -381,6 +395,14 @@
                     <p class="text-sm text-grey-700">{{ __('mirror.approve_all_first') }}</p>
                 @endif
                 <x-form.error name="approval" id="approval" role="alert" />
+            </div>
+        @endif
+
+        @if ($waitsForTeam)
+            {{-- One mirror for an invited member: a new one replaces this one (06 · 6.2) --}}
+            <div class="flex flex-col items-start gap-1 border-t border-grey-200 pt-4">
+                <x-ui.button tone="ghost" size="sm" icon="refresh" wire:click="startOver" wire:confirm="{{ __('mirror.start_over_confirm') }}">{{ __('mirror.start_over_new') }}</x-ui.button>
+                <p class="text-sm text-grey-700">{{ __('mirror.start_over_help') }}</p>
             </div>
         @endif
     @endif

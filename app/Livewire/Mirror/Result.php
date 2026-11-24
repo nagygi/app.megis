@@ -242,6 +242,18 @@ class Result extends Component
     }
 
     /**
+     * "Újrakezdem": an invited member records a new mirror in place of this
+     * one; this one goes once the new one is sent (06 · 6.2).
+     */
+    public function startOver(): void
+    {
+        $this->ensureOwner();
+        abort_unless($this->waitsForTeam(), 403);
+
+        $this->redirect(route('client.mirror.record', [$this->organization, 'uj' => 1]), navigate: false);
+    }
+
+    /**
      * A ticked question is kept at once; there is no button for it (ET5).
      */
     public function updatedCuriosity(): void
@@ -388,6 +400,7 @@ class Result extends Component
             'otherValues' => max(0, Value::query()->availableTo(null)->count() - $kept->whereNotNull('valueId')->count()),
             'accountUrl' => $this->accountUrl(),
             'asksCuriosity' => $this->asksCuriosity(),
+            'stories' => array_values(array_filter((array) __('mirror.processing_stories'), 'filled')),
             'waitsForTeam' => $this->waitsForTeam(),
             'interestSent' => $this->session->interest_sent_at !== null,
             'interestEmail' => $this->session->user?->email ?? $this->session->email,

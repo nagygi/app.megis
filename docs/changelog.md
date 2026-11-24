@@ -2,6 +2,18 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.118 · – · 2026-11-24
+
+Meghívott ügyféloldal, az első demó észrevételei (4. rész): egy tükör, az admin ugyanazt látja, példa riport, anekdoták helye.
+
+- **Az admin ugyanazt látja, mint az ügyfél:**
+  - **Eddig:** az ügyfél tükrében három érték állt, az admin diagnózisában csak egy. A pontozásnál „nincs adat” értékekből (kevés idézet) nem lett sor, a nem illeszkedő szabad név csak az „Egyéb detektált értékek” alatt állt. Az admin kézzel felvett sorát az ügyfél „nem az enyém” kattintása törölte.
+  - **Most:** a diagnózis oldalán új lista: „Pontszám nélküli értékek”, „nincs adat” jellel és az idézetekkel. Az ügyfél adatlapján a tükör sora kiírja az értékeit. Az admin kézzel felvett vagy módosított sora megmarad.
+- **Egy tükör a meghívott tagnak:** a menü *Értéktükör* pontja a meglévő tükrét nyitja; az ET3 alján „Újrakezdem” (megerősítéssel). Az új tükör beküldésekor a régi törlődik, a még jóváhagyásra váró automatikus diagnózisával együtt; a publikált diagnózis megmarad. Magánszemélynél és a diagnózis tükreinél nincs változás.
+- **Példa riport:** a „Most nincs több dolgod” kártyán „Így fog kinézni a riport · minta” link egy statikus mintalapra (kitalált „Minta Kft.”), végig „Minta” jelöléssel: a végleges riport a mégis elemzése és jóváhagyása után jelenik meg.
+- **Anekdoták:** az „Olvassuk, amit mondtál…” kártyán rövid, váltakozó történetek helye a mégis életéből. A szövegek még nincsenek meg, addig a rész nem látszik.
+- Jegyszövegek: 06 · 6.1, 6.2, 6.5; 26 · 26.4; 33.
+
 ## 1.117 · 09ad0b1 · 2026-11-24
 
 Meghívott ügyféloldal, az első demó észrevételei (3. rész): az értékek jóváhagyása és a saját meghatározás.

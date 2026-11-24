@@ -273,6 +273,29 @@
             @endif
         </section>
 
+        @if ($unscored->isNotEmpty())
+            {{-- Matched values without a score: the user sees them in the mirror (06 · 6.5) --}}
+            <section class="flex flex-col gap-3" aria-labelledby="unscored">
+                <div>
+                    <h2 id="unscored" class="text-lg font-semibold">{{ __('admin.diagnoses.unscored') }}</h2>
+                    <p class="text-sm text-grey-700">{{ __('admin.diagnoses.unscored_help') }}</p>
+                </div>
+                <ul class="flex flex-col gap-2">
+                    @foreach ($unscored as $match)
+                        <x-ui.card as="li" bordered padding="sm">
+                            <a href="{{ route('admin.values.edit', $match['value']) }}" class="font-semibold text-charcoal">{{ $match['value']->name }}</a>
+                            <x-ui.badge tone="muted" class="ml-2">{{ __('admin.diagnoses.no_data') }}</x-ui.badge>
+                            <ul class="mt-2 flex flex-col gap-1 text-sm text-grey-700">
+                                @foreach ($match['quotes'] as $quote)
+                                    <li>„{{ $quote }}”</li>
+                                @endforeach
+                            </ul>
+                        </x-ui.card>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
+
         @if ($otherDetected->isNotEmpty())
             {{-- What matched nothing in the Értéktár, without a score (06 · 6.5) --}}
             <section class="flex flex-col gap-3" aria-labelledby="other-detected">

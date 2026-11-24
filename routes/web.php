@@ -26,6 +26,7 @@ use App\Http\Controllers\Client\PasswordResetController;
 use App\Http\Controllers\Client\PausedController;
 use App\Http\Controllers\Client\ReportController;
 use App\Http\Controllers\Client\ReportPdfController;
+use App\Http\Controllers\Client\SampleReportController;
 use App\Http\Controllers\Client\TakeawayController;
 use App\Http\Controllers\Client\WisdomController;
 use App\Http\Controllers\ExternalClient\InvitationController as ExternalClientInvitationController;
@@ -284,6 +285,8 @@ Route::middleware('customer')->name('client.')->group(function () {
                 Route::livewire('diagnozis/{diagnosis}/folyamatok/osszegzes', Client\Diagnosis\ProcessSummary::class)->name('diagnosis.process-summary');
                 Route::livewire('diagnozis/{diagnosis}/folyamatok/{process}', Client\ProcessSheet::class)->whereNumber('process')->name('diagnosis.process');
                 Route::livewire('diagnozis/{diagnosis}/ki-lat-mit', Client\Diagnosis\Visibility::class)->name('diagnosis.ki-lat-mit');
+                // A sample report for the invited member before their own (26 · 26.4).
+                Route::get('minta-riport', SampleReportController::class)->name('sample-report');
                 // Bölcsességtár (32).
                 Route::get('bolcsessegtar', [WisdomController::class, 'index'])->name('wisdom.index');
                 Route::get('bolcsessegtar/{topic}', [WisdomController::class, 'show'])->name('wisdom.show');

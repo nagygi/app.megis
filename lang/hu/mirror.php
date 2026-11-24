@@ -62,6 +62,9 @@ return [
     'processing' => 'Olvassuk, amit mondtál…',
     'processing_hint' => 'Egy-két perc. Ezt a lapot nyitva hagyhatod.',
     'processing_mail' => 'Közben küldtünk egy megerősítő linket ide: :email.',
+    // Short stories from the life of the mégis while the mirror is read (2026-11-24). The mégis (Oszi) sends them; empty, nothing shows.
+    'stories_title' => 'A mégis műhelyéből',
+    'processing_stories' => [],
     'failed' => 'Nem tudtuk feldolgozni. Próbáld újra.',
     'try_again' => 'Újra próbálom',
     'failed_kept' => 'Amit küldtél, megvan, nem kell újra beküldened.',
@@ -197,5 +200,11 @@ return [
 
     // 06 · 6.2: the earlier mirrors on the own menu's Értéktükör page.
     'previous_mirrors' => 'Korábbi tükreid',
+
+    // 06 · 6.2: an invited member keeps one mirror; a new one replaces it (2026-11-24).
+    'start_over_new' => 'Újrakezdem',
+    'start_over_help' => 'Új tükröt veszel fel a mostani helyett.',
+    'start_over_confirm' => 'Új tükröt veszel fel. Amikor beküldöd, a mostani tükröd és az értékei törlődnek.',
+    'replacing' => 'Új tükröt veszel fel. Amikor beküldöd, a mostani tükröd és az értékei törlődnek; addig megmarad.',
 
 ];

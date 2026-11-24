@@ -10,6 +10,8 @@ use App\Enums\MirrorStatus;
 use App\Enums\ScoreResultState;
 use App\Enums\ValueOrigin;
 use App\Exceptions\EmptyValueCatalogException;
+use App\Livewire\Admin\Clients\Show as AdminClient;
+use App\Livewire\Admin\Diagnoses\Show as AdminDiagnosis;
 use App\Mail\ErrorAlert;
 use App\Models\AiCall;
 use App\Models\AnonymousValueStat;
@@ -19,6 +21,7 @@ use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\Value;
 use App\Services\Ai\AiGateway;
+use App\Services\Diagnoses\DiagnosisService;
 use App\Services\Materials\MaterialStore;
 use App\Services\Mirror\MirrorService;
 use App\Services\Values\ValueService;
@@ -29,6 +32,7 @@ use Illuminate\Support\Facades\Mail;
 use Laravel\Ai\Responses\Data\Meta;
 use Laravel\Ai\Responses\Data\TextUsage;
 use Laravel\Ai\Responses\StructuredTextResponse;
+use Livewire\Livewire;
 
 function aiAnswer(array $data): StructuredTextResponse
 {
@@ -297,6 +301,58 @@ it('turns a signed-in mirror into a diagnosis of the active organization at once
     app(MirrorService::class)->toggle($session->fresh(), 'value:'.$directness->id);
 
     expect($diagnosis->valueRows()->count())->toBe(0);
+});
+
+it('keeps the rows the admin added when the user changes their mind on ET3', function () {
+    [$directness, $care] = engineScenario();
+    $organization = Organization::factory()->create();
+    customerOf($organization);
+    $session = textMirror($organization);
+    $diagnosis = $session->fresh()->diagnosis;
+
+    app(DiagnosisService::class)->addValue($diagnosis, $care);
+    app(MirrorService::class)->toggle($session->fresh(), 'free:játékosság');
+
+    expect($diagnosis->valueRows()->pluck('value_id')->sort()->values()->all())->toBe(collect([$directness->id, $care->id])->sort()->values()->all());
+
+    // Taken out, the engine's row goes; the admin's stays.
+    app(MirrorService::class)->toggle($session->fresh(), 'value:'.$directness->id);
+
+    expect($diagnosis->valueRows()->pluck('value_id')->all())->toBe([$care->id]);
+});
+
+it('shows the admin the matched values without a score, as the user sees them in the mirror', function () {
+    actingAsAdmin();
+    $values = app(ValueService::class);
+    $directness = $values->create(['name' => 'Egyenesség', 'meanings' => ['Kimondom.']]);
+    $care = $values->create(['name' => 'Gondoskodás', 'meanings' => ['Figyelek.']]);
+    AiGateway::fake([
+        aiAnswer(['detections' => [
+            ['speaker' => 'Beszélő 1', 'quote' => 'inkább most mondom, mint csütörtökön', 'free_name' => 'egyenes beszéd', 'reasoning' => 'Kimondja.', 'strength' => 5],
+            ['speaker' => 'Beszélő 1', 'quote' => 'megkérdeztem, hogy van', 'free_name' => 'törődés', 'reasoning' => 'Figyel.', 'strength' => 2],
+        ]]),
+        aiAnswer(['results' => [
+            ['detection' => 'D1', 'matches' => [['ref' => 'E1', 'confidence' => 0.9]]],
+            ['detection' => 'D2', 'matches' => [['ref' => 'E2', 'confidence' => 0.8]]],
+        ]]),
+        aiAnswer(['scores' => [
+            ['ref' => 'E1', 'state' => 'scored', 'score' => 5, 'reasoning' => 'Így tesz.', 'detections' => ['D1']],
+            ['ref' => 'E2', 'state' => 'no_data', 'reasoning' => 'Kevés.', 'detections' => []],
+        ]]),
+    ]);
+    $organization = Organization::factory()->create();
+    $user = customerOf($organization);
+    $session = textMirror($organization);
+    $diagnosis = $session->fresh()->diagnosis;
+
+    expect($diagnosis->valueRows()->pluck('value_id')->all())->toBe([$directness->id]);
+
+    Livewire::test(AdminDiagnosis::class, ['diagnosis' => $diagnosis])
+        ->assertSee('Pontszám nélküli értékek')
+        ->assertSeeInOrder(['Pontszám nélküli értékek', 'Gondoskodás', 'nincs adat', 'megkérdeztem, hogy van']);
+
+    Livewire::test(AdminClient::class, ['user' => $user])
+        ->assertSeeInOrder(['Az értékei:', 'Egyenesség · Gondoskodás']);
 });
 
 it('shows the error state and opens a Beérkező row when processing fails for good', function () {

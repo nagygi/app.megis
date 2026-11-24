@@ -48,6 +48,7 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
   - A beküldéssel azonnal megy a megerősítő levél. Ha a cím már egy aktív fiókhoz tartozik, nem megy levél: a felhasználó az ET5-ön lép be.
 - Beküldés Turnstile-lal, IP-alapú rate limittel (óránként 5).
 - E-mail címenként naponta 10 ingyenes tükör készülhet (2026.10.27.); éjfélkor nullázódik. A 11.-nél az e-mail mező alatt: „Erre az e-mail címre ma már elkészült a napi 10 ingyenes tükör. Holnap újra belenézhetsz.” Felvételnél ezt is a feltöltés előtt ellenőrizzük. A belépett ügyfél saját menüs tükrét nem korlátozza.
+- **Anekdoták a várakozás alatt** (2026-11-24): a feldolgozó kártya alján rövid, statikus történetek a mégis életéből („A mégis műhelyéből”), kb. 12 másodpercenként váltakozva. A szövegeket a mégis adja (`lang/hu/mirror.php` · `processing_stories`); amíg nincs, a rész nem látszik.
 - A feldolgozás alatt várakozó állapot látszik: lüktető évgyűrű és „Olvassuk, amit mondtál…”, a három pont egymás után felvillan (MEGIS-5; mozgás nélkül álló pontok). Ugyanez a pont-animáció minden várakozó feliraton (feltöltés, átírás, beolvasás, mégis Coach). Ha a feldolgozás nem sikerül, ez jelenik meg: „Nem tudtuk feldolgozni. Próbáld újra.”
 
 **ET3 · az értékeid**
@@ -131,6 +132,7 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 - **A meghívott tag első tükre** (diagnózison kívül, nem magánszemélynél; 2026-11-24): az ET5 alján a kíváncsiság-kérdések helyén charcoal kártya: „Most nincs több dolgod · A mégis átnézi a tükrödet, és megvárjuk, hogy a csapattársaid is elkészítsék a sajátjukat. Ha indul a diagnózis, e-mailben kapsz meghívót.” A „Befejezem” a kezdőlapra visz, ahol ugyanez a kártya áll (26 · 26.4). Csapatszámláló nincs, mert kis csapatnál elárulná, ki nem töltötte még ki (25.4).
 - **Kíváncsiság-kérdések az ET5-ön:** csak magánszemélynél. A mégis által meghívott tag (nem magánszemély típusú szervezetben) nem kapja meg őket és az „Elküldöm”-et sem, mert vele már megállapodtak, miről lesz szó (2026-11-24).
 - Az *Értéktükör* lapján a felhasználó korábbi tükrei ebben a szervezetben („Korábbi tükreid”, a legutóbbi 10): dátum, a megtartott értékek, és egy link az eredményre.
+- **Egy tükör a meghívott tagnak** (nem magánszemély, diagnózison kívül; 2026-11-24): a menü *Értéktükör* pontja a meglévő tükör eredményét nyitja, „Korábbi tükreid” lista nincs. Az ET3 alján „Újrakezdem” (megerősítéssel: „Új tükröt veszel fel. Amikor beküldöd, a mostani tükröd és az értékei törlődnek.”). Az új tükör beküldésekor a korábbi törlődik (6.1 · Törlés), a hozzá tartozó automatikus diagnózissal együtt, ha az még „Jóváhagyásra vár”; a mégis által már publikált diagnózis megmarad. Az „Elmondom” út és a futó diagnózis tükrei nem ilyenek, magánszemélynél sincs korlát.
 - A diagnózis a felhasználó **aktív szervezetéhez** kerül (szervezetválasztó). Ha csak egy szervezete van, ahhoz.
 - Ha a felhasználó vezetőként vagy társként benne van egy futó fő diagnózisban, a tükör annak részdiagnózisa lesz (17 · 17.4).
 
@@ -206,6 +208,8 @@ Ebből látszik később, mely értékek térnek vissza, és mi hiányzik az Ér
 - Soronként: az illesztett érték, a mérőszám (a C lépcső 1–6 értéke), az indoklás (a motorból) és a sorhoz csatolt idézetek (csak olvasható).
 - A „nincs adat” értékek nem kerülnek be.
 - A nem illeszkedő értékek a diagnózis oldalán „Egyéb detektált értékek” listában látszanak, mérőszám nélkül.
+- **Pontszám nélküli értékek** (2026-11-24): ami az Értéktárra illeszkedett, de a pontozás „nincs adat” lett (kevés az idézet), nem lesz sor, mégis látszik az ügyfél tükrében. A diagnózis oldalán külön listában áll, „nincs adat” jellel és az idézetekkel, hogy az admin ugyanazt lássa, amit az ügyfél.
+- Az admin kézzel felvett sora („+ Érték”) és az általa módosított sor megmarad, ha az ügyfél utóbb „nem az enyém”-et jelöl; ha egy módosított sor értékét az ügyfél kiveszi, az a sor kikerül.
 - A diagnózis oldalán az admin látja az átiratot, és lejátszhatja a hangot.
 
 **Megjelenés a felhasználónál**

@@ -15,6 +15,8 @@ use App\Models\Membership;
 use App\Models\MirrorSession;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
+use App\Services\Mirror\MirrorService;
+use App\Services\Mirror\MirrorValueGroup;
 use App\Services\Organizations\MembershipService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
@@ -190,6 +192,11 @@ class Show extends Component
                 ->with('diagnosis')
                 ->latest('id')
                 ->get(),
+            // The kept values as the user sees them on ET3, scored or not (06 · 6.5).
+            'mirrorValues' => fn (MirrorSession $mirror): string => app(MirrorService::class)->groups($mirror)
+                ->where('excluded', false)
+                ->map(fn (MirrorValueGroup $group) => $group->isRenamed() ? $group->name.' ('.__('mirror.originally', ['name' => $group->originalName]).')' : $group->name)
+                ->implode(' · '),
             'canRename' => Gate::allows('rename', $this->user),
             'canChangeEmail' => Gate::allows('changeEmail', $this->user),
             'canImpersonate' => Gate::allows('impersonate', $this->user),

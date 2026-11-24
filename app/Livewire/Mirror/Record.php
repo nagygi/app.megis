@@ -34,7 +34,8 @@ use Livewire\WithFileUploads;
  * Public, it asks for the e-mail and the accepted documents right before
  * sending and is protected by Turnstile and an IP limit; from the own menu (06 · 6.2) it
  * belongs to the signed-in user and the active organization, and lists the
- * earlier mirrors.
+ * earlier mirrors. An invited member keeps one mirror outside a diagnosis:
+ * the menu opens it, and a new one ("Újrakezdem", ?uj=1) replaces it.
  */
 class Record extends Component
 {
@@ -83,6 +84,12 @@ class Record extends Component
     #[Url(as: 'diagnozis')]
     public ?int $mainDiagnosisId = null;
 
+    /**
+     * "Újrakezdem": the new mirror replaces the invited member's one (06 · 6.2).
+     */
+    #[Url(as: 'uj')]
+    public bool $replacing = false;
+
     public function mount(?Organization $organization = null): void
     {
         $this->organization = $organization?->exists ? $organization : null;
@@ -94,6 +101,15 @@ class Record extends Component
         if (! $options->contains(fn (MainDiagnosis $main) => $main->diagnosis_id === $this->mainDiagnosisId)) {
             $this->mainDiagnosisId = $options->count() === 1 ? $options->first()->diagnosis_id : null;
         }
+
+        // One mirror: the menu opens the one there is, unless a new one replaces it.
+        $existing = $this->keepsOneMirror() ? app(MirrorService::class)->standaloneFor($this->user(), $this->organization) : null;
+
+        if ($existing !== null && ! $this->replacing) {
+            $this->redirect(route('client.mirror.result', [$this->organization, $existing]), navigate: false);
+        }
+
+        $this->replacing = $this->replacing && $existing !== null;
     }
 
     public function setMode(string $mode): void
@@ -185,7 +201,7 @@ class Record extends Component
             'diagnosisOptions' => $this->diagnosisOptions(),
             'termsUrl' => $legalDocuments->current(LegalDocumentType::Terms) ? route('legal.show', LegalDocumentType::Terms->value) : null,
             'privacyUrl' => $legalDocuments->current(LegalDocumentType::PrivacyPolicy) ? route('legal.show', LegalDocumentType::PrivacyPolicy->value) : null,
-            'previousMirrors' => $this->previousMirrors(),
+            'previousMirrors' => $this->keepsOneMirror() ? collect() : $this->previousMirrors(),
         ]);
 
         return $this->organization === null
@@ -249,6 +265,11 @@ class Record extends Component
 
         $session = $mirrors->start($material, $this->user(), $this->organization);
         session()->push('mirror_tokens', $session->token);
+
+        // An invited member's new mirror replaces the earlier one (06 · 6.2).
+        if ($this->keepsOneMirror() && $this->mainDiagnosisId === null) {
+            $mirrors->replaceStandalone($this->user(), $this->organization, $session);
+        }
 
         if ($this->forOwnValues && $this->organization !== null && $this->mainDiagnosisId !== null) {
             session()->put(self::OWN_VALUES_SESSION_KEY.'.'.$session->id, $this->mainDiagnosisId);
@@ -352,6 +373,18 @@ class Record extends Component
         }
 
         return app(MainDiagnosisService::class)->acceptingInputFor($user, $this->organization);
+    }
+
+    /**
+     * An invited member (not a private person) keeps one mirror outside a
+     * diagnosis; "Elmondom" and a mirror of a running diagnosis are not that (06 · 6.2).
+     */
+    private function keepsOneMirror(): bool
+    {
+        return $this->organization !== null
+            && ! $this->organization->isIndividual()
+            && ! $this->forOwnValues
+            && $this->diagnosisOptions()->isEmpty();
     }
 
     private function context(): MaterialContext

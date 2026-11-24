@@ -8,6 +8,14 @@
         <p class="text-grey-700">{{ __('mirror.hint') }}</p>
     </div>
 
+    @if ($replacing)
+        {{-- "Újrakezdem": the new mirror replaces the one there is (06 · 6.2) --}}
+        <x-ui.card tone="paper" class="flex items-start gap-3" role="note">
+            <x-megis.symbol name="growth-rings" class="size-8 shrink-0 text-coral" />
+            <p>{{ __('mirror.replacing') }}</p>
+        </x-ui.card>
+    @endif
+
     @if ($diagnosisOptions->count() > 1)
         {{-- 17 · 17.6: more running diagnoses --}}
         <x-ui.card>

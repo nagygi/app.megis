@@ -40,7 +40,7 @@ Szuperadmin és Admin egyaránt használhatja (01).
 
 ### 33.4 Értéktükör és érdeklődés
 
-- A felhasználó Értéktükrei dátummal, linkkel a diagnózisra (06).
+- A felhasználó Értéktükrei dátummal, linkkel a diagnózisra (06), és a megtartott értékeivel úgy, ahogy az ügyfél látja őket (átnevezésnél az eredeti névvel), pontozott vagy sem (2026-11-24).
 - Az ET5-ön jelölt kíváncsiság-kérdések, és hogy rákattintott-e az „Időpontot foglalok” gombra, mikor: „időpontot foglalna · 2026.10.20. 14:05” (06, 22). Az ET5-ön most nincs foglalás: [NM-22](../backlog_nem_MVP/NM-22-idopontfoglalas.md).
 
 ### 33.5 Elfogadások és hozzájárulások
