@@ -64,6 +64,7 @@ Egy szint, lenyitható csoportokkal.
   - a felhasználónak van joga hozzá (címkék, 02);
   - van mögötte tartalom. A Riportok például csak publikálás után jelenik meg.
 - A menü tartalma ezért konfigurációból áll össze, és a lapok jegyei bővítik.
+- **Teendő-jel** (2026-11-24): ahol a felhasználónak dolga van, a menüsor címe coral aláhúzást, a sor jobb oldala coral „!” jelet kap, képernyőolvasónak „itt a következő lépésed”. Most egy helyen: az *Értéktükör* sorban, amíg a meghívott tagnak nincs kész tükre és nem nyílt meg diagnózisa (26 · 26.4).
 
 ### 15.4 Szervezetválasztó
 

@@ -107,6 +107,10 @@ it('asks an invited member no curiosity questions, and points to the tree in the
         ->assertSee('Mit jelentenek a fa részei?')
         ->assertSeeHtml(route('client.wisdom.show', [$organization, 'kuldetesfa']));
 
+    $result->assertSee('Most nincs több dolgod')
+        ->call('finish')
+        ->assertRedirect(route('client.home', $organization));
+
     $result->set('curiosity', ['gap'])->assertForbidden();
     Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])->call('sendInterest')->assertForbidden();
 

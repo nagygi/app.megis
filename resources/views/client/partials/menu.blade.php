@@ -71,6 +71,10 @@
             $latestReport !== null => collect([$latestReport->product_name, $latestReport->published_at?->format('m.d.')])->filter()->implode(' · '),
             default => null,
         };
+
+        // The Értéktükör waits for an invited member before their diagnosis (15 · 15.3, 26 · 26.4).
+        $mirrorWaits = ! $currentOrganization->isIndividual() && $currentMain === null
+            && app(\App\Services\Mirror\MirrorService::class)->firstStep($user, $currentOrganization)['state'] !== 'done';
     }
 @endphp
 
@@ -149,7 +153,7 @@
                     <x-client.menu-link :href="route('client.values', $currentOrganization)" :title="__('client.menu.value_library')" :meta="$valuesMeta" symbol="fruit" :active="$valuesActive" />
                 @endif
 
-                <x-client.menu-link :href="route('client.mirror.record', $currentOrganization)" :title="__('client.menu.mirror')" :meta="__('client.menu.mirror_meta')" symbol="tree-of-life" :active="request()->routeIs('client.mirror.*')" />
+                <x-client.menu-link :href="route('client.mirror.record', $currentOrganization)" :title="__('client.menu.mirror')" :meta="__('client.menu.mirror_meta')" symbol="tree-of-life" :active="request()->routeIs('client.mirror.*')" :attention="$mirrorWaits" />
                 <x-client.menu-link :href="route('client.wisdom.index', $currentOrganization)" :title="__('wisdom.menu')" :meta="__('client.menu.wisdom_meta')" symbol="growth-rings" :active="request()->routeIs('client.wisdom.*')" />
 
                 @if ($reports->isNotEmpty())

@@ -66,6 +66,16 @@ Egy ember lehet az egyik diagnózisban vezető, egy másikban társ (25.7), és 
 - Ha egy e-mailből jön (pl. társ-meghívó), az a lap nyílik, ahová a link mutat (14 · 14.4).
 - A régebbi riportok a „Riportok” listában és a menüben (15 · 15.3) maradnak.
 
+**A meghívott tag első lépése: az Értéktükör** (2026-11-24, a mégis első ügyféldemója után)
+
+Ha a felhasználó egy nem magánszemély típusú szervezet tagja, és még nem nyílt meg neki diagnózis, a kezdőlap lépéssora az **Értéktükör** sorral kezdődik (kb. 10 perc):
+
+- **Még nincs tükre:** coral gyűrű, alatta „Itt tartasz” és „Az első lépésed: mesélj el egy helyzetet, és megmutatjuk, mely értékeid hallatszanak ki belőle.”, és a gomb: **„Kezdjük az Értéktükröt!”** (→ Értéktükör). A lépéssor többi sora ilyenkor nem kap coral gyűrűt.
+- **A tükre feldolgozás alatt van, vagy még nincs kész vele:** „Folytatom a tükrömet” (→ a tükör eredménye).
+- **Kész a tükre:** a sor zöld pipát kap, a gomb „Megnézem a tükrömet”. Fölötte charcoal kártya: „Most nincs több dolgod · A mégis átnézi a tükrödet, és megvárjuk, hogy a csapattársaid is elkészítsék a sajátjukat. Ha indul a diagnózis, e-mailben kapsz meghívót.” (06 · 6.2).
+- A menüben az *Értéktükör* sor ugyaneddig coral aláhúzást és coral „!” jelet kap (15 · 15.3).
+- Csak a diagnózison kívüli tükör számít, a legutóbbi. Magánszemélynél nincs ilyen sor: ő a tükörrel érkezett.
+
 ## Nincs benne
 
 - A Brand-gyűrű és a „Brand · kívülről” sor: egyeztetés alatt.

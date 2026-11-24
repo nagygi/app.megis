@@ -10,6 +10,7 @@ use App\Models\Organization;
 use App\Models\User;
 use App\Services\Auth\LandingResolver;
 use App\Services\MainDiagnoses\HomePreview;
+use App\Services\Mirror\MirrorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -17,11 +18,12 @@ use Illuminate\View\View;
 /**
  * The organization's home (26 · 26.4): the diagnosis the login opens too
  * (V1, V10, V12, T1, T5). Before one opens for the user, a greeting with the
- * way ahead: the leader's steps and the team's, or the peer's.
+ * way ahead: the leader's steps and the team's, or the peer's. An invited
+ * member (not a private person) starts the way with the Értéktükör.
  */
 class HomeController extends Controller
 {
-    public function __invoke(Request $request, Organization $organization, LandingResolver $landing, HomePreview $preview): View|RedirectResponse
+    public function __invoke(Request $request, Organization $organization, LandingResolver $landing, HomePreview $preview, MirrorService $mirrors): View|RedirectResponse
     {
         $user = $request->user();
         $home = $landing->diagnosisFor($user, $organization);
@@ -38,6 +40,7 @@ class HomeController extends Controller
             'later' => $later,
             'lead' => $this->lead($organization, $user),
             'preview' => $preview->for($organization, $user),
+            'firstStep' => $later === null && ! $organization->isIndividual() ? $mirrors->firstStep($user, $organization) : null,
         ]);
     }
 

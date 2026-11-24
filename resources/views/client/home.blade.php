@@ -2,7 +2,9 @@
     Organization home (charcoal header, 15 · 15.2) before a diagnosis opens for
     the user (26 · 26.4): the way ahead, grey and not clickable. The leader's
     steps and the team's under them, or the peer's (HomePreview). When a
-    diagnosis is being set up, its start day too.
+    diagnosis is being set up, its start day too. An invited member's way
+    starts with the Értéktükör: where they stand, and the button to it; once
+    it is done, that there is nothing more to do for now.
 --}}
 @php
     $peerPath = fn () => collect([
@@ -15,6 +17,18 @@
     $upcoming = $preview['upcoming'];
     $startsOn = $upcoming?->starts_on?->format('m.d.');
     $startsLabel = $upcoming ? ($startsOn ?? __('diagnosis.date_open')) : null;
+    $mirrorSession = $firstStep['session'] ?? null;
+    $mirrorHead = $firstStep === null ? null : [
+        'title' => __('client.home.mirror_step.title'),
+        'minutes' => intdiv((int) config('megis.materials.recording_max_seconds'), 60),
+        'done' => $firstStep['state'] === 'done',
+        'lead' => $firstStep['state'] === 'todo' ? __('client.home.mirror_step.lead') : null,
+        'action' => match ($firstStep['state']) {
+            'todo' => ['label' => __('client.home.mirror_step.start'), 'href' => route('client.mirror.record', $organization), 'tone' => 'dark'],
+            'open' => ['label' => __('client.home.mirror_step.continue'), 'href' => route('client.mirror.result', [$organization, $mirrorSession]), 'tone' => 'dark'],
+            default => ['label' => __('client.home.mirror_step.open'), 'href' => route('client.mirror.result', [$organization, $mirrorSession]), 'tone' => 'outline'],
+        },
+    ];
 @endphp
 
 <x-layouts::client :title="__('client.home.title')" color="charcoal" :subtitle="$organization->name">
@@ -31,6 +45,10 @@
             @endif
         </section>
 
+        @if (($firstStep['state'] ?? null) === 'done')
+            <x-client.mirror-waiting />
+        @endif
+
         @unless ($later)
             @if ($preview['role'] === 'leader')
                 <section class="flex flex-col gap-4" aria-labelledby="leader-path">
@@ -41,7 +59,7 @@
                             {{ __('diagnosis.minutes_about', ['minutes' => $preview['leaderSteps']->totalMinutes()]) }}@if ($startsLabel) · {{ __('client.home.starts', ['date' => $startsLabel]) }}@endif
                         </p>
                     </div>
-                    <x-diagnosis.step-list :steps="$preview['leaderSteps']" :step-url="null" :open="false" />
+                    <x-diagnosis.step-list :steps="$preview['leaderSteps']" :step-url="null" :open="false" :head="$mirrorHead" />
                 </section>
 
                 @if ($preview['peerSteps'])
@@ -83,7 +101,7 @@
                         </p>
                     </div>
                     {{-- What comes later: adding while it runs is the last step of the line (prototype T2), the Útravaló after publishing (25 · 25.5, 29). --}}
-                    <x-diagnosis.step-list :steps="$preview['peerSteps']" :step-url="null" :open="false" :tail="['title' => __('diagnosis.peer_add'), 'meta' => __('diagnosis.peer_add_help')]" />
+                    <x-diagnosis.step-list :steps="$preview['peerSteps']" :step-url="null" :open="false" :head="$mirrorHead" :tail="['title' => __('diagnosis.peer_add'), 'meta' => __('diagnosis.peer_add_help')]" />
                 </section>
 
                 <x-diagnosis.end-picture :main="$preview['main']" peer />

@@ -1,7 +1,8 @@
 {{--
     The browser recorder of the Értéktükör and of "Egy helyzet" (06 · 6.1, 12 · 12.3):
-    a timer with a filling ring, encouraging lines, a supporting question after
-    silence. The Livewire component has a "recording" upload and submitRecording(seconds).
+    a timer with a filling ring, a level meter that shows the microphone hears
+    the speaker, encouraging lines, a supporting question after silence; a pause
+    and "Befejeztem". The Livewire component has a "recording" upload and submitRecording(seconds).
     Without the inline submit the page's own button (x-recorder-submit) sends it:
     the recorder reports its state ("recorder-state") and sends on "recorder-submit".
     "check" names the component's method that checks the rest before the upload.
@@ -48,8 +49,23 @@
                 <span class="absolute inset-0 flex items-center justify-center text-3xl font-semibold tabular-nums" x-text="timeLabel">0:00</span>
             </div>
 
+            {{-- The level meter: it moves with the voice, so the speaker sees they are heard --}}
+            <div x-show="state === 'recording' || state === 'paused'" x-cloak class="flex items-center gap-3" data-level-meter>
+                <span class="flex h-6 items-center gap-1" aria-hidden="true">
+                    <template x-for="index in [0, 1, 2, 3, 4]" :key="index">
+                        <span
+                            class="h-6 w-1.5 origin-center rounded-pill transition-transform duration-75"
+                            :class="state === 'paused' ? 'bg-grey-350' : 'bg-coral'"
+                            :style="`transform: scaleY(${state === 'paused' ? 0.15 : bar(index)})`"
+                        ></span>
+                    </template>
+                </span>
+                <span class="text-sm font-semibold" :class="state === 'paused' ? 'text-grey-700' : 'text-coral-ink'" x-text="state === 'paused' ? @js(__('mirror.paused_short')) : @js(__('mirror.hearing'))"></span>
+            </div>
+
             <p x-show="state === 'recording'" class="text-lg font-semibold" x-text="motivation"></p>
-            <p x-show="state === 'recording' && seconds >= {{ $recorderConfig['warning'] }}" class="text-sm font-semibold" role="alert">{{ __('mirror.warning') }}</p>
+            <p x-show="state === 'paused'" x-cloak class="text-center text-grey-700">{{ __('mirror.paused') }}</p>
+            <p x-show="(state === 'recording' || state === 'paused') && seconds >= {{ $recorderConfig['warning'] }}" class="text-sm font-semibold" role="alert">{{ __('mirror.warning') }}</p>
 
             <p
                 x-show="state === 'recording' && question"
@@ -64,7 +80,9 @@
 
             <div class="flex flex-wrap justify-center gap-3">
                 <x-ui.button size="lg" icon="mic" x-show="state === 'idle'" x-on:click="start()">{{ __('mirror.record_start') }}</x-ui.button>
-                <x-ui.button size="lg" x-show="state === 'recording'" x-on:click="stop()">{{ __('mirror.record_stop') }}</x-ui.button>
+                <x-ui.button size="lg" tone="outline" x-show="state === 'recording' && canPause" x-on:click="pause()">{{ __('mirror.record_pause') }}</x-ui.button>
+                <x-ui.button size="lg" tone="outline" icon="mic" x-show="state === 'paused'" x-cloak x-on:click="resume()">{{ __('mirror.record_resume') }}</x-ui.button>
+                <x-ui.button size="lg" x-show="state === 'recording' || state === 'paused'" x-on:click="stop()">{{ __('mirror.record_stop') }}</x-ui.button>
                 @if ($inlineSubmit)
                     <x-ui.button size="lg" x-show="state === 'recorded'" x-on:click="submit()">{{ __('mirror.submit') }}</x-ui.button>
                 @endif

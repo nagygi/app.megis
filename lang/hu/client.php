@@ -20,6 +20,8 @@ return [
         'heading' => 'Mit akarsz megérteni?',
         'mirror' => 'Értéktükör',
         'mirror_meta' => 'egy helyzet, és a benne hallható értékeid',
+        // For the screen reader with the coral "!" of a menu item (26 · 26.4).
+        'attention' => 'itt a következő lépésed',
         'libraries' => 'Tárak',
         'value_library' => 'Értéktár',
         'value_library_meta' => ':count érték, definícióval',
@@ -121,6 +123,15 @@ return [
         'starts' => 'indulás: :date',
         // The dates end in a dot already ("11.03.").
         'invited_starts' => 'Indulás: :date',
+        // The first step of an invited member before the diagnosis: the Értéktükör (26 · 26.4).
+        'mirror_step' => [
+            'title' => 'Értéktükör',
+            'here' => 'Itt tartasz',
+            'lead' => 'Az első lépésed: mesélj el egy helyzetet, és megmutatjuk, mely értékeid hallatszanak ki belőle.',
+            'start' => 'Kezdjük az Értéktükröt!',
+            'continue' => 'Folytatom a tükrömet',
+            'open' => 'Megnézem a tükrömet',
+        ],
         'path' => [
             'label' => 'A társ útja',
             'invitation' => 'Meghívó',

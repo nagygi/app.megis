@@ -228,6 +228,10 @@
             @endif
         @endif
 
+        @if ($waitsForTeam)
+            <x-client.mirror-waiting />
+        @endif
+
         @if (! $isPublic)
             <div>
                 <x-ui.button size="lg" wire:click="finish">{{ __('mirror.finish') }}</x-ui.button>

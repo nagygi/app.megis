@@ -3,8 +3,9 @@
     - first level: a symbol, the title and the line under it, divided by a line;
     - nested (inside x-client.menu-group): smaller, with the yellow chevron.
     active marks the current page: yellow title, aria-current.
+    attention marks where the user has something to do: a coral underline and a coral "!".
 --}}
-@props(['href', 'title', 'meta' => null, 'symbol' => null, 'symbolClass' => 'text-yellow', 'active' => false, 'nested' => false])
+@props(['href', 'title', 'meta' => null, 'symbol' => null, 'symbolClass' => 'text-yellow', 'active' => false, 'nested' => false, 'attention' => false])
 
 <li @class(['border-b border-grey-700' => ! $nested])>
     <a
@@ -25,11 +26,15 @@
                 'text-base' => ! $nested,
                 'text-sm' => $nested,
                 'text-yellow' => $active,
-            ])>{{ $title }}</span>
+                'underline decoration-coral decoration-2 underline-offset-4' => $attention,
+            ])>{{ $title }}@if ($attention)<span class="sr-only"> · {{ __('client.menu.attention') }}</span>@endif</span>
             @if (filled($meta))
                 <span class="mt-0.5 block text-xs text-grey-400">{{ $meta }}</span>
             @endif
         </span>
+        @if ($attention)
+            <span class="grid size-6 shrink-0 place-items-center rounded-pill bg-coral text-sm font-extrabold text-black" aria-hidden="true">!</span>
+        @endif
         @if ($nested)
             <x-megis.icon name="chevron-right" class="shrink-0 text-yellow" />
         @endif

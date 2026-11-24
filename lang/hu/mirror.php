@@ -21,7 +21,12 @@ return [
     'prompt' => 'Mesélj egy helyzetet a hétről, amikor nem az idő vagy a pénz számított, hanem az, ami igazán fontos neked.',
     'hint' => 'Legalább egy percig mesélj, ha teheted, többet.',
     'record_start' => 'Elkezdem a felvételt',
-    'record_stop' => 'Megállítom',
+    'record_stop' => 'Befejeztem',
+    'record_pause' => 'Szünet',
+    'record_resume' => 'Folytatom',
+    'paused' => 'Szünet. A „Folytatom” ugyanott veszi tovább a felvételt.',
+    'hearing' => 'Hallunk',
+    'paused_short' => 'Szünet',
     'restart' => 'Újraveszem',
     'recording' => 'Felvétel folyamatban',
     'motivation' => [
@@ -136,6 +141,9 @@ return [
     'promise' => 'A megerősítés után a fiókodban: :values részletesen, mit jelent, miben látszik, mi az 1 és a 6.',
     'and_more' => 'És még :count érték az Értéktárban, böngészhetően.',
     'finish' => 'Befejezem',
+    // The end for an invited member, on ET5 and the home (06 · 6.2, 26 · 26.4).
+    'waiting_title' => 'Most nincs több dolgod',
+    'waiting' => 'A mégis átnézi a tükrödet, és megvárjuk, hogy a csapattársaid is elkészítsék a sajátjukat. Ha indul a diagnózis, e-mailben kapsz meghívót.',
     'saved_to' => 'A tükröd a(z) :organization diagnózisai közé került. A mégis átnézi, mielőtt a platformon megjelenik.',
 
     'check_mail' => 'Nézd meg a leveled',

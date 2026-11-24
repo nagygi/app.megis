@@ -111,6 +111,14 @@ class MirrorSession extends Model
         return $this->hasMany(MirrorValueInsight::class);
     }
 
+    /**
+     * Made outside a diagnosis: not a subdiagnosis of a main diagnosis (17 · 17.4).
+     */
+    public function isStandalone(): bool
+    {
+        return $this->material?->parent_diagnosis_id === null;
+    }
+
     public function isAnonymous(): bool
     {
         return $this->claimed_at === null;

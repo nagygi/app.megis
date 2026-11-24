@@ -257,6 +257,8 @@ class Result extends Component
      * Own menu: the ticked questions are kept, the diagnosis is already there (06 · 6.2).
      * A mirror told with "Elmondom" goes back to the own values with its
      * values (24 · 24.1); any other mirror leaves the list alone (24 · 24.5).
+     * An invited member's first mirror goes to the home, where they wait for
+     * the diagnosis (26 · 26.4).
      */
     public function finish(PersonalValueSetService $sets): void
     {
@@ -273,6 +275,12 @@ class Result extends Component
             $sets->importMirror($main, auth('web')->user(), $this->session);
             session()->flash('status', __('mirror.back_to_diagnosis'));
             $this->redirect(route('client.diagnosis.sajat-ertekek', [$this->organization, $parent]), navigate: false);
+
+            return;
+        }
+
+        if ($this->waitsForTeam()) {
+            $this->redirect(route('client.home', $this->organization), navigate: false);
 
             return;
         }
@@ -310,6 +318,7 @@ class Result extends Component
             'otherValues' => max(0, Value::query()->availableTo(null)->count() - $kept->whereNotNull('valueId')->count()),
             'accountUrl' => $this->accountUrl(),
             'asksCuriosity' => $this->asksCuriosity(),
+            'waitsForTeam' => $this->waitsForTeam(),
             'interestSent' => $this->session->interest_sent_at !== null,
             'interestEmail' => $this->session->user?->email ?? $this->session->email,
         ]);
@@ -347,6 +356,15 @@ class Result extends Component
     private function asksCuriosity(): bool
     {
         return ! $this->isInvitedMember();
+    }
+
+    /**
+     * An invited member's mirror outside a diagnosis: after it, there is
+     * nothing to do until the diagnosis starts (06 · 6.2).
+     */
+    private function waitsForTeam(): bool
+    {
+        return $this->isInvitedMember() && $this->session->isStandalone();
     }
 
     private function ensureOwner(): void

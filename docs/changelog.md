@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.116 · – · 2026-11-24
+
+Meghívott ügyféloldal, az első demó észrevételei (2. rész): a felvevő és a meghívott útja.
+
+- **Felvevő (Értéktükör, Egy helyzet):**
+  - **Eddig:** felvétel közben „Megállítom” volt, ami valójában befejezte a felvételt, folytatni nem lehetett; semmi nem mutatta, hogy a mikrofon hall-e.
+  - **Most:** „Szünet” és „Folytatom” (ugyanaz a felvétel megy tovább, a szünet nem számít bele az időbe), a befejezés gombja „Befejeztem”. Öt coral sáv mozog a hanggal, mellette „Hallunk”. Ha a felhasználó felvétel közben a „Leírom” fülre vált, a mikrofon elengedődik.
+- **Kezdőlap, meghívott tag** (nem magánszemély, még nincs diagnózisa):
+  - A lépéssor az „Értéktükör” sorral kezdődik: „Itt tartasz”, és a „Kezdjük az Értéktükröt!” gomb. Feldolgozás alatt „Folytatom a tükrömet”.
+  - Kész tükörnél: „Most nincs több dolgod” kártya (a mégis átnézi, a csapattársak is elkészítik a sajátjukat, a diagnózis indulásakor meghívó jön), és „Megnézem a tükrömet”.
+  - A menüben az *Értéktükör* addig coral aláhúzást és coral „!” jelet kap.
+- **Értéktükör ET5, meghívott tag:** a kíváncsiság-kérdések helyén ugyanez a „Most nincs több dolgod” kártya, a „Befejezem” a kezdőlapra visz.
+- Jegyszövegek: 06 · 6.1, 6.2; 15 · 15.3; 26 · 26.4.
+
 ## 1.115 · a7cca72 · 2026-11-24
 
 Meghívott ügyféloldal, az első demó észrevételei (1. rész): Folyamatok, Értéktükör-szövegek, kíváncsiság-kérdések.

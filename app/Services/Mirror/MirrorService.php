@@ -112,6 +112,49 @@ class MirrorService
     }
 
     /**
+     * The user's latest mirror in the organization outside a diagnosis: the
+     * first step of an invited member before their diagnosis (06 · 6.2, 26 · 26.4).
+     */
+    public function standaloneFor(User $user, Organization $organization): ?MirrorSession
+    {
+        return MirrorSession::query()
+            ->where('user_id', $user->id)
+            ->where('organization_id', $organization->id)
+            ->whereNotNull('claimed_at')
+            ->whereHas('material', fn ($query) => $query->whereNull('parent_diagnosis_id'))
+            ->latest('id')
+            ->first();
+    }
+
+    /**
+     * Where an invited member stands with that first step: no mirror yet
+     * ("todo"), one being read or looked through ("open"), or done.
+     *
+     * @return array{state: 'todo'|'open'|'done', session: ?MirrorSession}
+     */
+    public function firstStep(User $user, Organization $organization): array
+    {
+        $session = $this->standaloneFor($user, $organization);
+
+        return [
+            'state' => match (true) {
+                $session === null => 'todo',
+                $this->isFinished($session) => 'done',
+                default => 'open',
+            },
+            'session' => $session,
+        ];
+    }
+
+    /**
+     * Read, and there is nothing left for the user to do on it.
+     */
+    public function isFinished(MirrorSession $session): bool
+    {
+        return $session->status->isDone();
+    }
+
+    /**
      * The values on ET3, the strongest first; each detection is counted with
      * its best match, or by its free name when nothing matched. A value marked
      * "nem az enyém" keeps its place, struck through, so it can be taken back.

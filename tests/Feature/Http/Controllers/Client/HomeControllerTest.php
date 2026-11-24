@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\MirrorStatus;
 use App\Models\Membership;
+use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\User;
 use App\Services\MainDiagnoses\MainDiagnosisService;
@@ -19,6 +21,55 @@ it('greets the customer until a diagnosis of the organization starts', function 
         ->assertSee('Útravaló')
         ->assertDontSee('ndulás:')
         ->assertDontSee('A vezető útja');
+});
+
+it('starts an invited member’s way with the Értéktükör, marked in the menu too', function () {
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+
+    $this->get(route('client.home', $organization))
+        ->assertOk()
+        ->assertSeeInOrder(['Értéktükör', 'Itt tartasz', 'Az első lépésed', 'Kezdjük az Értéktükröt!', 'Saját értékek'])
+        ->assertSee(route('client.mirror.record', $organization))
+        ->assertSee('itt a következő lépésed')
+        ->assertDontSee('Most nincs több dolgod');
+});
+
+it('sends an invited member back to the mirror being read, and the menu still marks it', function () {
+    $organization = Organization::factory()->create();
+    $user = actingAsCustomer(customerOf($organization));
+    $session = MirrorSession::factory()->ownMenu($user, $organization)->create(['status' => MirrorStatus::Processing]);
+
+    $this->get(route('client.home', $organization))
+        ->assertOk()
+        ->assertSee('Folytatom a tükrömet')
+        ->assertSee(route('client.mirror.result', [$organization, $session]))
+        ->assertSee('itt a következő lépésed');
+});
+
+it('tells an invited member with a mirror that there is nothing more to do for now', function () {
+    $organization = Organization::factory()->create();
+    $user = actingAsCustomer(customerOf($organization));
+    $session = MirrorSession::factory()->ownMenu($user, $organization)->create();
+
+    $this->get(route('client.home', $organization))
+        ->assertOk()
+        ->assertSee('Most nincs több dolgod')
+        ->assertSee('Megnézem a tükrömet')
+        ->assertSee(route('client.mirror.result', [$organization, $session]))
+        ->assertDontSee('Itt tartasz')
+        ->assertDontSee('Kezdjük az Értéktükröt!')
+        ->assertDontSee('itt a következő lépésed');
+});
+
+it('does not put the Értéktükör before a private person’s steps', function () {
+    $organization = Organization::factory()->individual()->create();
+    actingAsCustomer(customerOf($organization));
+
+    $this->get(route('client.home', $organization))
+        ->assertOk()
+        ->assertDontSee('Kezdjük az Értéktükröt!')
+        ->assertDontSee('itt a következő lépésed');
 });
 
 it('shows the leader of a draft diagnosis their steps and the team\'s, not clickable (26 · 26.4)', function () {

@@ -26,6 +26,9 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
   - „Inkább leírom” szöveges bevitel, legfeljebb 10 000 karakter (nagyjából 10 perc beszéd, 2026.10.27.);
   - fájl feltöltése: txt, md, doc vagy docx. A megengedett formátumok, a maximális méret és a karakterkorlát ki van írva (NFR). A fájl szövegére is a 10 000 karakter vonatkozik.
 - Ösztönzés és több instrukció a bevitelnél: „Legalább egy percig mesélj, ha teheted, többet.”
+- **Szünet és befejezés** (2026-11-24): felvétel közben „Szünet” és „Befejeztem”, szünetben „Folytatom” és „Befejeztem”. A szünet ugyanazt a felvételt folytatja; az idő és a csend közben nem számít, a 10 perces korlát a felvett időre vonatkozik. A befejezett felvételnél „Újraveszem”. Ahol a böngésző nem tud szüneteltetni, a „Szünet” nem látszik.
+- **Hangszint-jelző:** felvétel közben öt coral sáv mozog a hanggal, mellette „Hallunk”; szünetben szürke, „Szünet”. Ebből látja a felhasználó, hogy a rendszer hallja.
+- Ha a felhasználó felvétel közben a „Leírom” vagy a „Feltöltöm” fülre vált, a mikrofon elengedődik, a be nem küldött felvétel elvész.
 - **Motiváló elem felvétel közben:** egy idővel telő kör vagy sáv, mellette rövid biztató szöveg, ami az idővel változik. Például:
   - 0–1 perc: „Mesélj tovább…”
   - 1 perc után: „Jó kezdet. Mi történt utána?”
@@ -117,6 +120,7 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 ### 6.2 Értéktükör a saját menüből
 
 - A bejelentkezett felhasználó *Értéktükör* menüpontja ugyanezt az utat nyitja meg, az ET4-gyel együtt. Az ET2-n nincs e-mail mező és elfogadó jelölőnégyzet. Alul „Befejezem”.
+- **A meghívott tag első tükre** (diagnózison kívül, nem magánszemélynél; 2026-11-24): az ET5 alján a kíváncsiság-kérdések helyén charcoal kártya: „Most nincs több dolgod · A mégis átnézi a tükrödet, és megvárjuk, hogy a csapattársaid is elkészítsék a sajátjukat. Ha indul a diagnózis, e-mailben kapsz meghívót.” A „Befejezem” a kezdőlapra visz, ahol ugyanez a kártya áll (26 · 26.4). Csapatszámláló nincs, mert kis csapatnál elárulná, ki nem töltötte még ki (25.4).
 - **Kíváncsiság-kérdések az ET5-ön:** csak magánszemélynél. A mégis által meghívott tag (nem magánszemély típusú szervezetben) nem kapja meg őket és az „Elküldöm”-et sem, mert vele már megállapodtak, miről lesz szó (2026-11-24).
 - Az *Értéktükör* lapján a felhasználó korábbi tükrei ebben a szervezetben („Korábbi tükreid”, a legutóbbi 10): dátum, a megtartott értékek, és egy link az eredményre.
 - A diagnózis a felhasználó **aktív szervezetéhez** kerül (szervezetválasztó). Ha csak egy szervezete van, ahhoz.

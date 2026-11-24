@@ -43,7 +43,17 @@ it('walks the public Értéktükör from the opening through each value to the f
     // While recording it stays disabled: "Befejeztem" comes first
     $page->script("() => { window.Alpine.\$data(document.querySelector('[x-data^=\"mirrorRecorder\"]')).state = 'recording'; }");
     $page->assertButtonDisabled('Kész · mutasd a tükröt')
-        ->assertSee('Előbb fejezd be a felvételt.');
+        ->assertSee('Előbb fejezd be a felvételt.')
+        ->assertSee('Hallunk')
+        ->assertSee('Befejeztem')
+        ->assertSee('Szünet');
+
+    // Paused, the same recording waits for "Folytatom"
+    $page->script("() => { window.Alpine.\$data(document.querySelector('[x-data^=\"mirrorRecorder\"]')).state = 'paused'; }");
+    $page->assertSee('Folytatom')
+        ->assertSee('A „Folytatom” ugyanott veszi tovább a felvételt.')
+        ->assertButtonDisabled('Kész · mutasd a tükröt')
+        ->assertNoJavaScriptErrors();
 
     // A finished recording (set in place of the microphone) goes only once the e-mail part is right
     $page->script("() => { const recorder = window.Alpine.\$data(document.querySelector('[x-data^=\"mirrorRecorder\"]')); recorder.blob = new Blob(['hang'], { type: 'audio/webm' }); recorder.seconds = 75; recorder.state = 'recorded'; }");
