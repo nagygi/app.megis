@@ -184,6 +184,7 @@ class Result extends Component
     public function updatedCuriosity(): void
     {
         $this->ensureOwner();
+        abort_unless($this->asksCuriosity(), 403);
         $this->saveCuriosity();
         $this->noteChange('curiosity');
     }
@@ -194,6 +195,7 @@ class Result extends Component
     public function sendInterest(MirrorService $mirrors): void
     {
         $this->ensureOwner();
+        abort_unless($this->asksCuriosity(), 403);
 
         if ($this->session->interest_sent_at !== null) {
             return;
@@ -307,6 +309,7 @@ class Result extends Component
             'canRetry' => $mirrors->canRetry($this->session),
             'otherValues' => max(0, Value::query()->availableTo(null)->count() - $kept->whereNotNull('valueId')->count()),
             'accountUrl' => $this->accountUrl(),
+            'asksCuriosity' => $this->asksCuriosity(),
             'interestSent' => $this->session->interest_sent_at !== null,
             'interestEmail' => $this->session->user?->email ?? $this->session->email,
         ]);
@@ -329,6 +332,21 @@ class Result extends Component
         }
 
         return $isOwner || in_array($session->token, session('mirror_tokens', []), true);
+    }
+
+    /**
+     * Invited into an organization by the mégis: what it is about was agreed
+     * with them, the curiosity questions are for the public mirror and the
+     * private person (06 · 6.2).
+     */
+    private function isInvitedMember(): bool
+    {
+        return $this->organization !== null && ! $this->organization->isIndividual();
+    }
+
+    private function asksCuriosity(): bool
+    {
+        return ! $this->isInvitedMember();
     }
 
     private function ensureOwner(): void

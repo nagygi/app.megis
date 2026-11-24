@@ -4,7 +4,7 @@
  * with time, a warning before the end, and a supporting question after a
  * few seconds of silence. The finished recording is uploaded through Livewire.
  * The page's own button (x-recorder-submit) follows the state and asks for
- * the sending with "recorder-submit"; pressed during the recording, it stops it.
+ * the sending with "recorder-submit"; it only sends a finished recording.
  */
 export default (config) => ({
     state: 'idle',
@@ -20,7 +20,6 @@ export default (config) => ({
     timer: null,
     startedAt: null,
     audioContext: null,
-    submitAfterStop: false,
 
     init() {
         this.$watch('state', (state) => this.$dispatch('recorder-state', state));
@@ -90,11 +89,6 @@ export default (config) => ({
             this.blob = new Blob(chunks, { type: this.recorder.mimeType || 'audio/webm' });
             this.state = 'recorded';
             this.release();
-
-            if (this.submitAfterStop) {
-                this.submitAfterStop = false;
-                this.submit();
-            }
         };
 
         this.recorder.start(1000);
@@ -136,7 +130,6 @@ export default (config) => ({
     },
 
     restart() {
-        this.submitAfterStop = false;
         this.blob = null;
         this.seconds = 0;
         this.notice = null;
@@ -197,15 +190,8 @@ export default (config) => ({
     },
 
     async submit() {
-        // "Kész" during the recording: the recording goes once it is whole.
-        if (this.state === 'recording') {
-            this.submitAfterStop = true;
-            this.stop();
-
-            return;
-        }
-
-        if (! this.blob || this.state === 'uploading') {
+        // Only a finished recording goes: "Kész" waits for "Befejeztem".
+        if (! this.blob || this.state !== 'recorded') {
             return;
         }
 

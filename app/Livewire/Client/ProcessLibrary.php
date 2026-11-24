@@ -3,62 +3,30 @@
 namespace App\Livewire\Client;
 
 use App\Enums\ProcessKind;
-use App\Enums\ProcessRhythm;
-use App\Livewire\Concerns\WithDictation;
 use App\Models\CalendarConnection;
 use App\Models\Organization;
 use App\Models\Process;
 use App\Services\Processes\ProcessService;
 use App\Services\Report\ReportService;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 
 /**
  * Tárak → Folyamatok (11 · 11.5): the organization's routines, whether they
- * are in the calendar and measured; "+ Rutin" adds one by hand, its
- * description written, told or uploaded. The list a published diagnosis
- * recorded does not change, the library can.
+ * are in the calendar and measured. The customer does not add one here: the
+ * routines come once they are talked through with the mégis (the diagnosis
+ * step V6·d, or the admin). The list a published diagnosis recorded does not
+ * change, the library can.
  */
 class ProcessLibrary extends Component
 {
-    use WithDictation, WithFileUploads;
-
     public Organization $organization;
-
-    public bool $adding = false;
-
-    public string $name = '';
-
-    public ?string $rhythm = null;
-
-    public string $description = '';
 
     public function mount(Organization $organization): void
     {
         $this->organization = $organization;
 
         abort_unless($this->canView(), 403);
-    }
-
-    public function add(ProcessService $processes): void
-    {
-        abort_unless($this->canView(), 403);
-
-        $this->validate([
-            'name' => ['required', 'string', 'min:2', 'max:255'],
-            'rhythm' => ['nullable', Rule::enum(ProcessRhythm::class)],
-            'description' => ['nullable', 'string', 'max:'.ProcessSheet::DESCRIPTION_MAX],
-        ], attributes: [
-            'name' => __('processes.list.fields.name'),
-            'rhythm' => __('processes.list.fields.rhythm'),
-            'description' => __('processes.list.fields.description'),
-        ]);
-
-        $process = $processes->addManual($this->organization, $this->name, filled($this->rhythm) ? ProcessRhythm::from($this->rhythm) : null, description: $this->description);
-
-        $this->redirect(route('client.processes.show', [$this->organization, $process]), navigate: false);
     }
 
     public function render(): View
@@ -83,7 +51,6 @@ class ProcessLibrary extends Component
 
         return view('livewire.client.process-library', [
             'processes' => $processes,
-            'canDictate' => $this->canDictate('description'),
             'scores' => collect($snapshot?->data['chapters']['processes']['rows'] ?? [])->keyBy(fn (array $row) => mb_strtolower(trim($row['label']))),
         ])->layout('layouts::client', [
             // M4: cream with the yellow line, the mycelium, "naptár összekötve · 03.02. · 7 rutin · 5 mérve".
@@ -108,20 +75,5 @@ class ProcessLibrary extends Component
     public function canView(): bool
     {
         return ProcessService::canManageLibrary(auth('web')->user(), $this->organization);
-    }
-
-    protected function canDictate(string $field): bool
-    {
-        return $field === 'description' && $this->canView();
-    }
-
-    protected function dictationOrganization(): ?Organization
-    {
-        return $this->organization;
-    }
-
-    protected function dictationLimit(string $field): ?int
-    {
-        return ProcessSheet::DESCRIPTION_MAX;
     }
 }

@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'version' => '1.114',
+    'version' => '1.115',
 
     // Set by the deploy script, shown on Rendszer → Health (docs/uzemeltetes.md · 3).
     'deployed_at' => env('MEGIS_DEPLOYED_AT'),
@@ -43,7 +43,7 @@ return [
     // External booking calendar used by "Időpontot foglalok" and "Beszéljünk róla" (06, 26, 27).
     'booking_url' => env('MEGIS_BOOKING_URL'),
 
-    // Receives the ET5 curiosity questions sent with "Elküldöm" (06 · 6.1).
+    // Receives the ET5 curiosity questions sent with "Elküldöm" (06 · 6.1); several addresses comma-separated.
     'interest_email' => env('MEGIS_INTEREST_EMAIL', 'ng@exot.hu'),
 
     // The product of the private-person organization created from the Értéktükör

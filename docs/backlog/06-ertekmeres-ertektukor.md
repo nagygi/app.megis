@@ -40,7 +40,7 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
     - Rögzítjük, mikor és melyik dokumentumverziót fogadta el. A fiókhoz a megerősítéskor kerül.
   - Egy gomb van a három bemenethez, az oldal alján. Felvételnél:
     - amíg nincs felvétel, a gomb tiltott, alatta: „Előbb vedd fel, amit mesélnél.”;
-    - felvétel közben megnyomva leállítja a felvételt, és beküldi;
+    - felvétel közben is tiltott, alatta: „Előbb fejezd be a felvételt.” Csak a befejezett felvételt küldi be (2026-11-24: a felvétel közbeni beküldés egy demón hibához vezethetett);
     - az e-mailt és az elfogadást a feltöltés előtt ellenőrizzük, így egy hosszú felvétel nem töltődik fel hiába.
   - A beküldéssel azonnal megy a megerősítő levél. Ha a cím már egy aktív fiókhoz tartozik, nem megy levél: a felhasználó az ET5-ön lép be.
 - Beküldés Turnstile-lal, IP-alapú rate limittel (óránként 5).
@@ -51,27 +51,28 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 
 - Az értékek idézetekkel jelennek meg, szám és értékelés nélkül.
 - A „nem az enyém” jelöléssel a felhasználó kivehet egy értéket. A kivett érték nem kerül a diagnózisba, a nyers detektálásban jelölve megmarad.
-- Minden megtartott érték neve az ET4-re visz. Lent két gomb: az első érték neve (→ ET4) és „A teljes kép” (→ ET5).
+- Minden megtartott érték neve az ET4-re visz. Lent két gomb: az első érték neve (→ ET4) és „Tovább” (→ ET5; 2026-11-24 előtt „A teljes kép”).
 
 **ET4 · elmélyülés** (NM-06, 2026.10.26.)
 
-- Értékenként egy lap, lapozással: fent „‹ Az értékeid” és „EGYENESSÉG · 1 / 3”. Lent a következő érték neve és „A teljes kép”. A „nem az enyém”-mel kivett érték kimarad a lapozásból.
+- Értékenként egy lap, lapozással: fent „‹ Az értékeid” és „EGYENESSÉG · 1 / 3”. Lent a következő érték neve és „Tovább”. A „nem az enyém”-mel kivett érték kimarad a lapozásból.
 - Négy rész:
   - **„mégis Coach · mit jelent nálad”**: a Coach javaslata a kitöltő idézeteiből, szürke dobozban, coral örvénnyel. Két gomb: „Ez az” (elfogadja) és „Átírom” (saját mondat, legfeljebb 500 karakter).
   - **Miben látszik**: 2–4 rövid jel.
-  - **Mi az 1, mi a 6**: a skála két vége nála, a saját szavaival.
+  - **Mi az 1, mi a 6**: a skála két vége nála, a saját szavaival. Kiírva, hogy likert-skála: „Egy 1-től 6-ig tartó skála két vége, a te szavaiddal.”, és a két végén: „1 · amikor nagyon nem teljesül”, „6 · amikor nagyon teljesül”.
   - **Ebből épült**: az idézetek, „a te felvételed” vagy „a te szöveged” felirattal.
 - A Coach a mérés után, külön jobban dolgozik (`mirror_deepening`, prompt: `ertektukor-elmelyules`), tükrönként egy AI-hívással. Az ET3 nem vár rá. Amíg dolgozik, az ET4 ezt írja: „A mégis Coach a te szavaidra fordítja…”.
 - Ha a Coach nem válaszol, az illesztett értéknél az Értéktár szavai állnak (Mit jelent, 1, 6), Coach-doboz nélkül. A hiba Feldolgozási hiba sort nyit az Értékmérések alatt, és az „Újra” csak a Coachot indítja újra.
 - Kikapcsolható: `MIRROR_DEEPENING=false`. Ilyenkor az ET4 az Értéktár szavait mutatja.
 - Az elfogadott vagy átírt definíció és a két skálavég a saját értékek lépésébe (24 · V2) készen érkezik, az Értéktár szövege helyett.
 
-**ET5 · teljes kép** (csak az A változat)
+**ET5 · teljes kép** (csak az A változat; a képernyőn: „Hogyan tovább?”, 2026-11-24)
 
 - Charcoal sáv a manifesztó sorával: „Kell egy vízió, ami a belső forrásodtól a hatásodig tart.”
 - A fa kilenc eleme egy körön a felhasználó értékei körül: gyökér, törzs, korona, árnyék, talaj, micélium, évgyűrűk, a kör, illat.
+  - Belépve alatta: „Mit jelentenek a fa részei? Bölcsességtár” → a *Küldetésfa* téma (32). A nyilvános oldalon nincs, mert a Bölcsességtár belépéshez kötött. A téma most négy elemet magyaráz, a többi ötöt az NM-14 hozza.
 - Négy kíváncsiság-kérdés jelölőnégyzettel, mindegyik mellett a hozzá tartozó elemek jele (belül: gyökér, törzs · kívül: korona, árnyék · a kettő között: micélium · képesség: tűz). A jelölés azonnal mentődik; az admin a felhasználó adatlapján (33) látja.
-- Alatta **„Elküldöm”** (2026.10.26.): a jelölt kérdések és a megtartott értékek e-mailben mennek a `MEGIS_INTEREST_EMAIL` címre (most: ng@exot.hu). A válasz a kitöltőnek megy; bejelentkezett felhasználónál a levélben link az adatlapjára (33).
+- Alatta **„Elküldöm”** (2026.10.26.): a jelölt kérdések és a megtartott értékek e-mailben mennek a `MEGIS_INTEREST_EMAIL` címekre (vesszővel elválasztva több is lehet; a címet a mégis adja). A válasz a kitöltőnek megy; bejelentkezett felhasználónál a levélben link az adatlapjára (33).
   - Jelölés nélkül a gomb tiltott. Tükrönként egyszer küldhető (2026.10.26.): elküldés után a gomb helyén charcoal kártya évgyűrű-jellel: „Hamarosan · Elküldtük a kérdéseidet, a mégis ide jelentkezik: {e-mail}.” Új jelölés vagy újranyitott oldal után sem küldhető újra. A jelölés ezután is mentődik.
   - A saját menüben is megvan, a „Befejezem” mellett.
 - **E-mail mező és időpontfoglalás nincs** (2026.10.26.). A foglalás (Beérkező-sor, levél, adatlap-jelvény) a kódban megmarad, egyelőre nem hívja semmi: [NM-22](../backlog_nem_MVP/NM-22-idopontfoglalas.md).
@@ -115,7 +116,8 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 
 ### 6.2 Értéktükör a saját menüből
 
-- A bejelentkezett felhasználó *Értéktükör* menüpontja ugyanezt az utat nyitja meg, az ET4-gyel együtt. Az ET2-n nincs e-mail mező és elfogadó jelölőnégyzet. Az ET5-ön a kíváncsiság-kérdések megmaradnak, alul „Befejezem”.
+- A bejelentkezett felhasználó *Értéktükör* menüpontja ugyanezt az utat nyitja meg, az ET4-gyel együtt. Az ET2-n nincs e-mail mező és elfogadó jelölőnégyzet. Alul „Befejezem”.
+- **Kíváncsiság-kérdések az ET5-ön:** csak magánszemélynél. A mégis által meghívott tag (nem magánszemély típusú szervezetben) nem kapja meg őket és az „Elküldöm”-et sem, mert vele már megállapodtak, miről lesz szó (2026-11-24).
 - Az *Értéktükör* lapján a felhasználó korábbi tükrei ebben a szervezetben („Korábbi tükreid”, a legutóbbi 10): dátum, a megtartott értékek, és egy link az eredményre.
 - A diagnózis a felhasználó **aktív szervezetéhez** kerül (szervezetválasztó). Ha csak egy szervezete van, ahhoz.
 - Ha a felhasználó vezetőként vagy társként benne van egy futó fő diagnózisban, a tükör annak részdiagnózisa lesz (17 · 17.4).

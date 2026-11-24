@@ -111,7 +111,7 @@ A lista gépi javaslat, jóváhagyásra. Négy csoportja van: Erős minta · Biz
 
 - **Fejléc:** „naptár összekötve · 03.02. · 7 rutin · 5 mérve”.
 - **Soronként:** név, ritmus, felelős, létszám, naptárban van-e, mérjük-e. Pont csak publikálás után látszik.
-- „+ Rutin”: kézi hozzáadás (név, ritmus, leírás). A sor az adatlapra nyílik.
+- **Kézi hozzáadás nincs (2026-11-24, a mégis kérése):** az ügyfél itt nem vesz fel folyamatot. A folyamatok a mégissel átbeszélve kerülnek ide: a diagnózis V6·d lépéséből (11.2) vagy az adminból (11.6). Üresen: „Itt fognak megjelenni a folyamataid, miután a mégissel átbeszéltétek őket.” A sor az adatlapra nyílik.
 - **Szerkesztés:**
   - a diagnózis futása alatt szerkeszthető;
   - publikálás után a diagnózishoz rögzített lista nem változik, a tár viszont tovább szerkeszthető.

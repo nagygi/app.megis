@@ -116,19 +116,27 @@
             $high = $insight?->high_example ?? ($insightPending ? null : ($libraryValue?->high_examples[0] ?? null));
         @endphp
         @if ($low || $high)
+            {{-- A Likert-like scale: the two ends said in words, not only by the number (06 · ET4) --}}
             <section class="flex flex-col gap-2">
                 <h3 class="{{ $label }}">{{ __('mirror.scale_ends') }}</h3>
+                <p class="text-sm text-grey-700">{{ __('mirror.scale_lead') }}</p>
                 <dl class="flex flex-col">
                     @if ($low)
                         <div class="flex gap-4 border-b border-grey-250 py-3">
-                            <dt class="w-4 shrink-0 text-lg font-extrabold text-coral-ink"><span class="sr-only">{{ __('mirror.scale_low') }}</span><span aria-hidden="true">1</span></dt>
-                            <dd>{{ $low }}</dd>
+                            <dt class="w-4 shrink-0 text-lg font-extrabold text-coral-ink">1</dt>
+                            <dd class="flex flex-col gap-0.5">
+                                <span class="text-xs font-semibold tracking-wide text-coral-ink uppercase">{{ __('mirror.scale_low') }}</span>
+                                <span>{{ $low }}</span>
+                            </dd>
                         </div>
                     @endif
                     @if ($high)
                         <div class="flex gap-4 py-3">
-                            <dt class="w-4 shrink-0 text-lg font-extrabold text-green"><span class="sr-only">{{ __('mirror.scale_high') }}</span><span aria-hidden="true">6</span></dt>
-                            <dd>{{ $high }}</dd>
+                            <dt class="w-4 shrink-0 text-lg font-extrabold text-green">6</dt>
+                            <dd class="flex flex-col gap-0.5">
+                                <span class="text-xs font-semibold tracking-wide text-green uppercase">{{ __('mirror.scale_high') }}</span>
+                                <span>{{ $high }}</span>
+                            </dd>
                         </div>
                     @endif
                 </dl>
@@ -175,38 +183,49 @@
 
         @include('livewire.mirror.partials.tree-circle', ['names' => $keptGroups->pluck('name')])
 
-        <fieldset class="flex flex-col gap-3">
-            <legend class="mb-2 text-xl font-semibold">{{ __('mirror.curious') }}</legend>
-            @foreach (\App\Models\MirrorSession::CURIOSITY as $key)
-                <label class="{{ $tile }}">
-                    <input type="checkbox" value="{{ $key }}" wire:model.live="curiosity" class="mt-0.5 size-5 shrink-0 accent-charcoal focus-visible:outline-none">
-                    <span class="flex-1">
-                        <span class="block font-semibold">{{ __('mirror.curiosity.'.$key.'.question') }}</span>
-                        <span class="block text-sm text-grey-700">{{ __('mirror.curiosity.'.$key.'.hint') }}</span>
-                    </span>
-                    <span class="flex shrink-0 gap-1 pt-0.5">
-                        @foreach (\App\Models\MirrorSession::CURIOSITY_SYMBOLS[$key] as $symbol)
-                            <x-megis.symbol :name="$symbol" class="size-5" />
-                        @endforeach
-                    </span>
-                </label>
-            @endforeach
-        </fieldset>
+        @unless ($isPublic)
+            {{-- The tree's parts are told in the Bölcsességtár; it is behind the login, so not on the public page --}}
+            <p class="-mt-2 text-sm">
+                {{ __('mirror.tree_more') }}
+                <a href="{{ route('client.wisdom.show', [$organization, 'kuldetesfa']) }}" class="font-semibold">{{ __('mirror.tree_more_link') }}</a>
+            </p>
+        @endunless
 
-        {{-- "Elküldöm": the ticked questions go to the mégis by e-mail, once a mirror; sent, "Hamarosan" stands in its place --}}
-        @if ($interestSent)
-            <div class="on-dark -mt-2 flex items-center gap-4 rounded-card bg-charcoal p-5 text-cream" role="status">
-                <x-megis.symbol name="growth-rings" class="size-12 shrink-0 text-yellow" />
-                <div class="flex min-w-0 flex-col gap-1">
-                    <p class="text-xl leading-tight font-extrabold text-yellow uppercase">{{ __('mirror.interest_sent_title') }}</p>
-                    <p class="break-words">{{ $interestEmail ? __('mirror.interest_sent', ['email' => $interestEmail]) : __('mirror.interest_sent_plain') }}</p>
+        {{-- An invited member already agreed with the mégis what it is about: no questions for them (06 · 6.2) --}}
+        @if ($asksCuriosity)
+            <fieldset class="flex flex-col gap-3">
+                <legend class="mb-2 text-xl font-semibold">{{ __('mirror.curious') }}</legend>
+                @foreach (\App\Models\MirrorSession::CURIOSITY as $key)
+                    <label class="{{ $tile }}">
+                        <input type="checkbox" value="{{ $key }}" wire:model.live="curiosity" class="mt-0.5 size-5 shrink-0 accent-charcoal focus-visible:outline-none">
+                        <span class="flex-1">
+                            <span class="block font-semibold">{{ __('mirror.curiosity.'.$key.'.question') }}</span>
+                            <span class="block text-sm text-grey-700">{{ __('mirror.curiosity.'.$key.'.hint') }}</span>
+                        </span>
+                        <span class="flex shrink-0 gap-1 pt-0.5">
+                            @foreach (\App\Models\MirrorSession::CURIOSITY_SYMBOLS[$key] as $symbol)
+                                <x-megis.symbol :name="$symbol" class="size-5" />
+                            @endforeach
+                        </span>
+                    </label>
+                @endforeach
+            </fieldset>
+
+            {{-- "Elküldöm": the ticked questions go to the mégis by e-mail, once a mirror; sent, "Hamarosan" stands in its place --}}
+            @if ($interestSent)
+                <div class="on-dark -mt-2 flex items-center gap-4 rounded-card bg-charcoal p-5 text-cream" role="status">
+                    <x-megis.symbol name="growth-rings" class="size-12 shrink-0 text-yellow" />
+                    <div class="flex min-w-0 flex-col gap-1">
+                        <p class="text-xl leading-tight font-extrabold text-yellow uppercase">{{ __('mirror.interest_sent_title') }}</p>
+                        <p class="break-words">{{ $interestEmail ? __('mirror.interest_sent', ['email' => $interestEmail]) : __('mirror.interest_sent_plain') }}</p>
+                    </div>
                 </div>
-            </div>
-        @else
-            <div class="-mt-2 flex flex-col items-start gap-3">
-                <x-ui.button :tone="$isPublic ? 'dark' : 'outline'" icon="mail" wire:click="sendInterest" :disabled="$curiosity === []">{{ __('mirror.send_interest') }}</x-ui.button>
-                <x-form.error name="curiosity" id="curiosity" role="alert" />
-            </div>
+            @else
+                <div class="-mt-2 flex flex-col items-start gap-3">
+                    <x-ui.button :tone="$isPublic ? 'dark' : 'outline'" icon="mail" wire:click="sendInterest" :disabled="$curiosity === []">{{ __('mirror.send_interest') }}</x-ui.button>
+                    <x-form.error name="curiosity" id="curiosity" role="alert" />
+                </div>
+            @endif
         @endif
 
         @if (! $isPublic)

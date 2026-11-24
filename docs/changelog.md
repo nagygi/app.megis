@@ -2,6 +2,20 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.115 · – · 2026-11-24
+
+Meghívott ügyféloldal, az első demó észrevételei (1. rész): Folyamatok, Értéktükör-szövegek, kíváncsiság-kérdések.
+
+- **Folyamatok (Tárak):** az ügyfél itt nem vesz fel kézzel rutint; a „Rutint adok hozzá” gomb és az űrlap kikerült. Üresen: „Itt fognak megjelenni a folyamataid, miután a mégissel átbeszéltétek őket.” A diagnózis V6·d lépése nem változott.
+- **Értéktükör:**
+  - „A teljes kép” gomb helyett „Tovább”, az ET5 címe „Hogyan tovább?”.
+  - Az ET4 „Mi az 1, mi a 6” része kiírja, hogy 1-től 6-ig tartó skála: „1 · amikor nagyon nem teljesül”, „6 · amikor nagyon teljesül”. Eddig ez csak képernyőolvasónak szólt.
+  - Az ET5-ön belépve a fa alatt link: „Mit jelentenek a fa részei? Bölcsességtár” (Küldetésfa).
+  - A „Kíváncsi vagy?” kérdések és az „Elküldöm” csak a nyilvános tükörben és magánszemélynél jelennek meg; a mégis által meghívott tagnál nem.
+  - A „Kész · mutasd a tükröt” felvétel közben tiltott („Előbb fejezd be a felvételt.”), csak a befejezett felvételt küldi be.
+- **Kíváncsiság-levél:** a `MEGIS_INTEREST_EMAIL` vesszővel elválasztva több címet is elfogad.
+- Jegyszövegek: 06 · 6.1, 6.2; 11 · 11.5. `docs/deploy.md`, `.env.example`.
+
 ## 1.114 · 7f73554 · 2026-11-24
 
 Staging-védelem (MEGIS-8): a meghívott felhasználónak nem kell a staging jelszava.

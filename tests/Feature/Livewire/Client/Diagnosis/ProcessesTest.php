@@ -30,6 +30,7 @@ use Laravel\Ai\Responses\Data\TextUsage;
 use Laravel\Ai\Responses\StructuredTextResponse;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
+use Livewire\Exceptions\MethodNotFoundException;
 use Livewire\Livewire;
 
 function processParams(array $setup, $main): array
@@ -218,21 +219,28 @@ it('lets the responsible record a value, but not edit the sheet', function () {
     expect($metric->values()->count())->toBe(1);
 });
 
-it('lists the routines in Tárak → Folyamatok and adds one by hand', function () {
+it('lists the routines in Tárak → Folyamatok, with no adding by hand', function () {
     $setup = diagnosisTeam();
     startMainDiagnosis($setup);
     Process::factory()->for($setup['organization'])->fromCalendar()->accepted()->create(['name' => 'Vezetői kör']);
     actingAsCustomer($setup['leader']);
 
-    Livewire::test(ProcessLibrary::class, ['organization' => $setup['organization']])
+    $library = Livewire::test(ProcessLibrary::class, ['organization' => $setup['organization']])
         ->assertSee('Vezetői kör')
         ->assertSee('naptárban')
         ->assertSee('mérjük')
-        ->set('name', 'Onboarding')
-        ->call('add')
-        ->assertRedirect();
+        ->assertDontSee('Rutint adok hozzá');
 
-    expect(Process::query()->where('name', 'Onboarding')->exists())->toBeTrue();
+    expect(fn () => $library->call('add'))->toThrow(MethodNotFoundException::class);
+});
+
+it('says where the routines will come from while the library is empty', function () {
+    $setup = diagnosisTeam();
+    actingAsCustomer($setup['leader']);
+    $setup['organization']->memberships()->where('user_id', $setup['leader']->id)->update(['is_organization_leader' => true]);
+
+    Livewire::test(ProcessLibrary::class, ['organization' => $setup['organization']])
+        ->assertSee('Itt fognak megjelenni a folyamataid, miután a mégissel átbeszéltétek őket.');
 });
 
 it('keeps peers out of the processes', function () {

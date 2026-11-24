@@ -40,6 +40,11 @@ it('walks the public Értéktükör from the opening through each value to the f
     $page->assertButtonDisabled('Kész · mutasd a tükröt')
         ->assertSee('Előbb vedd fel, amit mesélnél.');
 
+    // While recording it stays disabled: "Befejeztem" comes first
+    $page->script("() => { window.Alpine.\$data(document.querySelector('[x-data^=\"mirrorRecorder\"]')).state = 'recording'; }");
+    $page->assertButtonDisabled('Kész · mutasd a tükröt')
+        ->assertSee('Előbb fejezd be a felvételt.');
+
     // A finished recording (set in place of the microphone) goes only once the e-mail part is right
     $page->script("() => { const recorder = window.Alpine.\$data(document.querySelector('[x-data^=\"mirrorRecorder\"]')); recorder.blob = new Blob(['hang'], { type: 'audio/webm' }); recorder.seconds = 75; recorder.state = 'recorded'; }");
     $page->assertButtonEnabled('Kész · mutasd a tükröt')
@@ -87,7 +92,7 @@ it('walks the public Értéktükör from the opening through each value to the f
     $page->assertSee('Játékosság · 2 / 2')->assertSee('A nehézben is nevetek egyet.');
 
     // ET5, without an e-mail field or a booking
-    $page->press('A teljes kép');
+    $page->press('Tovább');
     $page->assertSee('Kíváncsi vagy?')
         ->assertSee('micélium')
         ->assertSee('Nézd meg a leveled')

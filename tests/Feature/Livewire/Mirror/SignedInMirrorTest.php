@@ -59,7 +59,7 @@ it('records in the user’s name as well', function () {
 
 it('shows no account step and no booking, and keeps the curiosity questions when finishing', function () {
     config(['megis.booking_url' => 'https://foglalas.example.com']);
-    $organization = Organization::factory()->create();
+    $organization = Organization::factory()->individual()->create();
     actingAsCustomer(customerOf($organization));
     $session = signedInMirror($organization);
 
@@ -76,7 +76,7 @@ it('shows no account step and no booking, and keeps the curiosity questions when
 
 it('mails the questions in the user’s name, with a link to their datasheet', function () {
     Mail::fake();
-    $organization = Organization::factory()->create();
+    $organization = Organization::factory()->individual()->create();
     $user = actingAsCustomer(customerOf($organization));
     $session = signedInMirror($organization);
 
@@ -91,6 +91,26 @@ it('mails the questions in the user’s name, with a link to their datasheet', f
 
         return $mail->hasReplyTo($user->email);
     });
+});
+
+it('asks an invited member no curiosity questions, and points to the tree in the Bölcsességtár', function () {
+    Mail::fake();
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+    $session = signedInMirror($organization);
+
+    $result = Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])
+        ->call('showFull')
+        ->assertSee('Hogyan tovább?')
+        ->assertDontSee('Kíváncsi vagy?')
+        ->assertDontSee('Elküldöm')
+        ->assertSee('Mit jelentenek a fa részei?')
+        ->assertSeeHtml(route('client.wisdom.show', [$organization, 'kuldetesfa']));
+
+    $result->set('curiosity', ['gap'])->assertForbidden();
+    Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])->call('sendInterest')->assertForbidden();
+
+    Mail::assertNothingQueued();
 });
 
 it('deepens the values from the own menu too (ET4)', function () {

@@ -51,6 +51,7 @@ return [
     'throttled' => 'Most túl sok tükör készült erről a hálózatról. Próbáld újra egy óra múlva.',
     'daily_limit' => 'Erre az e-mail címre ma már elkészült a napi :count ingyenes tükör. Holnap újra belenézhetsz.',
     'recording_missing' => 'Előbb vedd fel, amit mesélnél.',
+    'recording_unfinished' => 'Előbb fejezd be a felvételt.',
 
     // Feldolgozás
     'processing' => 'Olvassuk, amit mondtál…',
@@ -72,7 +73,7 @@ return [
     'not_mine_label' => ':name: nem az enyém',
     'mine_again_label' => ':name: mégis az enyém',
     'no_values' => 'Ebből most nem hallottunk ki értéket. Próbáld újra egy konkrétabb helyzettel.',
-    'continue' => 'A teljes kép',
+    'continue' => 'Tovább',
     'deepen_open' => 'részletesen',
 
     // ET4 · elmélyülés (NM-06)
@@ -89,15 +90,16 @@ return [
     'library_meaning' => 'Mit jelent',
     'signs' => 'Miben látszik',
     'scale_ends' => 'Mi az 1, mi a 6',
-    'scale_low' => '1, nincs:',
-    'scale_high' => '6, beépült:',
+    'scale_lead' => 'Egy 1-től 6-ig tartó skála két vége, a te szavaiddal.',
+    'scale_low' => 'amikor nagyon nem teljesül',
+    'scale_high' => 'amikor nagyon teljesül',
     'built_from' => 'Ebből épült',
     'your_recording' => 'a te felvételed',
     'your_text' => 'a te szöveged',
     'deepening_failure_summary' => 'A mégis Coach nem írta meg az Értéktükör értékeit (ET4): :date',
 
-    // ET5 · teljes kép
-    'full_title' => 'Teljes kép',
+    // ET5 · teljes kép (on screen: „Hogyan tovább?”)
+    'full_title' => 'Hogyan tovább?',
     'back_to_values' => 'Az értékeid',
     'vision' => [
         'line1' => 'Kell egy vízió, ami',
@@ -106,6 +108,8 @@ return [
     ],
     'your_values' => 'a te értékeid',
     'circle_label' => 'A fa kilenc eleme a te értékeid körül: :values.',
+    'tree_more' => 'Mit jelentenek a fa részei?',
+    'tree_more_link' => 'Bölcsességtár',
     'elements' => [
         'root' => 'gyökér',
         'trunk' => 'törzs',

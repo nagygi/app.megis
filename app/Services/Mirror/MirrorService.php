@@ -343,7 +343,8 @@ class MirrorService
 
     /**
      * "Elküldöm" on ET5: the ticked questions and the kept values by e-mail to
-     * the mégis (megis.interest_email, 06 · 6.1), once a mirror.
+     * the mégis (megis.interest_email, comma-separated addresses, 06 · 6.1),
+     * once a mirror.
      */
     public function sendInterest(MirrorSession $session): void
     {
@@ -356,7 +357,9 @@ class MirrorService
 
         $values = $this->groups($session)->where('excluded', false)->pluck('name')->values()->all();
 
-        Mail::to(config('megis.interest_email'))->send(new MirrorInterestMail($session, $session->curiosity ?? [], $values));
+        $recipients = array_values(array_filter(array_map('trim', explode(',', (string) config('megis.interest_email')))));
+
+        Mail::to($recipients)->send(new MirrorInterestMail($session, $session->curiosity ?? [], $values));
     }
 
     /**

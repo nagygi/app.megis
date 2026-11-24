@@ -187,9 +187,7 @@ return [
         'not_in_calendar' => 'nincs a naptárban',
         'measured' => 'mérjük',
         'not_measured' => 'nem mérjük',
-        'add' => 'Rutint adok hozzá',
-        'empty' => 'Még nincs rutin.',
-        'readonly' => 'A folyamatokat a szervezet vezetője szerkeszti.',
+        'empty' => 'Itt fognak megjelenni a folyamataid, miután a mégissel átbeszéltétek őket.',
     ],
 
     // The occasions of a running diagnosis (12).

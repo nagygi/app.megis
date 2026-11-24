@@ -472,7 +472,7 @@ it('opens the mirror in the account after the confirmation, its values expanded 
     $response->assertRedirect(route('client.mirror.result', [$organization, $session]));
 
     $this->get(route('client.mirror.result', [$organization, $session]))->assertOk()->assertSee('Egyenesség');
-    $this->get(route('client.mirror.result', [$organization, $session]).'?lap=full')->assertOk()->assertSee('Teljes kép');
+    $this->get(route('client.mirror.result', [$organization, $session]).'?lap=full')->assertOk()->assertSee('Hogyan tovább?')->assertSee('Kíváncsi vagy?');
 });
 
 it('gets the diagnosis when the account is confirmed while the mirror is still being read', function () {
@@ -613,8 +613,8 @@ it('asks for no e-mail and offers no booking under the full picture, and keeps t
         ->and(InboxItem::query()->count())->toBe(0);
 });
 
-it('mails the ticked questions to the configured address with "Elküldöm", the reply going to the user', function () {
-    config(['megis.interest_email' => 'erdeklodes@megis.example']);
+it('mails the ticked questions to the configured addresses with "Elküldöm", the reply going to the user', function () {
+    config(['megis.interest_email' => 'erdeklodes@megis.example, oszi@megis.example']);
     Mail::fake();
     $session = submitTextMirror();
 
@@ -636,7 +636,7 @@ it('mails the ticked questions to the configured address with "Elküldöm", the 
             ->assertDontSeeInText('Hogyan látszanak kívülről?')
             ->assertSeeInText('Az értékei: Egyenesség');
 
-        return $mail->hasTo('erdeklodes@megis.example') && $mail->hasReplyTo('anna@example.com');
+        return $mail->hasTo('erdeklodes@megis.example') && $mail->hasTo('oszi@megis.example') && $mail->hasReplyTo('anna@example.com');
     });
 });
 
@@ -692,7 +692,10 @@ it('deepens a value with the mégis Coach from the quotes (ET4)', function () {
         ->assertSee('Ott, akkor, annak, indoklással.')
         ->assertSee('inkább most mondom, mint csütörtökön')
         ->assertSee('a te szöveged')
-        ->assertSee('A teljes kép');
+        ->assertSee('Egy 1-től 6-ig tartó skála két vége, a te szavaiddal.')
+        ->assertSee('amikor nagyon nem teljesül')
+        ->assertSee('amikor nagyon teljesül')
+        ->assertSee('Tovább');
 });
 
 it('takes the Coach’s meaning, or the user’s own sentence instead', function () {
