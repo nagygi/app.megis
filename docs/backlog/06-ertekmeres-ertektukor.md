@@ -54,20 +54,28 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 
 - Az értékek idézetekkel jelennek meg, szám és értékelés nélkül.
 - A „nem az enyém” jelöléssel a felhasználó kivehet egy értéket. A kivett érték nem kerül a diagnózisba, a nyers detektálásban jelölve megmarad.
-- Minden megtartott érték neve az ET4-re visz. Lent két gomb: az első érték neve (→ ET4) és „Tovább” (→ ET5; 2026-11-24 előtt „A teljes kép”).
+- **Egy út az értékeken át (2026-11-24):** a lista a központ. Minden megtartott érték neve az ET4-re visz; ott a „Jóváhagyom” után a felhasználó visszaérkezik a listára. Lapozás az ET4-en nincs.
+  - Fent: „Kattints az értékeidre, nézd át, mit jelentenek neked, és hagyd jóvá mindegyiket. · {k} / {n} jóváhagyva”.
+  - A kártyán az állapot: „átnézendő” vagy „✓ jóváhagyva”; ha a felhasználó átírta, „Saját meghatározás”, átnevezésnél „eredetileg: {név}”.
+  - Lent egy gomb: „Tovább” (→ ET5; 2026-11-24 előtt „A teljes kép”). **Belépve** csak akkor él, ha minden megtartott érték jóvá van hagyva (a „nem az enyém”-mel kivett nem számít); addig alatta: „Előbb nézd át és hagyd jóvá minden értékedet. Ami nem a tiéd, vedd ki.” Az ET5 címe sem nyitható meg előtte. A **nyilvános** tükörben az állapot látszik, de a „Tovább” nem vár rá.
 
 **ET4 · elmélyülés** (NM-06, 2026.10.26.)
 
-- Értékenként egy lap, lapozással: fent „‹ Az értékeid” és „EGYENESSÉG · 1 / 3”. Lent a következő érték neve és „Tovább”. A „nem az enyém”-mel kivett érték kimarad a lapozásból.
+- Értékenként egy lap: fent „‹ Az értékeid” és „EGYENESSÉG · 1 / 3”. A „nem az enyém”-mel kivett érték nem nyílik meg.
+- Lent két gomb (2026-11-24):
+  - **„Jóváhagyom”**: a felhasználó átnézte, és így tartja meg (a Coach vagy az Értéktár szavaival); vissza a listára. Amíg a Coach dolgozik, tiltott: „Amíg a mégis Coach ír, várj egy kicsit.” Coach nélkül is jóváhagyható.
+  - **„Átírom”**: minden rész a saját szavaival, **a név is**: az érték neve (legfeljebb 80 karakter), Mit jelent neked? (kötelező, legfeljebb 500), Miben látszik? (soronként egy, legfeljebb 4), 1 · Mikor érzed, hogy nagyon nem teljesül?, 6 · Mikor érzed, hogy nagyon teljesül? Az űrlap a Coach, ennek hiányában az Értéktár szavaival nyílik. A „Mentem és jóváhagyom” jóvá is hagyja.
+  - Az átírt érték „Saját meghatározás” címkét kap, átnevezésnél „eredetileg: {név}”. Ez a felhasználó saját meghatározása, nem a Schwartz-alapú Értéktár értéke: az Értéktár értéke nem változik. Az admin a tükör adatlapján ugyanígy látja (jóváhagyta, saját meghatározás, eredetileg, a jelek és a skálavégek).
+  - Jóváhagyva: „Jóváhagytad. Ez lesz a te definíciód.” (átírva: „…, a te szavaiddal.”), „Az értékeid” és „Átírom”.
 - Négy rész:
-  - **„mégis Coach · mit jelent nálad”**: a Coach javaslata a kitöltő idézeteiből, szürke dobozban, coral örvénnyel. Két gomb: „Ez az” (elfogadja) és „Átírom” (saját mondat, legfeljebb 500 karakter).
+  - **„mégis Coach · mit jelent nálad”**: a Coach javaslata a kitöltő idézeteiből, szürke dobozban, coral örvénnyel. Átírva a doboz címe „Saját meghatározás”, Coach nélkül „Mit jelent” (az Értéktár szavai).
   - **Miben látszik**: 2–4 rövid jel.
   - **Mi az 1, mi a 6**: a skála két vége nála, a saját szavaival. Kiírva, hogy likert-skála: „Egy 1-től 6-ig tartó skála két vége, a te szavaiddal.”, és a két végén: „1 · amikor nagyon nem teljesül”, „6 · amikor nagyon teljesül”.
   - **Ebből épült**: az idézetek, „a te felvételed” vagy „a te szöveged” felirattal.
 - A Coach a mérés után, külön jobban dolgozik (`mirror_deepening`, prompt: `ertektukor-elmelyules`), tükrönként egy AI-hívással. Az ET3 nem vár rá. Amíg dolgozik, az ET4 ezt írja: „A mégis Coach a te szavaidra fordítja…”.
-- Ha a Coach nem válaszol, az illesztett értéknél az Értéktár szavai állnak (Mit jelent, 1, 6), Coach-doboz nélkül. A hiba Feldolgozási hiba sort nyit az Értékmérések alatt, és az „Újra” csak a Coachot indítja újra.
+- Ha a Coach nem válaszol, az illesztett értéknél az Értéktár szavai állnak (Mit jelent, 1, 6), Coach-doboz nélkül. A hiba Feldolgozási hiba sort nyit az Értékmérések alatt, és az „Újra” csak a Coachot indítja újra. Az „Újra” nem írja felül, amit a felhasználó átírt, vagy a Coach szavaival jóváhagyott.
 - Kikapcsolható: `MIRROR_DEEPENING=false`. Ilyenkor az ET4 az Értéktár szavait mutatja.
-- Az elfogadott vagy átírt definíció és a két skálavég a saját értékek lépésébe (24 · V2) készen érkezik, az Értéktár szövege helyett.
+- Az elfogadott vagy átírt definíció és a két skálavég a saját értékek lépésébe (24 · V2) készen érkezik, az Értéktár szövege helyett. Az átnevezett érték a felhasználó saját értékeként érkezik (24 · 24.5).
 
 **ET5 · teljes kép** (csak az A változat; a képernyőn: „Hogyan tovább?”, 2026-11-24)
 

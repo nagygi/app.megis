@@ -95,11 +95,24 @@ it('walks the public Értéktükör from the opening through each value to the f
         ->assertSee('Ott, akkor, annak, indoklással.')
         ->assertNoAccessibilityIssues();
 
-    $page->press('Ez az');
-    $page->assertSee('Ez lesz a te definíciód.');
+    // "Jóváhagyom" goes back to the list, where the value shows approved
+    $page->press('Jóváhagyom');
+    $page->assertSee('1 / 2 jóváhagyva')
+        ->assertSee('✓ jóváhagyva')
+        ->assertNoAccessibilityIssues();
 
-    $page->click('[wire\\:click="showValue(2)"]');
+    $page->click('h3 [wire\\:click="showValue(2)"]');
     $page->assertSee('Játékosság · 2 / 2')->assertSee('A nehézben is nevetek egyet.');
+
+    // Written in the user's own words, the name too
+    $page->press('Átírom');
+    $page->fill('ownName', 'Humor');
+    $page->press('Mentem és jóváhagyom');
+    $page->assertSee('Saját meghatározás')
+        ->assertSee('eredetileg: Játékosság')
+        ->assertNoJavaScriptErrors();
+    $page->press('Az értékeid');
+    $page->assertSee('2 / 2 jóváhagyva')->assertSee('Humor');
 
     // ET5, without an e-mail field or a booking
     $page->press('Tovább');

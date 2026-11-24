@@ -2,6 +2,22 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.117 · – · 2026-11-24
+
+Meghívott ügyféloldal, az első demó észrevételei (3. rész): az értékek jóváhagyása és a saját meghatározás.
+
+- **Eddig:** az értékeken két úton lehetett végigmenni (a listából kattintva, vagy az ET4 alján lapozva), és semmi nem kérte, hogy a felhasználó mindet átnézze. Csak a definíciót lehetett átírni, a nevet és a többit nem.
+- **Most:**
+  - **Egy út:** az ET3 lista a központ, az értékre kattintva nyílik az ET4, ott **„Jóváhagyom”**, és vissza a listára. Lapozás nincs. A listán „{k} / {n} jóváhagyva”, kártyánként „átnézendő” vagy „✓ jóváhagyva”.
+  - **Belépve** a „Tovább” csak akkor él, ha minden megtartott érték jóvá van hagyva (a kivett nem számít). A nyilvános tükör nem vár rá.
+  - **„Átírom”:** minden rész a saját szavaival, a név is (név, mit jelent, miben látszik, az 1 és a 6). Az átírt érték „Saját meghatározás” címkét kap, átnevezésnél „eredetileg: {név}”; az Értéktár értéke nem változik.
+  - Az átnevezett érték a saját értékek közé a felhasználó saját értékeként kerül („Felhasználó által felvett”), „Saját meghatározás” címkével.
+  - A Coach újrafuttatása („Újra”) nem írja felül, amit a felhasználó átírt vagy jóváhagyott. Coach nélkül is jóváhagyható.
+  - Az admin a tükör adatlapján látja a jóváhagyást, a saját meghatározást és az eredeti nevet.
+  - A meghívott tag kezdőlapján a tükör addig „Folytatom a tükrömet”, amíg minden értéke nincs jóváhagyva.
+- Migráció: `mirror_value_insights.name` (új), a `meaning` és a `signs` üres is lehet.
+- Jegyszövegek: 06 · 6.1 (ET3, ET4); 24 · 24.5.
+
 ## 1.116 · c81efd8 · 2026-11-24
 
 Meghívott ügyféloldal, az első demó észrevételei (2. rész): a felvevő és a meghívott útja.

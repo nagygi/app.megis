@@ -1194,6 +1194,7 @@ return [
             'accepted' => 'elfogadta',
             'edited' => 'átírta',
         ],
+        'approved' => 'jóváhagyta',
         'values_processing' => 'Még dolgozunk rajta.',
         'no_values' => 'Nem találtunk értéket.',
         'no_curiosity' => 'Nem jelölt kérdést.',

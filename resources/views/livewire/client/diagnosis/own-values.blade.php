@@ -54,6 +54,9 @@
                         <div class="flex flex-wrap items-center gap-2 pt-2">
                             <h3 class="text-lg font-semibold">{{ $item['name'] }}</h3>
                             <x-ui.badge :tone="['strong' => 'green', 'partial' => 'yellow', 'none' => 'muted'][$state]">{{ __('diagnosis.own_values.state.'.$state) }}</x-ui.badge>
+                            @if (($item['value_id'] ?? null) === null || in_array($item['value_id'], $ownValueIds, true))
+                                <x-ui.badge tone="yellow">{{ __('mirror.own_definition') }}</x-ui.badge>
+                            @endif
                         </div>
                         @if ($editable)
                             <x-ui.icon-button

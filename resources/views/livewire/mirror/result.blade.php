@@ -41,7 +41,20 @@
             @endif
         </x-ui.card>
     @elseif ($step === 'value' && $current)
-        {{-- ET4 · one value in the user's own words: meaning, signs, the 1 and the 6, the quotes (NM-06) --}}
+        {{--
+            ET4 · one value in the user's own words: meaning, signs, the 1 and the 6, the quotes (NM-06).
+            The user approves it ("Jóváhagyom", back to the list) or writes any part of it, the name too ("Átírom").
+        --}}
+        @php
+            $meaningText = $insight?->meaning ?? ($insightPending ? null : ($libraryValue?->meanings[0] ?? null));
+            $meaningLabel = match (true) {
+                $current->edited => __('mirror.own_definition'),
+                filled($insight?->meaning) => __('mirror.coach_label'),
+                default => __('mirror.library_meaning'),
+            };
+            $low = $insight?->low_example ?? ($insightPending ? null : ($libraryValue?->low_examples[0] ?? null));
+            $high = $insight?->high_example ?? ($insightPending ? null : ($libraryValue?->high_examples[0] ?? null));
+        @endphp
         <div class="flex flex-col gap-3">
             <div class="flex items-center justify-between gap-3">
                 <x-ui.button tone="ghost" size="sm" icon="chevron-left" class="-ml-1.5" wire:click="showValues">{{ __('mirror.back_to_values') }}</x-ui.button>
@@ -51,96 +64,87 @@
                 <x-megis.symbol name="root" class="mt-0.5 size-10 shrink-0 text-coral" />
                 <div class="flex flex-col gap-1">
                     <{{ $heading }} class="{{ $headingClass }}">{{ $current->name }}</{{ $heading }}>
+                    @if ($current->edited)
+                        <p class="flex flex-wrap items-center gap-2 text-sm text-grey-700">
+                            <x-ui.badge tone="yellow">{{ __('mirror.own_definition') }}</x-ui.badge>
+                            @if ($current->isRenamed())
+                                {{ __('mirror.originally', ['name' => $current->originalName]) }}
+                            @endif
+                        </p>
+                    @endif
                     <p class="text-grey-700">{{ __('mirror.deepen_lead') }}</p>
                 </div>
             </div>
         </div>
 
-        @if ($insight)
-            <section wire:key="coach-{{ md5($current->key) }}" aria-labelledby="coach-title" class="flex flex-col gap-3 rounded-card bg-grey-100 p-5">
-                <p id="coach-title" class="flex items-center gap-2 {{ $label }} text-charcoal">
-                    <x-megis.symbol name="spiral" class="size-5 shrink-0 text-coral" />
-                    {{ __('mirror.coach_label') }}
-                </p>
+        @if ($rewriting)
+            {{-- Every part in the user's own words; the Értéktár's value does not change (06 · ET4) --}}
+            <x-ui.card as="form" wire:submit="saveRewrite" class="flex flex-col gap-4">
+                <p class="text-sm text-grey-700">{{ __('mirror.edit.lead') }}</p>
+                <x-form.input name="ownName" wire:model="ownName" :label="__('mirror.edit.name')" maxlength="{{ \App\Services\Mirror\MirrorInsightService::NAME_MAX }}" required />
+                <x-form.textarea name="meaning" wire:model="meaning" rows="3" :label="__('mirror.edit.meaning')" maxlength="{{ \App\Services\Mirror\MirrorInsightService::MEANING_MAX }}" required />
+                <x-form.textarea name="signs" wire:model="signs" rows="4" :label="__('mirror.edit.signs')" :help="__('mirror.edit.signs_help', ['count' => \App\Services\Mirror\MirrorInsightService::SIGNS_MAX])" />
+                <x-form.textarea name="lowExample" wire:model="lowExample" rows="2" :label="__('mirror.edit.low')" maxlength="{{ \App\Services\Mirror\MirrorInsightService::MEANING_MAX }}" />
+                <x-form.textarea name="highExample" wire:model="highExample" rows="2" :label="__('mirror.edit.high')" maxlength="{{ \App\Services\Mirror\MirrorInsightService::MEANING_MAX }}" />
+                <div class="flex flex-wrap gap-2">
+                    <x-ui.button type="submit" data-focus-errors>{{ __('mirror.edit.save') }}</x-ui.button>
+                    <x-ui.button tone="outline" wire:click="cancelRewrite">{{ __('ui.cancel') }}</x-ui.button>
+                </div>
+            </x-ui.card>
+        @else
+            @if ($insightPending && blank($insight?->meaning))
+                <section wire:key="coach-pending" wire:poll.3s class="flex items-center gap-3 rounded-card bg-grey-100 p-5" role="status">
+                    <x-megis.symbol name="spiral" class="size-8 shrink-0 animate-pulse text-coral" />
+                    <p><x-ui.working-text :text="__('mirror.coach_pending')" /></p>
+                </section>
+            @elseif (filled($meaningText))
+                <section wire:key="meaning-{{ md5($current->key) }}" aria-labelledby="meaning-title" class="flex flex-col gap-3 rounded-card bg-grey-100 p-5">
+                    <p id="meaning-title" class="flex items-center gap-2 {{ $label }} text-charcoal">
+                        <x-megis.symbol name="spiral" class="size-5 shrink-0 text-coral" />
+                        {{ $meaningLabel }}
+                    </p>
+                    <p class="text-lg leading-snug font-semibold">{{ $meaningText }}</p>
+                </section>
+            @endif
 
-                @if ($rewriting)
-                    <form wire:submit="saveRewrite" class="flex flex-col gap-3">
-                        <x-form.textarea name="meaning" wire:model="meaning" rows="3" :label="__('mirror.coach_rewrite_label')" maxlength="{{ \App\Services\Mirror\MirrorInsightService::MEANING_MAX }}" required />
-                        <div class="flex flex-wrap gap-2">
-                            <x-ui.button type="submit" size="sm" data-focus-errors>{{ __('mirror.coach_save') }}</x-ui.button>
-                            <x-ui.button tone="outline" size="sm" wire:click="cancelRewrite">{{ __('ui.cancel') }}</x-ui.button>
-                        </div>
-                    </form>
-                @else
-                    <p class="text-lg leading-snug font-semibold">{{ $insight->meaning }}</p>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <x-ui.button
-                            size="sm"
-                            :icon="$insight->isAccepted() ? 'check' : null"
-                            aria-pressed="{{ $insight->isAccepted() ? 'true' : 'false' }}"
-                            wire:click="accept"
-                        >{{ __('mirror.coach_accept') }}</x-ui.button>
-                        <x-ui.button tone="outline" size="sm" wire:click="startRewrite">{{ __('mirror.coach_rewrite') }}</x-ui.button>
-                    </div>
-                    @if ($insight->isAccepted())
-                        <p class="text-sm text-grey-700" role="status">{{ $insight->edited_at ? __('mirror.coach_edited') : __('mirror.coach_accepted') }}</p>
-                    @endif
-                @endif
-            </section>
-        @elseif ($insightPending)
-            <section wire:key="coach-pending" wire:poll.3s class="flex items-center gap-3 rounded-card bg-grey-100 p-5" role="status">
-                <x-megis.symbol name="spiral" class="size-8 shrink-0 animate-pulse text-coral" />
-                <p><x-ui.working-text :text="__('mirror.coach_pending')" /></p>
-            </section>
-        @elseif ($libraryValue && $libraryValue->meanings !== [])
-            {{-- The Coach did not answer: the Értéktár's words stand in --}}
-            <section class="flex flex-col gap-2">
-                <h3 class="{{ $label }}">{{ __('mirror.library_meaning') }}</h3>
-                <p class="text-lg leading-snug font-semibold">{{ $libraryValue->meanings[0] }}</p>
-            </section>
-        @endif
+            @if (filled($insight?->signs))
+                <section class="flex flex-col gap-2">
+                    <h3 class="{{ $label }}">{{ __('mirror.signs') }}</h3>
+                    <ul class="flex flex-wrap gap-2">
+                        @foreach ($insight->signs as $sign)
+                            <li><x-ui.chip>{{ $sign }}</x-ui.chip></li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endif
 
-        @if ($insight && $insight->signs !== [])
-            <section class="flex flex-col gap-2">
-                <h3 class="{{ $label }}">{{ __('mirror.signs') }}</h3>
-                <ul class="flex flex-wrap gap-2">
-                    @foreach ($insight->signs as $sign)
-                        <li><x-ui.chip>{{ $sign }}</x-ui.chip></li>
-                    @endforeach
-                </ul>
-            </section>
-        @endif
-
-        @php
-            $low = $insight?->low_example ?? ($insightPending ? null : ($libraryValue?->low_examples[0] ?? null));
-            $high = $insight?->high_example ?? ($insightPending ? null : ($libraryValue?->high_examples[0] ?? null));
-        @endphp
-        @if ($low || $high)
-            {{-- A Likert-like scale: the two ends said in words, not only by the number (06 · ET4) --}}
-            <section class="flex flex-col gap-2">
-                <h3 class="{{ $label }}">{{ __('mirror.scale_ends') }}</h3>
-                <p class="text-sm text-grey-700">{{ __('mirror.scale_lead') }}</p>
-                <dl class="flex flex-col">
-                    @if ($low)
-                        <div class="flex gap-4 border-b border-grey-250 py-3">
-                            <dt class="w-4 shrink-0 text-lg font-extrabold text-coral-ink">1</dt>
-                            <dd class="flex flex-col gap-0.5">
-                                <span class="text-xs font-semibold tracking-wide text-coral-ink uppercase">{{ __('mirror.scale_low') }}</span>
-                                <span>{{ $low }}</span>
-                            </dd>
-                        </div>
-                    @endif
-                    @if ($high)
-                        <div class="flex gap-4 py-3">
-                            <dt class="w-4 shrink-0 text-lg font-extrabold text-green">6</dt>
-                            <dd class="flex flex-col gap-0.5">
-                                <span class="text-xs font-semibold tracking-wide text-green uppercase">{{ __('mirror.scale_high') }}</span>
-                                <span>{{ $high }}</span>
-                            </dd>
-                        </div>
-                    @endif
-                </dl>
-            </section>
+            @if ($low || $high)
+                {{-- A Likert-like scale: the two ends said in words, not only by the number (06 · ET4) --}}
+                <section class="flex flex-col gap-2">
+                    <h3 class="{{ $label }}">{{ __('mirror.scale_ends') }}</h3>
+                    <p class="text-sm text-grey-700">{{ __('mirror.scale_lead') }}</p>
+                    <dl class="flex flex-col">
+                        @if ($low)
+                            <div class="flex gap-4 border-b border-grey-250 py-3">
+                                <dt class="w-4 shrink-0 text-lg font-extrabold text-coral-ink">1</dt>
+                                <dd class="flex flex-col gap-0.5">
+                                    <span class="text-xs font-semibold tracking-wide text-coral-ink uppercase">{{ __('mirror.scale_low') }}</span>
+                                    <span>{{ $low }}</span>
+                                </dd>
+                            </div>
+                        @endif
+                        @if ($high)
+                            <div class="flex gap-4 py-3">
+                                <dt class="w-4 shrink-0 text-lg font-extrabold text-green">6</dt>
+                                <dd class="flex flex-col gap-0.5">
+                                    <span class="text-xs font-semibold tracking-wide text-green uppercase">{{ __('mirror.scale_high') }}</span>
+                                    <span>{{ $high }}</span>
+                                </dd>
+                            </div>
+                        @endif
+                    </dl>
+                </section>
+            @endif
         @endif
 
         <section class="flex flex-col gap-2">
@@ -153,12 +157,27 @@
             @endforeach
         </section>
 
-        <div class="flex flex-wrap gap-3">
-            @if ($next)
-                <x-ui.button size="lg" icon-right="arrow-right" wire:click="showValue({{ $position + 1 }})">{{ $next->name }}</x-ui.button>
-            @endif
-            <x-ui.button :tone="$next ? 'outline' : 'dark'" size="lg" wire:click="showFull">{{ __('mirror.continue') }}</x-ui.button>
-        </div>
+        {{-- One way through the values: from the list into each, approved, back to the list (06 · ET3) --}}
+        @unless ($rewriting)
+            <div class="flex flex-col items-start gap-3">
+                @if ($current->approved)
+                    <p class="flex items-center gap-2 font-semibold text-green" role="status">
+                        <x-megis.icon name="check" />
+                        {{ $current->edited ? __('mirror.edited_status') : __('mirror.approved_status') }}
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <x-ui.button size="lg" icon="chevron-left" wire:click="showValues">{{ __('mirror.back_to_values') }}</x-ui.button>
+                        <x-ui.button tone="outline" size="lg" wire:click="startRewrite">{{ __('mirror.edit.open') }}</x-ui.button>
+                    </div>
+                @else
+                    <div class="flex flex-wrap gap-3">
+                        <x-ui.button size="lg" icon="check" wire:click="approve" :disabled="$insightPending">{{ __('mirror.approve') }}</x-ui.button>
+                        <x-ui.button tone="outline" size="lg" wire:click="startRewrite" :disabled="$insightPending">{{ __('mirror.edit.open') }}</x-ui.button>
+                    </div>
+                    <p class="text-sm text-grey-700">{{ $insightPending ? __('mirror.approve_wait') : __('mirror.approve_hint') }}</p>
+                @endif
+            </div>
+        @endunless
     @elseif ($step === 'full')
         {{-- ET5 · the full picture: the tree around the values, and what the user is curious about --}}
         <div class="flex flex-col gap-3">
@@ -279,7 +298,7 @@
             </x-ui.card>
         @endif
     @else
-        {{-- ET3 · the values with quotes, no number, no rating --}}
+        {{-- ET3 · the values with quotes, no number, no rating; each opens, to be approved (06 · ET3) --}}
         <div class="flex items-start gap-3">
             <x-megis.symbol name="root" class="mt-0.5 size-10 shrink-0 text-coral" />
             <div class="flex flex-col gap-1">
@@ -289,6 +308,13 @@
             </div>
         </div>
 
+        @if ($keptGroups->isNotEmpty())
+            <p class="flex flex-wrap items-baseline gap-x-2 text-sm">
+                <span>{{ __('mirror.review_lead') }}</span>
+                <span class="font-semibold">{{ __('mirror.approved_count', ['done' => $approvedCount, 'total' => $keptGroups->count()]) }}</span>
+            </p>
+        @endif
+
         @forelse ($groups as $group)
             @php
                 $keptPosition = $group->excluded ? null : $keptGroups->search(fn ($kept) => $kept->key === $group->key) + 1;
@@ -296,13 +322,28 @@
             <x-ui.card as="article" :tone="$group->excluded ? 'paper' : 'white'" wire:key="group-{{ md5($group->key) }}" class="flex flex-col gap-2">
                 <div class="flex items-start justify-between gap-3">
                     @if ($keptPosition)
-                        <h3 class="pt-1.5">
-                            <button type="button" wire:click="showValue({{ $keptPosition }})" class="press flex items-center gap-1.5 text-left text-xl font-semibold">
-                                {{ $group->name }}
-                                <x-megis.icon name="chevron-right" />
-                                <span class="sr-only">{{ __('mirror.deepen_open') }}</span>
-                            </button>
-                        </h3>
+                        <div class="flex min-w-0 flex-col items-start gap-1.5">
+                            <h3 class="pt-1.5">
+                                <button type="button" wire:click="showValue({{ $keptPosition }})" class="press flex items-center gap-1.5 text-left text-xl font-semibold">
+                                    {{ $group->name }}
+                                    <x-megis.icon name="chevron-right" />
+                                    <span class="sr-only">{{ __('mirror.deepen_open') }}</span>
+                                </button>
+                            </h3>
+                            <p class="flex flex-wrap items-center gap-2 text-sm text-grey-700">
+                                @if ($group->approved)
+                                    <x-ui.badge tone="green">{{ __('mirror.approved_badge') }}</x-ui.badge>
+                                @else
+                                    <x-ui.badge tone="neutral">{{ __('mirror.to_review_badge') }}</x-ui.badge>
+                                @endif
+                                @if ($group->edited)
+                                    <x-ui.badge tone="yellow">{{ __('mirror.own_definition') }}</x-ui.badge>
+                                @endif
+                                @if ($group->isRenamed())
+                                    <span>{{ __('mirror.originally', ['name' => $group->originalName]) }}</span>
+                                @endif
+                            </p>
+                        </div>
                     @else
                         <h3 class="pt-2 text-xl font-semibold text-grey-700 line-through">{{ $group->name }}</h3>
                     @endif
@@ -332,11 +373,14 @@
         @endforelse
 
         @if ($groups->isNotEmpty())
-            <div class="flex flex-wrap gap-3">
-                @if ($keptGroups->isNotEmpty())
-                    <x-ui.button size="lg" icon-right="arrow-right" wire:click="showValue(1)">{{ $keptGroups->first()->name }}</x-ui.button>
+            {{-- Signed in, ET5 comes once every kept value is approved; the public mirror does not wait --}}
+            @php($waitsForApproval = $requiresApproval && $approvedCount < $keptGroups->count())
+            <div class="flex flex-col items-start gap-2">
+                <x-ui.button size="lg" icon-right="arrow-right" wire:click="showFull" :disabled="$waitsForApproval">{{ __('mirror.continue') }}</x-ui.button>
+                @if ($waitsForApproval)
+                    <p class="text-sm text-grey-700">{{ __('mirror.approve_all_first') }}</p>
                 @endif
-                <x-ui.button :tone="$keptGroups->isNotEmpty() ? 'outline' : 'dark'" size="lg" wire:click="showFull">{{ __('mirror.continue') }}</x-ui.button>
+                <x-form.error name="approval" id="approval" role="alert" />
             </div>
         @endif
     @endif

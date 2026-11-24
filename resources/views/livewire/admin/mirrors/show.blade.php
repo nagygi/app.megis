@@ -104,6 +104,14 @@
                     @endif
                     @if ($group->excluded)
                         <x-ui.badge tone="coral">{{ __('admin.mirrors.excluded') }}</x-ui.badge>
+                    @elseif ($group->approved)
+                        <x-ui.badge tone="green">{{ __('admin.mirrors.approved') }}</x-ui.badge>
+                    @endif
+                    @if ($group->edited)
+                        <x-ui.badge tone="yellow">{{ __('mirror.own_definition') }}</x-ui.badge>
+                    @endif
+                    @if ($group->isRenamed())
+                        <span class="text-sm text-grey-700">{{ __('mirror.originally', ['name' => $group->originalName]) }}</span>
                     @endif
                 </div>
 
@@ -112,6 +120,18 @@
                         <span class="font-semibold">{{ __('admin.mirrors.meaning') }}:</span> {{ $insight->meaning }}
                         <span class="text-grey-700">· {{ __('admin.mirrors.meaning_states.'.($insight->edited_at ? 'edited' : ($insight->accepted_at ? 'accepted' : 'suggested'))) }}</span>
                     </p>
+                @endif
+                @if ($insight?->isEdited())
+                    {{-- The user's own words for the rest too (06 · ET4) --}}
+                    @if (filled($insight->signs))
+                        <p class="text-sm"><span class="font-semibold">{{ __('mirror.signs') }}:</span> {{ implode(' · ', $insight->signs) }}</p>
+                    @endif
+                    @if ($insight->low_example)
+                        <p class="text-sm"><span class="font-semibold">1:</span> {{ $insight->low_example }}</p>
+                    @endif
+                    @if ($insight->high_example)
+                        <p class="text-sm"><span class="font-semibold">6:</span> {{ $insight->high_example }}</p>
+                    @endif
                 @endif
 
                 <ul class="flex flex-col gap-1 text-sm text-grey-700">

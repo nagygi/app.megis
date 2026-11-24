@@ -17,6 +17,7 @@ use App\Services\Mirror\MirrorInsightService;
 use App\Services\Mirror\MirrorService;
 use App\Services\Mirror\MirrorValueGroup;
 use App\Services\Values\PersonalValueSetService;
+use Closure;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -27,6 +28,8 @@ use Livewire\Component;
 /**
  * ET3 · the values with quotes, ET4 · one value in the user's own words
  * (NM-06), ET5 · the full picture with the curiosity questions (06 · 6.1).
+ * The user goes through the values from the ET3 list and approves each on
+ * ET4, or writes it in their own words; signed in, ET5 waits for that.
  * The e-mail came with the recording: at the end a new address is asked to
  * confirm it, an existing account signs in. From the own menu (6.2) there is
  * no account step.
@@ -55,7 +58,16 @@ class Result extends Component
 
     public bool $rewriting = false;
 
+    /** "Átírom" (ET4): the name, the meaning, the signs one a line, the 1 and the 6. */
+    public string $ownName = '';
+
     public string $meaning = '';
+
+    public string $signs = '';
+
+    public string $lowExample = '';
+
+    public string $highExample = '';
 
     public string $loginMode = 'password';
 
@@ -125,33 +137,63 @@ class Result extends Component
         $this->resetValidation();
     }
 
-    public function showFull(): void
+    /**
+     * "Tovább" (ET3): signed in, every kept value is approved first.
+     */
+    public function showFull(MirrorService $mirrors): void
     {
+        if ($this->waitsForApproval($mirrors)) {
+            $this->addError('approval', __('mirror.approve_all_first'));
+
+            return;
+        }
+
         $this->step = 'full';
     }
 
     /**
-     * "Ez az": the Coach's sentence is the user's meaning (NM-06).
+     * "Jóváhagyom" (ET4): the user looked the value through and keeps it;
+     * back to the list. While the Coach writes, there is nothing to approve yet.
      */
-    public function accept(MirrorService $mirrors, MirrorInsightService $insights): void
+    public function approve(MirrorService $mirrors, MirrorInsightService $insights): void
     {
         $this->ensureOwner();
+
+        if ($this->session->insight_status === MirrorInsightStatus::Pending) {
+            return;
+        }
+
         $group = $this->currentGroup($mirrors);
 
         if ($group !== null) {
-            $insights->accept($this->session, $group->key);
+            $insights->approve($this->session, $group->key);
         }
+
+        $this->showValues();
     }
 
     /**
-     * "Átírom": the user's own sentence instead.
+     * "Átírom": every part in the user's own words, the name too; it starts
+     * from what stands there, the Coach's words or the Értéktár's.
      */
     public function startRewrite(MirrorService $mirrors, MirrorInsightService $insights): void
     {
         $this->ensureOwner();
         $group = $this->currentGroup($mirrors);
 
-        $this->meaning = $group === null ? '' : (string) $insights->forSession($this->session)->get($group->key)?->meaning;
+        if ($group === null) {
+            return;
+        }
+
+        $insight = $insights->forSession($this->session)->get($group->key);
+        $library = $group->valueId === null ? null : Value::query()->find($group->valueId);
+
+        $this->ownName = $group->name;
+        $this->meaning = (string) ($insight?->meaning ?? $library?->meanings[0] ?? '');
+        $this->signs = implode("\n", $insight?->signs ?? []);
+        $this->lowExample = (string) ($insight?->low_example ?? $library?->low_examples[0] ?? '');
+        $this->highExample = (string) ($insight?->high_example ?? $library?->high_examples[0] ?? '');
+        $this->resetValidation();
         $this->rewriting = true;
     }
 
@@ -164,15 +206,36 @@ class Result extends Component
     public function saveRewrite(MirrorService $mirrors, MirrorInsightService $insights): void
     {
         $this->ensureOwner();
-        $this->validate(
-            ['meaning' => ['required', 'string', 'max:'.MirrorInsightService::MEANING_MAX]],
-            attributes: ['meaning' => __('mirror.coach_rewrite_label')],
-        );
+        $signs = collect(preg_split('/\R/u', $this->signs) ?: [])->map(fn (string $sign) => trim($sign))->filter()->values();
+
+        $this->validate([
+            'ownName' => ['required', 'string', 'max:'.MirrorInsightService::NAME_MAX],
+            'meaning' => ['required', 'string', 'max:'.MirrorInsightService::MEANING_MAX],
+            'signs' => ['nullable', 'string', function (string $attribute, mixed $value, Closure $fail) use ($signs): void {
+                if ($signs->count() > MirrorInsightService::SIGNS_MAX || $signs->contains(fn (string $sign) => mb_strlen($sign) > MirrorInsightService::SIGN_MAX)) {
+                    $fail(__('mirror.edit.signs_rule', ['count' => MirrorInsightService::SIGNS_MAX, 'max' => MirrorInsightService::SIGN_MAX]));
+                }
+            }],
+            'lowExample' => ['nullable', 'string', 'max:'.MirrorInsightService::MEANING_MAX],
+            'highExample' => ['nullable', 'string', 'max:'.MirrorInsightService::MEANING_MAX],
+        ], attributes: [
+            'ownName' => __('mirror.edit.name'),
+            'meaning' => __('mirror.edit.meaning'),
+            'signs' => __('mirror.edit.signs'),
+            'lowExample' => __('mirror.edit.low'),
+            'highExample' => __('mirror.edit.high'),
+        ]);
 
         $group = $this->currentGroup($mirrors);
 
         if ($group !== null) {
-            $insights->rewrite($this->session, $group->key, $this->meaning);
+            $insights->edit($this->session, $group, [
+                'name' => $this->ownName,
+                'meaning' => $this->meaning,
+                'signs' => $signs->all(),
+                'low' => $this->lowExample,
+                'high' => $this->highExample,
+            ]);
         }
 
         $this->rewriting = false;
@@ -302,12 +365,19 @@ class Result extends Component
 
         $this->position = min(max(1, $this->position), max(1, $kept->count()));
         $current = $this->step === 'value' ? $kept->get($this->position - 1) : null;
+        $approvedCount = $kept->where('approved', true)->count();
+
+        // ET5 opened by its address before every value is approved goes back to the list.
+        if ($this->step === 'full' && $this->requiresApproval() && $approvedCount < $kept->count()) {
+            $this->step = 'values';
+        }
 
         $view = view('livewire.mirror.result', [
             'groups' => $groups,
             'keptGroups' => $kept,
+            'approvedCount' => $approvedCount,
+            'requiresApproval' => $this->requiresApproval(),
             'current' => $current,
-            'next' => $current === null ? null : $kept->get($this->position),
             'insight' => $current === null ? null : $insights->forSession($this->session)->get($current->key),
             'insightPending' => $this->session->insight_status === MirrorInsightStatus::Pending,
             'libraryValue' => $current?->valueId === null ? null : Value::query()->find($current->valueId),
@@ -351,6 +421,21 @@ class Result extends Component
     private function isInvitedMember(): bool
     {
         return $this->organization !== null && ! $this->organization->isIndividual();
+    }
+
+    /**
+     * Signed in, every kept value is approved before ET5; the public mirror
+     * shows the approvals but does not wait for them (06 · ET3).
+     */
+    private function requiresApproval(): bool
+    {
+        return $this->organization !== null;
+    }
+
+    private function waitsForApproval(MirrorService $mirrors): bool
+    {
+        return $this->requiresApproval()
+            && $mirrors->groups($this->session)->contains(fn (MirrorValueGroup $group) => ! $group->excluded && ! $group->approved);
     }
 
     private function asksCuriosity(): bool

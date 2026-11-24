@@ -101,6 +101,8 @@ it('walks a peer from the consent to the experience', function () {
     $page->assertSee('Érték hozzáadása')->wait(0.5);
     $page->fill('draft-name', 'Türelem')->fill('draft-meaning', 'Kivárom a végét.');
     $page->press('Hozzáadom');
+    // The list loads again with the new value before going on
+    $page->assertSee('ami nem a tiéd, vedd ki');
     $page->press('A megélésed');
 
     $page->assertSee('Hogyan látjátok ma a márkát?')->assertNoAccessibilityIssues();

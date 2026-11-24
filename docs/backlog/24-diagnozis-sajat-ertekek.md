@@ -66,6 +66,7 @@ Kapcsolódik: 03, 06, 08, 17.
 - A fiókhoz kötött, legutóbbi feldolgozott Értéktükör (06) értékei és idézetei átjönnek, a tükör dátumával.
 - Ha a diagnózis alatt új tükröt csinál, a lista magától nem változik. Ha a lista tükörből jött, a V2·b tetején egy sor jelenik meg: „Új tükröd van ({dátum}) · Átnézem”. Az „Átnézem” az új tükör értékeit a listához adja, legfeljebb 5-ig.
 - Ami az ET3-on „nem az enyém” jelölést kapott, nem jön át.
+- **Az ET4-en átnevezett érték** (06, 2026-11-24) a felhasználó saját értékeként jön, a saját nevével és szövegeivel: ha az Értéktárban van ilyen nevű érték, ahhoz kötődik, ha nincs, „Felhasználó által felvett” érték lesz belőle (24.3). Az eredeti Értéktár-érték nem változik. A kártyán „Saját meghatározás” címke áll, ahogy minden felhasználó által felvett értéken.
 - Az Értéktárra illesztett érték az Értéktár értékeként jön. A nem illeszkedő érték „AI által detektált” értékként jön (03 · 3.7), és a felhasználó választhatja, mert nála keletkezett.
 
 ### 24.6 A társnál (T3–T3·c)

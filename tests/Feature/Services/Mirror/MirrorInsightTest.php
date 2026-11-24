@@ -1,8 +1,10 @@
 <?php
 
+use App\Ai\AiContext;
 use App\Enums\InboxItemType;
 use App\Enums\MaterialContext;
 use App\Enums\MirrorInsightStatus;
+use App\Enums\ValueOrigin;
 use App\Livewire\Admin\Measurements\Index as MeasurementsIndex;
 use App\Models\AiCall;
 use App\Models\InboxItem;
@@ -133,7 +135,8 @@ it('brings the meaning taken on ET4 into the own values', function () {
     $session = deepenedMirror($organization, [coachAnswer()]);
     $directness = Value::query()->firstWhere('name', 'Egyenesség');
 
-    app(MirrorInsightService::class)->rewrite($session, 'value:'.$directness->id, 'Akkor szólok, amikor még számít.');
+    $group = app(MirrorService::class)->groups($session)->firstWhere('key', 'value:'.$directness->id);
+    app(MirrorInsightService::class)->edit($session, $group, ['name' => 'Egyenesség', 'meaning' => 'Akkor szólok, amikor még számít.', 'signs' => [], 'low' => 'Bólintok, aztán hallgatok.', 'high' => 'Ott, akkor, annak.']);
 
     $item = collect(app(PersonalValueSetService::class)->itemsFromMirror($session->fresh(), [], 5))->firstWhere('value_id', $directness->id);
 
@@ -143,4 +146,63 @@ it('brings the meaning taken on ET4 into the own values', function () {
         ->low_example->toBe('Bólintok, aztán hallgatok.')
         ->high_example->toBe('Ott, akkor, annak.')
         ->example->toBe('inkább most mondom, mint csütörtökön');
+});
+
+it('brings a value renamed on ET4 into the own values as the user’s own, the Értéktár unchanged', function () {
+    config(['megis.mirror.deepening' => true]);
+    $organization = Organization::factory()->create();
+    $user = customerOf($organization);
+    $session = deepenedMirror($organization, [coachAnswer()]);
+    $directness = Value::query()->firstWhere('name', 'Egyenesség');
+    $group = app(MirrorService::class)->groups($session)->firstWhere('key', 'value:'.$directness->id);
+
+    app(MirrorInsightService::class)->edit($session, $group, ['name' => 'Kiállás', 'meaning' => 'Kiállok, ha kell.', 'signs' => ['szólok'], 'low' => 'Hallgatok.', 'high' => 'Kimondom.']);
+
+    $sets = app(PersonalValueSetService::class);
+    $set = $sets->forUser($user);
+    $sets->save($set, $sets->itemsFromMirror($session->fresh(), [], 5), recordVersion: false);
+    $item = $set->items()->with('value')->get()->firstWhere('name', 'Kiállás');
+
+    expect($item)->not->toBeNull()
+        ->and($item->meaning)->toBe('Kiállok, ha kell.')
+        ->and($item->value->origin)->toBe(ValueOrigin::User)
+        ->and($item->value->origin_user_id)->toBe($user->id)
+        ->and($directness->fresh()->name)->toBe('Egyenesség')
+        ->and($directness->fresh()->meanings)->toBe(['Kimondom.']);
+});
+
+it('keeps what the user wrote or approved when the Coach runs again', function () {
+    config(['megis.mirror.deepening' => true]);
+    $session = deepenedMirror(more: [coachAnswer()]);
+    $directness = Value::query()->firstWhere('name', 'Egyenesség');
+    $mirrors = app(MirrorService::class);
+    $insights = app(MirrorInsightService::class);
+    $free = $mirrors->groups($session)->firstWhere('key', 'free:játékosság');
+
+    $insights->edit($session, $mirrors->groups($session)->firstWhere('key', 'value:'.$directness->id), ['name' => 'Kiállás', 'meaning' => 'Az én szavaim.', 'signs' => [], 'low' => null, 'high' => null]);
+    $insights->approve($session, $free->key);
+
+    AiGateway::fake([insightAnswer(['values' => [
+        ['ref' => 'V1', 'meaning' => 'Új javaslat.', 'signs' => [], 'low' => '', 'high' => ''],
+        ['ref' => 'V2', 'meaning' => 'Másik új javaslat.', 'signs' => [], 'low' => '', 'high' => ''],
+    ]])]);
+    $insights->deepen($session, AiContext::publicMirror($session));
+
+    $byKey = $insights->forSession($session);
+
+    expect($byKey->get('value:'.$directness->id)->meaning)->toBe('Az én szavaim.')
+        ->and($byKey->get('value:'.$directness->id)->name)->toBe('Kiállás')
+        ->and($byKey->get($free->key)->meaning)->toBe('A nehézben is nevetek.')
+        ->and($byKey->get($free->key)->accepted_at)->not->toBeNull();
+});
+
+it('approves a value the Coach had no words for', function () {
+    $session = deepenedMirror();
+    $insights = app(MirrorInsightService::class);
+    $group = app(MirrorService::class)->groups($session)->first();
+
+    $insights->approve($session, $group->key);
+
+    expect(app(MirrorService::class)->groups($session)->first()->approved)->toBeTrue()
+        ->and($insights->forSession($session)->get($group->key)->meaning)->toBeNull();
 });

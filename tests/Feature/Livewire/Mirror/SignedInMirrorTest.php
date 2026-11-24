@@ -7,6 +7,7 @@ use App\Mail\MirrorInterestMail;
 use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Services\Ai\AiGateway;
+use App\Services\Mirror\MirrorService;
 use App\Services\Values\ValueService;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Ai\Responses\Data\Meta;
@@ -64,6 +65,8 @@ it('shows no account step and no booking, and keeps the curiosity questions when
     $session = signedInMirror($organization);
 
     Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])
+        ->call('showValue', 1)
+        ->call('approve')
         ->call('showFull')
         ->assertDontSee('Nézd meg a leveled')
         ->assertDontSee('https://foglalas.example.com')
@@ -100,6 +103,8 @@ it('asks an invited member no curiosity questions, and points to the tree in the
     $session = signedInMirror($organization);
 
     $result = Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])
+        ->call('showValue', 1)
+        ->call('approve')
         ->call('showFull')
         ->assertSee('Hogyan tovább?')
         ->assertDontSee('Kíváncsi vagy?')
@@ -115,6 +120,41 @@ it('asks an invited member no curiosity questions, and points to the tree in the
     Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])->call('sendInterest')->assertForbidden();
 
     Mail::assertNothingQueued();
+});
+
+it('goes on to ET5 only once every kept value is approved, signed in', function () {
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+    $session = signedInMirror($organization);
+
+    $result = Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])
+        ->assertSee('Előbb nézd át és hagyd jóvá minden értékedet.')
+        ->call('showFull')
+        ->assertSet('step', 'values')
+        ->assertHasErrors('approval');
+
+    $this->get(route('client.mirror.result', [$organization, $session]).'?lap=full')
+        ->assertOk()
+        ->assertDontSee('Hogyan tovább?');
+
+    $result->call('showValue', 1)
+        ->call('approve')
+        ->assertSee('1 / 1 jóváhagyva')
+        ->assertDontSee('Előbb nézd át és hagyd jóvá minden értékedet.')
+        ->call('showFull')
+        ->assertSet('step', 'full');
+});
+
+it('lets a value taken out stand in for an approved one', function () {
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+    $session = signedInMirror($organization);
+    $key = app(MirrorService::class)->groups($session)->first()->key;
+
+    Livewire::test(Result::class, ['session' => $session, 'organization' => $organization])
+        ->call('toggle', $key)
+        ->call('showFull')
+        ->assertSet('step', 'full');
 });
 
 it('deepens the values from the own menu too (ET4)', function () {

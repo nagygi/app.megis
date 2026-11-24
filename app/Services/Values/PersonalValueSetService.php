@@ -215,7 +215,9 @@ class PersonalValueSetService
      * The values of an Értéktükör with their quotes, "nem az enyém" left out
      * (24 · 24.5). A matched value comes as the Értéktár value, an unmatched
      * one as the "AI által detektált" value made of it. What the user took or
-     * wrote on ET4 replaces the Értéktár's meaning and scale ends (NM-06).
+     * wrote on ET4 replaces the Értéktár's meaning and scale ends (NM-06). A
+     * value the user renamed there is their own: the value of that name, or a
+     * new "Felhasználó által felvett" one when the list is saved (24 · 24.3).
      *
      * @param  list<int>  $existingValueIds
      * @return list<array<string, mixed>>
@@ -230,6 +232,36 @@ class PersonalValueSetService
                 continue;
             }
 
+            $insight = $insights->get($group->key);
+
+            if ($group->isRenamed()) {
+                $own = $this->values->findByName($group->name);
+
+                if ($own !== null && in_array($own->id, $existingValueIds, true)) {
+                    continue;
+                }
+
+                if ($own !== null) {
+                    $existingValueIds[] = $own->id;
+                }
+
+                $items[] = [
+                    'key' => (string) Str::uuid(),
+                    'value_id' => $own?->id,
+                    'source_version_id' => null,
+                    'name' => $group->name,
+                    'meaning' => (string) $insight?->meaning,
+                    'non_meaning' => '',
+                    'low_example' => (string) $insight?->low_example,
+                    'high_example' => (string) $insight?->high_example,
+                    'example' => $group->quotes[0] ?? '',
+                    'source' => PersonalValueSetItem::SOURCE_NEW,
+                    'quotes' => $group->quotes,
+                ];
+
+                continue;
+            }
+
             $valueId = $group->valueId ?? RawDetection::query()->whereIn('id', $group->detectionIds)->whereNotNull('unmatched_value_id')->value('unmatched_value_id');
             $value = $valueId === null ? null : Value::query()->with('latestVersion')->find($valueId);
 
@@ -239,7 +271,6 @@ class PersonalValueSetService
 
             $existingValueIds[] = $value->id;
             $item = $this->itemFromValue($value, PersonalValueSetItem::SOURCE_MIRROR);
-            $insight = $insights->get($group->key);
 
             $items[] = [
                 ...$item,

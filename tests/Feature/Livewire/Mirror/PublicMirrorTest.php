@@ -21,8 +21,10 @@ use App\Models\MirrorSession;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\UserToken;
+use App\Models\Value;
 use App\Services\Ai\AiGateway;
 use App\Services\Auth\TokenService;
+use App\Services\Mirror\MirrorInsightService;
 use App\Services\Mirror\MirrorService;
 use App\Services\Transcription\FakeTranscriber;
 use App\Services\Transcription\Transcriber;
@@ -472,6 +474,9 @@ it('opens the mirror in the account after the confirmation, its values expanded 
     $response->assertRedirect(route('client.mirror.result', [$organization, $session]));
 
     $this->get(route('client.mirror.result', [$organization, $session]))->assertOk()->assertSee('Egyenesség');
+
+    // In the account ET5 comes once the values are approved (06 · ET3).
+    app(MirrorService::class)->groups($session)->each(fn ($group) => app(MirrorInsightService::class)->approve($session, $group->key));
     $this->get(route('client.mirror.result', [$organization, $session]).'?lap=full')->assertOk()->assertSee('Hogyan tovább?')->assertSee('Kíváncsi vagy?');
 });
 
@@ -695,35 +700,82 @@ it('deepens a value with the mégis Coach from the quotes (ET4)', function () {
         ->assertSee('Egy 1-től 6-ig tartó skála két vége, a te szavaiddal.')
         ->assertSee('amikor nagyon nem teljesül')
         ->assertSee('amikor nagyon teljesül')
-        ->assertSee('Tovább');
+        ->assertSee('Jóváhagyom');
 });
 
-it('takes the Coach’s meaning, or the user’s own sentence instead', function () {
+it('approves a value on ET4 and goes back to the list, where it shows approved', function () {
+    config(['megis.mirror.deepening' => true]);
+    $session = submitTextMirror();
+    $insight = $session->insights()->sole();
+
+    Livewire::test(Result::class, ['session' => $session])
+        ->assertSee('0 / 1 jóváhagyva')
+        ->assertSee('átnézendő')
+        ->call('showValue', 1)
+        ->assertSee('Jóváhagyom')
+        ->assertDontSee('Ez az')
+        ->call('approve')
+        ->assertSet('step', 'values')
+        ->assertSee('1 / 1 jóváhagyva')
+        ->assertSee('✓ jóváhagyva');
+
+    expect($insight->fresh()->accepted_at)->not->toBeNull();
+});
+
+it('lets the user write every part of a value, the name too, as their own definition', function () {
     config(['megis.mirror.deepening' => true]);
     $session = submitTextMirror();
     $insight = $session->insights()->sole();
 
     $component = Livewire::test(Result::class, ['session' => $session])
         ->call('showValue', 1)
-        ->call('accept')
-        ->assertSee('Ez lesz a te definíciód.');
-
-    expect($insight->fresh()->accepted_at)->not->toBeNull();
-
-    $component->call('startRewrite')
+        ->call('startRewrite')
+        ->assertSet('ownName', 'Egyenesség')
         ->assertSet('meaning', 'Kimondom, amit gondolok: annak, akire tartozik, most.')
+        ->assertSet('signs', "szólok, ha csúszik\nnem szépítem")
+        ->assertSet('lowExample', 'Bólintok a meetingen, aztán a folyosón mondom el.')
         ->set('meaning', '')
         ->call('saveRewrite')
         ->assertHasErrors(['meaning' => 'required'])
+        ->set('signs', "egy\nkettő\nhárom\nnégy\nöt")
         ->set('meaning', 'Akkor szólok, amikor még számít.')
         ->call('saveRewrite')
+        ->assertHasErrors(['signs'])
+        ->set('ownName', 'Kiállás')
+        ->set('signs', "szólok időben\nfelfelé is")
+        ->set('lowExample', 'Hallgatok, pedig tudom.')
+        ->set('highExample', 'Kimondom, és vállalom.')
+        ->call('saveRewrite')
         ->assertHasNoErrors()
+        ->assertSee('Kiállás')
+        ->assertSee('Saját meghatározás')
+        ->assertSee('eredetileg: Egyenesség')
         ->assertSee('Akkor szólok, amikor még számít.')
-        ->assertSee('A te szavaiddal mentettük.');
+        ->assertSee('szólok időben')
+        ->assertSee('Hallgatok, pedig tudom.')
+        ->assertSee('Jóváhagytad, a te szavaiddal.');
 
     expect($insight->fresh())
+        ->name->toBe('Kiállás')
         ->meaning->toBe('Akkor szólok, amikor még számít.')
-        ->edited_at->not->toBeNull();
+        ->signs->toBe(['szólok időben', 'felfelé is'])
+        ->high_example->toBe('Kimondom, és vállalom.')
+        ->edited_at->not->toBeNull()
+        ->accepted_at->not->toBeNull()
+        ->and(Value::query()->where('name', 'Egyenesség')->exists())->toBeTrue()
+        ->and(Value::query()->where('name', 'Kiállás')->exists())->toBeFalse();
+
+    $component->call('showValues')->assertSee('Kiállás')->assertSee('eredetileg: Egyenesség');
+});
+
+it('lets the public mirror go on before every value is approved', function () {
+    $session = submitTextMirror();
+
+    Livewire::test(Result::class, ['session' => $session])
+        ->assertSee('0 / 1 jóváhagyva')
+        ->call('showFull')
+        ->assertSet('step', 'full')
+        ->assertHasNoErrors();
 });
 
 it('waits for the Coach on ET4, and shows the Értéktár’s words when the Coach did not answer', function () {
@@ -745,7 +797,7 @@ it('waits for the Coach on ET4, and shows the Értéktár’s words when the Coa
         ->assertDontSee('Ez az');
 });
 
-it('pages through the kept values on ET4', function () {
+it('opens each kept value from the list, one way through them (ET4)', function () {
     fakeTurnstile();
     app(ValueService::class)->create(['name' => 'Egyenesség', 'meanings' => ['Kimondom.'], 'high_examples' => ['Mindig.'], 'low_examples' => ['Soha.']]);
     AiGateway::fake([
@@ -768,11 +820,13 @@ it('pages through the kept values on ET4', function () {
         ->assertSee('Játékosság')
         ->call('showValue', 1)
         ->assertSee('Egyenesség · 1 / 2')
+        ->assertDontSeeHtml('wire:click="showValue(2)"')
+        ->assertDontSeeHtml('wire:click="showFull"')
+        ->call('showValues')
         ->assertSeeHtml('wire:click="showValue(2)"')
         ->call('showValue', 2)
         ->assertSee('Játékosság · 2 / 2')
-        ->assertSee('a végén azért nevettünk egyet')
-        ->assertDontSeeHtml('wire:click="showValue(3)"');
+        ->assertSee('a végén azért nevettünk egyet');
 
     // A value taken out on ET3 keeps its place there, struck through, and leaves the pages.
     $component->call('showValues')

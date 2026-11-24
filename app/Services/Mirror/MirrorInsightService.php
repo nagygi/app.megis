@@ -15,12 +15,19 @@ use Illuminate\Support\Collection;
 
 /**
  * ET4 · elmélyülés (NM-06): the mégis Coach puts each value of a mirror into
- * the user's own words, from their quotes. The user takes the meaning or
- * rewrites it; it goes into the own values with the account (24 · V2).
+ * the user's own words, from their quotes. The user approves each value, or
+ * writes any part of it, the name too; it goes into the own values with the
+ * account (24 · V2).
  */
 class MirrorInsightService
 {
     public const MEANING_MAX = 500;
+
+    public const NAME_MAX = 80;
+
+    public const SIGN_MAX = 120;
+
+    public const SIGNS_MAX = 4;
 
     public function __construct(
         private MirrorService $mirrors,
@@ -39,12 +46,17 @@ class MirrorInsightService
 
     /**
      * One call for every value of the mirror, the ones marked "nem az enyém"
-     * too: they can come back.
+     * too: they can come back. What the user wrote, or approved with the
+     * Coach's words, stays when the Coach runs again ("Újra").
      */
     public function deepen(MirrorSession $session, AiContext $context): void
     {
         $groups = $this->mirrors->groups($session)->values();
-        $session->insights()->delete();
+        $kept = $session->insights()->get()
+            ->filter(fn (MirrorValueInsight $insight) => $insight->isEdited() || ($insight->isAccepted() && filled($insight->meaning)))
+            ->pluck('group_key')
+            ->all();
+        $session->insights()->whereNull('accepted_at')->whereNull('edited_at')->delete();
 
         if ($groups->isEmpty()) {
             $session->update(['insight_status' => MirrorInsightStatus::Ready]);
@@ -67,7 +79,7 @@ class MirrorInsightService
         foreach ($result->structured['values'] ?? [] as $row) {
             $group = $refs->get($row['ref'] ?? '');
 
-            if ($group === null || blank($row['meaning'] ?? null)) {
+            if ($group === null || in_array($group->key, $kept, true) || blank($row['meaning'] ?? null)) {
                 continue;
             }
 
@@ -92,20 +104,34 @@ class MirrorInsightService
     }
 
     /**
-     * "Ez az": the suggestion is the user's meaning now.
+     * "Jóváhagyom": the user looked the value through and keeps it as it
+     * stands, the Coach's words or the Értéktár's (06 · ET3, ET4).
      */
-    public function accept(MirrorSession $session, string $key): void
+    public function approve(MirrorSession $session, string $key): void
     {
-        $session->insights()->where('group_key', $key)->first()?->update(['accepted_at' => now()]);
+        $insight = $session->insights()->firstOrNew(['group_key' => $key]);
+        $insight->accepted_at = now();
+        $insight->save();
     }
 
     /**
-     * "Átírom": the user's own sentence instead of the suggestion.
+     * "Átírom": the user's own words for any part of the value, the name too.
+     * It is their own definition from then on, not the Értéktár's; the
+     * Értéktár does not change. Written, it is approved too.
+     *
+     * @param  array{name: string, meaning: string, signs: list<string>, low: ?string, high: ?string}  $fields
      */
-    public function rewrite(MirrorSession $session, string $key, string $meaning): void
+    public function edit(MirrorSession $session, MirrorValueGroup $group, array $fields): void
     {
-        $session->insights()->where('group_key', $key)->first()?->update([
-            'meaning' => $this->clip($meaning),
+        $detectedName = $group->originalName ?? $group->name;
+        $name = trim($fields['name']);
+
+        $session->insights()->updateOrCreate(['group_key' => $group->key], [
+            'name' => $name === '' || mb_strtolower($name) === mb_strtolower($detectedName) ? null : mb_substr($name, 0, self::NAME_MAX),
+            'meaning' => $this->clip($fields['meaning']),
+            'signs' => collect($fields['signs'])->map(fn (string $sign) => mb_substr(trim($sign), 0, self::SIGN_MAX))->filter()->take(self::SIGNS_MAX)->values()->all(),
+            'low_example' => filled($fields['low']) ? $this->clip($fields['low']) : null,
+            'high_example' => filled($fields['high']) ? $this->clip($fields['high']) : null,
             'edited_at' => now(),
             'accepted_at' => now(),
         ]);

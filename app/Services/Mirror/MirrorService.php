@@ -147,17 +147,19 @@ class MirrorService
     }
 
     /**
-     * Read, and there is nothing left for the user to do on it.
+     * Read, and every value the user kept is approved (06 · ET3).
      */
     public function isFinished(MirrorSession $session): bool
     {
-        return $session->status->isDone();
+        return $session->status->isDone()
+            && $this->groups($session)->every(fn (MirrorValueGroup $group) => $group->excluded || $group->approved);
     }
 
     /**
      * The values on ET3, the strongest first; each detection is counted with
      * its best match, or by its free name when nothing matched. A value marked
      * "nem az enyém" keeps its place, struck through, so it can be taken back.
+     * What the user did on ET4 comes with it: their own name, approved, edited.
      *
      * @return Collection<int, MirrorValueGroup>
      */
@@ -170,6 +172,7 @@ class MirrorService
         }
 
         $threshold = (float) config('megis.engine.match_threshold');
+        $insights = $session->insights()->get()->keyBy('group_key');
 
         return $material->detections()
             ->with(['matches' => fn ($query) => $query->where('confidence', '>=', $threshold)->with('value')])
@@ -180,17 +183,23 @@ class MirrorService
 
                 return $match === null ? 'free:'.mb_strtolower($detection->free_name) : 'value:'.$match->value_id;
             })
-            ->map(function (Collection $detections, string $key): MirrorValueGroup {
+            ->map(function (Collection $detections, string $key) use ($insights): MirrorValueGroup {
                 $first = $detections->first();
                 $value = $first->matches->first()?->value;
+                $insight = $insights->get($key);
+                $detectedName = $value?->name ?? $first->free_name;
+                $ownName = filled($insight?->name) ? $insight->name : null;
 
                 return new MirrorValueGroup(
                     key: $key,
-                    name: $value?->name ?? $first->free_name,
+                    name: $ownName ?? $detectedName,
                     quotes: $detections->pluck('quote')->unique()->values()->all(),
                     detectionIds: $detections->pluck('id')->all(),
                     excluded: $detections->every(fn (RawDetection $detection) => $detection->isExcluded()),
                     valueId: $value?->id,
+                    originalName: $ownName === null ? null : $detectedName,
+                    approved: (bool) $insight?->isAccepted(),
+                    edited: (bool) $insight?->isEdited(),
                 );
             })
             ->sortByDesc(fn (MirrorValueGroup $group) => count($group->quotes))

@@ -4,6 +4,7 @@ namespace App\Livewire\Client\Diagnosis;
 
 use App\Enums\DiagnosisStep;
 use App\Enums\MainDiagnosisSubject;
+use App\Enums\ValueOrigin;
 use App\Livewire\Client\Diagnosis\Concerns\InteractsWithMainDiagnosis;
 use App\Livewire\Mirror\Record;
 use App\Models\Diagnosis;
@@ -269,6 +270,12 @@ class OwnValues extends Component
             'mirrorCount' => $mirror === null ? 0 : $mirrors->groups($mirror)->reject(fn ($group) => $group->excluded)->count(),
             'newMirror' => $mirror !== null && $set->imported_mirror_session_id !== null && $set->imported_mirror_session_id !== $mirror->id ? $mirror : null,
             'occurrences' => $occurrences,
+            // The user's own values, not the Értéktár's: added here or renamed on ET4 (24 · 24.3).
+            'ownValueIds' => Value::query()
+                ->whereIn('id', array_values(array_filter(array_column($this->items, 'value_id'))))
+                ->where('origin', ValueOrigin::User)
+                ->pluck('id')
+                ->all(),
             'states' => collect($this->items)->mapWithKeys(fn (array $item) => [
                 $item['key'] => $sets->state($occurrences['counts'][$item['value_id'] ?? 0] ?? 0, $occurrences['total']),
             ])->all(),
