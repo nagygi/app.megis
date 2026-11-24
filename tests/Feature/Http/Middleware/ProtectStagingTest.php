@@ -1,7 +1,11 @@
 <?php
 
+use App\Http\Middleware\ProtectStaging;
+use App\Models\User;
 use Exot\OnsiteComment\Auth\ParticipantSessions;
 use Exot\OnsiteComment\Models\ParticipantSession;
+use Illuminate\Routing\Router;
+use Illuminate\Session\Middleware\StartSession;
 
 beforeEach(function () {
     $this->app['env'] = 'staging';
@@ -65,6 +69,47 @@ it('ignores a ticket session while the on-page tickets are switched off', functi
     $response = $this->get('/');
 
     $response->assertUnauthorized();
+});
+
+it('tells a visitor without a password prompt where to log in', function () {
+    $response = $this->get('/');
+
+    $response->assertUnauthorized()
+        ->assertSee(__('errors.401.title'))
+        ->assertSee(route('client.landing'), false);
+});
+
+it('opens the mail links and the login pages without credentials', function (string $path) {
+    $response = $this->get($path);
+
+    expect($response->status())->not->toBe(401);
+})->with([
+    'invitation' => '/meghivo/no-such-token',
+    'login' => '/belepes',
+    'password reset' => '/jelszo-visszaallitas/no-such-token',
+    'admin password setup' => '/admin/jelszo-beallitas/no-such-token',
+    'admin login' => '/admin/belepes',
+    'client user invitation' => '/ugyfelmeres/meghivo/no-such-token',
+]);
+
+it('sends a guest from a page behind the login to the login page', function () {
+    $response = $this->get(route('client.landing'));
+
+    $response->assertRedirect(route('client.login'));
+});
+
+it('lets a signed-in user through on every page', function (string $guard) {
+    $response = $this->actingAs(User::factory()->create(), $guard)->get('/');
+
+    $response->assertOk();
+})->with(['web', 'admin']);
+
+it('runs after the session starts, so it sees who is signed in', function () {
+    $router = app(Router::class);
+    $middleware = $router->gatherRouteMiddleware($router->getRoutes()->getByName('public.home'));
+
+    expect(array_search(ProtectStaging::class, $middleware, true))
+        ->toBeGreaterThan(array_search(StartSession::class, $middleware, true));
 });
 
 it('keeps the health check reachable for the monitor', function () {

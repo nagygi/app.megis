@@ -7,6 +7,12 @@ return [
     'account' => 'Tovább a fiókodba',
     'reload' => 'Újratöltöm az oldalt',
 
+    // The staging gate, when the browser shows no password prompt (MEGIS-8).
+    '401' => [
+        'title' => 'Ez a mégis tesztkörnyezete',
+        'message' => 'Ez az oldal jelszóval védett. Ha van fiókod, lépj be, és a fiókodon belül minden elérhető.',
+    ],
+
     '403' => [
         'title' => 'Nincs jogosultságod',
         'message' => 'Ehhez az oldalhoz nincs hozzáférésed. Ha szerinted kellene, szólj a mégis kapcsolattartódnak.',

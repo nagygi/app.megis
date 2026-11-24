@@ -2,6 +2,19 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.114 · – · 2026-11-24
+
+Staging-védelem (MEGIS-8): a meghívott felhasználónak nem kell a staging jelszava.
+
+- **Eddig:** a stagingen minden oldal a staging jelszavát kérte, kivéve az engedélyezett IP-ket és a „Jegyek az oldalon” meghívottjait. Egy új felhasználó a meghívó levél linkjéről a jelszóablakba futott, és ahol a böngésző nem dobta fel (például a Gmailből nyitva), csak a „Staging” szót látta.
+- **Most:**
+  - Jelszó nélkül nyílnak a levelek linkjei (meghívó, belépőlink, jelszó-visszaállítás, admin jelszó-beállítás, ügyfélmérés-meghívó), a belépés lapjai és a jogi dokumentumok.
+  - A belépéshez kötött oldalak (ügyfél és admin) is jelszó nélkül nyílnak: vendégként a belépésre visznek, így az értesítő levelek linkjei is működnek.
+  - A bejelentkezett felhasználónak (ügyfél vagy admin) minden oldal nyílik, a Livewire-hívások is.
+  - Jelszó csak a nyilvános oldalakhoz kell (kezdőlap, nyilvános Értéktükör), fiók nélkül. Ha a böngésző nem kér jelszót, a 401-es lap „Ez a mégis tesztkörnyezete” címmel a belépésre mutat.
+  - A védelem a munkamenet indítása után fut, hogy lássa, ki van bejelentkezve.
+- Dokumentáció: `docs/uzemeltetes.md` · 2, `docs/deploy.md`.
+
 ## 1.113 · e05d6a1 · 2026-11-24
 
 Lezárt diagnózis: a kezdőlap nem visz a megszűnt lépésekre.

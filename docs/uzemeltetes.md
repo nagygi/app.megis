@@ -25,6 +25,7 @@ Minden adat az EU-n belül van: az adatbázis, a fájlok, a mentések és a logo
 - **Staging:**
   - Itt nézi át a mégis a kiadást.
   - Jelszóval vagy IP-szűréssel védett, és noindex. A „Jegyek az oldalon” meghívottjai (tesztelők, megrendelő) a személyes linkjükkel jelszó nélkül is bejutnak, amíg a jegy-munkamenetük érvényes.
+  - A fiókkal rendelkezőknek nem kell a staging jelszava (MEGIS-8). Jelszó nélkül nyílik: a levelek linkjei (meghívó, belépőlink, jelszó-visszaállítás, admin jelszó-beállítás, ügyfélmérés-meghívó), a belépés lapjai, a jogi dokumentumok és minden belépéshez kötött oldal (vendégként ezek a belépésre visznek). A bejelentkezett felhasználónak minden oldal nyílik. Jelszó csak a nyilvános oldalakhoz kell (kezdőlap, nyilvános Értéktükör); ahol a böngésző nem kérdez jelszót, a 401-es lap a belépésre mutat.
   - A levelek valódi címekre mennek, hogy a mégis a meghívókat és az értesítéseket is kipróbálhassa. A `MEGIS_MAIL_ALLOWLIST` megadásával szűkíthető a címzettek köre; ilyenkor az admin felület sávban jelzi, kik kapnak levelet.
   - Saját AI-kulcsai vannak, alacsony kerettel.
 - **Production:** csak itt indexelhetők a nyilvános oldalak.

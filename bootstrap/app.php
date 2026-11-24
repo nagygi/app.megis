@@ -18,6 +18,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
 
@@ -40,6 +41,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(AddRobotsHeader::class);
         $middleware->append(SecurityHeaders::class);
         $middleware->web(prepend: [ProtectStaging::class], append: [LogUserActivity::class]);
+        // The staging gate lets a signed-in user through, so it needs the session (MEGIS-8).
+        $middleware->appendToPriorityList(StartSession::class, ProtectStaging::class);
 
         $middleware->alias([
             'admin' => AuthenticateAdmin::class,
