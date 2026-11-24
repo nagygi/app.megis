@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.112 · – · 2026-11-24
+## 1.112 · d40c94f · 2026-11-24
 
 Tevékenységnapló: fájlban látszik, melyik felhasználó mikor mit csinált.
 
