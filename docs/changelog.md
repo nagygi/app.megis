@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.114 · – · 2026-11-24
+## 1.114 · 7f73554 · 2026-11-24
 
 Staging-védelem (MEGIS-8): a meghívott felhasználónak nem kell a staging jelszava.
 
