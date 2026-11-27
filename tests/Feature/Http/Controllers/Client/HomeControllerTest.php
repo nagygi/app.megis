@@ -18,9 +18,22 @@ it('greets the customer until a diagnosis of the organization starts', function 
         // A member's way ahead: the peer's (26 · 26.4).
         ->assertSee('A csapat hangja')
         ->assertSee('Amikor a vezetőd elindítja a diagnózist, meghívót kapsz.')
-        ->assertSee('Útravaló')
+        // The line ends with the day it is done, the Útravaló under it (25 · 25.3); no diagnosis yet, so no day.
+        ->assertSeeInOrder(['Hozzáteszel', 'Elkészül a diagnózisotok', 'Útravaló', 'összehangoljuk az értékeidet és a szervezet folyamatait a mindennapokban'])
+        ->assertDontSee('A végén')
         ->assertDontSee('ndulás:')
         ->assertDontSee('A vezető útja');
+});
+
+it('opens the menu with the home, "A te utad", and the Értéktükör above the Értéktár (15 · 15.3)', function () {
+    $organization = Organization::factory()->create();
+    actingAsCustomer(customerOf($organization));
+
+    $this->get(route('client.home', $organization))
+        ->assertOk()
+        ->assertSeeInOrder(['A te utad', 'hol tartasz, és amit eddig behoztál', 'Értéktükör', 'Értéktár', 'Bölcsességtár'])
+        // The logo links home too; the menu row is the current page.
+        ->assertSeeInOrder([route('client.home', $organization), 'aria-current="page"', 'A te utad'], false);
 });
 
 it('starts an invited member’s way with the Értéktükör, marked in the menu too', function () {
@@ -102,6 +115,8 @@ it('shows the leader of a draft diagnosis their steps and the team\'s, not click
         ->assertSee('Meghívó')
         ->assertSee('indulás: '.today()->addWeek()->format('m.d.'))
         ->assertSee('A csapat az induláskor ('.today()->addWeek()->format('m.d.').') kap meghívót.')
+        // The leader's last step starts it; the end has the day it is done (23 · 23.1, 23.4).
+        ->assertSeeInOrder(['Indul a diagnózis', 'Elkészül a diagnózisotok · '.$main->publishes_on->format('m.d.')])
         ->assertDontSeeHtml('href="'.route('client.diagnosis.sajat-ertekek', [$setup['organization'], $main->diagnosis]).'"');
 });
 
@@ -146,7 +161,7 @@ it('says the start day is being agreed when the diagnosis has none', function ()
 
 it('tells a peer of a draft diagnosis who will invite them, with the peer\'s way', function () {
     $setup = diagnosisTeam(peers: 1);
-    startMainDiagnosis($setup, invite: false);
+    $main = startMainDiagnosis($setup, invite: false);
     actingAsCustomer($setup['peers'][0]);
 
     $this->get(route('client.home', $setup['organization']))
@@ -155,7 +170,7 @@ it('tells a peer of a draft diagnosis who will invite them, with the peer\'s way
         ->assertSee($setup['leader']->name.' hamarosan meghív a(z) '.$setup['team']->name.' diagnózisába.')
         ->assertSee('Indulás: '.today()->addWeek()->format('m.d.'))
         ->assertDontSee('Indulás: '.today()->addWeek()->format('m.d.').'.')
-        ->assertSee('Hozzáteszel')
+        ->assertSeeInOrder(['Hozzáteszel', 'Elkészül a diagnózisotok', $main->publishes_on->format('m.d.')])
         ->assertDontSee('A vezető útja');
 });
 

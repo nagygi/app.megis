@@ -43,7 +43,7 @@ it('renders every page of the leader with the frame', function (string $route, ?
     'V6·d' => ['client.diagnosis.process-list', 'Detektált folyamatok'],
     'V6·e' => ['client.diagnosis.process', 'Ops heti'],
     'V6·f' => ['client.diagnosis.process-summary', 'A folyamataid'],
-    'V9' => ['client.diagnosis.ki-lat-mit', 'Egy lap, a diagnózis végéig érvényes.'],
+    'V9' => ['client.diagnosis.ki-lat-mit', 'Mielőtt elindítod: ki mit lát a diagnózis végéig.'],
 ]);
 
 it('renders the peer\'s pages from the invitation to the home', function () {

@@ -78,7 +78,7 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 - Kikapcsolható: `MIRROR_DEEPENING=false`. Ilyenkor az ET4 az Értéktár szavait mutatja.
 - Az elfogadott vagy átírt definíció és a két skálavég a saját értékek lépésébe (24 · V2) készen érkezik, az Értéktár szövege helyett. Az átnevezett érték a felhasználó saját értékeként érkezik (24 · 24.5).
 
-**ET5 · teljes kép** (csak az A változat; a képernyőn: „Hogyan tovább?”, 2026-11-24)
+**ET5 · teljes kép** (csak az A változat; a képernyőn: „Hogyan tovább?”, 2026-11-24; a meghívott tag első tükrénél más: 6.2)
 
 - Charcoal sáv a manifesztó sorával: „Kell egy vízió, ami a belső forrásodtól a hatásodig tart.”
 - A fa kilenc eleme egy körön a felhasználó értékei körül: gyökér, törzs, korona, árnyék, talaj, micélium, évgyűrűk, a kör, illat.
@@ -129,7 +129,12 @@ Mobil-első publikus oldal (NFR: SEO, OG, sitemap, Turnstile).
 ### 6.2 Értéktükör a saját menüből
 
 - A bejelentkezett felhasználó *Értéktükör* menüpontja ugyanezt az utat nyitja meg, az ET4-gyel együtt. Az ET2-n nincs e-mail mező és elfogadó jelölőnégyzet. Alul „Befejezem”.
-- **A meghívott tag első tükre** (diagnózison kívül, nem magánszemélynél; 2026-11-24): az ET5 alján a kíváncsiság-kérdések helyén charcoal kártya: „Most nincs több dolgod · A mégis átnézi a tükrödet, és megvárjuk, hogy a csapattársaid is elkészítsék a sajátjukat. Ha indul a diagnózis, e-mailben kapsz meghívót.” A „Befejezem” a kezdőlapra visz, ahol ugyanez a kártya áll (26 · 26.4). Csapatszámláló nincs, mert kis csapatnál elárulná, ki nem töltötte még ki (25.4).
+- **A meghívott tag első tükre** (diagnózison kívül, nem magánszemélynél; 2026-11-24, átalakítva 2026-11-27): az ET5 neki a saját részének a vége.
+  - Cím: „Az értékeid:” (a „Hogyan tovább?” helyett), alatta a megtartott értékek nevei.
+  - A vízió-sáv helyén charcoal kártya: „Most nincs több dolgod · A mégis átnézi a tükrödet, és megvárjuk, hogy a csapattársaid is elkészítsék a sajátjukat. Ha indul a diagnózis, e-mailben kapsz meghívót.”, benne a minta riport linkje (26 · 26.4). Ugyanez a kártya áll a kezdőlapon.
+  - A fa kilenc eleme a kör közepén „A szervezetetek is olyan, mint egy fa” felirat körül, nem az értékek körül (azok már fent állnak). Alatta a Bölcsességtár-link marad.
+  - A gomb: „Vissza a kezdőlapra” („Befejezem” helyett, mert nem jön újabb lépés), és a kezdőlapra visz.
+  - Csapatszámláló nincs, mert kis csapatnál elárulná, ki nem töltötte még ki (25.4).
 - **Kíváncsiság-kérdések az ET5-ön:** csak magánszemélynél. A mégis által meghívott tag (nem magánszemély típusú szervezetben) nem kapja meg őket és az „Elküldöm”-et sem, mert vele már megállapodtak, miről lesz szó (2026-11-24).
 - Az *Értéktükör* lapján a felhasználó korábbi tükrei ebben a szervezetben („Korábbi tükreid”, a legutóbbi 10): dátum, a megtartott értékek, és egy link az eredményre.
 - **Egy tükör a meghívott tagnak** (nem magánszemély, diagnózison kívül; 2026-11-24): a menü *Értéktükör* pontja a meglévő tükör eredményét nyitja, „Korábbi tükreid” lista nincs. Az ET3 alján „Újrakezdem” (megerősítéssel: „Új tükröt veszel fel. Amikor beküldöd, a mostani tükröd és az értékei törlődnek.”). Az új tükör beküldésekor a korábbi törlődik (6.1 · Törlés), a hozzá tartozó automatikus diagnózissal együtt, ha az még „Jóváhagyásra vár”; a mégis által már publikált diagnózis megmarad. Az „Elmondom” út és a futó diagnózis tükrei nem ilyenek, magánszemélynél sincs korlát.

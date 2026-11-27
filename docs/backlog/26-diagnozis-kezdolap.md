@@ -76,6 +76,8 @@ Ha a felhasználó egy nem magánszemély típusú szervezet tagja, és még nem
 - A menüben az *Értéktükör* sor ugyaneddig coral aláhúzást és coral „!” jelet kap (15 · 15.3).
 - **Példa riport:** a „Most nincs több dolgod” kártyán (itt és az ET5-ön) link: „Így fog kinézni a riport · minta” → statikus mintalap kitalált adatokkal („Minta Kft.”): a riport gyűrűje, létrája, érték- és folyamatsorai, egy Útravaló-mondat. Felül végig coral „Minta” sáv: „Ez egy példa riport kitalált adatokkal. A te riportod a mégis csapat elemzése és jóváhagyása után jelenik meg.” A szövegeket a mégis nézi át (`lang/hu/sample_report.php`).
 - Csak a diagnózison kívüli tükör számít, a legutóbbi. Magánszemélynél nincs ilyen sor: ő a tükörrel érkezett.
+- **A lépéssor vége** (2026-11-27): a meghívott tag sora „Hozzáteszel”, majd „Elkészül a diagnózisotok” sorral zárul, mellette a publikálás dátuma, ha már van előkészülő diagnózis. Alatta „Útravaló · összehangoljuk az értékeidet és a szervezet folyamatait a mindennapokban” (25 · 25.3). A vezetőnél a vég képe „Elkészül a diagnózisotok · {dátum}” címet és a rés, Képességek, Folyamatok sorokat kapja (23 · 23.1); az utolsó lépése „Indul a diagnózis” (23 · 23.4).
+- A menü első pontja, „A te utad”, ide visz (15 · 15.3).
 
 ## Nincs benne
 

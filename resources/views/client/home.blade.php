@@ -102,8 +102,11 @@
                             @endif
                         </p>
                     </div>
-                    {{-- What comes later: adding while it runs is the last step of the line (prototype T2), the Útravaló after publishing (25 · 25.5, 29). --}}
-                    <x-diagnosis.step-list :steps="$preview['peerSteps']" :step-url="null" :open="false" :head="$mirrorHead" :tail="['title' => __('diagnosis.peer_add'), 'meta' => __('diagnosis.peer_add_help')]" />
+                    {{-- What comes later: adding while it runs, then the day the diagnosis is done, end the line (prototype T2, 25 · 25.3); the Útravaló after publishing (25 · 25.5, 29). --}}
+                    <x-diagnosis.step-list :steps="$preview['peerSteps']" :step-url="null" :open="false" :head="$mirrorHead" :tail="[
+                        ['title' => __('diagnosis.peer_add'), 'meta' => __('diagnosis.peer_add_help')],
+                        ['title' => __('diagnosis.end.finish'), 'meta' => $preview['main']?->publishes_on?->format('m.d.')],
+                    ]" />
                 </section>
 
                 <x-diagnosis.end-picture :main="$preview['main']" peer />

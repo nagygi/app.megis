@@ -5,8 +5,11 @@
     @if ($withdrawn)
         <x-ui.notice>{{ __('diagnosis.peer_home.withdrawn') }}</x-ui.notice>
     @elseif ($current && $main->acceptsInput())
-        {{-- T2: the lead lines are in the header (Overview::peerWelcomeHeader), as on V1. What comes later is the last step of the line (prototype T2). --}}
-        <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" :tail="['title' => __('diagnosis.peer_add'), 'meta' => __('diagnosis.peer_add_help')]" />
+        {{-- T2: the lead lines are in the header (Overview::peerWelcomeHeader), as on V1. What comes later ends the line: adding, then the day it is done (prototype T2, 25 · 25.3). --}}
+        <x-diagnosis.step-list :steps="$steps" :step-url="$stepUrl" :tail="[
+            ['title' => __('diagnosis.peer_add'), 'meta' => __('diagnosis.peer_add_help')],
+            ['title' => __('diagnosis.end.finish'), 'meta' => $main->publishes_on?->format('m.d.')],
+        ]" />
 
         <div class="flex flex-wrap items-center gap-3">
             <x-ui.button size="lg" icon-right="arrow-right" :href="$stepUrl($current->step)">

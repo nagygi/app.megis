@@ -22,10 +22,11 @@ A vezető útja az első belépéstől az „Indul a diagnózis” gombig: a lé
   - csak a termék valódi lépései szerepelnek. A kimaradó lépések (pl. a snapshotnál a csatornák és a társak) áthúzva sem jelennek meg;
   - pöttyök: coral az aktuális, pipa a kész, szürke a hátralévő.
 - **Gombok:** „Kezdjük” (elsődleges) és „Bővebben” (szöveges link a Bölcsességtárba, BT6, 32).
-- **A vég képe:** alatta szürkén, nem kattinthatóan, „A végén · {publikálás}” felirattal:
-  - Teljesnél: egy gyűrű kérdőjellel („Belső működés”), „A legnagyobb rés · amit látni véltek, és amit mutattok”, és „Négy fejezet · értékek · folyamatok · területek · a márkád alapja”;
-  - Belső snapshotnál: a gyűrű, a legnagyobb rés és „Egy lap”;
-  - bekapcsolt képességmérésnél egy sor is: „Képességek · amire építhettek, és ami hiányzik”.
+- **A vég képe:** alatta szürkén, nem kattinthatóan, „Elkészül a diagnózisotok · {publikálás}” felirattal (2026-11-27 előtt „A végén · {publikálás}”). Egy gyűrű kérdőjellel („Belső működés”), alatta a sorok:
+  - „A legnagyobb rés · amit látni véltek, és amit mutattok”;
+  - bekapcsolt képességmérésnél: „Képességek · amire építhettek, és ami hiányzik”;
+  - ha a termékben van Folyamatok lépés: „Folyamatok · amik az értékvezérelt működést támogatják”.
+  - A korábbi „Négy fejezet” (snapshotnál „Egy lap”) sor 2026-11-27 óta nincs.
 - **Belépéskor** (14 · 14.4) a kitöltés alatt mindig ez a lap nyílik.
 
 ### 23.2 Folytatás (V1·b)
@@ -49,7 +50,10 @@ A vezető útja az első belépéstől az „Indul a diagnózis” gombig: a lé
   - egyetlen gombja: „Tovább”;
   - akkor kész, ha a vezető megnézte.
 
-### 23.4 Ki lát mit (V9)
+### 23.4 Indul a diagnózis (V9)
+
+- **A lépés neve** a lépéssorban és a lap címében: „Indul a diagnózis”, alcíme: „Mielőtt elindítod: ki mit lát a diagnózis végéig.” (2026-11-27 előtt „Ki lát mit”, az ügyfél nem értette, mi ez). A megelőző lépés gombja ide „Tovább”, nem a lépés nevét viseli, mert az indítás a lap saját gombja.
+- Indulás után (a Profil linkjéről vagy a V10 Onboarding sorából) a lap címe „Ki lát mit”, alcíme „Egy lap, a diagnózis végéig érvényes.”, mert ekkor már csak tájékoztat.
 
 Egy lap, a diagnózis végéig érvényes. Szereplőnként két sor: mit lát, és mit nem.
 

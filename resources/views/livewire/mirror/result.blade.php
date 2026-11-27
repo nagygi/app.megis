@@ -191,28 +191,39 @@
             </div>
         @endunless
     @elseif ($step === 'full')
-        {{-- ET5 · the full picture: the tree around the values, and what the user is curious about --}}
+        {{--
+            ET5 · the full picture: the tree around the values, and what the user is curious about.
+            An invited member's first mirror ends their part (06 · 6.2, 2026-11-27): their values,
+            that there is nothing more to do, the organization as a tree, back to the home.
+        --}}
         <div class="flex flex-col gap-3">
             <x-ui.button tone="ghost" size="sm" icon="chevron-left" class="-ml-1.5 self-start" wire:click="showValues">{{ __('mirror.back_to_values') }}</x-ui.button>
             <div class="flex items-start gap-3">
                 <x-megis.symbol name="tree-of-life" class="mt-0.5 size-10 shrink-0 text-coral" />
                 <div class="flex flex-col gap-1">
-                    <{{ $heading }} class="{{ $headingClass }}">{{ __('mirror.full_title') }}</{{ $heading }}>
+                    <{{ $heading }} class="{{ $headingClass }}">{{ $waitsForTeam ? __('mirror.full_title_waiting') : __('mirror.full_title') }}</{{ $heading }}>
                     <p class="text-grey-700">{{ $keptGroups->pluck('name')->implode(' · ') }}</p>
                 </div>
             </div>
         </div>
 
-        <div class="on-dark relative overflow-hidden rounded-card bg-charcoal p-6 text-cream">
-            <x-megis.symbol name="root" class="absolute -top-10 -right-12 size-28 text-yellow" />
-            <p class="relative pr-10 text-2xl leading-tight font-extrabold uppercase">
-                {{ __('mirror.vision.line1') }}<br>
-                {{ __('mirror.vision.line2') }}<br>
-                <span class="text-yellow">{{ __('mirror.vision.line3') }}</span>
-            </p>
-        </div>
+        @if ($waitsForTeam)
+            <x-client.mirror-waiting>
+                <a href="{{ route('client.sample-report', $organization) }}" class="mt-1 self-start font-semibold">{{ __('sample_report.link') }}</a>
+            </x-client.mirror-waiting>
+        @else
+            <div class="on-dark relative overflow-hidden rounded-card bg-charcoal p-6 text-cream">
+                <x-megis.symbol name="root" class="absolute -top-10 -right-12 size-28 text-yellow" />
+                <p class="relative pr-10 text-2xl leading-tight font-extrabold uppercase">
+                    {{ __('mirror.vision.line1') }}<br>
+                    {{ __('mirror.vision.line2') }}<br>
+                    <span class="text-yellow">{{ __('mirror.vision.line3') }}</span>
+                </p>
+            </div>
+        @endif
 
-        @include('livewire.mirror.partials.tree-circle', ['names' => $keptGroups->pluck('name')])
+        {{-- The values are above already: an invited member's tree is the organization's --}}
+        @include('livewire.mirror.partials.tree-circle', ['names' => $keptGroups->pluck('name'), 'center' => $waitsForTeam ? __('mirror.tree_organization') : null])
 
         @unless ($isPublic)
             {{-- The tree's parts are told in the Bölcsességtár; it is behind the login, so not on the public page --}}
@@ -259,15 +270,10 @@
             @endif
         @endif
 
-        @if ($waitsForTeam)
-            <x-client.mirror-waiting>
-                <a href="{{ route('client.sample-report', $organization) }}" class="mt-1 self-start font-semibold">{{ __('sample_report.link') }}</a>
-            </x-client.mirror-waiting>
-        @endif
-
         @if (! $isPublic)
             <div>
-                <x-ui.button size="lg" wire:click="finish">{{ __('mirror.finish') }}</x-ui.button>
+                {{-- An invited member's first mirror goes back to the home: no step follows (26 · 26.4) --}}
+                <x-ui.button size="lg" wire:click="finish">{{ $waitsForTeam ? __('mirror.finish_home') : __('mirror.finish') }}</x-ui.button>
             </div>
         @elseif ($session->awaitsConfirmation())
             {{-- The link went out with the mirror; confirmed, the mirror stays in the account (06 · 6.1) --}}

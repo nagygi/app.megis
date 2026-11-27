@@ -40,7 +40,7 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
   - Képességek · 3 perc, egy szöveg friss helyzetekről (leírva, elmondva vagy feltöltve), csak ha a képességmérés be van kapcsolva (NM-12, 1.32). A vezető csak a számát látja;
   - Hozzáteszel · amíg fut, egy-egy helyzet (12).
 - **Gombok:** „Kezdjük”, és „Bővebben” a Bölcsességtárba (BT6, 32).
-- **A vég képe:** alatta szürkén, a publikálás dátumával: „Útravaló · a te értékeid”.
+- **A vég képe** (2026-11-27): a lépéssor utolsó két sora „Hozzáteszel · amíg fut · egy-egy helyzet” és „Elkészül a diagnózisotok”, mellette a publikálás dátuma (ha még nincs diagnózis, dátum nélkül). Alatta szürkén: „Útravaló · összehangoljuk az értékeidet és a szervezet folyamatait a mindennapokban”. Korábban „A végén · {dátum}” cím alatt „Útravaló · a te értékeid” állt; az ügyfél egyiket sem értette.
 - Kilépés után ugyanez fogad, a coral pötty ott áll, ahol abbahagyta (mint a V1·b).
 
 ### 25.4 A megélésed (T4)
@@ -59,7 +59,7 @@ Csak a Teljes termékben és csak csapatnál van társ (17.3).
   - Saját értékek: a nevek, a 24-re visz;
   - A megélésed: „az elején · {dátum}”, a T4-re visz;
   - Helyzetek: „{n} elmondva · {k} dokumentum · mindegyikhez a megélésed”, a T5·b-re visz (12 · 12.5).
-- **Útravaló:** szürkén, jobbra „publikálás: {dátum}” (MEGIS-4). Publikálás után él (29).
+- **Útravaló:** szürkén, „Útravaló · összehangoljuk az értékeidet és a szervezet folyamatait a mindennapokban” (2026-11-27), jobbra „publikálás: {dátum}” (MEGIS-4). Publikálás után él (29).
 - **Értéktár:** a csapat értékei, definícióval, pont nélkül.
 - **A coral plusz** (15 · 15.5) a feltöltésre visz (12). A „Hova tartozik” listán csak azok a folyamatok vannak, amelyekben a társ résztvevő (12).
 - Az olvasat indításától a coral plusz eltűnik. Publikálás után a saját értékek és a megélés csak olvashatók (21.3).

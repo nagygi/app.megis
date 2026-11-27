@@ -18,6 +18,9 @@ return [
         'diagnosis_window' => ':product · :from – :to',
         // M1: the menu's question and the line under each item.
         'heading' => 'Mit akarsz megérteni?',
+        // The first item: the home, the way ahead and what came so far (2026-11-27).
+        'journey' => 'A te utad',
+        'journey_meta' => 'hol tartasz, és amit eddig behoztál',
         'mirror' => 'Értéktükör',
         'mirror_meta' => 'egy helyzet, és a benne hallható értékeid',
         // For the screen reader with the coral "!" of a menu item (26 · 26.4).

@@ -13,9 +13,10 @@ use Illuminate\View\View;
 use Livewire\Component;
 
 /**
- * V9 · Ki lát mit (23 · 23.4): who sees what, valid until the end; the only
- * button starts the diagnosis. It only informs, nothing can be switched here.
- * A peer reads their own version from the Profile (31 · 31.5).
+ * V9 · Indul a diagnózis, before 2026-11-27 "Ki lát mit" (23 · 23.4): who
+ * sees what, valid until the end; the only button starts the diagnosis. It
+ * only informs, nothing can be switched here. A peer reads their own version
+ * from the Profile (31 · 31.5), still called "Ki lát mit".
  */
 class Visibility extends Component
 {
@@ -50,16 +51,23 @@ class Visibility extends Component
                 'actors' => $this->peerActors(),
                 'isLeader' => false,
             ])->layout('layouts::client', [
-                'title' => DiagnosisStep::Visibility->label(),
+                'title' => __('client.profile.visibility'),
                 'subtitle' => __('diagnosis.visibility.lead'),
                 'back' => route('client.profile', $this->organization),
                 'backLabel' => __('client.profile.title'),
                 'color' => 'cream',
-            ])->title(DiagnosisStep::Visibility->label());
+            ])->title(__('client.profile.visibility'));
         }
 
         $steps = $this->steps();
         $missing = $steps->firstMissing(except: DiagnosisStep::Visibility);
+        $beforeRunning = $this->main()->stage->isBeforeRunning();
+        $layout = $this->stepLayout(DiagnosisStep::Visibility, __('diagnosis.visibility.leader_lead'));
+
+        // Started, the page only tells who sees what, as the Profile's link names it.
+        if (! $beforeRunning) {
+            $layout = [...$layout, 'title' => __('client.profile.visibility'), 'subtitle' => __('diagnosis.visibility.lead')];
+        }
 
         return view('livewire.client.diagnosis.visibility', [
             'main' => $this->main(),
@@ -67,8 +75,8 @@ class Visibility extends Component
             'isLeader' => true,
             'missing' => $missing,
             'missingUrl' => $missing === null ? null : $this->stepUrl($missing->step),
-            'canStart' => $this->main()->stage->isBeforeRunning() && $missing === null,
-        ])->layout('layouts::client', $this->stepLayout(DiagnosisStep::Visibility, __('diagnosis.visibility.lead')))->title(DiagnosisStep::Visibility->label());
+            'canStart' => $beforeRunning && $missing === null,
+        ])->layout('layouts::client', $layout)->title($layout['title']);
     }
 
     /**

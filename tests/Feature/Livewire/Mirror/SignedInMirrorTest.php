@@ -75,6 +75,9 @@ it('shows no account step and no booking, and keeps the curiosity questions when
         ->call('showValue', 1)
         ->call('approve')
         ->call('showFull')
+        ->assertSee('Hogyan tovább?')
+        ->assertSee('Kell egy vízió, ami')
+        ->assertSee('Befejezem')
         ->assertDontSee('Nézd meg a leveled')
         ->assertDontSee('https://foglalas.example.com')
         ->set('curiosity', ['gap'])
@@ -103,7 +106,7 @@ it('mails the questions in the user’s name, with a link to their datasheet', f
     });
 });
 
-it('asks an invited member no curiosity questions, and points to the tree in the Bölcsességtár', function () {
+it('ends an invited member’s first mirror with their values, nothing more to do and the organization’s tree', function () {
     Mail::fake();
     $organization = Organization::factory()->create();
     actingAsCustomer(customerOf($organization));
@@ -113,14 +116,17 @@ it('asks an invited member no curiosity questions, and points to the tree in the
         ->call('showValue', 1)
         ->call('approve')
         ->call('showFull')
-        ->assertSee('Hogyan tovább?')
+        ->assertSeeHtmlInOrder(['Az értékeid:', 'Most nincs több dolgod', 'A szervezetetek is olyan, mint egy fa', 'Mit jelentenek a fa részei?', 'Vissza a kezdőlapra'])
+        ->assertDontSee('Hogyan tovább?')
+        ->assertDontSee('Kell egy vízió')
+        ->assertDontSee('a te értékeid')
+        ->assertDontSee('Befejezem')
         ->assertDontSee('Kíváncsi vagy?')
         ->assertDontSee('Elküldöm')
-        ->assertSee('Mit jelentenek a fa részei?')
+        ->assertSeeHtml(route('client.sample-report', $organization))
         ->assertSeeHtml(route('client.wisdom.show', [$organization, 'kuldetesfa']));
 
-    $result->assertSee('Most nincs több dolgod')
-        ->call('finish')
+    $result->call('finish')
         ->assertRedirect(route('client.home', $organization));
 
     $result->set('curiosity', ['gap'])->assertForbidden();
@@ -142,7 +148,7 @@ it('goes on to ET5 only once every kept value is approved, signed in', function 
 
     $this->get(route('client.mirror.result', [$organization, $session]).'?lap=full')
         ->assertOk()
-        ->assertDontSee('Hogyan tovább?');
+        ->assertDontSee('Az értékeid:');
 
     $result->call('showValue', 1)
         ->call('approve')

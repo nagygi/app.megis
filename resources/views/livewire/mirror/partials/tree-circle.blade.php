@@ -1,19 +1,29 @@
 {{--
     ET5 · the nine elements of the tree on a circle around the user's values
     (06 · 6.1). Clockwise from the top; it scales with the width of the phone.
+    With a center line instead (an invited member's first mirror, 06 · 6.2),
+    the circle stands around that line, not the values.
 --}}
 @php
     $elements = ['root', 'trunk', 'fruit', 'shade', 'soil', 'mycelium', 'growth-rings', 'circle', 'scent'];
+    $center ??= null;
+    $label = $center === null
+        ? __('mirror.circle_label', ['values' => $names->implode(', ')])
+        : __('mirror.circle_label_plain', ['center' => $center, 'elements' => collect($elements)->map(fn ($element) => __('mirror.elements.'.$element))->implode(', ')]);
 @endphp
 
-<figure class="relative mx-auto aspect-square w-full max-w-80" aria-label="{{ __('mirror.circle_label', ['values' => $names->implode(', ')]) }}">
+<figure class="relative mx-auto aspect-square w-full max-w-80" aria-label="{{ $label }}">
     <div class="absolute inset-[11%] rounded-full border-[1.5px] border-dashed border-grey-400" aria-hidden="true"></div>
 
     <div class="absolute inset-[26%] flex flex-col items-center justify-center gap-1 rounded-full bg-yellow p-3 text-center">
-        <span class="text-xs font-semibold tracking-wide uppercase">{{ __('mirror.your_values') }}</span>
-        @foreach ($names as $name)
-            <span class="text-sm leading-snug font-semibold">{{ $name }}</span>
-        @endforeach
+        @if ($center !== null)
+            <span class="text-sm leading-snug font-semibold [text-wrap:balance]">{{ $center }}</span>
+        @else
+            <span class="text-xs font-semibold tracking-wide uppercase">{{ __('mirror.your_values') }}</span>
+            @foreach ($names as $name)
+                <span class="text-sm leading-snug font-semibold">{{ $name }}</span>
+            @endforeach
+        @endif
     </div>
 
     <ul aria-hidden="true">

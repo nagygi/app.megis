@@ -51,8 +51,9 @@ it('walks the leader from V1 to "Indul a diagnózis"', function () {
     $page->assertSee('Milyen folyamataid vannak?')->assertNoAccessibilityIssues();
     $page->press('Kihagyom');
 
-    $page->assertSee('Egy lap, a diagnózis végéig érvényes.')->assertNoAccessibilityIssues();
-    $page->press('Indul a diagnózis');
+    $page->assertSee('Mielőtt elindítod: ki mit lát a diagnózis végéig.')->assertNoAccessibilityIssues();
+    // The page's title is "Indul a diagnózis" too (23 · 23.4): the button itself.
+    $page->click('button[wire\:click="startDiagnosis"]');
 
     // V10: the home while it runs (26 · 26.1).
     $page->assertSee('Hol tartunk')->assertNoAccessibilityIssues();

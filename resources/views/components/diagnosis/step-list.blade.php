@@ -2,13 +2,15 @@
     The steps of V1 / T2, the V10 onboarding and the home (23 · 23.1) as the
     prototype's line: a coral ring for the current step, a green tick for a
     done one, a grey ring for the rest, joined by a grey line. Done and
-    current steps open. The tail is a last row that does not open (T2:
-    Hozzáteszel, while it runs). The head is a first row before the steps
-    (the home of an invited member: the Értéktükör, 26 · 26.4); while it is
-    there, it is where the user stands, and no step below is the current one.
+    current steps open. The tail is the last rows, which do not open (T2:
+    Hozzáteszel while it runs, then the day the diagnosis is done; 25 · 25.3).
+    The head is a first row before the steps (the home of an invited member:
+    the Értéktükör, 26 · 26.4); while it is there, it is where the user
+    stands, and no step below is the current one.
     head: array{title: string, minutes: int, done: bool, lead: ?string, action: ?array{label: string, href: string, tone: string}}
+    tail: list<array{title: string, meta: ?string}>
 --}}
-@props(['steps', 'stepUrl', 'open' => true, 'tail' => null, 'head' => null])
+@props(['steps', 'stepUrl', 'open' => true, 'tail' => [], 'head' => null])
 
 @php($current = $head === null ? $steps->current() : null)
 
@@ -50,21 +52,26 @@
             <x-diagnosis.step-row
                 :state="$state"
                 :current="$isCurrent"
-                :last="$loop->last && $tail === null"
+                :last="$loop->last && $tail === []"
                 :href="$open && ($state->done || $isCurrent) ? $stepUrl($state->step) : null"
             />
         </li>
     @endforeach
 
-    @if ($tail)
+    @foreach ($tail as $row)
         <li class="flex gap-3 text-charcoal">
             <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
                 <span class="size-5.5 rounded-pill border-[1.5px] border-grey-500"></span>
+                @unless ($loop->last)
+                    <span class="mt-[3px] min-h-3.5 w-0.5 flex-1 bg-grey-250"></span>
+                @endunless
             </span>
-            <span class="flex min-w-0 flex-1 items-baseline justify-between gap-3 pt-0.5">
-                <span class="font-semibold">{{ $tail['title'] }}</span>
-                <span class="text-right text-sm text-grey-700">{{ $tail['meta'] }}</span>
+            <span @class(['flex min-w-0 flex-1 items-baseline justify-between gap-3 pt-0.5', 'min-h-11 pb-3.5' => ! $loop->last])>
+                <span class="font-semibold">{{ $row['title'] }}</span>
+                @if (filled($row['meta']))
+                    <span class="text-right text-sm text-grey-700 tabular-nums">{{ $row['meta'] }}</span>
+                @endif
             </span>
         </li>
-    @endif
+    @endforeach
 </ol>

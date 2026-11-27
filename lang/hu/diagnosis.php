@@ -50,19 +50,21 @@ return [
         'todo' => 'hátravan',
     ],
 
+    // The end of the way (23 · 23.1, 25 · 25.3); 2026-11-27 before: „A végén · :date”.
     'end' => [
-        'title' => 'A végén · :date',
-        'title_open' => 'A végén',
+        'title' => 'Elkészül a diagnózisotok · :date',
+        'title_open' => 'Elkészül a diagnózisotok',
+        // The last row of a peer's step line, the publishing day beside it.
+        'finish' => 'Elkészül a diagnózisotok',
         'ring' => 'Belső működés',
         'gap' => 'A legnagyobb rés',
         'gap_help' => 'amit látni véltek, és amit mutattok',
-        'chapters' => 'Négy fejezet',
-        'chapters_help' => 'értékek · folyamatok · területek · a márkád alapja',
-        'one_page' => 'Egy lap',
         'capabilities' => 'Képességek',
         'capabilities_help' => 'amire építhettek, és ami hiányzik',
-        'takeaway' => 'Útravaló · a te értékeid',
-        'takeaway_help' => 'a megélésed az elején, a helyzeteidben, és a többieké',
+        'processes' => 'Folyamatok',
+        'processes_help' => 'amik az értékvezérelt működést támogatják',
+        'takeaway' => 'Útravaló',
+        'takeaway_help' => 'összehangoljuk az értékeidet és a szervezet folyamatait a mindennapokban',
     ],
 
     'invitation' => [
@@ -161,7 +163,10 @@ return [
     ],
 
     'visibility' => [
+        // The peer's own page from the Profile (31 · 31.5).
         'lead' => 'Egy lap, a diagnózis végéig érvényes.',
+        // The leader's V9, the step "Indul a diagnózis" (23 · 23.4).
+        'leader_lead' => 'Mielőtt elindítod: ki mit lát a diagnózis végéig.',
         'actor' => [
             'you' => 'Te',
             'peers' => 'A társak',

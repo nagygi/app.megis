@@ -399,7 +399,8 @@ return [
         'experience' => 'A megélésed',
         'capabilities' => 'Képességek',
         'processes' => 'Folyamatok',
-        'visibility' => 'Ki lát mit',
+        // V9, where the leader starts it; 2026-11-27 before: „Ki lát mit” (23 · 23.4).
+        'visibility' => 'Indul a diagnózis',
     ],
 
 ];

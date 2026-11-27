@@ -127,6 +127,8 @@ return [
 
     // ET5 · teljes kép (on screen: „Hogyan tovább?”)
     'full_title' => 'Hogyan tovább?',
+    // An invited member's first mirror (06 · 6.2, 2026-11-27).
+    'full_title_waiting' => 'Az értékeid:',
     'back_to_values' => 'Az értékeid',
     'vision' => [
         'line1' => 'Kell egy vízió, ami',
@@ -135,6 +137,9 @@ return [
     ],
     'your_values' => 'a te értékeid',
     'circle_label' => 'A fa kilenc eleme a te értékeid körül: :values.',
+    // The invited member's tree: the organization, not the values (06 · 6.2).
+    'tree_organization' => 'A szervezetetek is olyan, mint egy fa',
+    'circle_label_plain' => ':center: :elements.',
     'tree_more' => 'Mit jelentenek a fa részei?',
     'tree_more_link' => 'Bölcsességtár',
     'elements' => [
@@ -163,6 +168,8 @@ return [
     'promise' => 'A megerősítés után a fiókodban: :values részletesen, mit jelent, miben látszik, mi az 1 és a 6.',
     'and_more' => 'És még :count érték az Értéktárban, böngészhetően.',
     'finish' => 'Befejezem',
+    // An invited member's first mirror: no step follows, the home waits (26 · 26.4).
+    'finish_home' => 'Vissza a kezdőlapra',
     // The end for an invited member, on ET5 and the home (06 · 6.2, 26 · 26.4).
     'waiting_title' => 'Most nincs több dolgod',
     'waiting' => 'A mégis átnézi a tükrödet, és megvárjuk, hogy a csapattársaid is elkészítsék a sajátjukat. Ha indul a diagnózis, e-mailben kapsz meghívót.',

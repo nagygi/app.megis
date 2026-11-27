@@ -2,6 +2,25 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
+## 1.119 · – · 2026-11-27
+
+Meghívott ügyféloldal, a második demó észrevételei (5. rész): „A te utad” a menüben, érthetőbb folyamatvég, „Indul a diagnózis”, az Értéktükör záró oldala.
+
+- **Menü:**
+  - **Eddig:** a kezdőlapra (folyamatábra, eddigi eredmények) csak a bal felső logó vitt vissza. Az *Értéktükör* az Értéktár (a vezetőnél a Tárak) alatt állt.
+  - **Most:** az első menüpont mindenkinek **„A te utad”** („hol tartasz, és amit eddig behoztál”), a kezdőlapra visz, és ott, illetve a diagnózis kezdőlapján aktív. Az *Értéktükör* az Értéktár, illetve a Tárak fölé került.
+- **A folyamatábra vége:**
+  - **Eddig:** „A végén · {dátum}” cím, a társnál alatta „Útravaló · a te értékeid / a megélésed az elején, a helyzeteidben, és a többieké”. Egyik sem volt érthető.
+  - **Most:** a társ (és a diagnózis előtti meghívott tag) lépéssora „Hozzáteszel” után **„Elkészül a diagnózisotok”** sorral zárul, mellette a publikálás napja. Alatta **„Útravaló · összehangoljuk az értékeidet és a szervezet folyamatait a mindennapokban”**; ugyanez a szöveg áll a T5 szaggatott Útravaló-dobozában. A vezető vég-képének címe „Elkészül a diagnózisotok · {dátum}”.
+- **A vezető vég-képének sorai:** „A legnagyobb rés” marad, a „Négy fejezet” (snapshotnál „Egy lap”) kikerült. Második a „Képességek” (továbbra is csak bekapcsolt képességmérésnél), harmadik a „Folyamatok · amik az értékvezérelt működést támogatják” (ha a termékben van Folyamatok lépés).
+- **„Ki lát mit” → „Indul a diagnózis”:**
+  - **Eddig:** a vezető utolsó lépése „Ki lát mit” volt; az ügyfél nem értette, mi ez.
+  - **Most:** a lépés neve „Indul a diagnózis”, a lap alcíme „Mielőtt elindítod: ki mit lát a diagnózis végéig.” A megelőző lépés gombja ide csak „Tovább”, hogy ne tűnjön indításnak. Indulás után a lap címe „Ki lát mit” marad (Profil-link, V10 Onboarding), és a társ Profilból nyíló lapja is.
+- **Az Értéktükör záró oldala (ET5), a meghívott tag első tükrénél:**
+  - **Eddig:** „Hogyan tovább?”, a „Kell egy vízió…” sáv, a fa a felhasználó értékei körül, alul a „Most nincs több dolgod” kártya és a „Befejezem”.
+  - **Most:** **„Az értékeid:”** és alatta az értékek; a vízió-sáv helyén felül a **„Most nincs több dolgod”** kártya a minta riport linkjével; a fa közepén **„A szervezetetek is olyan, mint egy fa”**; a gomb **„Vissza a kezdőlapra”**. A nyilvános, a magánszemélyes és a diagnózison belüli tükör ET5-je nem változott.
+- Jegyszövegek: 06 · 6.1, 6.2; 15 · 15.3; 23 · 23.1, 23.4; 25 · 25.3, 25.5; 26 · 26.4.
+
 ## 1.118 · 2a0c257 · 2026-11-24
 
 Meghívott ügyféloldal, az első demó észrevételei (4. rész): egy tükör, az admin ugyanazt látja, példa riport, anekdoták helye.

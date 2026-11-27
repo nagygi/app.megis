@@ -1,4 +1,4 @@
-{{-- V9 · Ki lát mit (23 · 23.4); the peer's own version from the Profile (31 · 31.5). --}}
+{{-- V9 · Indul a diagnózis, who sees what before the start (23 · 23.4); the peer's own "Ki lát mit" from the Profile (31 · 31.5). --}}
 <div class="flex max-w-2xl flex-col gap-6">
     <x-ui.flash />
 

@@ -124,13 +124,14 @@ trait InteractsWithMainDiagnosis
 
     /**
      * The name on "Tovább": the next step's, as in the prototype ("A szervezet
-     * értékei"); plain "Tovább" when it goes home.
+     * értékei"); plain "Tovább" when it goes home, and before V9, whose name
+     * "Indul a diagnózis" is its own button's (23 · 23.4).
      */
     public function nextLabel(DiagnosisStep $step): string
     {
         $next = $this->isRevisit() ? null : $this->steps()->after($step);
 
-        return $next?->step->label() ?? __('diagnosis.next');
+        return $next === null || $next->step === DiagnosisStep::Visibility ? __('diagnosis.next') : $next->step->label();
     }
 
     /**

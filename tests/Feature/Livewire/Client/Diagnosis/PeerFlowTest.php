@@ -41,7 +41,10 @@ it('asks the peer for the consents before anything else (T1)', function () {
     // T2 has its own header, so the page loads again.
     $this->get(route('client.diagnosis.show', peerParams($setup, $main)))
         ->assertSee('Első belépés')
-        ->assertSee('Két lépés most, egy amíg fut.');
+        ->assertSee('Két lépés most, egy amíg fut.')
+        // The line ends with the day it is done, the Útravaló under it (25 · 25.3).
+        ->assertSeeInOrder(['Hozzáteszel', 'Elkészül a diagnózisotok', $main->publishes_on->format('m.d.'), 'Útravaló', 'összehangoljuk az értékeidet és a szervezet folyamatait a mindennapokban'])
+        ->assertDontSee('A végén');
 
     $consent = Consent::query()->where('user_id', $peer->id)->sole();
     expect($consent->kind)->toBe(ConsentKind::Answers)
@@ -136,7 +139,7 @@ it('lets a peer fill in the own values and the experience, answering the recorde
         ->assertSee('0 elmondva · 0 dokumentum')
         ->assertSee('az elején · '.$experience->diagnosed_on->format('m.d.').' · három érték')
         // The Útravaló's day says what it is (MEGIS-4).
-        ->assertSeeInOrder(['Útravaló · a te értékeid', 'publikálás: '.$main->publishes_on->format('m.d.')])
+        ->assertSeeInOrder(['Útravaló', 'összehangoljuk az értékeidet', 'publikálás: '.$main->publishes_on->format('m.d.')])
         ->assertSee('Coach');
 
     $this->get(route('client.diagnosis.show', peerParams($setup, $main)))
@@ -179,7 +182,7 @@ it('keeps the peer\'s home after closing without publishing, its rows no longer 
         ->assertSee('Türelem')
         ->assertSee($setup['team']->name.' · Teljes · lezárva')
         // No report, so no Útravaló: neither its row nor the day it would have come.
-        ->assertDontSee('Útravaló · a te értékeid')
+        ->assertDontSee('összehangoljuk az értékeidet')
         ->assertDontSee('publikálás:');
 
     foreach ($stepLinks as $link) {
@@ -320,6 +323,12 @@ it('shows the peer their own "Ki lát mit", linked from the Profile (31 · 31.5)
     Livewire::test(Visibility::class, peerParams($setup, $main))
         ->assertSee('a válaszaid összesítve, legalább 3 kitöltőnél')
         ->assertSee('a neved, az egyéni válaszaid, az idézeteid')
+        ->assertDontSee('Indul a diagnózis');
+
+    // The leader's V9 is "Indul a diagnózis"; the peer's page keeps its name (23 · 23.4).
+    $this->get(route('client.diagnosis.ki-lat-mit', peerParams($setup, $main)))
+        ->assertOk()
+        ->assertSee('<title>Ki lát mit', false)
         ->assertDontSee('Indul a diagnózis');
 
     Consent::create(['user_id' => $peer->id, 'main_diagnosis_id' => $main->id, 'kind' => ConsentKind::Quotes, 'text_version' => 'v', 'text' => 't', 'given_at' => now()]);

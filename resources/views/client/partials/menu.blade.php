@@ -103,6 +103,9 @@
     <nav class="flex-1 px-6 pt-3 pb-6" aria-label="{{ __('client.menu.title') }}">
         @if ($currentOrganization)
             <ul class="flex flex-col">
+                {{-- The home, with the way ahead and what came so far; it opens the diagnosis once there is one (15 · 15.3, 26 · 26.4). --}}
+                <x-client.menu-link :href="route('client.home', $currentOrganization)" :title="__('client.menu.journey')" :meta="__('client.menu.journey_meta')" symbol="spiral" :active="request()->routeIs('client.home', 'client.diagnosis.show')" />
+
                 @if ($reports->isNotEmpty() || $standaloneReports->isNotEmpty())
                     <x-client.menu-group :title="__('report.menu.reports')" :meta="$reportsMeta" symbol="growth-rings" :open="$reportsOpen">
                         @foreach ($reports as $reportMain)
@@ -133,6 +136,8 @@
                     </x-client.menu-group>
                 @endif
 
+                <x-client.menu-link :href="route('client.mirror.record', $currentOrganization)" :title="__('client.menu.mirror')" :meta="__('client.menu.mirror_meta')" symbol="tree-of-life" :active="request()->routeIs('client.mirror.*')" :attention="$mirrorWaits" />
+
                 @php($valuesMeta = $valueCount > 0 ? __('client.menu.value_library_meta', ['count' => $valueCount]) : __('client.menu.value_library_browse'))
                 @if ($showsProcesses || $showsCapabilities)
                     <x-client.menu-group
@@ -153,7 +158,6 @@
                     <x-client.menu-link :href="route('client.values', $currentOrganization)" :title="__('client.menu.value_library')" :meta="$valuesMeta" symbol="fruit" :active="$valuesActive" />
                 @endif
 
-                <x-client.menu-link :href="route('client.mirror.record', $currentOrganization)" :title="__('client.menu.mirror')" :meta="__('client.menu.mirror_meta')" symbol="tree-of-life" :active="request()->routeIs('client.mirror.*')" :attention="$mirrorWaits" />
                 <x-client.menu-link :href="route('client.wisdom.index', $currentOrganization)" :title="__('wisdom.menu')" :meta="__('client.menu.wisdom_meta')" symbol="growth-rings" :active="request()->routeIs('client.wisdom.*')" />
 
                 @if ($reports->isNotEmpty())

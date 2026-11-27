@@ -54,9 +54,11 @@ Egy szint, lenyitható csoportokkal.
 
 | Kinek | Menüpontok |
 |---|---|
-| Vezető | Riportok · Fejezetek · Tárak (Értéktár, Folyamatok) · Bölcsességtár |
-| Társ | Saját nézet · Értéktár |
+| Vezető | A te utad · Riportok · Fejezetek · Értéktükör · Tárak (Értéktár, Képességtár, Folyamatok) · Bölcsességtár · Honnan tudjuk? |
+| Társ, meghívott tag | A te utad · Értéktükör · Értéktár · Bölcsességtár |
 
+- **A te utad** (2026-11-27): az első menüpont mindenkinek, a kezdőlapra visz (14.4), ahol a folyamatábra és az eddig behozott anyag látszik. Ha már van diagnózisa, a kezdőlap azt nyitja (26 · 26.4). A bal felső logó is a kezdőlapra visz.
+- Az *Értéktükör* közvetlenül az Értéktár (a vezetőnél a Tárak) fölött áll (2026-11-27).
 - A menü alján: az ügyfél-sor (15.4), a Profil és a Kijelentkezés.
 - Nem menüpont: Ma, Mérés, Idővonal, Heti összefoglaló, Felvétel.
 - Egy menüpont csak akkor látszik, ha:

@@ -55,8 +55,13 @@ it('shows the leader what awaits and moves the diagnosis to filling on the first
         ->assertSee('kb. 13 perc · '.$main->starts_on->format('m.d.').'-ig')
         ->assertSee('Saját értékek')
         ->assertSee('A márkád alapja')
-        ->assertSee('Ki lát mit')
-        ->assertSee('Kezdjük');
+        // V9, the start; before 2026-11-27 "Ki lát mit" (23 · 23.4).
+        ->assertSee('Indul a diagnózis')
+        ->assertDontSee('Ki lát mit')
+        ->assertSee('Kezdjük')
+        // The end: the day it is done, the gap and the processes (23 · 23.1).
+        ->assertSeeInOrder(['Elkészül a diagnózisotok · '.$main->publishes_on->format('m.d.'), 'A legnagyobb rés', 'Folyamatok', 'amik az értékvezérelt működést támogatják'])
+        ->assertDontSee('Négy fejezet');
 
     expect($main->refresh()->stage)->toBe(MainDiagnosisStage::Filling);
 });
