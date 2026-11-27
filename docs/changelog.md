@@ -2,7 +2,7 @@
 
 A legfrissebb verzió van felül. Formátum: `## {verzió} · {commit-hash} · {commit dátuma}`.
 
-## 1.119 · – · 2026-11-27
+## 1.119 · 92ac389 · 2026-11-27
 
 Meghívott ügyféloldal, a második demó észrevételei (5. rész): „A te utad” a menüben, érthetőbb folyamatvég, „Indul a diagnózis”, az Értéktükör záró oldala.
 
